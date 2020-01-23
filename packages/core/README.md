@@ -1,1 +1,1 @@
-# core
+# Vue Sync 🔰
