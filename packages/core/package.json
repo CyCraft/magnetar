@@ -33,11 +33,7 @@
     "vuex": "^3.1.2"
   },
   "ava": {
-    "extensions": [
-      "ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ]
+    "extensions": ["ts"],
+    "require": ["ts-node/register"]
   }
 }

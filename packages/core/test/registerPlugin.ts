@@ -6,4 +6,6 @@ test('Should register plugin', t => {
   t.is(vueSyncVuexState.vuexInstance, null)
   const plugin = VueSyncVuex({ vuexInstance: store })
   t.is(vueSyncVuexState.vuexInstance.state.test, 1)
+  const { vuexInstance } = plugin
+  t.is(vuexInstance.state.test, 1)
 })
