@@ -2,21 +2,21 @@ import { reactive } from 'vue'
 import { Store } from 'vuex'
 import { plainObject } from '../../src/types'
 
-interface Config {
+interface VueSyncVuexConfig {
   vuexInstance: null | Store<plainObject> | plainObject
 }
+
 interface VueSyncVuexState {
   vuexInstance: null | Store<plainObject> | plainObject
+  insert: (payload: plainObject) => Promise<void>
 }
 
-// export const vueSyncVuexState: VueSyncVuexState = {
-//   vuexInstance: null,
-// }
-export const vueSyncVuexState: VueSyncVuexState = reactive({
-  vuexInstance: null,
-})
-
-export const VueSyncVuex = (config: Config) => {
-  vueSyncVuexState.vuexInstance = config.vuexInstance
-  return vueSyncVuexState
+export const VueSyncVuex = (config: VueSyncVuexConfig): VueSyncVuexState => {
+  return {
+    vuexInstance: config.vuexInstance,
+    insert: async (payload: plainObject): Promise<void> => {
+      console.log('vuex mock insert → ', payload)
+      return
+    },
+  }
 }
