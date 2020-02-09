@@ -1,21 +1,21 @@
-import { plainObject, Actions } from './types'
+import { ActionName, PluginAction, ActionType } from './types/actions'
 import { CreateModuleWithContext, ModuleConfig } from './CreateModule'
 
-type storeName = string
+type StoreName = string
 
 export interface VueSyncConfig {
   stores: {
     [storeName: string]: {
-      actions: { [action in Actions]?: (payload: plainObject) => Promise<any> }
+      actions: { [action in ActionName]?: PluginAction }
       config: { [key: string]: any } // any other config the plugin needs
     }
   }
   executionOrder: {
-    reads: storeName[]
-    writes: storeName[]
-  } & {
-    [action in Actions]?: storeName[]
-  }
+    [actionType in ActionType]?: StoreName[]
+  } &
+    {
+      [action in ActionName]?: StoreName[]
+    }
 }
 
 export interface VueSyncInstance {

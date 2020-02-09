@@ -1,21 +1,25 @@
 import { reactive } from 'vue'
-import { plainObject } from '../../src/types'
+import { plainObject, ActionName, PluginAction } from '../../src/types/actions'
 
-interface Config {
+interface PluginConfig {
   firebaseInstance: null | plainObject
 }
-interface VueSyncFirestoreState {
-  firebaseInstance: null | plainObject
+type PluginActions = {
+  [action in ActionName]?: PluginAction
+}
+interface PluginState {
+  actions: PluginActions
+  config: PluginConfig
 }
 
-export const vueSyncFirestoreState: VueSyncFirestoreState = {
-  firebaseInstance: null,
+export const vueSyncFirestoreState: PluginState = {
+  config: {
+    firebaseInstance: null,
+  },
+  actions: {},
 }
-// export const vueSyncFirestoreState: vueSyncFirestoreState = reactive({
-//   firebaseInstance: null,
-// })
 
-export const VueSyncFirestore = (config: Config) => {
-  vueSyncFirestoreState.firebaseInstance = config.firebaseInstance
+export const VueSyncFirestore = (config: PluginConfig): PluginState => {
+  vueSyncFirestoreState.config = config
   return vueSyncFirestoreState
 }

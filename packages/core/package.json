@@ -6,7 +6,10 @@
   "module": "dist/index.esm.js",
   "typings": "types/index.d.ts",
   "scripts": {
-    "test": "ava --verbose"
+    "build": "npm run lint && npm run test && npm run rollup",
+    "test": "ava --verbose",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "rollup": "rollup -c build.js"
   },
   "repository": {
     "type": "git",
@@ -18,6 +21,9 @@
     "url": "https://github.com/vue-sync/core/issues"
   },
   "homepage": "https://github.com/vue-sync/core#readme",
+  "dependencies": {
+    "is-what": "^3.6.0"
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.18.0",
     "@typescript-eslint/parser": "^2.18.0",
