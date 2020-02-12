@@ -1,4 +1,4 @@
-export type plainObject = { [key: string]: any }
+import { plainObject, Config } from './base'
 
 export type ActionName = 'insert' | 'merge' | 'assign' | 'get' | 'stream'
 
@@ -12,26 +12,6 @@ export const actionNameTypeMap: { [action in ActionName]: ActionType } = {
   stream: 'read',
 }
 
-export type EventName = 'before' | 'success' | 'error'
-
-// export interface EventParams<T> {}
-
-export type EventFn = <T extends plainObject>(args: {
-  payload: T
-  abort: () => void
-  error?: any
-}) => Partial<T> | Promise<Partial<T>>
-
-export interface ActionConfig {
-  on?: {
-    [storeName: string]: {
-      [key in EventName]?: EventFn
-    } & {
-      aborted?: <T extends plainObject>(
-        args: { payload: T; error?: any } & { at: EventName }
-      ) => Partial<T> | Promise<Partial<T>>
-    }
-  }
-}
+export type ActionConfig = Config
 
 export type PluginAction = <T extends plainObject>(payload: T, actionConfig?: ActionConfig) => Promise<Partial<T>> // prettier-ignore

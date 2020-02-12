@@ -80,7 +80,7 @@ function handleAction(args) {
                     result = payload // the payload throughout the stages
                     ;
                     if (!on.before) return [3 /*break*/, 4];
-                    eventResult = on.before({ payload: payload, abort: abort });
+                    eventResult = on.before({ payload: result, abort: abort });
                     if (!isWhat.isPromise(eventResult)) return [3 /*break*/, 2];
                     return [4 /*yield*/, eventResult];
                 case 1:
@@ -96,7 +96,7 @@ function handleAction(args) {
                     if (!abortExecution) return [3 /*break*/, 9];
                     wasAborted();
                     if (!on.aborted) return [3 /*break*/, 8];
-                    eventResult = on.aborted({ at: 'before', payload: payload });
+                    eventResult = on.aborted({ at: 'before', payload: result });
                     if (!isWhat.isPromise(eventResult)) return [3 /*break*/, 6];
                     return [4 /*yield*/, eventResult];
                 case 5:
@@ -105,20 +105,20 @@ function handleAction(args) {
                 case 6:
                     _b = eventResult;
                     _g.label = 7;
-                case 7: return [2 /*return*/, _b];
-                case 8: 
-                // return the result when there's no event
-                return [2 /*return*/, result];
+                case 7:
+                    result = _b;
+                    _g.label = 8;
+                case 8: return [2 /*return*/, result];
                 case 9:
                     _g.trys.push([9, 11, , 21]);
-                    return [4 /*yield*/, pluginAction(payload)];
+                    return [4 /*yield*/, pluginAction(result)];
                 case 10:
                     result = _g.sent();
                     return [3 /*break*/, 21];
                 case 11:
                     error_1 = _g.sent();
                     if (!on.error) return [3 /*break*/, 15];
-                    eventResult = on.error({ payload: payload, abort: abort, error: error_1 });
+                    eventResult = on.error({ payload: result, abort: abort, error: error_1 });
                     if (!isWhat.isPromise(eventResult)) return [3 /*break*/, 13];
                     return [4 /*yield*/, eventResult];
                 case 12:
@@ -134,7 +134,7 @@ function handleAction(args) {
                     if (!abortExecution) return [3 /*break*/, 20];
                     wasAborted();
                     if (!on.aborted) return [3 /*break*/, 19];
-                    eventResult = on.aborted({ at: 'error', payload: payload });
+                    eventResult = on.aborted({ at: 'error', payload: result });
                     if (!isWhat.isPromise(eventResult)) return [3 /*break*/, 17];
                     return [4 /*yield*/, eventResult];
                 case 16:
@@ -143,14 +143,14 @@ function handleAction(args) {
                 case 17:
                     _d = eventResult;
                     _g.label = 18;
-                case 18: return [2 /*return*/, _d];
-                case 19: 
-                // return the result when there's no event
-                return [2 /*return*/, result];
+                case 18:
+                    result = _d;
+                    _g.label = 19;
+                case 19: return [2 /*return*/, result];
                 case 20: return [3 /*break*/, 21];
                 case 21:
                     if (!on.success) return [3 /*break*/, 25];
-                    eventResult = on.success({ payload: payload, abort: abort });
+                    eventResult = on.success({ payload: result, abort: abort });
                     if (!isWhat.isPromise(eventResult)) return [3 /*break*/, 23];
                     return [4 /*yield*/, eventResult];
                 case 22:
@@ -166,7 +166,7 @@ function handleAction(args) {
                     if (!abortExecution) return [3 /*break*/, 30];
                     wasAborted();
                     if (!on.aborted) return [3 /*break*/, 29];
-                    eventResult = on.aborted({ at: 'success', payload: payload });
+                    eventResult = on.aborted({ at: 'success', payload: result });
                     if (!isWhat.isPromise(eventResult)) return [3 /*break*/, 27];
                     return [4 /*yield*/, eventResult];
                 case 26:
@@ -175,10 +175,10 @@ function handleAction(args) {
                 case 27:
                     _f = eventResult;
                     _g.label = 28;
-                case 28: return [2 /*return*/, _f];
-                case 29: 
-                // return the result when there's no event
-                return [2 /*return*/, result];
+                case 28:
+                    result = _f;
+                    _g.label = 29;
+                case 29: return [2 /*return*/, result];
                 case 30: return [2 /*return*/, result];
             }
         });
@@ -216,7 +216,7 @@ function CreateModuleWithContext(moduleConfig, vueSyncConfig) {
                         return [3 /*break*/, 4];
                     case 2: return [4 /*yield*/, handleAction({
                             pluginAction: pluginAction,
-                            payload: payload,
+                            payload: result,
                             actionConfig: actionConfig,
                             storeName: storeName,
                             wasAborted: wasAborted,

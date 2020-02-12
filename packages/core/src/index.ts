@@ -1,21 +1,28 @@
-import { ActionName, PluginAction, ActionType } from './types/actions'
+import merge from 'merge-anything'
+import { ActionName, PluginAction } from './types/actions'
 import { CreateModuleWithContext, ModuleConfig } from './CreateModule'
+import { Config } from './types/base'
 
-type StoreName = string
-
-export interface VueSyncConfig {
+export type VueSyncConfig = {
   stores: {
     [storeName: string]: {
       actions: { [action in ActionName]?: PluginAction }
       config: { [key: string]: any } // any other config the plugin needs
     }
   }
-  executionOrder: {
-    [actionType in ActionType]?: StoreName[]
-  } &
-    {
-      [action in ActionName]?: StoreName[]
-    }
+} & Config
+
+function configWithDefaults (config: VueSyncConfig): Required<VueSyncConfig> {
+  const defaults: Required<Config> = {
+    executionOrder: {
+      read: [],
+      write: [],
+    },
+    onError: 'stop',
+    on: {},
+  }
+  return merge(defaults, config)
+  // return { ...defaults, ...config }
 }
 
 export interface VueSyncInstance {
@@ -24,11 +31,11 @@ export interface VueSyncInstance {
 }
 
 export function VueSync (vueSyncConfig: VueSyncConfig): VueSyncInstance {
-  const config = vueSyncConfig
+  const globalConfig = configWithDefaults(vueSyncConfig)
   const createModule = (moduleConfig: ModuleConfig): ReturnType<typeof CreateModuleWithContext> =>
-    CreateModuleWithContext(moduleConfig, vueSyncConfig)
+    CreateModuleWithContext(moduleConfig, globalConfig)
   return {
-    config,
+    config: globalConfig,
     createModule,
   }
 }

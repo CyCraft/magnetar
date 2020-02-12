@@ -72,6 +72,12 @@ test('emits fail events', async t => {
           return payload
         },
       },
+      remote: {
+        before: ({ payload, abort }) => {
+          t.fail()
+          return payload
+        },
+      },
     },
   })
   // @ts-ignore
@@ -90,11 +96,21 @@ test('can abort in before events', async t => {
           ranAllEvents.push(1)
           return payload
         },
+        aborted: ({ payload, at }) => {
+          t.is(at, 'before')
+          return payload
+        },
         success: ({ payload, abort }) => {
           t.fail()
           return payload
         },
         error: ({ payload, abort }) => {
+          t.fail()
+          return payload
+        },
+      },
+      remote: {
+        before: ({ payload, abort }) => {
           t.fail()
           return payload
         },
@@ -121,6 +137,10 @@ test('can abort in success events', async t => {
           abort()
           return payload
         },
+        aborted: ({ payload, at }) => {
+          t.is(at, 'success')
+          return payload
+        },
       },
       remote: {
         before: ({ payload, abort }) => {
@@ -133,4 +153,38 @@ test('can abort in success events', async t => {
   // @ts-ignore
   t.deepEqual(result, insertPayload)
   t.is(ranAllEvents.length, 2)
+})
+
+test('can mutate payload via events', async t => {
+  const insertPayload = { name: 'luca' }
+  const result = await usersModule.insert(insertPayload, {
+    on: {
+      local: {
+        before: ({ payload, abort }) => {
+          // @ts-ignore
+          t.deepEqual(payload, { name: 'luca' })
+          return { ...payload, age: 0 }
+        },
+        success: ({ payload, abort }) => {
+          // @ts-ignore
+          t.deepEqual(payload, { name: 'luca', age: 0 })
+          return { ...payload, lastName: 'ban' }
+        },
+      },
+      remote: {
+        before: ({ payload, abort }) => {
+          // @ts-ignore
+          t.deepEqual(payload, { name: 'luca', age: 0, lastName: 'ban' })
+          return { ...payload, power: 'flight' }
+        },
+        success: ({ payload, abort }) => {
+          // @ts-ignore
+          t.deepEqual(payload, { name: 'luca', age: 0, lastName: 'ban', power: 'flight' })
+          return { ...payload, strength: 9000 }
+        },
+      },
+    },
+  })
+  // @ts-ignore
+  t.deepEqual(result, { name: 'luca', age: 0, lastName: 'ban', power: 'flight', strength: 9000 })
 })

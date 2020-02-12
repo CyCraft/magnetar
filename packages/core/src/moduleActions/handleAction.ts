@@ -4,11 +4,11 @@ import { plainObject, PluginAction, ActionConfig } from '../types/actions'
 export async function handleAction<Payload extends plainObject> (args: {
   pluginAction: PluginAction
   payload: Payload
-  actionConfig: ActionConfig
+  config: ActionConfig
   storeName: string
-  wasAborted: () => void
+  stopExecutionAfterAction: () => void
 }): Promise<Partial<Payload>> {
-  const { pluginAction, payload, actionConfig, storeName, wasAborted } = args
+  const { pluginAction, payload, actionConfig, storeName, stopExecutionAfterAction } = args
   const { on: onPerStore } = actionConfig
   const on = onPerStore[storeName] || {}
   // create abort mechanism for current scope
@@ -19,54 +19,51 @@ export async function handleAction<Payload extends plainObject> (args: {
   let result: Partial<Payload> = payload // the payload throughout the stages
   // before hook
   if (on.before) {
-    const eventResult = on.before({ payload, abort })
+    const eventResult = on.before({ payload: result, abort })
     result = isPromise(eventResult) ? await eventResult : eventResult
   }
   // abort?
   if (abortExecution) {
-    wasAborted()
+    stopExecutionAfterAction()
     // return whatever is returned in the aborted event
     if (on.aborted) {
-      const eventResult = on.aborted({ at: 'before', payload })
-      return isPromise(eventResult) ? await eventResult : eventResult
+      const eventResult = on.aborted({ at: 'before', payload: result })
+      result = isPromise(eventResult) ? await eventResult : eventResult
     }
-    // return the result when there's no event
     return result
   }
   try {
-    result = await pluginAction(payload)
+    result = await pluginAction(result)
   } catch (error) {
     // error hook
     if (on.error) {
-      const eventResult = on.error({ payload, abort, error })
+      const eventResult = on.error({ payload: result, abort, error })
       result = isPromise(eventResult) ? await eventResult : eventResult
     }
     // abort?
     if (abortExecution) {
-      wasAborted()
+      stopExecutionAfterAction()
       // return whatever is returned in the aborted event
       if (on.aborted) {
-        const eventResult = on.aborted({ at: 'error', payload })
-        return isPromise(eventResult) ? await eventResult : eventResult
+        const eventResult = on.aborted({ at: 'error', payload: result })
+        result = isPromise(eventResult) ? await eventResult : eventResult
       }
-      // return the result when there's no event
       return result
     }
   }
   // success hook
   if (on.success) {
-    const eventResult = on.success({ payload, abort })
+    const eventResult = on.success({ payload: result, abort })
     result = isPromise(eventResult) ? await eventResult : eventResult
   }
   // abort?
   if (abortExecution) {
-    wasAborted()
+    stopExecutionAfterAction()
     // return whatever is returned in the aborted event
     if (on.aborted) {
-      const eventResult = on.aborted({ at: 'success', payload })
-      return isPromise(eventResult) ? await eventResult : eventResult
+      const eventResult = on.aborted({ at: 'success', payload: result })
+      result = isPromise(eventResult) ? await eventResult : eventResult
     }
-    // return the result when there's no event
     return result
   }
   return result
