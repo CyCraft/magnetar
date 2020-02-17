@@ -1,69 +1,67 @@
 import { isPromise } from 'is-what'
-import { plainObject, PluginAction, ActionConfig } from '../types/actions'
+import { VueSyncAction, isVueSyncError, ActionName } from '../types/actions'
+import { PlainObject, EventNameFnsMap, Config } from '../types/base'
+import { O } from 'ts-toolbelt'
 
-export async function handleAction<Payload extends plainObject> (args: {
-  pluginAction: PluginAction
+export async function handleAction<Payload extends PlainObject> (args: {
+  pluginAction: VueSyncAction
   payload: Payload
-  config: ActionConfig
-  storeName: string
-  stopExecutionAfterAction: () => void
+  eventNameFnsMap: O.Compulsory<EventNameFnsMap>
+  onError: Config['onError']
+  actionName: ActionName
+  stopExecutionAfterAction: (arg?: boolean | 'revert') => void
 }): Promise<Partial<Payload>> {
-  const { pluginAction, payload, actionConfig, storeName, stopExecutionAfterAction } = args
-  const { on: onPerStore } = actionConfig
-  const on = onPerStore[storeName] || {}
+  const {
+    pluginAction,
+    payload,
+    eventNameFnsMap: on,
+    onError,
+    actionName,
+    stopExecutionAfterAction,
+  } = args
   // create abort mechanism for current scope
   let abortExecution = false
   function abort (): void {
     abortExecution = true
   }
   let result: Partial<Payload> = payload // the payload throughout the stages
-  // before hook
-  if (on.before) {
-    const eventResult = on.before({ payload: result, abort })
+  // handle and await each eventFn in sequence
+  for (const fn of on.before) {
+    const eventResult = fn({ payload: result, actionName, abort })
     result = isPromise(eventResult) ? await eventResult : eventResult
   }
   // abort?
   if (abortExecution) {
     stopExecutionAfterAction()
-    // return whatever is returned in the aborted event
-    if (on.aborted) {
-      const eventResult = on.aborted({ at: 'before', payload: result })
-      result = isPromise(eventResult) ? await eventResult : eventResult
-    }
     return result
   }
   try {
     result = await pluginAction(result)
   } catch (error) {
-    // error hook
-    if (on.error) {
-      const eventResult = on.error({ payload: result, abort, error })
+    if (!isVueSyncError(error)) throw new Error(error)
+    // handle and await each eventFn in sequence
+    for (const fn of on.error) {
+      const eventResult = fn({ payload: error.payload, actionName, abort, error })
       result = isPromise(eventResult) ? await eventResult : eventResult
     }
     // abort?
-    if (abortExecution) {
+    if (abortExecution || onError === 'stop') {
       stopExecutionAfterAction()
-      // return whatever is returned in the aborted event
-      if (on.aborted) {
-        const eventResult = on.aborted({ at: 'error', payload: result })
-        result = isPromise(eventResult) ? await eventResult : eventResult
-      }
+      throw error
+    }
+    if (onError === 'revert') {
+      stopExecutionAfterAction('revert')
       return result
     }
   }
-  // success hook
-  if (on.success) {
-    const eventResult = on.success({ payload: result, abort })
+  // handle and await each eventFn in sequence
+  for (const fn of on.success) {
+    const eventResult = fn({ payload: result, actionName, abort })
     result = isPromise(eventResult) ? await eventResult : eventResult
   }
   // abort?
   if (abortExecution) {
     stopExecutionAfterAction()
-    // return whatever is returned in the aborted event
-    if (on.aborted) {
-      const eventResult = on.aborted({ at: 'success', payload: result })
-      result = isPromise(eventResult) ? await eventResult : eventResult
-    }
     return result
   }
   return result

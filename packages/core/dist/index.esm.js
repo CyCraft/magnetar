@@ -1,4 +1,5 @@
-import { isPromise } from 'is-what';
+import { merge } from 'merge-anything';
+import { isAnyObject, isPromise } from 'is-what';
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -14,6 +15,17 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
+
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 
 function __awaiter(thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -52,200 +64,402 @@ function __generator(thisArg, body) {
     }
 }
 
+function __values(o) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+    if (m) return m.call(o);
+    return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+}
+
+function __read(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+}
+
 var actionNameTypeMap = {
+    get: 'read',
+    stream: 'read',
     insert: 'write',
     merge: 'write',
     assign: 'write',
-    get: 'read',
-    stream: 'read',
 };
+function isVueSyncError(payload) {
+    return isAnyObject(payload) && 'payload' in payload && 'message' in payload;
+}
 
 function handleAction(args) {
     return __awaiter(this, void 0, void 0, function () {
         function abort() {
             abortExecution = true;
         }
-        var pluginAction, payload, actionConfig, storeName, wasAborted, onPerStore, on, abortExecution, result, eventResult, _a, eventResult, _b, error_1, eventResult, _c, eventResult, _d, eventResult, _e, eventResult, _f;
-        return __generator(this, function (_g) {
-            switch (_g.label) {
+        var pluginAction, payload, on, onError, actionName, stopExecutionAfterAction, abortExecution, result, _a, _b, fn, eventResult, _c, e_1_1, error_1, _d, _e, fn, eventResult, _f, e_2_1, _g, _h, fn, eventResult, _j, e_3_1;
+        var e_1, _k, e_2, _l, e_3, _m;
+        return __generator(this, function (_o) {
+            switch (_o.label) {
                 case 0:
-                    pluginAction = args.pluginAction, payload = args.payload, actionConfig = args.actionConfig, storeName = args.storeName, wasAborted = args.wasAborted;
-                    onPerStore = actionConfig.on;
-                    on = onPerStore[storeName] || {};
+                    pluginAction = args.pluginAction, payload = args.payload, on = args.eventNameFnsMap, onError = args.onError, actionName = args.actionName, stopExecutionAfterAction = args.stopExecutionAfterAction;
                     abortExecution = false;
                     result = payload // the payload throughout the stages
                     ;
-                    if (!on.before) return [3 /*break*/, 4];
-                    eventResult = on.before({ payload: result, abort: abort });
-                    if (!isPromise(eventResult)) return [3 /*break*/, 2];
-                    return [4 /*yield*/, eventResult];
+                    _o.label = 1;
                 case 1:
-                    _a = _g.sent();
-                    return [3 /*break*/, 3];
+                    _o.trys.push([1, 8, 9, 10]);
+                    _a = __values(on.before), _b = _a.next();
+                    _o.label = 2;
                 case 2:
-                    _a = eventResult;
-                    _g.label = 3;
+                    if (!!_b.done) return [3 /*break*/, 7];
+                    fn = _b.value;
+                    eventResult = fn({ payload: result, actionName: actionName, abort: abort });
+                    if (!isPromise(eventResult)) return [3 /*break*/, 4];
+                    return [4 /*yield*/, eventResult];
                 case 3:
-                    result = _a;
-                    _g.label = 4;
+                    _c = _o.sent();
+                    return [3 /*break*/, 5];
                 case 4:
-                    if (!abortExecution) return [3 /*break*/, 9];
-                    wasAborted();
-                    if (!on.aborted) return [3 /*break*/, 8];
-                    eventResult = on.aborted({ at: 'before', payload: result });
-                    if (!isPromise(eventResult)) return [3 /*break*/, 6];
-                    return [4 /*yield*/, eventResult];
-                case 5:
-                    _b = _g.sent();
-                    return [3 /*break*/, 7];
-                case 6:
-                    _b = eventResult;
-                    _g.label = 7;
-                case 7:
-                    result = _b;
-                    _g.label = 8;
-                case 8: return [2 /*return*/, result];
-                case 9:
-                    _g.trys.push([9, 11, , 21]);
-                    return [4 /*yield*/, pluginAction(result)];
-                case 10:
-                    result = _g.sent();
-                    return [3 /*break*/, 21];
-                case 11:
-                    error_1 = _g.sent();
-                    if (!on.error) return [3 /*break*/, 15];
-                    eventResult = on.error({ payload: result, abort: abort, error: error_1 });
-                    if (!isPromise(eventResult)) return [3 /*break*/, 13];
-                    return [4 /*yield*/, eventResult];
-                case 12:
-                    _c = _g.sent();
-                    return [3 /*break*/, 14];
-                case 13:
                     _c = eventResult;
-                    _g.label = 14;
-                case 14:
+                    _o.label = 5;
+                case 5:
                     result = _c;
-                    _g.label = 15;
+                    _o.label = 6;
+                case 6:
+                    _b = _a.next();
+                    return [3 /*break*/, 2];
+                case 7: return [3 /*break*/, 10];
+                case 8:
+                    e_1_1 = _o.sent();
+                    e_1 = { error: e_1_1 };
+                    return [3 /*break*/, 10];
+                case 9:
+                    try {
+                        if (_b && !_b.done && (_k = _a["return"])) _k.call(_a);
+                    }
+                    finally { if (e_1) throw e_1.error; }
+                    return [7 /*endfinally*/];
+                case 10:
+                    // abort?
+                    if (abortExecution) {
+                        stopExecutionAfterAction();
+                        return [2 /*return*/, result];
+                    }
+                    _o.label = 11;
+                case 11:
+                    _o.trys.push([11, 13, , 24]);
+                    return [4 /*yield*/, pluginAction(result)];
+                case 12:
+                    result = _o.sent();
+                    return [3 /*break*/, 24];
+                case 13:
+                    error_1 = _o.sent();
+                    if (!isVueSyncError(error_1))
+                        throw new Error(error_1);
+                    _o.label = 14;
+                case 14:
+                    _o.trys.push([14, 21, 22, 23]);
+                    _d = __values(on.error), _e = _d.next();
+                    _o.label = 15;
                 case 15:
-                    if (!abortExecution) return [3 /*break*/, 20];
-                    wasAborted();
-                    if (!on.aborted) return [3 /*break*/, 19];
-                    eventResult = on.aborted({ at: 'error', payload: result });
+                    if (!!_e.done) return [3 /*break*/, 20];
+                    fn = _e.value;
+                    eventResult = fn({ payload: error_1.payload, actionName: actionName, abort: abort, error: error_1 });
                     if (!isPromise(eventResult)) return [3 /*break*/, 17];
                     return [4 /*yield*/, eventResult];
                 case 16:
-                    _d = _g.sent();
+                    _f = _o.sent();
                     return [3 /*break*/, 18];
                 case 17:
-                    _d = eventResult;
-                    _g.label = 18;
+                    _f = eventResult;
+                    _o.label = 18;
                 case 18:
-                    result = _d;
-                    _g.label = 19;
-                case 19: return [2 /*return*/, result];
-                case 20: return [3 /*break*/, 21];
+                    result = _f;
+                    _o.label = 19;
+                case 19:
+                    _e = _d.next();
+                    return [3 /*break*/, 15];
+                case 20: return [3 /*break*/, 23];
                 case 21:
-                    if (!on.success) return [3 /*break*/, 25];
-                    eventResult = on.success({ payload: result, abort: abort });
-                    if (!isPromise(eventResult)) return [3 /*break*/, 23];
-                    return [4 /*yield*/, eventResult];
+                    e_2_1 = _o.sent();
+                    e_2 = { error: e_2_1 };
+                    return [3 /*break*/, 23];
                 case 22:
-                    _e = _g.sent();
-                    return [3 /*break*/, 24];
+                    try {
+                        if (_e && !_e.done && (_l = _d["return"])) _l.call(_d);
+                    }
+                    finally { if (e_2) throw e_2.error; }
+                    return [7 /*endfinally*/];
                 case 23:
-                    _e = eventResult;
-                    _g.label = 24;
+                    // abort?
+                    if (abortExecution || onError === 'stop') {
+                        stopExecutionAfterAction();
+                        throw error_1;
+                    }
+                    if (onError === 'revert') {
+                        stopExecutionAfterAction('revert');
+                        return [2 /*return*/, result];
+                    }
+                    return [3 /*break*/, 24];
                 case 24:
-                    result = _e;
-                    _g.label = 25;
+                    _o.trys.push([24, 31, 32, 33]);
+                    _g = __values(on.success), _h = _g.next();
+                    _o.label = 25;
                 case 25:
-                    if (!abortExecution) return [3 /*break*/, 30];
-                    wasAborted();
-                    if (!on.aborted) return [3 /*break*/, 29];
-                    eventResult = on.aborted({ at: 'success', payload: result });
+                    if (!!_h.done) return [3 /*break*/, 30];
+                    fn = _h.value;
+                    eventResult = fn({ payload: result, actionName: actionName, abort: abort });
                     if (!isPromise(eventResult)) return [3 /*break*/, 27];
                     return [4 /*yield*/, eventResult];
                 case 26:
-                    _f = _g.sent();
+                    _j = _o.sent();
                     return [3 /*break*/, 28];
                 case 27:
-                    _f = eventResult;
-                    _g.label = 28;
+                    _j = eventResult;
+                    _o.label = 28;
                 case 28:
-                    result = _f;
-                    _g.label = 29;
-                case 29: return [2 /*return*/, result];
-                case 30: return [2 /*return*/, result];
+                    result = _j;
+                    _o.label = 29;
+                case 29:
+                    _h = _g.next();
+                    return [3 /*break*/, 25];
+                case 30: return [3 /*break*/, 33];
+                case 31:
+                    e_3_1 = _o.sent();
+                    e_3 = { error: e_3_1 };
+                    return [3 /*break*/, 33];
+                case 32:
+                    try {
+                        if (_h && !_h.done && (_m = _g["return"])) _m.call(_g);
+                    }
+                    finally { if (e_3) throw e_3.error; }
+                    return [7 /*endfinally*/];
+                case 33:
+                    // abort?
+                    if (abortExecution) {
+                        stopExecutionAfterAction();
+                        return [2 /*return*/, result];
+                    }
+                    return [2 /*return*/, result];
             }
         });
     });
 }
 
-function CreateModuleWithContext(moduleConfig, vueSyncConfig) {
-    var _this = this;
-    var insert = function (payload, actionConfig) {
-        if (actionConfig === void 0) { actionConfig = {}; }
-        return __awaiter(_this, void 0, void 0, function () {
-            function wasAborted() {
-                abortExecution = true;
-            }
-            var storesToExecute, abortExecution, result, _i, storesToExecute_1, storeName, pluginAction, _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        storesToExecute = vueSyncConfig.executionOrder.insert ||
-                            vueSyncConfig.executionOrder[actionNameTypeMap.insert] ||
-                            [];
-                        if (storesToExecute.length === 0) {
-                            throw new Error('None of your store plugins have implemented this function.');
-                        }
-                        abortExecution = false;
-                        result = payload;
-                        _i = 0, storesToExecute_1 = storesToExecute;
-                        _b.label = 1;
-                    case 1:
-                        if (!(_i < storesToExecute_1.length)) return [3 /*break*/, 6];
-                        storeName = storesToExecute_1[_i];
-                        pluginAction = vueSyncConfig.stores[storeName].actions.insert;
-                        if (!!pluginAction) return [3 /*break*/, 2];
-                        _a = result;
-                        return [3 /*break*/, 4];
-                    case 2: return [4 /*yield*/, handleAction({
-                            pluginAction: pluginAction,
-                            payload: result,
-                            actionConfig: actionConfig,
-                            storeName: storeName,
-                            wasAborted: wasAborted,
-                        })];
-                    case 3:
-                        _a = _b.sent();
-                        _b.label = 4;
-                    case 4:
-                        // the plugin action
-                        result = _a;
-                        if (abortExecution)
-                            return [2 /*return*/, result];
-                        _b.label = 5;
-                    case 5:
-                        _i++;
-                        return [3 /*break*/, 1];
-                    case 6: return [2 /*return*/, result];
-                }
-            });
-        });
-    };
-    return {
-        insert: insert,
-    };
+// prettier-ignore
+function eventFnsMapWithDefaults(eventNameFnsMap) {
+    if (eventNameFnsMap === void 0) { eventNameFnsMap = {}; }
+    return merge({ before: [], success: [], error: [], revert: [] }, eventNameFnsMap);
 }
 
+function getEventFnsPerStore(globalConfig, moduleConfig, actionConfig) {
+    var result = [globalConfig, moduleConfig, actionConfig].reduce(function (carry, configPartial) {
+        var onPerStore = configPartial.on || {};
+        Object.entries(onPerStore).forEach(function (_a) {
+            var _b = __read(_a, 2), storeName = _b[0], eventFnMap = _b[1];
+            if (!(storeName in carry))
+                carry[storeName] = {};
+            Object.entries(eventFnMap).forEach(function (_a) {
+                var _b = __read(_a, 2), eventName = _b[0], eventFn = _b[1];
+                if (!(eventName in carry[storeName]))
+                    carry[storeName][eventName] = [];
+                carry[storeName][eventName].push(eventFn);
+            });
+        }, {});
+        return carry;
+    }, {});
+    return result;
+}
+
+function CreateModuleWithContext(moduleConfig, globalConfig) {
+    function createActionHandler(actionName, actionType) {
+        return function (payload, actionConfig) {
+            if (actionConfig === void 0) { actionConfig = {}; }
+            return __awaiter(this, void 0, void 0, function () {
+                /**
+                 * The abort mechanism for the entire store chain. When executed in handleAction() it won't go to the next store in executionOrder.
+                 *
+                 */
+                function stopExecutionAfterAction(trueOrRevert) {
+                    if (trueOrRevert === void 0) { trueOrRevert = true; }
+                    stopExecution = trueOrRevert;
+                }
+                var config, eventFnsPerStore, storesToExecute, stopExecution, result, _a, _b, _c, i, storeName, pluginAction, _d, storesToRevert, storesToRevert_1, storesToRevert_1_1, storeToRevert, revertAction, eventNameFnsMap, _e, _f, fn, eventResult, _g, e_1_1, e_2_1, e_3_1;
+                var e_3, _h, e_2, _j, e_1, _k;
+                return __generator(this, function (_l) {
+                    switch (_l.label) {
+                        case 0:
+                            config = merge(globalConfig, moduleConfig, actionConfig);
+                            eventFnsPerStore = getEventFnsPerStore(globalConfig, moduleConfig, actionConfig);
+                            storesToExecute = config.executionOrder.insert || config.executionOrder[actionNameTypeMap.insert] || [];
+                            if (storesToExecute.length === 0) {
+                                throw new Error('None of your store plugins have implemented this function.');
+                            }
+                            stopExecution = false;
+                            result = payload;
+                            _l.label = 1;
+                        case 1:
+                            _l.trys.push([1, 26, 27, 28]);
+                            _a = __values(storesToExecute.entries()), _b = _a.next();
+                            _l.label = 2;
+                        case 2:
+                            if (!!_b.done) return [3 /*break*/, 25];
+                            _c = __read(_b.value, 2), i = _c[0], storeName = _c[1];
+                            pluginAction = globalConfig.stores[storeName].actions.insert;
+                            if (!!pluginAction) return [3 /*break*/, 3];
+                            _d = result;
+                            return [3 /*break*/, 5];
+                        case 3: return [4 /*yield*/, handleAction({
+                                pluginAction: pluginAction,
+                                payload: result,
+                                eventNameFnsMap: eventFnsMapWithDefaults(eventFnsPerStore[storeName]),
+                                onError: config.onError,
+                                actionName: actionName,
+                                stopExecutionAfterAction: stopExecutionAfterAction,
+                            })
+                            // handle reverting
+                        ];
+                        case 4:
+                            _d = _l.sent();
+                            _l.label = 5;
+                        case 5:
+                            // the plugin action
+                            result = _d;
+                            if (!(stopExecution === 'revert')) return [3 /*break*/, 23];
+                            storesToRevert = storesToExecute.slice(0, i);
+                            storesToRevert.reverse();
+                            _l.label = 6;
+                        case 6:
+                            _l.trys.push([6, 20, 21, 22]);
+                            storesToRevert_1 = (e_2 = void 0, __values(storesToRevert)), storesToRevert_1_1 = storesToRevert_1.next();
+                            _l.label = 7;
+                        case 7:
+                            if (!!storesToRevert_1_1.done) return [3 /*break*/, 19];
+                            storeToRevert = storesToRevert_1_1.value;
+                            revertAction = globalConfig.stores[storeToRevert].revert;
+                            return [4 /*yield*/, revertAction(result, actionName)
+                                // revert eventFns
+                            ];
+                        case 8:
+                            result = _l.sent();
+                            eventNameFnsMap = eventFnsMapWithDefaults(eventFnsPerStore[storeToRevert]);
+                            _l.label = 9;
+                        case 9:
+                            _l.trys.push([9, 16, 17, 18]);
+                            _e = (e_1 = void 0, __values(eventNameFnsMap.revert)), _f = _e.next();
+                            _l.label = 10;
+                        case 10:
+                            if (!!_f.done) return [3 /*break*/, 15];
+                            fn = _f.value;
+                            eventResult = fn({ payload: result, actionName: actionName });
+                            if (!isPromise(eventResult)) return [3 /*break*/, 12];
+                            return [4 /*yield*/, eventResult];
+                        case 11:
+                            _g = _l.sent();
+                            return [3 /*break*/, 13];
+                        case 12:
+                            _g = eventResult;
+                            _l.label = 13;
+                        case 13:
+                            result = _g;
+                            _l.label = 14;
+                        case 14:
+                            _f = _e.next();
+                            return [3 /*break*/, 10];
+                        case 15: return [3 /*break*/, 18];
+                        case 16:
+                            e_1_1 = _l.sent();
+                            e_1 = { error: e_1_1 };
+                            return [3 /*break*/, 18];
+                        case 17:
+                            try {
+                                if (_f && !_f.done && (_k = _e["return"])) _k.call(_e);
+                            }
+                            finally { if (e_1) throw e_1.error; }
+                            return [7 /*endfinally*/];
+                        case 18:
+                            storesToRevert_1_1 = storesToRevert_1.next();
+                            return [3 /*break*/, 7];
+                        case 19: return [3 /*break*/, 22];
+                        case 20:
+                            e_2_1 = _l.sent();
+                            e_2 = { error: e_2_1 };
+                            return [3 /*break*/, 22];
+                        case 21:
+                            try {
+                                if (storesToRevert_1_1 && !storesToRevert_1_1.done && (_j = storesToRevert_1["return"])) _j.call(storesToRevert_1);
+                            }
+                            finally { if (e_2) throw e_2.error; }
+                            return [7 /*endfinally*/];
+                        case 22: 
+                        // return result early to prevent going to the next store
+                        return [2 /*return*/, result];
+                        case 23:
+                            // handle abortion
+                            if (stopExecution === true) {
+                                // return result early to prevent going to the next store
+                                return [2 /*return*/, result];
+                            }
+                            _l.label = 24;
+                        case 24:
+                            _b = _a.next();
+                            return [3 /*break*/, 2];
+                        case 25: return [3 /*break*/, 28];
+                        case 26:
+                            e_3_1 = _l.sent();
+                            e_3 = { error: e_3_1 };
+                            return [3 /*break*/, 28];
+                        case 27:
+                            try {
+                                if (_b && !_b.done && (_h = _a["return"])) _h.call(_a);
+                            }
+                            finally { if (e_3) throw e_3.error; }
+                            return [7 /*endfinally*/];
+                        case 28: return [2 /*return*/, result];
+                    }
+                });
+            });
+        };
+    }
+    var actions = Object.entries(actionNameTypeMap).reduce(function (carry, _a) {
+        var _b = __read(_a, 2), actionName = _b[0], actionType = _b[1];
+        carry[actionName] = createActionHandler(actionName);
+        return carry;
+    }, {});
+    return __assign({}, actions);
+}
+
+function configWithDefaults(config) {
+    var defaults = {
+        executionOrder: {
+            read: [],
+            write: [],
+        },
+        onError: 'stop',
+        on: {},
+    };
+    var merged = merge(defaults, config);
+    return merged;
+}
 function VueSync(vueSyncConfig) {
-    var config = vueSyncConfig;
+    var globalConfig = configWithDefaults(vueSyncConfig);
     var createModule = function (moduleConfig) {
-        return CreateModuleWithContext(moduleConfig, vueSyncConfig);
+        return CreateModuleWithContext(moduleConfig, globalConfig);
     };
     return {
-        config: config,
+        globalConfig: globalConfig,
         createModule: createModule,
     };
 }

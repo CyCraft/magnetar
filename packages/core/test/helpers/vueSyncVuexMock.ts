@@ -1,20 +1,20 @@
-import { reactive } from 'vue'
 import { Store } from 'vuex'
-import { plainObject, ActionName, PluginAction } from '../../src/types/actions'
+import { ActionName, VueSyncAction } from '../../src/types/actions'
+import { PlainObject } from '../../src/types/base'
 
 interface PluginConfig {
-  vuexInstance: null | Store<plainObject> | plainObject
+  vuexInstance: null | Store<PlainObject> | PlainObject
 }
-type PluginActions = {
-  [action in ActionName]?: PluginAction
+type VueSyncActions = {
+  [action in ActionName]?: VueSyncAction
 }
 interface PluginState {
-  actions: PluginActions
+  actions: VueSyncActions
   config: PluginConfig
 }
 
 export const VueSyncVuex = (config: PluginConfig): PluginState => {
-  const insert: PluginAction = async payload => {
+  const insert: VueSyncAction = async payload => {
     return new Promise(resolve => {
       setTimeout(() => {
         resolve(payload)

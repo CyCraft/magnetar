@@ -1,8 +1,11 @@
-import { plainObject, PluginAction, ActionConfig } from '../types/actions';
-export declare function handleAction<Payload extends plainObject>(args: {
-    pluginAction: PluginAction;
+import { VueSyncAction, ActionName } from '../types/actions';
+import { PlainObject, EventNameFnsMap, Config } from '../types/base';
+import { O } from 'ts-toolbelt';
+export declare function handleAction<Payload extends PlainObject>(args: {
+    pluginAction: VueSyncAction;
     payload: Payload;
-    actionConfig: ActionConfig;
-    storeName: string;
-    wasAborted: () => void;
+    eventNameFnsMap: O.Compulsory<EventNameFnsMap>;
+    onError: Config['onError'];
+    actionName: ActionName;
+    stopExecutionAfterAction: (arg?: boolean | 'revert') => void;
 }): Promise<Partial<Payload>>;

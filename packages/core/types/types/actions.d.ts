@@ -1,29 +1,17 @@
-export declare type plainObject = {
-    [key: string]: any;
-};
-export declare type ActionName = 'insert' | 'merge' | 'assign' | 'get' | 'stream';
-export declare type ActionType = 'write' | 'read';
+import { PlainObject, Config } from './base';
+export declare type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign';
+export declare type ActionType = 'read' | 'write';
 export declare const actionNameTypeMap: {
     [action in ActionName]: ActionType;
 };
-export declare type EventName = 'before' | 'success' | 'error';
-export declare type EventFn = <T extends plainObject>(args: {
-    payload: T;
-    abort: () => void;
-    error?: any;
-}) => Partial<T> | Promise<Partial<T>>;
-export interface ActionConfig {
-    on?: {
-        [storeName: string]: {
-            [key in EventName]?: EventFn;
-        } & {
-            aborted?: <T extends plainObject>(args: {
-                payload: T;
-                error?: any;
-            } & {
-                at: EventName;
-            }) => Partial<T> | Promise<Partial<T>>;
-        };
-    };
-}
-export declare type PluginAction = <T extends plainObject>(payload: T, actionConfig?: ActionConfig) => Promise<Partial<T>>;
+export declare type ActionConfig = Partial<Config>;
+export declare type VueSyncReadAction = <T extends PlainObject>(payload: T, actionConfig?: ActionConfig) => Promise<Partial<T>>;
+export declare type VueSyncWriteAction = <T extends PlainObject>(payload: T, actionConfig?: ActionConfig) => Promise<Partial<T>>;
+export declare type VueSyncAction = VueSyncReadAction | VueSyncWriteAction;
+export declare type VueSyncError = {
+    payload: PlainObject;
+    message: string;
+    code?: number;
+    errors?: VueSyncError[];
+};
+export declare function isVueSyncError(payload: any): payload is VueSyncError;

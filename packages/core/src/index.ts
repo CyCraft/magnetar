@@ -1,19 +1,19 @@
-import merge from 'merge-anything'
-import { ActionName, PluginAction } from './types/actions'
+import { O } from 'ts-toolbelt'
+import { merge } from 'merge-anything'
 import { CreateModuleWithContext, ModuleConfig } from './CreateModule'
-import { Config } from './types/base'
+import { Config, PluginInstance } from './types/base'
 
-export type VueSyncConfig = {
-  stores: {
-    [storeName: string]: {
-      actions: { [action in ActionName]?: PluginAction }
-      config: { [key: string]: any } // any other config the plugin needs
+export type VueSyncConfig = O.Merge<
+  Partial<Config>,
+  {
+    stores: {
+      [storeName: string]: PluginInstance
     }
   }
-} & Config
+>
 
-function configWithDefaults (config: VueSyncConfig): Required<VueSyncConfig> {
-  const defaults: Required<Config> = {
+function configWithDefaults (config: VueSyncConfig): O.Compulsory<VueSyncConfig> {
+  const defaults: Config = {
     executionOrder: {
       read: [],
       write: [],
@@ -21,12 +21,12 @@ function configWithDefaults (config: VueSyncConfig): Required<VueSyncConfig> {
     onError: 'stop',
     on: {},
   }
-  return merge(defaults, config)
-  // return { ...defaults, ...config }
+  const merged = merge(defaults, config)
+  return merged
 }
 
 export interface VueSyncInstance {
-  config: VueSyncConfig
+  globalConfig: O.Compulsory<VueSyncConfig>
   createModule: (moduleConfig: ModuleConfig) => ReturnType<typeof CreateModuleWithContext>
 }
 
@@ -35,7 +35,7 @@ export function VueSync (vueSyncConfig: VueSyncConfig): VueSyncInstance {
   const createModule = (moduleConfig: ModuleConfig): ReturnType<typeof CreateModuleWithContext> =>
     CreateModuleWithContext(moduleConfig, globalConfig)
   return {
-    config: globalConfig,
+    globalConfig,
     createModule,
   }
 }

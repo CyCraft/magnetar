@@ -2,8 +2,8 @@ import test from 'ava'
 import { VueSync } from '../src/index'
 import { VueSyncGenericPlugin } from './helpers/pluginMock'
 
-const local = VueSyncGenericPlugin({})
-const remote = VueSyncGenericPlugin({})
+const local = VueSyncGenericPlugin({ storeName: 'local' })
+const remote = VueSyncGenericPlugin({ storeName: 'remote' })
 const vueSync = VueSync({
   stores: { local, remote },
   executionOrder: {
@@ -25,13 +25,13 @@ test('emits before & success events', async t => {
   const result = await usersModule.insert(insertPayload, {
     on: {
       local: {
-        before: ({ payload, abort }) => {
+        before: ({ payload }) => {
           // @ts-ignore
           t.deepEqual(payload, insertPayload)
           ranAllEvents.push(1)
           return payload
         },
-        success: ({ payload, abort }) => {
+        success: ({ payload }) => {
           // @ts-ignore
           t.deepEqual(payload, insertPayload)
           ranAllEvents.push(1)
@@ -39,13 +39,13 @@ test('emits before & success events', async t => {
         },
       },
       remote: {
-        before: ({ payload, abort }) => {
+        before: ({ payload }) => {
           // @ts-ignore
           t.deepEqual(payload, insertPayload)
           ranAllEvents.push(1)
           return payload
         },
-        success: ({ payload, abort }) => {
+        success: ({ payload }) => {
           // @ts-ignore
           t.deepEqual(payload, insertPayload)
           ranAllEvents.push(1)
@@ -59,58 +59,26 @@ test('emits before & success events', async t => {
   t.is(ranAllEvents.length, 4)
 })
 
-test('emits fail events', async t => {
-  const insertPayload = { name: 'luca', shouldFail: true }
-  let ranAllEvents = []
-  const result = await usersModule.insert(insertPayload, {
-    on: {
-      local: {
-        error: ({ payload, abort }) => {
-          // @ts-ignore
-          t.deepEqual(payload, insertPayload)
-          ranAllEvents.push(1)
-          return payload
-        },
-      },
-      remote: {
-        before: ({ payload, abort }) => {
-          t.fail()
-          return payload
-        },
-      },
-    },
-  })
-  // @ts-ignore
-  t.deepEqual(result, insertPayload)
-  t.is(ranAllEvents.length, 1)
-})
-
 test('can abort in before events', async t => {
-  const insertPayload = { name: 'luca', shouldFail: true }
-  let ranAllEvents = []
+  const insertPayload = { name: 'luca' }
   const result = await usersModule.insert(insertPayload, {
     on: {
       local: {
         before: ({ payload, abort }) => {
           abort()
-          ranAllEvents.push(1)
           return payload
         },
-        aborted: ({ payload, at }) => {
-          t.is(at, 'before')
-          return payload
-        },
-        success: ({ payload, abort }) => {
+        success: ({ payload }) => {
           t.fail()
           return payload
         },
-        error: ({ payload, abort }) => {
+        error: ({ payload }) => {
           t.fail()
           return payload
         },
       },
       remote: {
-        before: ({ payload, abort }) => {
+        before: ({ payload }) => {
           t.fail()
           return payload
         },
@@ -119,7 +87,6 @@ test('can abort in before events', async t => {
   })
   // @ts-ignore
   t.deepEqual(result, insertPayload)
-  t.is(ranAllEvents.length, 1)
 })
 
 test('can abort in success events', async t => {
@@ -128,7 +95,7 @@ test('can abort in success events', async t => {
   const result = await usersModule.insert(insertPayload, {
     on: {
       local: {
-        before: ({ payload, abort }) => {
+        before: ({ payload }) => {
           ranAllEvents.push(1)
           return payload
         },
@@ -137,13 +104,9 @@ test('can abort in success events', async t => {
           abort()
           return payload
         },
-        aborted: ({ payload, at }) => {
-          t.is(at, 'success')
-          return payload
-        },
       },
       remote: {
-        before: ({ payload, abort }) => {
+        before: ({ payload }) => {
           t.fail()
           return payload
         },
@@ -160,24 +123,24 @@ test('can mutate payload via events', async t => {
   const result = await usersModule.insert(insertPayload, {
     on: {
       local: {
-        before: ({ payload, abort }) => {
+        before: ({ payload }) => {
           // @ts-ignore
           t.deepEqual(payload, { name: 'luca' })
           return { ...payload, age: 0 }
         },
-        success: ({ payload, abort }) => {
+        success: ({ payload }) => {
           // @ts-ignore
           t.deepEqual(payload, { name: 'luca', age: 0 })
           return { ...payload, lastName: 'ban' }
         },
       },
       remote: {
-        before: ({ payload, abort }) => {
+        before: ({ payload }) => {
           // @ts-ignore
           t.deepEqual(payload, { name: 'luca', age: 0, lastName: 'ban' })
           return { ...payload, power: 'flight' }
         },
-        success: ({ payload, abort }) => {
+        success: ({ payload }) => {
           // @ts-ignore
           t.deepEqual(payload, { name: 'luca', age: 0, lastName: 'ban', power: 'flight' })
           return { ...payload, strength: 9000 }

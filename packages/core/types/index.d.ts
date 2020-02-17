@@ -1,26 +1,13 @@
-import { ActionName, PluginAction, ActionType } from './types/actions';
+import { O } from 'ts-toolbelt';
 import { CreateModuleWithContext, ModuleConfig } from './CreateModule';
-declare type StoreName = string;
-export interface VueSyncConfig {
+import { Config, PluginInstance } from './types/base';
+export declare type VueSyncConfig = O.Merge<Partial<Config>, {
     stores: {
-        [storeName: string]: {
-            actions: {
-                [action in ActionName]?: PluginAction;
-            };
-            config: {
-                [key: string]: any;
-            };
-        };
+        [storeName: string]: PluginInstance;
     };
-    executionOrder: {
-        [actionType in ActionType]?: StoreName[];
-    } & {
-        [action in ActionName]?: StoreName[];
-    };
-}
+}>;
 export interface VueSyncInstance {
-    config: VueSyncConfig;
+    globalConfig: O.Compulsory<VueSyncConfig>;
     createModule: (moduleConfig: ModuleConfig) => ReturnType<typeof CreateModuleWithContext>;
 }
 export declare function VueSync(vueSyncConfig: VueSyncConfig): VueSyncInstance;
-export {};

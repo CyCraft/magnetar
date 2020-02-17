@@ -1,14 +1,14 @@
-import { reactive } from 'vue'
-import { plainObject, ActionName, PluginAction } from '../../src/types/actions'
+import { ActionName, VueSyncAction } from '../../src/types/actions'
+import { PlainObject } from '../../src/types/base'
 
 interface PluginConfig {
-  firebaseInstance: null | plainObject
+  firebaseInstance: null | PlainObject
 }
-type PluginActions = {
-  [action in ActionName]?: PluginAction
+type VueSyncActions = {
+  [action in ActionName]?: VueSyncAction
 }
 interface PluginState {
-  actions: PluginActions
+  actions: VueSyncActions
   config: PluginConfig
 }
 

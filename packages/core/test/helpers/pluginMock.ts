@@ -1,27 +1,67 @@
-import { reactive } from 'vue'
-import { Store } from 'vuex'
-import { plainObject, ActionName, PluginAction } from '../../src/types/actions'
+import { ActionName, VueSyncAction, VueSyncError } from '../../src/types/actions'
+import { PluginInstance } from '../../src/types/base'
+import { PlainObject } from '../../types/types/actions'
 
-interface PluginConfig {}
-type PluginActions = {
-  [action in ActionName]?: PluginAction
+interface PluginConfig {
+  storeName: string
 }
-interface PluginState {
-  actions: PluginActions
-  config: PluginConfig
+type VueSyncActions = {
+  [action in ActionName]?: VueSyncAction
 }
 
-export const VueSyncGenericPlugin = (config: PluginConfig): PluginState => {
-  const insert: PluginAction = async payload => {
+function createGenericAction (storeName): VueSyncAction {
+  return async <T extends PlainObject>(payload: T): Promise<Partial<T>> => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        if (payload.shouldFail === true) reject(payload)
-        resolve(payload)
-      }, 1000)
+        if (payload.shouldFail === storeName) {
+          const errorToThrow: VueSyncError = {
+            payload,
+            message: 'fail',
+          }
+          reject(errorToThrow)
+        } else {
+          resolve(payload)
+        }
+      }, 10)
     })
   }
+}
+
+function createRevertAction (storeName) {
+  return function<T extends PlainObject> (payload: T, actionName: ActionName): Promise<T> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (payload.shouldFailOnRevert === storeName) {
+          const errorToThrow: VueSyncError = {
+            payload,
+            message: 'revert failed',
+          }
+          reject(errorToThrow)
+        } else {
+          resolve({ ...payload, reverted: { actionName, storeName } })
+        }
+      }, 10)
+    })
+  }
+}
+
+export const VueSyncGenericPlugin = (config: PluginConfig): PluginInstance => {
+  const { storeName } = config
+  const get = createGenericAction(storeName)
+  const stream = createGenericAction(storeName)
+  const insert = createGenericAction(storeName)
+  const merge = createGenericAction(storeName)
+  const assign = createGenericAction(storeName)
+  const revert = createRevertAction(storeName)
   return {
     config,
-    actions: { insert },
+    revert,
+    actions: {
+      get,
+      stream,
+      insert,
+      merge,
+      assign,
+    },
   }
 }
