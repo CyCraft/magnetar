@@ -1,6 +1,6 @@
 import { ActionName, VueSyncAction, VueSyncError } from '../../src/types/actions'
 import { PluginInstance } from '../../src/types/base'
-import { PlainObject } from '../../types/types/actions'
+import { PlainObject } from '../../types/types/base'
 
 interface PluginConfig {
   storeName: string
@@ -52,6 +52,8 @@ export const VueSyncGenericPlugin = (config: PluginConfig): PluginInstance => {
   const insert = createGenericAction(storeName)
   const merge = createGenericAction(storeName)
   const assign = createGenericAction(storeName)
+  const replace = createGenericAction(storeName)
+  const _delete = createGenericAction(storeName)
   const revert = createRevertAction(storeName)
   return {
     config,
@@ -62,6 +64,8 @@ export const VueSyncGenericPlugin = (config: PluginConfig): PluginInstance => {
       insert,
       merge,
       assign,
+      replace,
+      delete: _delete,
     },
   }
 }

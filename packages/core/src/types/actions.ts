@@ -1,7 +1,7 @@
 import { PlainObject, Config } from './base'
 import { isAnyObject } from 'is-what'
 
-export type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign'
+export type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign' | 'replace' | 'delete'
 
 export type ActionType = 'read' | 'write'
 
@@ -11,6 +11,8 @@ export const actionNameTypeMap: { [action in ActionName]: ActionType } = {
   insert: 'write',
   merge: 'write',
   assign: 'write',
+  replace: 'write',
+  delete: 'write',
 }
 
 export type ActionConfig = Partial<Config>
