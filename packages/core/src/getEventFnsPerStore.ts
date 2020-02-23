@@ -1,9 +1,9 @@
-import { Config, EventName, EventFn, EventFnsPerStore } from './types/base'
+import { SharedConfig, EventName, EventFn, EventFnsPerStore } from './types/base'
 
 export default function getEventFnsPerStore (
-  globalConfig: Partial<Config>,
-  moduleConfig: Partial<Config>,
-  actionConfig: Partial<Config>
+  globalConfig: Partial<SharedConfig>,
+  moduleConfig: Partial<SharedConfig>,
+  actionConfig: Partial<SharedConfig>
 ): EventFnsPerStore {
   const result = [globalConfig, moduleConfig, actionConfig].reduce((carry, configPartial) => {
     const onPerStore = configPartial.on || {}

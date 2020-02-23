@@ -1,18 +1,21 @@
 import { isPromise } from 'is-what'
-import { VueSyncAction, isVueSyncError, ActionName } from '../types/actions'
-import { PlainObject, EventNameFnsMap, Config } from '../types/base'
+import { isVueSyncError, ActionName } from '../types/actions'
+import { PlainObject, EventNameFnsMap, SharedConfig } from '../types/base'
 import { O } from 'ts-toolbelt'
+import { PluginAction, PluginActionConfig } from '../types/plugins'
 
 export async function handleAction<Payload extends PlainObject> (args: {
-  pluginAction: VueSyncAction
+  pluginAction: PluginAction
+  pluginActionConfig: PluginActionConfig
   payload: Payload
   eventNameFnsMap: O.Compulsory<EventNameFnsMap>
-  onError: Config['onError']
+  onError: SharedConfig['onError']
   actionName: ActionName
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
 }): Promise<Partial<Payload>> {
   const {
     pluginAction,
+    pluginActionConfig,
     payload,
     eventNameFnsMap: on,
     onError,
@@ -36,7 +39,7 @@ export async function handleAction<Payload extends PlainObject> (args: {
     return result
   }
   try {
-    result = await pluginAction(result)
+    result = await pluginAction(result, pluginActionConfig)
   } catch (error) {
     if (!isVueSyncError(error)) throw new Error(error)
     // handle and await each eventFn in sequence

@@ -1,10 +1,12 @@
 import { O } from 'ts-toolbelt'
 import { merge } from 'merge-anything'
-import { CreateModuleWithContext, ModuleConfig } from './CreateModule'
-import { Config, PluginInstance } from './types/base'
+import { CreateModuleWithContext, ModuleConfig, VueSyncModuleInstance } from './CreateModule'
+import { SharedConfig } from './types/base'
+import { PluginInstance } from './types/plugins'
 
+// this is what the dev passes as config to instanciate VueSync
 export type VueSyncConfig = O.Merge<
-  Partial<Config>,
+  Partial<SharedConfig>,
   {
     stores: {
       [storeName: string]: PluginInstance
@@ -13,7 +15,7 @@ export type VueSyncConfig = O.Merge<
 >
 
 function configWithDefaults (config: VueSyncConfig): O.Compulsory<VueSyncConfig> {
-  const defaults: Config = {
+  const defaults: SharedConfig = {
     executionOrder: {
       read: [],
       write: [],
@@ -25,17 +27,27 @@ function configWithDefaults (config: VueSyncConfig): O.Compulsory<VueSyncConfig>
   return merged
 }
 
+// this is the global VueSync instance
 export interface VueSyncInstance {
   globalConfig: O.Compulsory<VueSyncConfig>
-  createModule: (moduleConfig: ModuleConfig) => ReturnType<typeof CreateModuleWithContext>
+  createModule: CreateModule
 }
 
+// this is the `CreateModule` action exposed on the VueSync instance
+export type CreateModule = (moduleConfig: ModuleConfig) => VueSyncModuleInstance
+
 export function VueSync (vueSyncConfig: VueSyncConfig): VueSyncInstance {
+  // the passed VueSyncConfig is merged onto defaults
   const globalConfig = configWithDefaults(vueSyncConfig)
-  const createModule = (moduleConfig: ModuleConfig): ReturnType<typeof CreateModuleWithContext> =>
+
+  const createModule: CreateModule = moduleConfig =>
     CreateModuleWithContext(moduleConfig, globalConfig)
-  return {
+  // const createModule: VueSyncInstance['createModule'] = moduleConfig =>
+  //   CreateModuleWithContext(moduleConfig, globalConfig)
+
+  const instance: VueSyncInstance = {
     globalConfig,
     createModule,
   }
+  return instance
 }

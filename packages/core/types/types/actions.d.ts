@@ -1,10 +1,10 @@
-import { PlainObject, Config } from './base';
-export declare type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign';
+import { PlainObject, SharedConfig } from './base';
+export declare type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign' | 'replace' | 'delete';
 export declare type ActionType = 'read' | 'write';
 export declare const actionNameTypeMap: {
     [action in ActionName]: ActionType;
 };
-export declare type ActionConfig = Partial<Config>;
+export declare type ActionConfig = Partial<SharedConfig>;
 export declare type VueSyncReadAction = <T extends PlainObject>(payload: T, actionConfig?: ActionConfig) => Promise<Partial<T>>;
 export declare type VueSyncWriteAction = <T extends PlainObject>(payload: T, actionConfig?: ActionConfig) => Promise<Partial<T>>;
 export declare type VueSyncAction = VueSyncReadAction | VueSyncWriteAction;

@@ -1,4 +1,4 @@
-import { ActionType, ActionName, VueSyncError, VueSyncAction } from './actions'
+import { ActionType, ActionName, VueSyncError } from './actions'
 import { O } from 'ts-toolbelt'
 import { merge } from 'merge-anything'
 
@@ -30,8 +30,8 @@ export type EventFnsPerStore = {
   [storeName: string]: EventNameFnsMap
 }
 
-// config
-export interface Config {
+// the shared config which can be set globally < per module < or per action.
+export interface SharedConfig {
   executionOrder: {
     [actionType in ActionType]?: StoreName[]
   } &
@@ -47,12 +47,4 @@ export interface Config {
       revert?: EventFnRevert
     }
   }
-}
-
-// stores / plugins
-
-export interface PluginInstance {
-  actions: { [action in ActionName]?: VueSyncAction }
-  revert: <T extends PlainObject>(payload: T, actionName: ActionName) => Promise<T> // prettier-ignore // the action that reverts other actions on error
-  config: { [key: string]: any } // any other config the plugin needs
 }

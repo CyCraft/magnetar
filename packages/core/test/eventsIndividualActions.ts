@@ -13,7 +13,7 @@ const vueSync = VueSync({
 })
 const usersModule = vueSync.createModule({
   type: 'collection',
-  storeConfig: {
+  configPerStore: {
     local: { path: 'users' }, // path for vuex
     remote: { path: 'users' }, // path for vuex
   },

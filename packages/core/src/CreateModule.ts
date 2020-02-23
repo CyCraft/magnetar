@@ -8,22 +8,26 @@ import {
   ActionType,
 } from './types/actions'
 import { handleAction } from './moduleActions/handleAction'
-import { Config, PlainObject, eventFnsMapWithDefaults } from './types/base'
+import { SharedConfig, PlainObject, eventFnsMapWithDefaults } from './types/base'
 import { VueSyncConfig } from '.'
 import { isPromise } from 'is-what'
 import getEventFnsPerStore from './getEventFnsPerStore'
+import { PluginActionConfig } from './types/plugins'
 
 export type VueSyncModuleInstance = {
   [action in ActionName]?: VueSyncAction // prettier-ignore
 }
 
+export type ModuleType = 'collection' | 'document'
+
+// this is what the dev passes when creating a module
 export type ModuleConfig = O.Merge<
-  Partial<Config>,
+  Partial<SharedConfig>,
   {
-    type: 'collection' | 'document'
-    storeConfig?: {
+    type: ModuleType
+    configPerStore?: {
       [storeName: string]: {
-        path: string
+        [key: string]: any // whatever the dev passed for this plugin when creating a Vue Sync Module instance (`VueSyncPluginModuleConfig`)
       }
     }
   }
@@ -64,11 +68,16 @@ export function CreateModuleWithContext (
       for (const [i, storeName] of storesToExecute.entries()) {
         // find the action on the plugin
         const pluginAction = globalConfig.stores[storeName].actions.insert
+        const pluginActionConfig: PluginActionConfig = {
+          moduleType: moduleConfig.type,
+          moduleConfig: moduleConfig?.configPerStore[storeName],
+        }
         // the plugin action
         result = !pluginAction
           ? result
           : await handleAction({
               pluginAction,
+              pluginActionConfig,
               payload: result,
               eventNameFnsMap: eventFnsMapWithDefaults(eventFnsPerStore[storeName]),
               onError: config.onError,
@@ -82,7 +91,7 @@ export function CreateModuleWithContext (
           storesToRevert.reverse()
           for (const storeToRevert of storesToRevert) {
             const revertAction = globalConfig.stores[storeToRevert].revert
-            result = await revertAction(result, actionName)
+            result = await revertAction(actionName, result, pluginActionConfig)
             // revert eventFns
             const eventNameFnsMap = eventFnsMapWithDefaults(eventFnsPerStore[storeToRevert])
             // handle and await each eventFn in sequence

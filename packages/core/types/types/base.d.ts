@@ -1,4 +1,4 @@
-import { ActionType, ActionName, VueSyncError, VueSyncAction } from './actions';
+import { ActionType, ActionName, VueSyncError } from './actions';
 import { O } from 'ts-toolbelt';
 export declare type PlainObject = {
     [key: string]: any;
@@ -36,7 +36,7 @@ export declare function eventFnsMapWithDefaults(eventNameFnsMap?: EventNameFnsMa
 export declare type EventFnsPerStore = {
     [storeName: string]: EventNameFnsMap;
 };
-export interface Config {
+export interface SharedConfig {
     executionOrder: {
         [actionType in ActionType]?: StoreName[];
     } & {
@@ -50,14 +50,5 @@ export interface Config {
             error?: EventFnError;
             revert?: EventFnRevert;
         };
-    };
-}
-export interface PluginInstance {
-    actions: {
-        [action in ActionName]?: VueSyncAction;
-    };
-    revert: <T extends PlainObject>(payload: T, actionName: ActionName) => Promise<T>;
-    config: {
-        [key: string]: any;
     };
 }
