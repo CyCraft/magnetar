@@ -9,10 +9,10 @@ export type StoreName = string
 // events
 export type EventName = 'before' | 'success' | 'error' | 'revert'
 
-export type EventFnBefore = <T extends PlainObject>(args: {payload: T, actionName: ActionName, abort: () => void}) => Partial<T> | Promise<Partial<T>> // prettier-ignore
-export type EventFnSuccess = <T extends PlainObject>(args: {payload: T, actionName: ActionName, abort: () => void}) => Partial<T> | Promise<Partial<T>> // prettier-ignore
-export type EventFnError = <T extends PlainObject>(args: {payload: T, actionName: ActionName, abort: () => void, error: VueSyncError}) => Partial<T> | Promise<Partial<T>> // prettier-ignore
-export type EventFnRevert = <T extends PlainObject>(args: {payload: T, actionName: ActionName}) => Partial<T> | Promise<Partial<T>> // prettier-ignore
+export type EventFnBefore = <T extends object>(args: {payload: T, actionName: ActionName, abort: () => void}) => Partial<T> | Promise<Partial<T>> // prettier-ignore
+export type EventFnSuccess = <T extends object>(args: {payload: T, actionName: ActionName, abort: () => void}) => Partial<T> | Promise<Partial<T>> // prettier-ignore
+export type EventFnError = <T extends object>(args: {payload: T, actionName: ActionName, abort: () => void, error: VueSyncError}) => Partial<T> | Promise<Partial<T>> // prettier-ignore
+export type EventFnRevert = <T extends object>(args: {payload: T, actionName: ActionName}) => Partial<T> | Promise<Partial<T>> // prettier-ignore
 export type EventFn = EventFnBefore | EventFnSuccess | EventFnError | EventFnRevert
 
 export type EventNameFnsMap = {
@@ -48,3 +48,5 @@ export interface SharedConfig {
     }
   }
 }
+
+export type OnRetrieveHandler = (storeName: string, data: PlainObject[] | PlainObject) => void

@@ -1,11 +1,14 @@
 import { ActionName, VueSyncError } from '../../src/types/actions'
 import {
   PluginInstance,
-  PluginAction,
   PluginRevertAction,
   PluginActionConfig,
+  PluginGetAction,
+  PluginWriteAction,
+  PluginStreamAction,
 } from '../../src/types/plugins'
 import { PlainObject } from '../../types/types/base'
+import { OnRetrieveHandler } from '../../src/types/base'
 
 // there are two interfaces to be defined & exported by each plugin
 // - VueSyncPluginConfig
@@ -18,7 +21,31 @@ export interface VueSyncPluginModuleConfig {
   path: string
 }
 
-function createGenericAction (storeName: string): PluginAction {
+function createGenericGetAction (storeName: string): PluginGetAction {
+  // this is a `PluginAction`:
+  return async (
+    onRetrieveHandlers: OnRetrieveHandler[],
+    payload: PlainObject = {},
+    pluginActionConfig: PluginActionConfig
+  ): Promise<PlainObject[] | PlainObject> => {
+    // this is custom logic to be implemented by the plugin author
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (payload.shouldFail === storeName) {
+          const errorToThrow: VueSyncError = {
+            payload,
+            message: 'fail',
+          }
+          reject(errorToThrow)
+        } else {
+          resolve({ name: 'Luca' })
+        }
+      }, 10)
+    })
+  }
+}
+
+function createGenericAction (storeName: string): PluginWriteAction {
   // this is a `PluginAction`:
   return async <T extends PlainObject>(
     payload: T,
@@ -71,13 +98,13 @@ function createRevertAction (storeName: string): PluginRevertAction {
 export const VueSyncGenericPlugin = (config: VueSyncPluginConfig): PluginInstance => {
   const { storeName } = config
   // the plugin must try to implement logic for every `ActionName`
-  const get: PluginAction = createGenericAction(storeName)
-  const stream: PluginAction = createGenericAction(storeName)
-  const insert: PluginAction = createGenericAction(storeName)
-  const merge: PluginAction = createGenericAction(storeName)
-  const assign: PluginAction = createGenericAction(storeName)
-  const replace: PluginAction = createGenericAction(storeName)
-  const _delete: PluginAction = createGenericAction(storeName)
+  const get: PluginGetAction = createGenericGetAction(storeName)
+  // const stream: PluginStreamAction = createGenericGetAction(storeName)
+  const insert: PluginWriteAction = createGenericAction(storeName)
+  const merge: PluginWriteAction = createGenericAction(storeName)
+  const assign: PluginWriteAction = createGenericAction(storeName)
+  const replace: PluginWriteAction = createGenericAction(storeName)
+  const _delete: PluginWriteAction = createGenericAction(storeName)
   const revert: PluginRevertAction = createRevertAction(storeName)
 
   // the plugin function must return a `PluginInstance`
@@ -86,7 +113,7 @@ export const VueSyncGenericPlugin = (config: VueSyncPluginConfig): PluginInstanc
     revert,
     actions: {
       get,
-      stream,
+      // stream,
       insert,
       merge,
       assign,

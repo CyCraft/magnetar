@@ -1,8 +1,7 @@
 import { ActionName, VueSyncAction } from '../../src/types/actions'
-import { PlainObject } from '../../src/types/base'
 
 interface PluginConfig {
-  firebaseInstance: null | PlainObject
+  firebaseInstance: null | object
 }
 type VueSyncActions = {
   [action in ActionName]?: VueSyncAction

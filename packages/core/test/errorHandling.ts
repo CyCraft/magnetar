@@ -7,7 +7,7 @@ const remote = VueSyncGenericPlugin({ storeName: 'remote' })
 const vueSync = VueSync({
   stores: { local, remote },
   executionOrder: {
-    read: ['remote', 'local'],
+    read: ['local', 'remote'],
     write: ['local', 'remote'],
   },
 })

@@ -1,8 +1,12 @@
-import { PlainObject, SharedConfig } from './base'
+import { PlainObject, SharedConfig, StoreName } from './base'
 import { isAnyObject } from 'is-what'
+import { O } from 'ts-toolbelt'
+import { OnRetrieveHandler } from './base'
 
 // these are all the actions that Vue Sync aims to streamline, whichever plugin is used
 // these actions are executable from a `VueSyncModule` and handled by each plugin individually
+export type ActionNameRead = 'get' | 'stream'
+export type ActionNameWrite = 'insert' | 'merge' | 'assign' | 'replace' | 'delete'
 export type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign' | 'replace' | 'delete'
 
 // there are two action types for easier setting the execution order
@@ -18,13 +22,28 @@ export const actionNameTypeMap: { [action in ActionName]: ActionType } = {
   delete: 'write',
 }
 
+export function isReadAction (actionName: ActionName): actionName is ActionNameRead {
+  const actionType = actionNameTypeMap[actionName]
+  return actionType === 'read'
+}
+export function isWriteAction (actionName: ActionName): actionName is ActionNameWrite {
+  const actionType = actionNameTypeMap[actionName]
+  return actionType === 'write'
+}
+
 // this is what the dev can provide as second param when executing any action in addition to the payload
-export type ActionConfig = Partial<SharedConfig>
+export type ActionConfig = Partial<O.Overwrite<SharedConfig, { executionOrder: StoreName[] }>>
 
 // these are the action types exposed to the dev via a VueSyncModule, it's what the dev will end up calling.
-export type VueSyncReadAction = <T extends PlainObject>(payload: T, actionConfig?: ActionConfig) => Promise<Partial<T>> // prettier-ignore
-export type VueSyncWriteAction = <T extends PlainObject>(payload: T, actionConfig?: ActionConfig) => Promise<Partial<T>> // prettier-ignore
-export type VueSyncAction = VueSyncReadAction | VueSyncWriteAction
+// export type VueSyncStreamAction = <T extends object>(payload: T, actionConfig?: ActionConfig) => Promise<Partial<T>> // prettier-ignore
+export type VueSyncGetAction = <T extends object>(
+                                  payload?: T,
+                                  actionConfig?: ActionConfig
+                                ) => {
+                                  onRetrieve: (arg: OnRetrieveHandler) => void
+                                  retrieved: Promise<PlainObject[] | PlainObject>
+                                } // prettier-ignore
+export type VueSyncWriteAction = <T extends object>(payload: T, actionConfig?: ActionConfig) => Promise<Partial<T>> // prettier-ignore
 
 export type VueSyncError = {
   payload: PlainObject

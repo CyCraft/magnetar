@@ -1,11 +1,11 @@
 import { isPromise } from 'is-what'
 import { isVueSyncError, ActionName } from '../types/actions'
-import { PlainObject, EventNameFnsMap, SharedConfig } from '../types/base'
+import { EventNameFnsMap, SharedConfig } from '../types/base'
 import { O } from 'ts-toolbelt'
-import { PluginAction, PluginActionConfig } from '../types/plugins'
+import { PluginWriteAction, PluginActionConfig } from '../types/plugins'
 
-export async function handleAction<Payload extends PlainObject> (args: {
-  pluginAction: PluginAction
+export async function handleWrite<Payload extends object> (args: {
+  pluginAction: PluginWriteAction
   pluginActionConfig: PluginActionConfig
   payload: Payload
   eventNameFnsMap: O.Compulsory<EventNameFnsMap>

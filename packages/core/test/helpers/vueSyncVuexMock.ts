@@ -1,9 +1,8 @@
 import { Store } from 'vuex'
 import { ActionName, VueSyncAction } from '../../src/types/actions'
-import { PlainObject } from '../../src/types/base'
 
 interface PluginConfig {
-  vuexInstance: null | Store<PlainObject> | PlainObject
+  vuexInstance: null | Store<object> | object
 }
 type VueSyncActions = {
   [action in ActionName]?: VueSyncAction
