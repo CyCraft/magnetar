@@ -1,28 +1,11 @@
 import test from 'ava'
-import { VueSync } from '../src/index'
-import { VueSyncGenericPlugin } from './helpers/pluginMock'
-
-const local = VueSyncGenericPlugin({ storeName: 'local' })
-const remote = VueSyncGenericPlugin({ storeName: 'remote' })
-const vueSync = VueSync({
-  stores: { local, remote },
-  executionOrder: {
-    read: ['local', 'remote'],
-    write: ['local', 'remote'],
-  },
-})
-const usersModule = vueSync.createModule({
-  type: 'collection',
-  configPerStore: {
-    local: { path: 'users' }, // path for vuex
-    remote: { path: 'users' }, // path for vuex
-  },
-})
+import { createVueSyncInstance } from './helpers/createVueSyncInstance'
 
 test('emits fail events & aborts execution by default', async t => {
+  const { pokedexModule } = createVueSyncInstance()
   const insertPayload = { name: 'this should fail', shouldFail: 'local' }
   try {
-    await usersModule.insert(insertPayload, {
+    await pokedexModule.insert(insertPayload, {
       on: {
         local: {
           error: ({ payload }) => {
@@ -45,9 +28,10 @@ test('emits fail events & aborts execution by default', async t => {
 })
 
 test('onError: continue', async t => {
+  const { pokedexModule } = createVueSyncInstance()
   const insertPayload = { name: 'this should fail', shouldFail: 'local' }
   try {
-    await usersModule.insert(insertPayload, {
+    await pokedexModule.insert(insertPayload, {
       onError: 'continue',
       on: {
         local: {
@@ -76,13 +60,14 @@ test('onError: continue', async t => {
 })
 
 test('onError: revert', async t => {
+  const { pokedexModule } = createVueSyncInstance()
   const insertPayload = { name: 'this should fail', shouldFail: 'remote' }
   const revertedPayload = {
     ...insertPayload,
     reverted: { actionName: 'insert', storeName: 'local' },
   }
   try {
-    const result = await usersModule.insert(insertPayload, {
+    const result = await pokedexModule.insert(insertPayload, {
       onError: 'revert',
       on: {
         local: {
@@ -114,9 +99,10 @@ test('onError: revert', async t => {
 })
 
 test('onError: revert - will not go to next store', async t => {
+  const { pokedexModule } = createVueSyncInstance()
   const insertPayload = { name: 'this should fail', shouldFail: 'local' }
   try {
-    const result = await usersModule.insert(insertPayload, {
+    const result = await pokedexModule.insert(insertPayload, {
       onError: 'revert',
       on: {
         local: {

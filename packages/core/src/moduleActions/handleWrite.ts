@@ -1,10 +1,10 @@
 import { isPromise } from 'is-what'
 import { isVueSyncError, ActionName } from '../types/actions'
-import { EventNameFnsMap, SharedConfig } from '../types/base'
+import { EventNameFnsMap, SharedConfig, Modified, PlainObject } from '../types/base'
 import { O } from 'ts-toolbelt'
 import { PluginWriteAction, PluginActionConfig } from '../types/plugins'
 
-export async function handleWrite<Payload extends object> (args: {
+export async function handleWrite<Payload extends PlainObject> (args: {
   pluginAction: PluginWriteAction
   pluginActionConfig: PluginActionConfig
   payload: Payload
@@ -12,7 +12,7 @@ export async function handleWrite<Payload extends object> (args: {
   onError: SharedConfig['onError']
   actionName: ActionName
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
-}): Promise<Partial<Payload>> {
+}): Promise<Modified<Payload>> {
   const {
     pluginAction,
     pluginActionConfig,
@@ -27,7 +27,7 @@ export async function handleWrite<Payload extends object> (args: {
   function abort (): void {
     abortExecution = true
   }
-  let result: Partial<Payload> = payload // the payload throughout the stages
+  let result: Modified<Payload> = payload // the payload throughout the stages
   // handle and await each eventFn in sequence
   for (const fn of on.before) {
     const eventResult = fn({ payload: result, actionName, abort })

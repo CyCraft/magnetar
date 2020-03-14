@@ -4,7 +4,7 @@ import { VueSyncConfig } from '..'
 import { ModuleConfig } from '../CreateModule'
 import { getEventFnsPerStore } from '../getEventFnsPerStore'
 import { handleWrite } from './handleWrite'
-import { EventFnsPerStore, eventFnsMapWithDefaults } from '../types/base'
+import { EventFnsPerStore, eventFnsMapWithDefaults, PlainObject, Modified } from '../types/base'
 import { ActionType, VueSyncWriteAction, ActionConfig, ActionNameWrite } from '../types/actions'
 import { PluginActionConfig } from '../types/plugins'
 
@@ -18,7 +18,7 @@ export function createWriteHandler (
   return async function<T extends object> (
     payload: T,
     actionConfig: ActionConfig = {}
-  ): Promise<Partial<T>> {
+  ): Promise<Modified<T>> {
     // get all the config needed to perform this action
     const onError = actionConfig.onError || moduleConfig.onError || globalConfig.onError
     const eventFnsPerStore: EventFnsPerStore = getEventFnsPerStore(
@@ -49,7 +49,7 @@ export function createWriteHandler (
     }
 
     // handle and await each action in sequence
-    let result: Partial<T> = payload
+    let result: Modified<T> = payload
     for (const [i, storeName] of storesToExecute.entries()) {
       // find the action on the plugin
       const pluginAction = globalConfig.stores[storeName].actions[actionName]

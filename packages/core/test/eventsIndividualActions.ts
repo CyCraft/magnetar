@@ -1,28 +1,11 @@
 import test from 'ava'
-import { VueSync } from '../src/index'
-import { VueSyncGenericPlugin } from './helpers/pluginMock'
-
-const local = VueSyncGenericPlugin({ storeName: 'local' })
-const remote = VueSyncGenericPlugin({ storeName: 'remote' })
-const vueSync = VueSync({
-  stores: { local, remote },
-  executionOrder: {
-    read: ['remote', 'local'],
-    write: ['local', 'remote'],
-  },
-})
-const usersModule = vueSync.createModule({
-  type: 'collection',
-  configPerStore: {
-    local: { path: 'users' }, // path for vuex
-    remote: { path: 'users' }, // path for vuex
-  },
-})
+import { createVueSyncInstance } from './helpers/createVueSyncInstance'
 
 test('emits before & success events', async t => {
-  const insertPayload = { name: 'luca' }
+  const { pokedexModule } = createVueSyncInstance()
+  const insertPayload = { name: 'Squirtle', id: '007' }
   let ranAllEvents = []
-  const result = await usersModule.insert(insertPayload, {
+  const result = await pokedexModule.insert(insertPayload, {
     on: {
       local: {
         before: ({ payload }) => {
@@ -60,8 +43,9 @@ test('emits before & success events', async t => {
 })
 
 test('can abort in before events', async t => {
-  const insertPayload = { name: 'luca' }
-  const result = await usersModule.insert(insertPayload, {
+  const { pokedexModule } = createVueSyncInstance()
+  const insertPayload = { name: 'Squirtle', id: '007' }
+  const result = await pokedexModule.insert(insertPayload, {
     on: {
       local: {
         before: ({ payload, abort }) => {
@@ -90,9 +74,10 @@ test('can abort in before events', async t => {
 })
 
 test('can abort in success events', async t => {
-  const insertPayload = { name: 'luca' }
+  const { pokedexModule } = createVueSyncInstance()
+  const insertPayload = { name: 'Squirtle', id: '007' }
   let ranAllEvents = []
-  const result = await usersModule.insert(insertPayload, {
+  const result = await pokedexModule.insert(insertPayload, {
     on: {
       local: {
         before: ({ payload }) => {
@@ -119,35 +104,49 @@ test('can abort in success events', async t => {
 })
 
 test('can mutate payload via events', async t => {
-  const insertPayload = { name: 'luca' }
-  const result = await usersModule.insert(insertPayload, {
+  const { pokedexModule } = createVueSyncInstance()
+  const insertPayload = { name: 'Squirtle', id: '007' }
+  const result = await pokedexModule.insert(insertPayload, {
     on: {
       local: {
         before: ({ payload }) => {
           // @ts-ignore
-          t.deepEqual(payload, { name: 'luca' })
-          return { ...payload, age: 0 }
+          t.deepEqual(payload, { name: 'Squirtle', id: '007' })
+          return { ...payload, level: 1 }
         },
         success: ({ payload }) => {
           // @ts-ignore
-          t.deepEqual(payload, { name: 'luca', age: 0 })
-          return { ...payload, lastName: 'ban' }
+          t.deepEqual(payload, { name: 'Squirtle', id: '007', level: 1 })
+          return { ...payload, sunglasses: true }
         },
       },
       remote: {
         before: ({ payload }) => {
           // @ts-ignore
-          t.deepEqual(payload, { name: 'luca', age: 0, lastName: 'ban' })
-          return { ...payload, power: 'flight' }
+          t.deepEqual(payload, { name: 'Squirtle', id: '007', level: 1, sunglasses: true })
+          return { ...payload, trait: 'water resistance' }
         },
         success: ({ payload }) => {
           // @ts-ignore
-          t.deepEqual(payload, { name: 'luca', age: 0, lastName: 'ban', power: 'flight' })
+          t.deepEqual(payload, {
+            name: 'Squirtle',
+            id: '007',
+            level: 1,
+            sunglasses: true,
+            trait: 'water resistance',
+          })
           return { ...payload, strength: 9000 }
         },
       },
     },
   })
   // @ts-ignore
-  t.deepEqual(result, { name: 'luca', age: 0, lastName: 'ban', power: 'flight', strength: 9000 })
+  t.deepEqual(result, {
+    name: 'Squirtle',
+    id: '007',
+    level: 1,
+    sunglasses: true,
+    trait: 'water resistance',
+    strength: 9000,
+  })
 })

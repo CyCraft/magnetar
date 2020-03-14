@@ -1,29 +1,11 @@
 import test from 'ava'
-import { VueSync } from '../src/index'
-import { VueSyncGenericPlugin } from './helpers/pluginMock'
-import { VueSyncModuleInstance } from '../src/CreateModule'
+import { createVueSyncInstance } from './helpers/createVueSyncInstance'
 import { OnRetrieveHandler } from '../src/types/base'
 
-const local = VueSyncGenericPlugin({ storeName: 'local' })
-const remote = VueSyncGenericPlugin({ storeName: 'remote' })
-const vueSync = VueSync({
-  stores: { local, remote },
-  executionOrder: {
-    read: ['remote', 'local'],
-    write: ['local', 'remote'],
-  },
-})
-const usersModule: VueSyncModuleInstance = vueSync.createModule({
-  type: 'collection',
-  configPerStore: {
-    local: { path: 'users' }, // path for vuex
-    remote: { path: 'users' }, // path for vuex
-  },
-})
-
-test('write actions', async t => {
-  const insertPayload = { name: 'luca' }
-  const result = await usersModule.insert(insertPayload)
+test('write: insert (collection module)', async t => {
+  const { trainerModule } = createVueSyncInstance()
+  const insertPayload = { name: 'Squirtle', id: '007' }
+  const result = await trainerModule.insert(insertPayload)
   t.deepEqual(result, insertPayload)
 })
 
@@ -57,21 +39,22 @@ test('write actions', async t => {
 //   }, 1000)
 // })
 
-test('read action - get', async t => {
+test('read: get (document)', async t => {
   // get resolves once all stores have given a response with data
-  const { retrieved, onRetrieve } = usersModule.get()
+  const { trainerModule } = createVueSyncInstance()
+  const { retrieved, onRetrieve } = trainerModule.get()
   let ranAllEvents = []
   //   // You can pass a function to `onRetrieve` which gets triggered every time data comes in
   const myHandler: OnRetrieveHandler = (storeName, data) => {
     t.true(['remote', 'local'].includes(storeName))
-    t.deepEqual(data, { name: 'Luca' })
+    t.deepEqual(data, { name: 'Luca', age: 10 })
     ranAllEvents.push(1)
   }
   onRetrieve(myHandler)
 
   try {
     const data = await retrieved // prettier-ignore
-    t.deepEqual(data, { name: 'Luca' })
+    t.deepEqual(data, { name: 'Luca', age: 10 })
   } catch (error) {
     t.fail(error)
   }

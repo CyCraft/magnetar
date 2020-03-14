@@ -1,4 +1,4 @@
-import { PlainObject, SharedConfig, StoreName } from './base'
+import { PlainObject, SharedConfig, StoreName, Modified } from './base'
 import { isAnyObject } from 'is-what'
 import { O } from 'ts-toolbelt'
 import { OnRetrieveHandler } from './base'
@@ -43,7 +43,7 @@ export type VueSyncGetAction = <T extends object>(
                                   onRetrieve: (arg: OnRetrieveHandler) => void
                                   retrieved: Promise<PlainObject[] | PlainObject>
                                 } // prettier-ignore
-export type VueSyncWriteAction = <T extends object>(payload: T, actionConfig?: ActionConfig) => Promise<Partial<T>> // prettier-ignore
+export type VueSyncWriteAction = <T extends object>(payload: T, actionConfig?: ActionConfig) => Promise<Modified<T>> // prettier-ignore
 
 export type VueSyncError = {
   payload: PlainObject

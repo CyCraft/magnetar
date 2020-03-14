@@ -1,5 +1,5 @@
 import { ActionName } from './actions'
-import { PlainObject, OnRetrieveHandler } from './base'
+import { PlainObject, OnRetrieveHandler, Modified } from './base'
 import { ModuleType } from '../CreateModule'
 
 // stores / plugins
@@ -47,7 +47,7 @@ export type PluginGetAction = <T extends object>(
 export type PluginWriteAction = <T extends object>(
                                   payload: T,
                                   pluginActionConfig?: PluginActionConfig
-                                ) => Promise<Partial<T>> // prettier-ignore
+                                ) => Promise<Modified<T>> // prettier-ignore
 
 // the revert action is a bit different, receives the ActionName
 export type PluginRevertAction = <T extends object>(
