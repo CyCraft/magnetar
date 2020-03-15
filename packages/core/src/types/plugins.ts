@@ -1,6 +1,5 @@
 import { ActionName } from './actions'
 import { PlainObject, OnRetrieveHandler, Modified } from './base'
-import { ModuleType } from '../CreateModule'
 
 // stores / plugins
 
@@ -22,38 +21,35 @@ export interface PluginInstance {
   }
   revert: PluginRevertAction // the action that reverts other actions on error
   setModuleDataReference: <T extends any>(
-    moduleConfig: PlainObject,
+    moduleConfig: PluginModuleConfig,
     previousStoreData: T
   ) => Modified<T>
   config: { [key: string]: any } // any other config the plugin needs which is passed by the dev
 }
 
-// the `PluginActionConfig` is extra config passed when an action is executed by the dev via the VueSyncModule
-export interface PluginActionConfig {
-  moduleType: ModuleType
-  moduleConfig: PlainObject // whatever the dev passed for this plugin when creating a Vue Sync Module instance (`VueSyncPluginModuleConfig`)
-}
+// the `PluginModuleConfig` is the extra config of a plugin when a module is instanciated
+export type PluginModuleConfig = PlainObject
 
 // these are the action types exposed to the dev via a VueSyncModule, it's what the dev will end up calling.
 export type PluginStreamAction = <T extends object>(
                                     payload?: T,
-                                    pluginActionConfig?: PluginActionConfig
+                                    pluginModuleConfig?: PluginModuleConfig
                                   ) => Promise<PlainObject> // prettier-ignore
 
 export type PluginGetAction = <T extends object>(
                                 onRetrieveHandlers: OnRetrieveHandler[],
                                 payload?: T,
-                                pluginActionConfig?: PluginActionConfig
+                                pluginModuleConfig?: PluginModuleConfig
                               ) => Promise<PlainObject[] | PlainObject> // prettier-ignore
 
 export type PluginWriteAction = <T extends object>(
                                   payload: T,
-                                  pluginActionConfig?: PluginActionConfig
+                                  pluginModuleConfig?: PluginModuleConfig
                                 ) => Promise<Modified<T>> // prettier-ignore
 
 // the revert action is a bit different, receives the ActionName
 export type PluginRevertAction = <T extends object>(
                                     actionName: ActionName,
                                     payload: T,
-                                    pluginActionConfig: PluginActionConfig
+                                    pluginModuleConfig: PluginModuleConfig
                                   ) => Promise<T> // prettier-ignore

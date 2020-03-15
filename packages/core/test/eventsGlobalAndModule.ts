@@ -14,7 +14,6 @@ test('emits global, module and action events', async t => {
     on: { local: { before: ({ payload }) => ({ ...payload, addedInGlobal: true }) } },
   })
   const usersModule = vueSync.createModule({
-    type: 'collection',
     configPerStore: {
       local: { path: 'users' }, // path for vuex
       remote: { path: 'users' }, // path for vuex

@@ -22,14 +22,12 @@ export function createVueSyncInstance (): {
   })
   const getInitialDataDocument = () => ({ name: 'Luca', age: 10 })
   const pokedexModule = vueSync.createModule({
-    type: 'collection',
     configPerStore: {
       local: { path: 'pokedex', initialData: getInitialDataCollection() }, // path for the plugin
       remote: { path: 'pokedex', initialData: getInitialDataCollection() }, // path for the plugin
     },
   })
   const trainerModule = vueSync.createModule({
-    type: 'document',
     configPerStore: {
       local: { path: 'data/trainer', initialData: getInitialDataDocument() }, // path for the plugin
       remote: { path: 'data/trainer', initialData: getInitialDataDocument() }, // path for the plugin

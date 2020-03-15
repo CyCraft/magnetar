@@ -25,17 +25,13 @@ export type VueSyncModuleInstance = {
   delete?: VueSyncWriteAction
 }
 
-export type ModuleType = 'collection' | 'document'
-
 // this is what the dev passes when creating a module
 export type ModuleConfig = O.Merge<
   Partial<SharedConfig>,
   {
-    type: ModuleType
+    // custom config per store plugin
     configPerStore?: {
-      [storeName: string]: {
-        [key: string]: any // whatever the dev passed for this plugin when creating a Vue Sync Module instance (`VueSyncPluginModuleConfig`)
-      }
+      [storeName: string]: PlainObject
     }
   }
 >
@@ -67,7 +63,7 @@ export function CreateModuleWithContext (
     const previousStoreName = storesToInitialise[i - 1]
     const previousStoreData = data[previousStoreName] || {}
     // save a reference to the dataReference of each the store plugin
-    const pluginModuleConfig = moduleConfig?.configPerStore[storeName]
+    const pluginModuleConfig = moduleConfig?.configPerStore[storeName] || {}
     const setModuleDataReference = globalConfig.stores[storeName].setModuleDataReference
     data[storeName] = setModuleDataReference(pluginModuleConfig, previousStoreData)
   }

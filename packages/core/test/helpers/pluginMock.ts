@@ -5,7 +5,6 @@ import { ActionName, VueSyncError } from '../../src/types/actions'
 import {
   PluginInstance,
   PluginRevertAction,
-  PluginActionConfig,
   PluginGetAction,
   PluginWriteAction,
   PluginStreamAction,
@@ -13,7 +12,6 @@ import {
 import { PlainObject } from '../../types/types/base'
 import { OnRetrieveHandler, Modified } from '../../src/types/base'
 import pathToProp from 'path-to-prop'
-import { ModuleType } from '../../src/CreateModule'
 
 // there are two interfaces to be defined & exported by each plugin
 // - VueSyncPluginConfig
@@ -27,19 +25,19 @@ export interface VueSyncPluginModuleConfig {
   initialData?: PlainObject
 }
 
-function dots (path: string): string {
-  return path.replace(/\//g, '.')
-}
+function dots (path: string): string { return path.replace(/\//g, '.') } // prettier-ignore
+function isOdd (number: number) { return number % 2 === 1 } // prettier-ignore
+function isEven (number: number) { return number % 2 === 0 } // prettier-ignore
 
-function createGetAction (data: PlainObject, storeName: string): PluginGetAction {
+function createGetAction (moduleData: PlainObject, storeName: string): PluginGetAction {
   // this is a `PluginAction`:
   return async (
     onRetrieveHandlers: OnRetrieveHandler[],
     payload: PlainObject = {},
-    pluginActionConfig: PluginActionConfig
+    pluginModuleConfig: VueSyncPluginModuleConfig
   ): Promise<PlainObject[] | PlainObject> => {
     // this is custom logic to be implemented by the plugin author
-    const { path } = pluginActionConfig.moduleConfig
+    const { path } = pluginModuleConfig
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         if (payload.shouldFail === storeName) {
@@ -49,7 +47,7 @@ function createGetAction (data: PlainObject, storeName: string): PluginGetAction
           }
           reject(errorToThrow)
         } else {
-          resolve(pathToProp(data, path))
+          resolve(pathToProp(moduleData, path))
         }
       }, 10)
     })
@@ -57,20 +55,20 @@ function createGetAction (data: PlainObject, storeName: string): PluginGetAction
 }
 
 function createWriteAction (
-  data: PlainObject,
+  moduleData: PlainObject,
   actionName: string,
   storeName: string
 ): PluginWriteAction {
   // this is a `PluginAction`:
   return async <T extends PlainObject>(
     payload: T,
-    pluginActionConfig: PluginActionConfig
+    pluginModuleConfig: VueSyncPluginModuleConfig
   ): Promise<Modified<T>> => {
     // this is custom logic to be implemented by the plugin author
-    const { moduleType, moduleConfig } = pluginActionConfig
-    const { path } = moduleConfig
+    const { path } = pluginModuleConfig
+    const moduleIsDocument = isEven(path.split('/').length)
     const shouldFail =
-      payload.shouldFail === storeName || (actionName === 'insert' && moduleType !== 'collection')
+      payload.shouldFail === storeName || (actionName === 'insert' && moduleIsDocument)
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         if (shouldFail) {
@@ -80,7 +78,7 @@ function createWriteAction (
           }
           reject(errorToThrow)
         } else {
-          const db = pathToProp(data, path)
+          const db = pathToProp(moduleData, path)
           if (actionName === 'insert') {
             db[payload.id] = payload
           }
@@ -94,12 +92,12 @@ function createWriteAction (
   }
 }
 
-function createRevertAction (data: PlainObject, storeName: string): PluginRevertAction {
+function createRevertAction (moduleData: PlainObject, storeName: string): PluginRevertAction {
   // this is a `PluginRevertAction`:
   return function<T extends PlainObject> (
     actionName: ActionName,
     payload: T,
-    pluginActionConfig: PluginActionConfig
+    pluginModuleConfig: VueSyncPluginModuleConfig
   ): Promise<T> {
     // this is custom logic to be implemented by the plugin author
     return new Promise((resolve, reject) => {

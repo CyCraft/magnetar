@@ -9,7 +9,7 @@ import {
   EventFnsPerStore,
   eventFnsMapWithDefaults,
 } from '../types/base'
-import { PluginActionConfig } from '../types/plugins'
+import { PluginModuleConfig } from '../types/plugins'
 
 export function createGetHandler (
   moduleConfig: ModuleConfig,
@@ -56,15 +56,12 @@ export function createGetHandler (
       for (const storeName of storesToExecute) {
         // find the action on the plugin
         const pluginAction = globalConfig.stores[storeName].actions['get']
-        const pluginActionConfig: PluginActionConfig = {
-          moduleType: moduleConfig.type,
-          moduleConfig: moduleConfig?.configPerStore[storeName],
-        }
+        const pluginModuleConfig: PluginModuleConfig = moduleConfig?.configPerStore[storeName] || {}
         // const eventNameFnsMap = eventFnsMapWithDefaults(eventFnsPerStore[storeName])
         // the plugin action
         result = !pluginAction
           ? result
-          : await pluginAction(onRetrieveHandlers, payload, pluginActionConfig)
+          : await pluginAction(onRetrieveHandlers, payload, pluginModuleConfig)
         // any time a plugin has resolved its result, trigger all the handlers
         for (const onRetrieveFn of onRetrieveHandlers) {
           onRetrieveFn(storeName, result)

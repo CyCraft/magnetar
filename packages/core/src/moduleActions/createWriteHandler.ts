@@ -6,7 +6,7 @@ import { getEventFnsPerStore } from '../getEventFnsPerStore'
 import { handleWrite } from './handleWrite'
 import { EventFnsPerStore, eventFnsMapWithDefaults, PlainObject, Modified } from '../types/base'
 import { ActionType, VueSyncWriteAction, ActionConfig, ActionNameWrite } from '../types/actions'
-import { PluginActionConfig } from '../types/plugins'
+import { PluginModuleConfig } from '../types/plugins'
 
 export function createWriteHandler (
   moduleConfig: ModuleConfig,
@@ -53,16 +53,13 @@ export function createWriteHandler (
     for (const [i, storeName] of storesToExecute.entries()) {
       // find the action on the plugin
       const pluginAction = globalConfig.stores[storeName].actions[actionName]
-      const pluginActionConfig: PluginActionConfig = {
-        moduleType: moduleConfig.type,
-        moduleConfig: moduleConfig?.configPerStore[storeName],
-      }
+      const pluginModuleConfig: PluginModuleConfig = moduleConfig?.configPerStore[storeName] || {}
       // the plugin action
       result = !pluginAction
         ? result
         : await handleWrite({
             pluginAction,
-            pluginActionConfig,
+            pluginModuleConfig,
             payload: result,
             eventNameFnsMap: eventFnsMapWithDefaults(eventFnsPerStore[storeName]),
             onError,
@@ -76,7 +73,7 @@ export function createWriteHandler (
         storesToRevert.reverse()
         for (const storeToRevert of storesToRevert) {
           const revertAction = globalConfig.stores[storeToRevert].revert
-          result = await revertAction(actionName, result, pluginActionConfig)
+          result = await revertAction(actionName, result, pluginModuleConfig)
           // revert eventFns
           const eventNameFnsMap = eventFnsMapWithDefaults(eventFnsPerStore[storeToRevert])
           // handle and await each eventFn in sequence

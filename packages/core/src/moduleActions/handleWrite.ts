@@ -2,11 +2,11 @@ import { isPromise } from 'is-what'
 import { isVueSyncError, ActionName } from '../types/actions'
 import { EventNameFnsMap, SharedConfig, Modified, PlainObject } from '../types/base'
 import { O } from 'ts-toolbelt'
-import { PluginWriteAction, PluginActionConfig } from '../types/plugins'
+import { PluginWriteAction, PluginModuleConfig } from '../types/plugins'
 
 export async function handleWrite<Payload extends PlainObject> (args: {
   pluginAction: PluginWriteAction
-  pluginActionConfig: PluginActionConfig
+  pluginModuleConfig: PluginModuleConfig
   payload: Payload
   eventNameFnsMap: O.Compulsory<EventNameFnsMap>
   onError: SharedConfig['onError']
@@ -15,7 +15,7 @@ export async function handleWrite<Payload extends PlainObject> (args: {
 }): Promise<Modified<Payload>> {
   const {
     pluginAction,
-    pluginActionConfig,
+    pluginModuleConfig,
     payload,
     eventNameFnsMap: on,
     onError,
@@ -39,7 +39,7 @@ export async function handleWrite<Payload extends PlainObject> (args: {
     return result
   }
   try {
-    result = await pluginAction(result, pluginActionConfig)
+    result = await pluginAction(result, pluginModuleConfig)
   } catch (error) {
     if (!isVueSyncError(error)) throw new Error(error)
     // handle and await each eventFn in sequence
