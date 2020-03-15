@@ -7,12 +7,15 @@ import {
   VueSyncGetAction,
   isWriteAction,
 } from './types/actions'
-import { SharedConfig } from './types/base'
+import { SharedConfig, PlainObject } from './types/base'
 import { VueSyncConfig } from '.'
 import { createWriteHandler } from './moduleActions/createWriteHandler'
 import { createGetHandler } from './moduleActions/createGetHandler'
 
 export type VueSyncModuleInstance = {
+  data: {
+    [storeName: string]: PlainObject
+  }
   get?: VueSyncGetAction
   stream?: VueSyncGetAction
   insert?: VueSyncWriteAction
@@ -54,7 +57,23 @@ export function CreateModuleWithContext (
     {} as VueSyncModuleInstance
   )
 
+  // each store in write order will get the chance to initialise data
+  const data: { [storeName: string]: PlainObject } = {}
+  const storesToInitialise =
+    globalConfig.executionOrder?.write ||
+    globalConfig.executionOrder?.insert ||
+    Object.keys(globalConfig.stores)
+  for (const [i, storeName] of storesToInitialise.entries()) {
+    const previousStoreName = storesToInitialise[i - 1]
+    const previousStoreData = data[previousStoreName] || {}
+    // save a reference to the dataReference of each the store plugin
+    const pluginModuleConfig = moduleConfig?.configPerStore[storeName]
+    const setModuleDataReference = globalConfig.stores[storeName].setModuleDataReference
+    data[storeName] = setModuleDataReference(pluginModuleConfig, previousStoreData)
+  }
+
   return {
+    data,
     ...actions,
   }
 }

@@ -21,15 +21,17 @@ export interface PluginInstance {
     delete?: PluginWriteAction
   }
   revert: PluginRevertAction // the action that reverts other actions on error
-  config: { [key: string]: any } // any other config the plugin needs
+  setModuleDataReference: <T extends any>(
+    moduleConfig: PlainObject,
+    previousStoreData: T
+  ) => Modified<T>
+  config: { [key: string]: any } // any other config the plugin needs which is passed by the dev
 }
 
 // the `PluginActionConfig` is extra config passed when an action is executed by the dev via the VueSyncModule
 export interface PluginActionConfig {
   moduleType: ModuleType
-  moduleConfig: {
-    [key: string]: any // whatever the dev passed for this plugin when creating a Vue Sync Module instance (`VueSyncPluginModuleConfig`)
-  }
+  moduleConfig: PlainObject // whatever the dev passed for this plugin when creating a Vue Sync Module instance (`VueSyncPluginModuleConfig`)
 }
 
 // these are the action types exposed to the dev via a VueSyncModule, it's what the dev will end up calling.

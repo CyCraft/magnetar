@@ -3,8 +3,8 @@ import { VueSync } from '../src/index'
 import { VueSyncGenericPlugin } from './helpers/pluginMock'
 
 test('emits global, module and action events', async t => {
-  const local = VueSyncGenericPlugin({ storeName: 'local', initialState: {} })
-  const remote = VueSyncGenericPlugin({ storeName: 'remote', initialState: {} })
+  const local = VueSyncGenericPlugin({ storeName: 'local' })
+  const remote = VueSyncGenericPlugin({ storeName: 'remote' })
   const vueSync = VueSync({
     stores: { local, remote },
     executionOrder: {

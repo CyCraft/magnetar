@@ -42,8 +42,6 @@ export function VueSync (vueSyncConfig: VueSyncConfig): VueSyncInstance {
 
   const createModule: CreateModule = moduleConfig =>
     CreateModuleWithContext(moduleConfig, globalConfig)
-  // const createModule: VueSyncInstance['createModule'] = moduleConfig =>
-  //   CreateModuleWithContext(moduleConfig, globalConfig)
 
   const instance: VueSyncInstance = {
     globalConfig,

@@ -53,7 +53,7 @@ export function createGetHandler (
     const retrieveFn = async function (): Promise<PlainObject[] | PlainObject> {
       // handle and await each action in sequence
       let result: undefined | PlainObject[] | PlainObject = undefined
-      for (const [i, storeName] of storesToExecute.entries()) {
+      for (const storeName of storesToExecute) {
         // find the action on the plugin
         const pluginAction = globalConfig.stores[storeName].actions['get']
         const pluginActionConfig: PluginActionConfig = {

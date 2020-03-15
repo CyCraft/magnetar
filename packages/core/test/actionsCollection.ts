@@ -3,10 +3,11 @@ import { createVueSyncInstance } from './helpers/createVueSyncInstance'
 import { OnRetrieveHandler } from '../src/types/base'
 
 test('write: insert (collection module)', async t => {
-  const { trainerModule } = createVueSyncInstance()
+  const { pokedexModule } = createVueSyncInstance()
   const insertPayload = { name: 'Squirtle', id: '007' }
-  const result = await trainerModule.insert(insertPayload)
+  const result = await pokedexModule.insert(insertPayload)
   t.deepEqual(result, insertPayload)
+  t.deepEqual(pokedexModule.data.local['007'], insertPayload)
 })
 
 // test('read action - stream', async t => {
