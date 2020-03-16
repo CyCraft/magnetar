@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
-import { bulbasaur, charmander } from './helpers/pokemon'
+import { bulbasaur, charmander, flareon } from './helpers/pokemon'
 
 test('write + onError: abort (default) -- emits fail events & aborts execution by default', async t => {
   const { pokedexModule } = createVueSyncInstance()
@@ -238,7 +238,7 @@ test('get + onError: continue', async t => {
     t.fail()
   }
   t.deepEqual(pokedexModule.data.local, { '001': bulbasaur })
-  t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur, '004': charmander })
+  t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur, '136': flareon })
 })
 
 test('get + onError: revert', async t => {

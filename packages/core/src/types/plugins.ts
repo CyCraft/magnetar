@@ -1,5 +1,6 @@
 import { ActionName } from './actions'
 import { PlainObject, Modified } from './base'
+import { EventFnSuccess } from './events'
 
 // stores / plugins
 
@@ -37,13 +38,15 @@ export type PluginStreamAction = <T extends object>(
                                   ) => Promise<PlainObject> // prettier-ignore
 
 export type PluginGetAction = <T extends object>(
-                                payload?: T,
-                                pluginModuleConfig?: PluginModuleConfig
-                              ) => Promise<PlainObject[] | PlainObject> // prettier-ignore
+                                payload: T | undefined,
+                                pluginModuleConfig: PluginModuleConfig,
+                                onNextStoresSuccess: EventFnSuccess[]
+                                ) => Promise<PlainObject[] | PlainObject> // prettier-ignore
 
 export type PluginWriteAction = <T extends object>(
                                   payload: T,
-                                  pluginModuleConfig?: PluginModuleConfig
+                                  pluginModuleConfig: PluginModuleConfig,
+                                  onNextStoresSuccess: EventFnSuccess[]
                                 ) => Promise<Modified<T>> // prettier-ignore
 
 // the revert action is a bit different, receives the ActionName

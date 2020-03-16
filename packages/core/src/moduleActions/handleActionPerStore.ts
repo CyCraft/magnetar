@@ -5,7 +5,7 @@ import { ModuleConfig } from '../CreateModule'
 import { getEventFnsPerStore } from '../getEventFnsPerStore'
 import { handleAction } from './handleAction'
 import { Modified, PlainObject } from '../types/base'
-import { EventFnsPerStore, eventFnsMapWithDefaults } from '../types/events'
+import { EventFnsPerStore, eventFnsMapWithDefaults, EventFnSuccess } from '../types/events'
 import {
   ActionType,
   VueSyncWriteAction,
@@ -59,6 +59,9 @@ export function handleActionPerStore (
       stopExecution = trueOrRevert
     }
 
+    // a mutatable array of successevents which is to be triggered after each store
+    const onNextStoresSuccess: EventFnSuccess[] = []
+
     // handle and await each action in sequence
     let result: PlainObject[] | PlainObject | Modified<T> = payload
     for (const [i, storeName] of storesToExecute.entries()) {
@@ -77,6 +80,7 @@ export function handleActionPerStore (
             onError,
             actionName,
             stopExecutionAfterAction,
+            onNextStoresSuccess,
           })
       // handle reverting
       if ((stopExecution as StopExecution) === 'revert') {

@@ -1,7 +1,7 @@
 import { isPromise } from 'is-what'
 import { isVueSyncError, ActionName } from '../types/actions'
 import { SharedConfig, Modified, PlainObject } from '../types/base'
-import { EventNameFnsMap } from '../types/events'
+import { EventNameFnsMap, EventFnSuccess } from '../types/events'
 import { O } from 'ts-toolbelt'
 import { PluginWriteAction, PluginGetAction, PluginModuleConfig } from '../types/plugins'
 
@@ -17,6 +17,7 @@ export async function handleAction<Payload extends PlainObject> (args: {
   onError: SharedConfig['onError']
   actionName: ActionName
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
+  onNextStoresSuccess: EventFnSuccess[]
 }): Promise<PlainObject | PlainObject[] | Modified<Payload>> {
   const {
     pluginAction,
@@ -26,7 +27,9 @@ export async function handleAction<Payload extends PlainObject> (args: {
     onError,
     actionName,
     stopExecutionAfterAction,
+    onNextStoresSuccess,
   } = args
+  const successEventsToExecute = [...onNextStoresSuccess]
   const pluginActionTypeSafe =
     actionName === 'get' ? (pluginAction as PluginGetAction) : (pluginAction as PluginWriteAction)
 
@@ -50,7 +53,11 @@ export async function handleAction<Payload extends PlainObject> (args: {
   }
   let result: PlainObject | Modified<Payload> = payloadAfterBeforeEvent
   try {
-    result = await pluginActionTypeSafe(result as Modified<Payload>, pluginModuleConfig)
+    result = await pluginActionTypeSafe(
+      result as Modified<Payload>,
+      pluginModuleConfig,
+      onNextStoresSuccess
+    )
   } catch (error) {
     if (!isVueSyncError(error)) throw new Error(error)
     // handle and await each eventFn in sequence
@@ -76,6 +83,10 @@ export async function handleAction<Payload extends PlainObject> (args: {
     const eventResultResolved = isPromise(eventResult) ? await eventResult : eventResult
     // overwrite the result with whatever the dev returns in the event function, as long as it's not undefined
     if (!isUndefined(eventResultResolved)) result = eventResultResolved
+  }
+  // handle and await each "onNextStoresSuccess" eventFn in sequence (besides the ones just added of course)
+  for (const fn of successEventsToExecute) {
+    await fn({ payload: payloadAfterBeforeEvent, result, actionName, abort })
   }
   // abort?
   if (abortExecution) {

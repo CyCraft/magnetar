@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
-import { bulbasaur, charmander, squirtle } from './helpers/pokemon'
+import { bulbasaur, charmander, squirtle, flareon } from './helpers/pokemon'
 
 test('write: insert (collection module)', async t => {
   const { pokedexModule } = createVueSyncInstance()
@@ -73,13 +73,34 @@ test('read: get (collection)', async t => {
   t.deepEqual(pokedexModule.data.local, { '001': bulbasaur })
   t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur })
   try {
-    const result = await pokedexModule.get()
-    t.deepEqual(result, [bulbasaur, charmander])
+    const result = await pokedexModule.get(
+      {},
+      {
+        on: {
+          local: {
+            success: ({ result }) => {
+              // here we check if the data returned at this point is actually what that store plugin should return
+              t.deepEqual(result, [bulbasaur, charmander])
+              t.deepEqual(pokedexModule.data.local, { '001': bulbasaur, '004': charmander })
+            },
+          },
+          remote: {
+            success: ({ result }) => {
+              // here we check if the data returned at this point is actually what that store plugin should return
+              t.deepEqual(result, [bulbasaur, flareon])
+              t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur, '136': flareon })
+            },
+          },
+        },
+      }
+    )
+    t.deepEqual(result, [bulbasaur, flareon])
   } catch (error) {
     t.fail(error)
   }
-  t.deepEqual(pokedexModule.data.local, { '001': bulbasaur, '004': charmander })
-  t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur, '004': charmander })
+  t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur, '136': flareon })
+  // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
+  t.deepEqual(pokedexModule.data.local, { '001': bulbasaur, '136': flareon })
 })
 
 test('read: get (document)', async t => {
@@ -88,11 +109,25 @@ test('read: get (document)', async t => {
   t.deepEqual(trainerModule.data.local, { name: 'Luca', age: 10 })
   t.deepEqual(trainerModule.data.remote, { name: 'Luca', age: 10 })
   try {
-    const result = await trainerModule.get()
-    t.deepEqual(result, { name: 'Luca', age: 10, colour: 'blue' })
+    const result = await trainerModule.get(
+      {},
+      {
+        on: {
+          local: {
+            success: ({ result }) => {
+              // here we check if the data returned at this point is actually what that store plugin should return
+              t.deepEqual(result, { name: 'Luca', age: 10, colour: 'blue' })
+              t.deepEqual(trainerModule.data.local, { name: 'Luca', age: 10, colour: 'blue' })
+            },
+          },
+        },
+      }
+    )
+    t.deepEqual(result, { name: 'Luca', age: 10, dream: 'job' })
   } catch (error) {
     t.fail(error)
   }
-  t.deepEqual(trainerModule.data.local, { name: 'Luca', age: 10, colour: 'blue' })
-  t.deepEqual(trainerModule.data.remote, { name: 'Luca', age: 10, colour: 'blue' })
+  t.deepEqual(trainerModule.data.remote, { name: 'Luca', age: 10, dream: 'job' })
+  // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
+  t.deepEqual(trainerModule.data.local, { name: 'Luca', age: 10, dream: 'job' })
 })
