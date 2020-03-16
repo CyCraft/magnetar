@@ -1,6 +1,7 @@
 import { VueSyncGenericPlugin } from './pluginMock'
 import { VueSync, VueSyncInstance } from '../../src'
 import { VueSyncModuleInstance } from '../../src/CreateModule'
+import { bulbasaur } from './pokemon'
 
 export function createVueSyncInstance (): {
   pokedexModule: VueSyncModuleInstance
@@ -18,7 +19,7 @@ export function createVueSyncInstance (): {
   })
   const getInitialDataCollection = () => ({
     // doc
-    '001': { name: 'Bulbasaur', id: '001', type: { grass: 'Grass' } },
+    '001': bulbasaur,
   })
   const getInitialDataDocument = () => ({ name: 'Luca', age: 10 })
   const pokedexModule = vueSync.createModule({

@@ -9,8 +9,7 @@ import {
 } from './types/actions'
 import { SharedConfig, PlainObject } from './types/base'
 import { VueSyncConfig } from '.'
-import { createWriteHandler } from './moduleActions/createWriteHandler'
-import { createGetHandler } from './moduleActions/createGetHandler'
+import { handleActionPerStore } from './moduleActions/handleActionPerStore'
 
 export type VueSyncModuleInstance = {
   data: {
@@ -43,10 +42,10 @@ export function CreateModuleWithContext (
   const actions = Object.entries(actionNameTypeMap).reduce(
     (carry, [actionName, actionType]: [ActionName, ActionType]) => {
       if (isWriteAction(actionName)) {
-        carry[actionName] = createWriteHandler(moduleConfig, globalConfig, actionName, actionType)
+        carry[actionName] = handleActionPerStore(moduleConfig, globalConfig, actionName, actionType) as VueSyncWriteAction // prettier-ignore
       }
       if (actionName === 'get') {
-        carry[actionName] = createGetHandler(moduleConfig, globalConfig)
+        carry[actionName] = handleActionPerStore(moduleConfig, globalConfig, actionName, actionType)
       }
       return carry
     },

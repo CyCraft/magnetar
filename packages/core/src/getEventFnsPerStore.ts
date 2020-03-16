@@ -1,4 +1,13 @@
-import { SharedConfig, EventName, EventFn, EventFnsPerStore } from './types/base'
+import { SharedConfig } from './types/base'
+import {
+  EventName,
+  EventFn,
+  EventFnsPerStore,
+  EventFnBefore,
+  EventFnSuccess,
+  EventFnError,
+  EventFnRevert,
+} from './types/events'
 import { ActionConfig } from './types/actions'
 
 export function getEventFnsPerStore (
@@ -12,7 +21,12 @@ export function getEventFnsPerStore (
       if (!(storeName in carry)) carry[storeName] = {}
       Object.entries(eventFnMap).forEach(([eventName, eventFn]: [EventName, EventFn]) => {
         if (!(eventName in carry[storeName])) carry[storeName][eventName] = []
-        carry[storeName][eventName].push(eventFn)
+        // todo: why is this not type safe?
+        // carry[storeName][eventName].push(eventFn)
+        if (eventName === 'before') carry[storeName].before.push(eventFn as EventFnBefore)
+        if (eventName === 'success') carry[storeName].success.push(eventFn as EventFnSuccess)
+        if (eventName === 'error') carry[storeName].error.push(eventFn as EventFnError)
+        if (eventName === 'revert') carry[storeName].revert.push(eventFn as EventFnRevert)
       })
     }, {})
     return carry

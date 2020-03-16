@@ -1,7 +1,7 @@
 import { merge } from 'merge-anything'
 import { copy } from 'copy-anything'
 import { nestifyObject as nestify } from 'nestify-anything'
-import { ActionName, VueSyncError } from '../../src/types/actions'
+import { ActionName, VueSyncError, actionNameTypeMap } from '../../src/types/actions'
 import {
   PluginInstance,
   PluginRevertAction,
@@ -10,8 +10,9 @@ import {
   PluginStreamAction,
 } from '../../src/types/plugins'
 import { PlainObject } from '../../types/types/base'
-import { OnRetrieveHandler, Modified } from '../../src/types/base'
+import { Modified } from '../../src/types/base'
 import pathToProp from 'path-to-prop'
+import { bulbasaur, charmander } from './pokemon'
 
 // there are two interfaces to be defined & exported by each plugin
 // - VueSyncPluginConfig
@@ -28,15 +29,22 @@ export interface VueSyncPluginModuleConfig {
 function dots (path: string): string { return path.replace(/\//g, '.') } // prettier-ignore
 function isOdd (number: number) { return number % 2 === 1 } // prettier-ignore
 function isEven (number: number) { return number % 2 === 0 } // prettier-ignore
+function isModuleCollection (moduleConfig: VueSyncPluginModuleConfig): boolean {
+  return isOdd(moduleConfig.path.split('/').length)
+}
 
-function createGetAction (moduleData: PlainObject, storeName: string): PluginGetAction {
+function createGetAction (
+  moduleData: PlainObject,
+  storeName: string,
+  makeDataSnapshot: any
+): PluginGetAction {
   // this is a `PluginAction`:
   return async (
-    onRetrieveHandlers: OnRetrieveHandler[],
     payload: PlainObject = {},
     pluginModuleConfig: VueSyncPluginModuleConfig
   ): Promise<PlainObject[] | PlainObject> => {
     // this is custom logic to be implemented by the plugin author
+    makeDataSnapshot()
     const { path } = pluginModuleConfig
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -47,9 +55,22 @@ function createGetAction (moduleData: PlainObject, storeName: string): PluginGet
           }
           reject(errorToThrow)
         } else {
-          resolve(pathToProp(moduleData, path))
+          const db = pathToProp(moduleData, path)
+          let dataRetrieved
+          if (path === 'pokedex') {
+            dataRetrieved = [bulbasaur, charmander]
+            dataRetrieved.forEach(p => {
+              db[p.id] = p
+            })
+          } else {
+            dataRetrieved = { name: 'Luca', age: 10, colour: 'blue' }
+            Object.entries(dataRetrieved).forEach(([key, value]) => {
+              db[key] = value
+            })
+          }
+          resolve(dataRetrieved)
         }
-      }, 10)
+      }, 1)
     })
   }
 }
@@ -66,9 +87,9 @@ function createWriteAction (
   ): Promise<Modified<T>> => {
     // this is custom logic to be implemented by the plugin author
     const { path } = pluginModuleConfig
-    const moduleIsDocument = isEven(path.split('/').length)
+    const isCollection = isModuleCollection(pluginModuleConfig)
     const shouldFail =
-      payload.shouldFail === storeName || (actionName === 'insert' && moduleIsDocument)
+      payload.shouldFail === storeName || (actionName === 'insert' && !isCollection)
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         if (shouldFail) {
@@ -83,16 +104,26 @@ function createWriteAction (
             db[payload.id] = payload
           }
           if (actionName === 'merge') {
-            db[payload.id] = merge(db[payload.id], payload)
+            if (isCollection) {
+              db[payload.id] = merge(db[payload.id], payload)
+            } else {
+              Object.entries(payload).forEach(([key, value]) => {
+                db[key] = merge(db[key], value)
+              })
+            }
           }
           resolve(payload)
         }
-      }, 10)
+      }, 1)
     })
   }
 }
 
-function createRevertAction (moduleData: PlainObject, storeName: string): PluginRevertAction {
+function createRevertAction (
+  moduleData: PlainObject,
+  storeName: string,
+  restoreDataSnapshot: any
+): PluginRevertAction {
   // this is a `PluginRevertAction`:
   return function<T extends PlainObject> (
     actionName: ActionName,
@@ -109,9 +140,18 @@ function createRevertAction (moduleData: PlainObject, storeName: string): Plugin
           }
           reject(errorToThrow)
         } else {
+          const actionType = actionNameTypeMap[actionName]
+          if (actionType === 'write') {
+            const { path } = pluginModuleConfig
+            const db = pathToProp(moduleData, path)
+            db[payload.id] = undefined
+          }
+          if (actionType === 'read') {
+            restoreDataSnapshot()
+          }
           resolve({ ...payload, reverted: { actionName, storeName } })
         }
-      }, 10)
+      }, 1)
     })
   }
 }
@@ -123,6 +163,14 @@ export const VueSyncGenericPlugin = (config: VueSyncPluginConfig): PluginInstanc
   const { storeName } = config
 
   const data: PlainObject = {}
+
+  const dataSnapshots = []
+  const makeDataSnapshot = () => dataSnapshots.push(copy(data))
+  const restoreDataSnapshot = () => {
+    const last = dataSnapshots.pop()
+    Object.keys(data.pokedex).forEach(key => delete data.pokedex[key])
+    Object.keys(last.pokedex).forEach(key => (data.pokedex[key] = last.pokedex[key]))
+  }
 
   // triggered on every module that is registered
   function setModuleDataReference<T extends PlainObject> (
@@ -138,14 +186,14 @@ export const VueSyncGenericPlugin = (config: VueSyncPluginConfig): PluginInstanc
   }
 
   // the plugin must try to implement logic for every `ActionName`
-  const get: PluginGetAction = createGetAction(data, storeName)
+  const get: PluginGetAction = createGetAction(data, storeName, makeDataSnapshot)
   // const stream: PluginStreamAction = createGetAction(data, storeName)
   const insert: PluginWriteAction = createWriteAction(data, 'insert', storeName)
   const _merge: PluginWriteAction = createWriteAction(data, 'merge', storeName)
-  const assign: PluginWriteAction = createWriteAction(data, 'assign', storeName)
-  const replace: PluginWriteAction = createWriteAction(data, 'replace', storeName)
+  // const assign: PluginWriteAction = createWriteAction(data, 'assign', storeName)
+  // const replace: PluginWriteAction = createWriteAction(data, 'replace', storeName)
   const _delete: PluginWriteAction = createWriteAction(data, 'delete', storeName)
-  const revert: PluginRevertAction = createRevertAction(data, storeName)
+  const revert: PluginRevertAction = createRevertAction(data, storeName, restoreDataSnapshot)
 
   // the plugin function must return a `PluginInstance`
   const instance: PluginInstance = {
@@ -157,8 +205,8 @@ export const VueSyncGenericPlugin = (config: VueSyncPluginConfig): PluginInstanc
       // stream,
       insert,
       merge: _merge,
-      assign,
-      replace,
+      // assign,
+      // replace,
       delete: _delete,
     },
   }

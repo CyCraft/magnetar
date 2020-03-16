@@ -1,5 +1,5 @@
 import { ActionName } from './actions'
-import { PlainObject, OnRetrieveHandler, Modified } from './base'
+import { PlainObject, Modified } from './base'
 
 // stores / plugins
 
@@ -37,7 +37,6 @@ export type PluginStreamAction = <T extends object>(
                                   ) => Promise<PlainObject> // prettier-ignore
 
 export type PluginGetAction = <T extends object>(
-                                onRetrieveHandlers: OnRetrieveHandler[],
                                 payload?: T,
                                 pluginModuleConfig?: PluginModuleConfig
                               ) => Promise<PlainObject[] | PlainObject> // prettier-ignore

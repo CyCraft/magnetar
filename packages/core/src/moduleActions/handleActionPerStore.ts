@@ -3,22 +3,33 @@ import { isPromise } from 'is-what'
 import { VueSyncConfig } from '..'
 import { ModuleConfig } from '../CreateModule'
 import { getEventFnsPerStore } from '../getEventFnsPerStore'
-import { handleWrite } from './handleWrite'
-import { EventFnsPerStore, eventFnsMapWithDefaults, PlainObject, Modified } from '../types/base'
-import { ActionType, VueSyncWriteAction, ActionConfig, ActionNameWrite } from '../types/actions'
+import { handleAction } from './handleAction'
+import { Modified, PlainObject } from '../types/base'
+import { EventFnsPerStore, eventFnsMapWithDefaults } from '../types/events'
+import {
+  ActionType,
+  VueSyncWriteAction,
+  ActionConfig,
+  ActionName,
+  VueSyncGetAction,
+} from '../types/actions'
 import { PluginModuleConfig } from '../types/plugins'
 
-export function createWriteHandler (
+function isUndefined (payload: any): payload is undefined | void {
+  return payload === undefined
+}
+
+export function handleActionPerStore (
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<VueSyncConfig>,
-  actionName: ActionNameWrite,
+  actionName: ActionName,
   actionType: ActionType
-): VueSyncWriteAction {
+): VueSyncGetAction | VueSyncWriteAction {
   // returns the action the dev can call with myModule.insert() etc.
   return async function<T extends object> (
     payload: T,
     actionConfig: ActionConfig = {}
-  ): Promise<Modified<T>> {
+  ): Promise<PlainObject[] | PlainObject | Modified<T>> {
     // get all the config needed to perform this action
     const onError = actionConfig.onError || moduleConfig.onError || globalConfig.onError
     const eventFnsPerStore: EventFnsPerStore = getEventFnsPerStore(
@@ -49,37 +60,38 @@ export function createWriteHandler (
     }
 
     // handle and await each action in sequence
-    let result: Modified<T> = payload
+    let result: PlainObject[] | PlainObject | Modified<T> = payload
     for (const [i, storeName] of storesToExecute.entries()) {
       // find the action on the plugin
       const pluginAction = globalConfig.stores[storeName].actions[actionName]
       const pluginModuleConfig: PluginModuleConfig = moduleConfig?.configPerStore[storeName] || {}
+      const eventNameFnsMap = eventFnsMapWithDefaults(eventFnsPerStore[storeName])
       // the plugin action
       result = !pluginAction
         ? result
-        : await handleWrite({
+        : await handleAction({
             pluginAction,
             pluginModuleConfig,
-            payload: result,
-            eventNameFnsMap: eventFnsMapWithDefaults(eventFnsPerStore[storeName]),
+            payload, // should always use the payload as passed originally for clarity
+            eventNameFnsMap,
             onError,
             actionName,
             stopExecutionAfterAction,
           })
-
       // handle reverting
       if ((stopExecution as StopExecution) === 'revert') {
         const storesToRevert = storesToExecute.slice(0, i)
         storesToRevert.reverse()
         for (const storeToRevert of storesToRevert) {
-          const revertAction = globalConfig.stores[storeToRevert].revert
-          result = await revertAction(actionName, result, pluginModuleConfig)
+          const pluginRevertAction = globalConfig.stores[storeToRevert].revert
+          result = await pluginRevertAction(actionName, result, pluginModuleConfig)
           // revert eventFns
           const eventNameFnsMap = eventFnsMapWithDefaults(eventFnsPerStore[storeToRevert])
           // handle and await each eventFn in sequence
           for (const fn of eventNameFnsMap.revert) {
-            const eventResult = fn({ payload: result, actionName })
-            result = isPromise(eventResult) ? await eventResult : eventResult
+            const eventResult = fn({ payload, result, actionName })
+            const eventResultResolved = isPromise(eventResult) ? await eventResult : eventResult
+            if (!isUndefined(eventResultResolved)) result = eventResultResolved
           }
         }
         // return result early to prevent going to the next store

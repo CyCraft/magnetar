@@ -1,7 +1,6 @@
 import { PlainObject, SharedConfig, StoreName, Modified } from './base'
 import { isAnyObject } from 'is-what'
 import { O } from 'ts-toolbelt'
-import { OnRetrieveHandler } from './base'
 
 // these are all the actions that Vue Sync aims to streamline, whichever plugin is used
 // these actions are executable from a `VueSyncModule` and handled by each plugin individually
@@ -39,10 +38,7 @@ export type ActionConfig = Partial<O.Overwrite<SharedConfig, { executionOrder: S
 export type VueSyncGetAction = <T extends object>(
                                   payload?: T,
                                   actionConfig?: ActionConfig
-                                ) => {
-                                  onRetrieve: (arg: OnRetrieveHandler) => void
-                                  retrieved: Promise<PlainObject[] | PlainObject>
-                                } // prettier-ignore
+                                ) => Promise<PlainObject[] | PlainObject> // prettier-ignore
 export type VueSyncWriteAction = <T extends object>(payload: T, actionConfig?: ActionConfig) => Promise<Modified<T>> // prettier-ignore
 
 export type VueSyncError = {

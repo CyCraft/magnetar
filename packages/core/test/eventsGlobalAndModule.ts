@@ -4,19 +4,17 @@ import { VueSyncGenericPlugin } from './helpers/pluginMock'
 
 test('emits global, module and action events', async t => {
   const local = VueSyncGenericPlugin({ storeName: 'local' })
-  const remote = VueSyncGenericPlugin({ storeName: 'remote' })
   const vueSync = VueSync({
-    stores: { local, remote },
+    stores: { local },
     executionOrder: {
-      read: ['remote', 'local'],
-      write: ['local', 'remote'],
+      read: ['local'],
+      write: ['local'],
     },
     on: { local: { before: ({ payload }) => ({ ...payload, addedInGlobal: true }) } },
   })
   const usersModule = vueSync.createModule({
     configPerStore: {
       local: { path: 'users' }, // path for vuex
-      remote: { path: 'users' }, // path for vuex
     },
     on: { local: { before: ({ payload }) => ({ ...payload, addedInModule: true }) } },
   })
