@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
-import { squirtle } from './helpers/pokemon'
+import { squirtle, bulbasaur, charmander, flareon } from './helpers/pokemon'
 
 test('emits before & success events', async t => {
   const { pokedexModule } = createVueSyncInstance()
@@ -92,7 +92,7 @@ test('can abort in success events', async t => {
   t.is(ranAllEvents.length, 2)
 })
 
-test('can mutate payload via events -- should not carry over modification to payload over multiple stores', async t => {
+test('write: can mutate payload via events -- should not carry over modification to payload over multiple stores', async t => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = squirtle
   t.is(pokedexModule.data.local['007'], undefined)
@@ -132,4 +132,51 @@ test('can mutate payload via events -- should not carry over modification to pay
   t.deepEqual(pokedexModule.data.remote['007'], { ...squirtle, trait: 'water resistance' })
   // should be the same payload as AFTER the "succes event" of the last store:
   t.deepEqual(result, { ...squirtle, trait: 'water resistance', strength: 9000 })
+})
+
+test('read: can mutate payload via events -- can apply defaults to remote data to be carried over to local store', async t => {
+  // get resolves once all stores have given a response with data
+  const { pokedexModule } = createVueSyncInstance()
+  t.deepEqual(pokedexModule.data.local, { '001': bulbasaur })
+  t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur })
+  try {
+    const result = await pokedexModule.get(
+      {},
+      {
+        on: {
+          local: {
+            success: ({ result }) => {
+              // here we check if the data returned at this point is actually what that store plugin should return
+              t.deepEqual(result, [bulbasaur, charmander])
+              t.deepEqual(pokedexModule.data.local, { '001': bulbasaur, '004': charmander })
+            },
+          },
+          remote: {
+            success: ({ result }) => {
+              // here we check if the data returned at this point is actually what that store plugin should return
+              t.deepEqual(result, [bulbasaur, flareon])
+              t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur, '136': flareon })
+              // can apply defaults to the remote data
+              return result.map(pokemon => ({ ...pokemon, seen: true }))
+            },
+          },
+        },
+      }
+    )
+    // the remote result SHOULD HAVE the applied defaults
+    t.deepEqual(result, [
+      { ...bulbasaur, seen: true },
+      { ...flareon, seen: true },
+    ])
+  } catch (error) {
+    t.fail(error)
+  }
+  // the remote store SHOULD NOT have the applied defaults
+  t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur, '136': flareon })
+  // the local store should have updated its data to the whatever was returned in the remote success event (via the plugin's onNextStoresSuccess handler)
+  // therefore: the local store SHOULD HAVE the applied defaults
+  t.deepEqual(pokedexModule.data.local, {
+    '001': { ...bulbasaur, seen: true },
+    '136': { ...flareon, seen: true },
+  })
 })

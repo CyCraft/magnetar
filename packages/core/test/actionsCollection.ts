@@ -37,35 +37,41 @@ test('write: merge (document module)', async t => {
   t.deepEqual(trainerModule.data.remote, { name: 'Luca', age: 10, nickName: 'Mesqueeb' })
 })
 
-// test('read action - stream', async t => {
-//   const streamInfo = usersModule.stream()
-//   const { onRetrieve, opened, closed, close } = streamInfo
+test('read: stream (collection module)', async t => {
+  const { pokedexModule } = createVueSyncInstance()
+  t.deepEqual(pokedexModule.data.local, { '001': bulbasaur })
+  t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur })
+  const streamResults = []
+  pokedexModule.stream(
+    {},
+    {
+      on: {
+        remote: {
+          success: ({ result }) => {
+            streamResults.push(result)
+          },
+        },
+      },
+    }
+  )
+  function closeAfter1sec () {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        // use `close()` to close the stream
+        // the promise returned from this is the same promise as the one returned in `closed`
+        // close() // prettier-ignore
+        //   .then(resolve)
+        //   .catch(error => {})
+        resolve()
+      }, 1000)
+    })
+  }
 
-//   // this promise gets triggered once
-//   //   resolves when the stream was correctly opened;
-//   //   rejected when the stream couldn't be opened
-//   opened // prettier-ignore
-//     .then(storeName => {})
-//     .catch(error => {})
+  await closeAfter1sec()
 
-//   // this promise gets triggered once
-//   //   resolves when the stream was (a) correctly closed or (b) the store provided doesn't have stream functionality;
-//   //   rejected when the stream was closed because of an error
-//   closed // prettier-ignore
-//     .then(storeName => {})
-//     .catch(error => {})
-
-//   // You can pass a function to `onRetrieve` which gets triggered every time data comes in
-//   onRetrieve((storeName, dataArray) => {})
-
-//   setTimeout(() => {
-//     // use `close()` to close the stream
-//     // the promise returned from this is the same promise as the one returned in `closed`
-//     close() // prettier-ignore
-//       .then(() => {})
-//       .catch(error => {})
-//   }, 1000)
-// })
+  t.deepEqual(streamResults, [bulbasaur, flareon])
+  t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur, '136': flareon })
+})
 
 test('read: get (collection)', async t => {
   // get resolves once all stores have given a response with data

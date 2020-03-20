@@ -4,32 +4,31 @@ import { VueSyncConfig } from '..'
 import { ModuleConfig } from '../CreateModule'
 import { getEventFnsPerStore } from '../getEventFnsPerStore'
 import { handleAction } from './handleAction'
-import { Modified, PlainObject } from '../types/base'
 import { EventFnsPerStore, eventFnsMapWithDefaults, EventFnSuccess } from '../types/events'
 import {
   ActionType,
-  VueSyncWriteAction,
   ActionConfig,
   ActionName,
-  VueSyncGetAction,
+  ActionResultTernary,
+  ActionTernary,
 } from '../types/actions'
-import { PluginModuleConfig } from '../types/plugins'
+import { PluginModuleConfig, PluginActionTernary } from '../types/plugins'
 
 function isUndefined (payload: any): payload is undefined | void {
   return payload === undefined
 }
 
-export function handleActionPerStore (
+export function handleActionPerStore<TActionName extends Exclude<ActionName, 'stream'>> (
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<VueSyncConfig>,
-  actionName: ActionName,
+  actionName: TActionName,
   actionType: ActionType
-): VueSyncGetAction | VueSyncWriteAction {
+): ActionTernary<TActionName> {
   // returns the action the dev can call with myModule.insert() etc.
-  return async function<T extends object> (
+  const action = async function<T extends object> (
     payload: T,
     actionConfig: ActionConfig = {}
-  ): Promise<PlainObject[] | PlainObject | Modified<T>> {
+  ): Promise<ActionResultTernary<TActionName, T>> {
     // get all the config needed to perform this action
     const onError = actionConfig.onError || moduleConfig.onError || globalConfig.onError
     const eventFnsPerStore: EventFnsPerStore = getEventFnsPerStore(
@@ -63,10 +62,11 @@ export function handleActionPerStore (
     const onNextStoresSuccess: EventFnSuccess[] = []
 
     // handle and await each action in sequence
-    let result: PlainObject[] | PlainObject | Modified<T> = payload
+    let result = (payload as unknown) as ActionResultTernary<TActionName, T>
     for (const [i, storeName] of storesToExecute.entries()) {
       // find the action on the plugin
-      const pluginAction = globalConfig.stores[storeName].actions[actionName]
+      const pluginAction = globalConfig.stores[storeName]
+        .actions[actionName] as PluginActionTernary<TActionName> // prettier-ignore
       const pluginModuleConfig: PluginModuleConfig = moduleConfig?.configPerStore[storeName] || {}
       const eventNameFnsMap = eventFnsMapWithDefaults(eventFnsPerStore[storeName])
       // the plugin action
@@ -95,7 +95,8 @@ export function handleActionPerStore (
           for (const fn of eventNameFnsMap.revert) {
             const eventResult = fn({ payload, result, actionName })
             const eventResultResolved = isPromise(eventResult) ? await eventResult : eventResult
-            if (!isUndefined(eventResultResolved)) result = eventResultResolved
+            if (!isUndefined(eventResultResolved))
+              result = (eventResultResolved as unknown) as ActionResultTernary<TActionName, T>
           }
         }
         // return result early to prevent going to the next store
@@ -110,4 +111,5 @@ export function handleActionPerStore (
     }
     return result
   }
+  return (action as unknown) as ActionTernary<TActionName>
 }

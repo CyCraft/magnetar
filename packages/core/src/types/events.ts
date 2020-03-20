@@ -1,4 +1,4 @@
-import { ActionName, VueSyncError } from './actions'
+import { ActionName, VueSyncError, ActionResultTernary } from './actions'
 import { O } from 'ts-toolbelt'
 import { merge } from 'merge-anything'
 import { Modified, PlainObject } from './base'
@@ -12,10 +12,10 @@ export type EventFnBefore = <T extends PlainObject>(args: {
   abort: () => void
 }) => undefined | void | Modified<T> | Promise<Modified<T>>
 
-export type EventFnSuccess = <T extends PlainObject>(args: {
+export type EventFnSuccess = <T extends PlainObject, TActionName extends ActionName>(args: {
   payload: Modified<T>
-  result: PlainObject | Modified<T>
-  actionName: ActionName
+  actionName: TActionName
+  result: ActionResultTernary<ActionName>
   abort: () => void
 }) => undefined | void | Modified<T> | Promise<Modified<T>>
 
@@ -26,10 +26,10 @@ export type EventFnError = <T extends PlainObject>(args: {
   error: VueSyncError
 }) => undefined | void | Modified<T> | Promise<Modified<T>>
 
-export type EventFnRevert = <T extends PlainObject>(args: {
+export type EventFnRevert = <T extends PlainObject, TActionName extends ActionName>(args: {
   payload: T
-  result: PlainObject | Modified<T>
-  actionName: ActionName
+  actionName: TActionName
+  result: ActionResultTernary<ActionName>
 }) => undefined | void | Modified<T> | Promise<Modified<T>>
 
 export type EventFn = EventFnBefore | EventFnSuccess | EventFnError | EventFnRevert

@@ -21,11 +21,7 @@ test('emits global, module and action events', async t => {
   const insertPayload = { name: 'luca' }
 
   const result = await usersModule.insert(insertPayload, {
-    on: {
-      local: {
-        before: ({ payload }) => ({ ...payload, addedInAction: true }),
-      },
-    },
+    on: { local: { before: ({ payload }) => ({ ...payload, addedInAction: true }) } },
   })
   t.deepEqual(result, {
     ...insertPayload,

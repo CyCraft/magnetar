@@ -34,12 +34,27 @@ export function isWriteAction (actionName: ActionName): actionName is ActionName
 export type ActionConfig = Partial<O.Overwrite<SharedConfig, { executionOrder: StoreName[] }>>
 
 // these are the action types exposed to the dev via a VueSyncModule, it's what the dev will end up calling.
-// export type VueSyncStreamAction = <T extends object>(payload: T, actionConfig?: ActionConfig) => Promise<Partial<T>> // prettier-ignore
+export type VueSyncStreamAction = <T extends object>(payload?: T, actionConfig?: ActionConfig) => Promise<void> // prettier-ignore
 export type VueSyncGetAction = <T extends object>(
                                   payload?: T,
                                   actionConfig?: ActionConfig
                                 ) => Promise<PlainObject[] | PlainObject> // prettier-ignore
 export type VueSyncWriteAction = <T extends object>(payload: T, actionConfig?: ActionConfig) => Promise<Modified<T>> // prettier-ignore
+
+export type ActionTernary<TActionName extends ActionName> = TActionName extends 'stream'
+  ? VueSyncStreamAction
+  : TActionName extends 'get'
+  ? VueSyncGetAction
+  : VueSyncWriteAction
+
+export type ActionResultTernary<
+  TActionName extends ActionName,
+  Payload = never
+> = TActionName extends 'stream'
+  ? void
+  : TActionName extends 'get'
+  ? PlainObject[] | PlainObject
+  : Modified<Payload>
 
 export type VueSyncError = {
   payload: PlainObject

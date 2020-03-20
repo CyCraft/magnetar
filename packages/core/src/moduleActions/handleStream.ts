@@ -1,44 +1,31 @@
 import { isPromise } from 'is-what'
-import { isVueSyncError, ActionName, ActionResultTernary } from '../types/actions'
 import { SharedConfig, Modified, PlainObject } from '../types/base'
+import { isVueSyncError } from '../types/actions'
 import { EventNameFnsMap, EventFnSuccess } from '../types/events'
 import { O } from 'ts-toolbelt'
-import { PluginModuleConfig, PluginActionTernary, OnNextStoresStream } from '../types/plugins'
+import { PluginModuleConfig, PluginStreamAction } from '../types/plugins'
 
 function isUndefined (payload: any): payload is undefined | void {
   return payload === undefined
 }
 
-export async function handleAction<
-  Payload extends PlainObject,
-  TActionName extends ActionName
-> (args: {
-  pluginAction: PluginActionTernary<TActionName>
+export function handleStream<Payload extends PlainObject> (args: {
+  pluginAction: PluginStreamAction
   pluginModuleConfig: PluginModuleConfig
   payload: Payload
   eventNameFnsMap: O.Compulsory<EventNameFnsMap>
   onError: SharedConfig['onError']
-  actionName: TActionName
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
-  onNextStoresSuccess?: EventFnSuccess[]
-  onNextStoresStream?: OnNextStoresStream
-}): Promise<ActionResultTernary<TActionName, Payload>> {
+  onNextStoresSuccess: EventFnSuccess[]
+}): Promise<void> {
   const {
     pluginAction,
     pluginModuleConfig,
     payload,
     eventNameFnsMap: on,
     onError,
-    actionName,
     stopExecutionAfterAction,
-    onNextStoresSuccess = [],
-    onNextStoresStream = {
-      inserted: [],
-      merged: [],
-      assigned: [],
-      replaced: [],
-      deleted: [],
-    },
+    onNextStoresSuccess,
   } = args
   const successEventsToExecute = [...onNextStoresSuccess]
 
@@ -50,33 +37,33 @@ export async function handleAction<
   let payloadAfterBeforeEvent: Modified<Payload> = payload // the payload throughout the stages
   // handle and await each eventFn in sequence
   for (const fn of on.before) {
-    const eventResult = fn({ payload: payloadAfterBeforeEvent, actionName, abort })
-    const eventResultResolved = isPromise(eventResult) ? await eventResult : eventResult
+    // cannot await an async before event
+    const eventResult = fn({ payload: payloadAfterBeforeEvent, actionName: 'stream', abort })
     // overwrite the result with whatever the dev returns in the event function, as long as it's not undefined
-    if (!isUndefined(eventResultResolved)) payloadAfterBeforeEvent = eventResultResolved
+    if (!isUndefined(eventResultResolved)) payloadAfterBeforeEvent = eventResult
   }
   // abort?
   if (abortExecution) {
     stopExecutionAfterAction()
-    // return the proper return type based on the ActionName
-    const returnEarlyValue =
-      actionName === 'stream'
-        ? undefined
-        : actionName === 'get'
-        ? ({} as PlainObject)
-        : payloadAfterBeforeEvent
-    return (returnEarlyValue as unknown) as ActionResultTernary<TActionName, Payload>
+    return payloadAfterBeforeEvent
   }
-  let result: Modified<Payload> | PlainObject | PlainObject[] | void = payloadAfterBeforeEvent
+  let result: PlainObject | Modified<Payload> = payloadAfterBeforeEvent
   try {
-    const thirdParam = actionName === 'stream' ? onNextStoresStream : onNextStoresSuccess
-    // @ts-ignore
-    result = await pluginAction(result as Modified<Payload>, pluginModuleConfig, thirdParam)
+    result = await pluginAction(
+      result as Modified<Payload>,
+      pluginModuleConfig,
+      onNextStoresSuccess
+    )
   } catch (error) {
     if (!isVueSyncError(error)) throw new Error(error)
     // handle and await each eventFn in sequence
     for (const fn of on.error) {
-      const eventResult = fn({ payload: payloadAfterBeforeEvent, actionName, abort, error })
+      const eventResult = fn({
+        payload: payloadAfterBeforeEvent,
+        actionName: 'stream',
+        abort,
+        error,
+      })
       const eventResultResolved = isPromise(eventResult) ? await eventResult : eventResult
       // overwrite the result with whatever the dev returns in the event function, as long as it's not undefined
       if (!isUndefined(eventResultResolved)) result = eventResultResolved
@@ -88,24 +75,29 @@ export async function handleAction<
     }
     if (onError === 'revert') {
       stopExecutionAfterAction('revert')
-      return (result as unknown) as ActionResultTernary<TActionName, Payload>
+      return result
     }
   }
   // handle and await each eventFn in sequence
   for (const fn of on.success) {
-    const eventResult = fn({ payload: payloadAfterBeforeEvent, result, actionName, abort })
+    const eventResult = fn({
+      payload: payloadAfterBeforeEvent,
+      result,
+      actionName: 'stream',
+      abort,
+    })
     const eventResultResolved = isPromise(eventResult) ? await eventResult : eventResult
     // overwrite the result with whatever the dev returns in the event function, as long as it's not undefined
     if (!isUndefined(eventResultResolved)) result = eventResultResolved
   }
   // handle and await each "onNextStoresSuccess" eventFn in sequence (besides the ones just added of course)
   for (const fn of successEventsToExecute) {
-    await fn({ payload: payloadAfterBeforeEvent, result, actionName, abort })
+    await fn({ payload: payloadAfterBeforeEvent, result, actionName: 'stream', abort })
   }
   // abort?
   if (abortExecution) {
     stopExecutionAfterAction()
-    return (result as unknown) as ActionResultTernary<TActionName, Payload>
+    return result
   }
-  return (result as unknown) as ActionResultTernary<TActionName, Payload>
+  return result
 }

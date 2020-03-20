@@ -8,6 +8,7 @@ import {
   PluginGetAction,
   PluginWriteAction,
   PluginStreamAction,
+  OnNextStoresStream,
 } from '../../src/types/plugins'
 import { PlainObject } from '../../types/types/base'
 import { Modified } from '../../src/types/base'
@@ -34,6 +35,93 @@ function isModuleCollection (moduleConfig: VueSyncPluginModuleConfig): boolean {
   return isOdd(moduleConfig.path.split('/').length)
 }
 
+function createStreamAction (moduleData: PlainObject, storeName: string): PluginStreamAction {
+  // this is a `PluginAction`:
+  return async (
+    payload: PlainObject = {},
+    pluginModuleConfig: VueSyncPluginModuleConfig,
+    onNextStoresStream: OnNextStoresStream
+  ): Promise<void> => {
+    // this is custom logic to be implemented by the plugin author
+    const { path } = pluginModuleConfig
+    const db = pathToProp(moduleData, path)
+
+    // let's pass a new event that will make sure this plugin's data is kept up to date with the server data
+    // this mocks how the result from the next store (the remote store) should update this local store per action type
+    if (storeName === 'local') {
+      const isCollection = isModuleCollection(pluginModuleConfig)
+      const inserted = (payload: PlainObject) => {
+        if (isCollection) {
+          // this mocks data inserted into 'pokedex'
+          db[payload.id] = payload
+        } else {
+          // this mocks data inserted into 'data/trainer' (each prop is replaced with whatever came from the server)
+          Object.entries(payload).forEach(([key, value]) => {
+            db[key] = value
+          })
+        }
+      }
+      const merged = (payload: PlainObject) => {
+        if (isCollection) {
+          // this mocks data merged into 'pokedex'
+          db[payload.id] = merge(db[payload.id], payload)
+        } else {
+          // this mocks data merged into 'data/trainer'
+          Object.entries(payload).forEach(([key, value]) => {
+            db[key] = merge(db[key], value)
+          })
+        }
+      }
+      onNextStoresStream.inserted.push(inserted)
+      onNextStoresStream.merged.push(merged)
+      // in this case, the local store doesn't have a real-time connection, so we return early
+      return
+    }
+
+    // otherwise if we are trying to mock the remote store plugin we'll mock opening a stream
+    let dataRetrieved = []
+    // this mocks data returned from 'pokedex'
+    if (path === 'pokedex') {
+      // this is to mock different data in the local store opposed to the remote one
+      dataRetrieved = storeName === 'local' ? [bulbasaur, charmander] : [bulbasaur, flareon]
+    } else if (path === 'data/trainer') {
+      // this mocks data returned from 'data/trainer'
+      dataRetrieved =
+        // this is to mock different data in the local store opposed to the remote one
+        storeName === 'local'
+          ? [{ name: 'Luca', age: 10, colour: 'blue' }]
+          : [{ name: 'Luca', age: 10, dream: 'job' }]
+      Object.entries(dataRetrieved).forEach(([key, value]) => {
+        db[key] = value
+      })
+    }
+    // this mocks actually data coming in at different intervals
+    dataRetrieved.forEach((data, i) => {
+      const waitTime = 50 + i * 10
+      setTimeout(() => {
+        for (const inserted of onNextStoresStream.inserted) {
+          inserted(data)
+        }
+      }, waitTime)
+    })
+    // this mocks the opening of the stream
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        // this mocks an error during execution
+        if (payload.shouldFail === storeName) {
+          const errorToThrow: VueSyncError = {
+            payload,
+            message: 'fail',
+          }
+          reject(errorToThrow)
+        } else {
+          // integrate logic to close the stream & resolve this promise
+        }
+      }, 1)
+    })
+  }
+}
+
 function createGetAction (
   moduleData: PlainObject,
   storeName: string,
@@ -48,6 +136,30 @@ function createGetAction (
     // this is custom logic to be implemented by the plugin author
     makeDataSnapshot()
     const { path } = pluginModuleConfig
+
+    // let's pass a new event that will make sure this plugin's data is kept up to date with the server data
+    // this mocks how the result from the next store (the remote store) should be merged into the local stores
+    if (storeName === 'local') {
+      const isCollection = isModuleCollection(pluginModuleConfig)
+      const { path } = pluginModuleConfig
+      const db = pathToProp(moduleData, path)
+      onNextStoresSuccess.push(({ result }) => {
+        if (!result) return
+        Object.keys(db).forEach(key => delete db[key])
+        if (isCollection) {
+          // this mocks data to be replaced in 'pokedex'
+          result.forEach(doc => (db[doc.id] = doc))
+        } else {
+          // this mocks data to be replaced in 'data/trainer'
+          Object.entries(result).forEach(([key, value]) => {
+            db[key] = value
+          })
+        }
+      })
+    }
+    // in case of a local store that doesn't fetch from anywhere, not even from cach, we could return early here
+
+    // otherwise fetch from cache/or from a remote store with logic you implement here
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         // this mocks an error during execution
@@ -59,7 +171,7 @@ function createGetAction (
           reject(errorToThrow)
         } else {
           const db = pathToProp(moduleData, path)
-          let dataRetrieved
+          let dataRetrieved: PlainObject[] | PlainObject
           // this mocks data returned from 'pokedex'
           if (path === 'pokedex') {
             // this is to mock different data in the local store opposed to the remote one
@@ -76,25 +188,6 @@ function createGetAction (
                 : { name: 'Luca', age: 10, dream: 'job' }
             Object.entries(dataRetrieved).forEach(([key, value]) => {
               db[key] = value
-            })
-          }
-          // let's pass a new event that will make sure this plugin's data is kept up to date with the server data
-          // this mocks how the result from the next store (the remote store) should be merged into the local stores
-          if (storeName === 'local') {
-            const isCollection = isModuleCollection(pluginModuleConfig)
-            const { path } = pluginModuleConfig
-            const db = pathToProp(moduleData, path)
-            onNextStoresSuccess.push(({ result }) => {
-              Object.keys(db).forEach(key => delete db[key])
-              if (isCollection) {
-                // this mocks data to be replaced in 'pokedex'
-                result.forEach(doc => (db[doc.id] = doc))
-              } else {
-                // this mocks data to be replaced in 'data/trainer'
-                Object.entries(result).forEach(([key, value]) => {
-                  db[key] = value
-                })
-              }
             })
           }
           resolve(dataRetrieved)
@@ -225,7 +318,7 @@ export const VueSyncGenericPlugin = (config: VueSyncPluginConfig): PluginInstanc
 
   // the plugin must try to implement logic for every `ActionName`
   const get: PluginGetAction = createGetAction(data, storeName, makeDataSnapshot)
-  // const stream: PluginStreamAction = createGetAction(data, storeName)
+  const stream: PluginStreamAction = createStreamAction(data, storeName)
   const insert: PluginWriteAction = createWriteAction(data, 'insert', storeName)
   const _merge: PluginWriteAction = createWriteAction(data, 'merge', storeName)
   // const assign: PluginWriteAction = createWriteAction(data, 'assign', storeName)
@@ -240,7 +333,7 @@ export const VueSyncGenericPlugin = (config: VueSyncPluginConfig): PluginInstanc
     setModuleDataReference,
     actions: {
       get,
-      // stream,
+      stream,
       insert,
       merge: _merge,
       // assign,

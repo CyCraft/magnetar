@@ -31,11 +31,19 @@ export interface PluginInstance {
 // the `PluginModuleConfig` is the extra config of a plugin when a module is instanciated
 export type PluginModuleConfig = PlainObject
 
-// these are the action types exposed to the dev via a VueSyncModule, it's what the dev will end up calling.
+export type OnNextStoresStream = {
+  inserted: ((payload: object) => void)[]
+  merged: ((payload: object) => void)[]
+  assigned: ((payload: object) => void)[]
+  replaced: ((payload: object) => void)[]
+  deleted: ((payload: object | string) => void)[]
+}
+
 export type PluginStreamAction = <T extends object>(
-                                    payload?: T,
-                                    pluginModuleConfig?: PluginModuleConfig
-                                  ) => Promise<PlainObject> // prettier-ignore
+                                    payload: T,
+                                    pluginModuleConfig: PluginModuleConfig,
+                                    onNextStoresStream: OnNextStoresStream
+                                  ) => Promise<void> // prettier-ignore
 
 export type PluginGetAction = <T extends object>(
                                 payload: T | undefined,
@@ -55,3 +63,9 @@ export type PluginRevertAction = <T extends object>(
                                     payload: T,
                                     pluginModuleConfig: PluginModuleConfig
                                   ) => Promise<T> // prettier-ignore
+
+export type PluginActionTernary<TActionName extends ActionName> = TActionName extends 'stream'
+  ? PluginStreamAction
+  : TActionName extends 'get'
+  ? PluginGetAction
+  : PluginWriteAction

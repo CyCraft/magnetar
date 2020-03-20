@@ -6,17 +6,19 @@ import {
   VueSyncWriteAction,
   VueSyncGetAction,
   isWriteAction,
+  VueSyncStreamAction,
 } from './types/actions'
 import { SharedConfig, PlainObject } from './types/base'
 import { VueSyncConfig } from '.'
 import { handleActionPerStore } from './moduleActions/handleActionPerStore'
+import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
 
 export type VueSyncModuleInstance = {
   data: {
     [storeName: string]: PlainObject
   }
   get?: VueSyncGetAction
-  stream?: VueSyncGetAction
+  stream?: VueSyncStreamAction
   insert?: VueSyncWriteAction
   merge?: VueSyncWriteAction
   assign?: VueSyncWriteAction
@@ -42,10 +44,13 @@ export function CreateModuleWithContext (
   const actions = Object.entries(actionNameTypeMap).reduce(
     (carry, [actionName, actionType]: [ActionName, ActionType]) => {
       if (isWriteAction(actionName)) {
-        carry[actionName] = handleActionPerStore(moduleConfig, globalConfig, actionName, actionType) as VueSyncWriteAction // prettier-ignore
+        carry[actionName] = handleActionPerStore(moduleConfig, globalConfig, actionName, actionType)
       }
       if (actionName === 'get') {
         carry[actionName] = handleActionPerStore(moduleConfig, globalConfig, actionName, actionType)
+      }
+      if (actionName === 'stream') {
+        carry[actionName] = handleStreamPerStore(moduleConfig, globalConfig, actionType)
       }
       return carry
     },
