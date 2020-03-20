@@ -221,7 +221,6 @@ test('get + onError: continue', async t => {
           error: ({ payload }) => {
             // @ts-ignore
             t.deepEqual(payload, getPayload)
-            return payload
           },
         },
         remote: {
@@ -229,7 +228,6 @@ test('get + onError: continue', async t => {
           success: ({ payload }) => {
             // @ts-ignore
             t.deepEqual(payload, getPayload)
-            return payload
           },
         },
       },
@@ -237,7 +235,7 @@ test('get + onError: continue', async t => {
   } catch (e) {
     t.fail()
   }
-  t.deepEqual(pokedexModule.data.local, { '001': bulbasaur })
+  t.deepEqual(pokedexModule.data.local, { '001': bulbasaur, '136': flareon })
   t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur, '136': flareon })
 })
 

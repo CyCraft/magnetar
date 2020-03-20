@@ -148,6 +148,7 @@ function createGetAction (
         Object.keys(db).forEach(key => delete db[key])
         if (isCollection) {
           // this mocks data to be replaced in 'pokedex'
+          console.log('result → ', result)
           result.forEach(doc => (db[doc.id] = doc))
         } else {
           // this mocks data to be replaced in 'data/trainer'

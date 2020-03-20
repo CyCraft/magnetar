@@ -1,6 +1,7 @@
 import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
 import { squirtle, bulbasaur, charmander, flareon } from './helpers/pokemon'
+import { isArray } from 'is-what'
 
 test('emits before & success events', async t => {
   const { pokedexModule } = createVueSyncInstance()
@@ -156,6 +157,7 @@ test('read: can mutate payload via events -- can apply defaults to remote data t
               // here we check if the data returned at this point is actually what that store plugin should return
               t.deepEqual(result, [bulbasaur, flareon])
               t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur, '136': flareon })
+              if (!isArray(result)) return
               // can apply defaults to the remote data
               return result.map(pokemon => ({ ...pokemon, seen: true }))
             },

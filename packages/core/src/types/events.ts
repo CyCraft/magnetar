@@ -6,31 +6,47 @@ import { Modified, PlainObject } from './base'
 // events
 export type EventName = 'before' | 'success' | 'error' | 'revert'
 
-export type EventFnBefore = <T extends PlainObject>(args: {
-  payload: T
+export type EventFnBefore = <Payload extends PlainObject | undefined | void>(args: {
+  payload: Payload
   actionName: ActionName
   abort: () => void
-}) => undefined | void | Modified<T> | Promise<Modified<T>>
+}) => undefined | void | Modified<Payload> | Promise<Modified<Payload>>
 
-export type EventFnSuccess = <T extends PlainObject, TActionName extends ActionName>(args: {
-  payload: Modified<T>
+export type EventFnSuccess = <
+  Payload extends PlainObject | undefined | void,
+  TActionName extends ActionName
+>(args: {
+  payload: Modified<Payload>
   actionName: TActionName
   result: ActionResultTernary<ActionName>
   abort: () => void
-}) => undefined | void | Modified<T> | Promise<Modified<T>>
+}) =>
+  | undefined
+  | void
+  | Modified<Payload>
+  | Promise<Modified<Payload>>
+  | Modified<ActionResultTernary<ActionName>>
 
-export type EventFnError = <T extends PlainObject>(args: {
-  payload: Modified<T>
+export type EventFnError = <Payload extends PlainObject | undefined | void>(args: {
+  payload: Modified<Payload>
   actionName: ActionName
   abort: () => void
   error: VueSyncError
-}) => undefined | void | Modified<T> | Promise<Modified<T>>
+}) => undefined | void | Modified<Payload> | Promise<Modified<Payload>>
 
-export type EventFnRevert = <T extends PlainObject, TActionName extends ActionName>(args: {
-  payload: T
+export type EventFnRevert = <
+  Payload extends PlainObject | undefined | void,
+  TActionName extends ActionName
+>(args: {
+  payload: Payload
   actionName: TActionName
   result: ActionResultTernary<ActionName>
-}) => undefined | void | Modified<T> | Promise<Modified<T>>
+}) =>
+  | undefined
+  | void
+  | Modified<Payload>
+  | Promise<Modified<Payload>>
+  | Modified<ActionResultTernary<ActionName>>
 
 export type EventFn = EventFnBefore | EventFnSuccess | EventFnError | EventFnRevert
 

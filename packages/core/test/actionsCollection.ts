@@ -41,19 +41,7 @@ test('read: stream (collection module)', async t => {
   const { pokedexModule } = createVueSyncInstance()
   t.deepEqual(pokedexModule.data.local, { '001': bulbasaur })
   t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur })
-  const streamResults = []
-  pokedexModule.stream(
-    {},
-    {
-      on: {
-        remote: {
-          success: ({ result }) => {
-            streamResults.push(result)
-          },
-        },
-      },
-    }
-  )
+  pokedexModule.stream()
   function closeAfter1sec () {
     return new Promise(resolve => {
       setTimeout(() => {
@@ -69,8 +57,7 @@ test('read: stream (collection module)', async t => {
 
   await closeAfter1sec()
 
-  t.deepEqual(streamResults, [bulbasaur, flareon])
-  t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur, '136': flareon })
+  t.deepEqual(pokedexModule.data.local, { '001': bulbasaur, '136': flareon })
 })
 
 test('read: get (collection)', async t => {
