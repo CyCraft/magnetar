@@ -1,4 +1,4 @@
-import { ActionName, VueSyncError, ActionResultTernary } from './actions'
+import { ActionName, VueSyncError } from './actions'
 import { O } from 'ts-toolbelt'
 import { merge } from 'merge-anything'
 import { Modified, PlainObject } from './base'
@@ -6,47 +6,58 @@ import { Modified, PlainObject } from './base'
 // events
 export type EventName = 'before' | 'success' | 'error' | 'revert'
 
-export type EventFnBefore = <Payload extends PlainObject | undefined | void>(args: {
-  payload: Payload
-  actionName: ActionName
-  abort: () => void
-}) => undefined | void | Modified<Payload> | Promise<Modified<Payload>>
-
-export type EventFnSuccess = <
+export type EventFnBefore<TActionNameDefault extends ActionName = ActionName> = <
   Payload extends PlainObject | undefined | void,
-  TActionName extends ActionName
+  TActionName extends TActionNameDefault
+>(args: {
+  payload: Payload
+  actionName: TActionName
+  abort: TActionName extends 'stream' ? void : () => void
+}) => undefined | void | Modified<Payload> | Promise<undefined | void | Modified<Payload>>
+
+export type EventFnSuccess<TActionNameDefault extends ActionName = ActionName> = <
+  Payload extends PlainObject | undefined | void,
+  TActionName extends TActionNameDefault
 >(args: {
   payload: Modified<Payload>
   actionName: TActionName
-  result: ActionResultTernary<ActionName>
-  abort: () => void
+  result: void | PlainObject | PlainObject[] | Modified<Payload>
+  abort: TActionName extends 'stream' ? void : () => void
 }) =>
-  | undefined
   | void
+  | PlainObject
+  | PlainObject[]
   | Modified<Payload>
-  | Promise<Modified<Payload>>
-  | Modified<ActionResultTernary<ActionName>>
+  | Promise<void | PlainObject | PlainObject[] | Modified<Payload>>
 
-export type EventFnError = <Payload extends PlainObject | undefined | void>(args: {
+export type EventFnError<TActionNameDefault extends ActionName = ActionName> = <
+  Payload extends PlainObject | undefined | void,
+  TActionName extends TActionNameDefault
+>(args: {
   payload: Modified<Payload>
-  actionName: ActionName
-  abort: () => void
+  actionName: TActionName
   error: VueSyncError
-}) => undefined | void | Modified<Payload> | Promise<Modified<Payload>>
+  abort: TActionName extends 'stream' ? void : () => void
+}) =>
+  | void
+  | PlainObject
+  | PlainObject[]
+  | Modified<Payload>
+  | Promise<void | PlainObject | PlainObject[] | Modified<Payload>>
 
-export type EventFnRevert = <
+export type EventFnRevert<TActionNameDefault extends ActionName = ActionName> = <
   Payload extends PlainObject | undefined | void,
-  TActionName extends ActionName
+  TActionName extends TActionNameDefault
 >(args: {
   payload: Payload
   actionName: TActionName
-  result: ActionResultTernary<ActionName>
+  result: void | PlainObject | PlainObject[] | Modified<Payload>
 }) =>
-  | undefined
   | void
+  | PlainObject
+  | PlainObject[]
   | Modified<Payload>
-  | Promise<Modified<Payload>>
-  | Modified<ActionResultTernary<ActionName>>
+  | Promise<void | PlainObject | PlainObject[] | Modified<Payload>>
 
 export type EventFn = EventFnBefore | EventFnSuccess | EventFnError | EventFnRevert
 

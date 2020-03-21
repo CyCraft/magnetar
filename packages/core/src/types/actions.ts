@@ -31,30 +31,23 @@ export function isWriteAction (actionName: ActionName): actionName is ActionName
 }
 
 // this is what the dev can provide as second param when executing any action in addition to the payload
-export type ActionConfig = Partial<O.Overwrite<SharedConfig, { executionOrder: StoreName[] }>>
+export type ActionConfig<TActionName extends ActionName = ActionName> = Partial<
+  O.Overwrite<SharedConfig<TActionName>, { executionOrder: StoreName[] }>
+>
 
 // these are the action types exposed to the dev via a VueSyncModule, it's what the dev will end up calling.
-export type VueSyncStreamAction = <T extends object>(payload?: T, actionConfig?: ActionConfig) => Promise<void> // prettier-ignore
+export type VueSyncStreamAction = <T extends object>(payload?: T, actionConfig?: ActionConfig<'stream'>) => Promise<void> // prettier-ignore
 export type VueSyncGetAction = <T extends object>(
                                   payload?: T,
-                                  actionConfig?: ActionConfig
-                                ) => Promise<PlainObject[] | PlainObject> // prettier-ignore
-export type VueSyncWriteAction = <T extends object>(payload: T, actionConfig?: ActionConfig) => Promise<Modified<T>> // prettier-ignore
+                                  actionConfig?: ActionConfig<'get'>
+                                ) => Promise<PlainObject | PlainObject[] | void | undefined> // prettier-ignore
+export type VueSyncWriteAction = <T extends object>(payload: T, actionConfig?: ActionConfig<Exclude<ActionName, 'get' | 'stream'>>) => Promise<Modified<T>> // prettier-ignore
 
 export type ActionTernary<TActionName extends ActionName> = TActionName extends 'stream'
   ? VueSyncStreamAction
   : TActionName extends 'get'
   ? VueSyncGetAction
   : VueSyncWriteAction
-
-export type ActionResultTernary<
-  TActionName extends ActionName,
-  Payload = never
-> = TActionName extends 'stream'
-  ? void
-  : TActionName extends 'get'
-  ? PlainObject[] | PlainObject
-  : Modified<Payload>
 
 export type VueSyncError = {
   payload: PlainObject

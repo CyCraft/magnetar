@@ -21,10 +21,7 @@ export interface PluginInstance {
     delete?: PluginWriteAction
   }
   revert: PluginRevertAction // the action that reverts other actions on error
-  setModuleDataReference: <T extends any>(
-    moduleConfig: PluginModuleConfig,
-    previousStoreData: T
-  ) => Modified<T>
+  setModuleDataReference: <T extends any>(moduleConfig: PluginModuleConfig) => Modified<T>
   config: { [key: string]: any } // any other config the plugin needs which is passed by the dev
 }
 
@@ -39,30 +36,38 @@ export type OnNextStoresStream = {
   deleted: ((payload: object | string) => void)[]
 }
 
-export type PluginStreamAction = <T extends object>(
-                                    payload: T,
-                                    pluginModuleConfig: PluginModuleConfig,
-                                    onNextStoresStream: OnNextStoresStream
-                                  ) => Promise<void> // prettier-ignore
+export type PluginStreamAction = <Payload extends object | void>(
+  payload: Payload,
+  pluginModuleConfig: PluginModuleConfig,
+  onNextStoresStream: OnNextStoresStream
+) =>
+  | void
+  | { streaming: Promise<void>; stop: () => void }
+  | Promise<void | { streaming: Promise<void>; stop: () => void }>
 
-export type PluginGetAction = <T extends object>(
-                                payload: T | undefined,
-                                pluginModuleConfig: PluginModuleConfig,
-                                onNextStoresSuccess: EventFnSuccess[]
-                                ) => Promise<PlainObject[] | PlainObject> // prettier-ignore
+export type PluginGetAction = <Payload extends object | void>(
+  payload: Payload,
+  pluginModuleConfig: PluginModuleConfig,
+  onNextStoresSuccess: EventFnSuccess[]
+) => void | PlainObject | PlainObject[] | Promise<void | PlainObject | PlainObject[]>
 
-export type PluginWriteAction = <T extends object>(
-                                  payload: T,
-                                  pluginModuleConfig: PluginModuleConfig,
-                                  onNextStoresSuccess: EventFnSuccess[]
-                                ) => Promise<Modified<T>> // prettier-ignore
+export type PluginWriteAction = <Payload extends object | void>(
+  payload: Payload,
+  pluginModuleConfig: PluginModuleConfig,
+  onNextStoresSuccess: EventFnSuccess[]
+) => Modified<Payload> | Promise<Modified<Payload>>
 
 // the revert action is a bit different, receives the ActionName
-export type PluginRevertAction = <T extends object>(
-                                    actionName: ActionName,
-                                    payload: T,
-                                    pluginModuleConfig: PluginModuleConfig
-                                  ) => Promise<T> // prettier-ignore
+export type PluginRevertAction = <Payload extends object | void>(
+  actionName: ActionName,
+  payload: Payload,
+  pluginModuleConfig: PluginModuleConfig
+) =>
+  | void
+  | PlainObject
+  | PlainObject[]
+  | Modified<Payload>
+  | Promise<void | PlainObject | PlainObject[] | Modified<Payload>>
 
 export type PluginActionTernary<TActionName extends ActionName> = TActionName extends 'stream'
   ? PluginStreamAction

@@ -8,7 +8,7 @@ export type StoreName = string
 export type Modified<T> = PlainObject & Partial<T>
 
 // the shared config which can be set globally < per module < or per action.
-export interface SharedConfig {
+export type SharedConfig<TActionName extends ActionName = ActionName> = {
   executionOrder: {
     [actionType in ActionType]?: StoreName[]
   } &
@@ -18,10 +18,27 @@ export interface SharedConfig {
   onError: 'stop' | 'continue' | 'revert'
   on: {
     [storeName: string]: {
-      before?: EventFnBefore
-      success?: EventFnSuccess
-      error?: EventFnError
-      revert?: EventFnRevert
+      before?: EventFnBefore<TActionName>
+      success?: EventFnSuccess<TActionName>
+      error?: EventFnError<TActionName>
+      revert?: EventFnRevert<TActionName>
     }
   }
 }
+// export interface SharedConfig {
+//   executionOrder: {
+//     [actionType in ActionType]?: StoreName[]
+//   } &
+//     {
+//       [action in ActionName]?: StoreName[]
+//     }
+//   onError: 'stop' | 'continue' | 'revert'
+//   on: {
+//     [storeName: string]: {
+//       before?: EventFnBefore<ActionName>
+//       success?: EventFnSuccess
+//       error?: EventFnError
+//       revert?: EventFnRevert
+//     }
+//   }
+// }

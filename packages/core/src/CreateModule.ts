@@ -17,6 +17,7 @@ export type VueSyncModuleInstance = {
   data: {
     [storeName: string]: PlainObject
   }
+  openStreams: { [identifier: string]: () => void }
   get?: VueSyncGetAction
   stream?: VueSyncStreamAction
   insert?: VueSyncWriteAction
@@ -63,17 +64,18 @@ export function CreateModuleWithContext (
     globalConfig.executionOrder?.write ||
     globalConfig.executionOrder?.insert ||
     Object.keys(globalConfig.stores)
-  for (const [i, storeName] of storesToInitialise.entries()) {
-    const previousStoreName = storesToInitialise[i - 1]
-    const previousStoreData = data[previousStoreName] || {}
+  for (const storeName of storesToInitialise) {
     // save a reference to the dataReference of each the store plugin
     const pluginModuleConfig = moduleConfig?.configPerStore[storeName] || {}
-    const setModuleDataReference = globalConfig.stores[storeName].setModuleDataReference
-    data[storeName] = setModuleDataReference(pluginModuleConfig, previousStoreData)
+    const { setModuleDataReference } = globalConfig.stores[storeName]
+    data[storeName] = setModuleDataReference(pluginModuleConfig)
   }
+
+  const openStreams: { [identifier: string]: () => void } = {}
 
   return {
     data,
+    openStreams,
     ...actions,
   }
 }

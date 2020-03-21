@@ -1,5 +1,4 @@
 import { O } from 'ts-toolbelt'
-import { isPromise } from 'is-what'
 import { VueSyncConfig } from '..'
 import { ModuleConfig } from '../CreateModule'
 import { getEventFnsPerStore } from '../getEventFnsPerStore'
@@ -9,10 +8,12 @@ import {
   ActionType,
   ActionConfig,
   ActionName,
-  ActionResultTernary,
   ActionTernary,
+  VueSyncGetAction,
+  VueSyncWriteAction,
 } from '../types/actions'
-import { PluginModuleConfig, PluginActionTernary } from '../types/plugins'
+import { PluginModuleConfig } from '../types/plugins'
+import { Modified, PlainObject } from '../types/base'
 
 function isUndefined (payload: any): payload is undefined | void {
   return payload === undefined
@@ -23,12 +24,19 @@ export function handleActionPerStore<TActionName extends Exclude<ActionName, 'st
   globalConfig: O.Compulsory<VueSyncConfig>,
   actionName: TActionName,
   actionType: ActionType
-): ActionTernary<TActionName> {
+): ActionTernary<TActionName>
+
+export function handleActionPerStore (
+  moduleConfig: ModuleConfig,
+  globalConfig: O.Compulsory<VueSyncConfig>,
+  actionName: Exclude<ActionName, 'stream'>,
+  actionType: ActionType
+): VueSyncGetAction | VueSyncWriteAction {
   // returns the action the dev can call with myModule.insert() etc.
-  const action = async function<T extends object> (
-    payload: T,
+  return async function<Payload extends object> (
+    payload: Payload,
     actionConfig: ActionConfig = {}
-  ): Promise<ActionResultTernary<TActionName, T>> {
+  ): Promise<void | PlainObject | PlainObject[] | Modified<Payload>> {
     // get all the config needed to perform this action
     const onError = actionConfig.onError || moduleConfig.onError || globalConfig.onError
     const eventFnsPerStore: EventFnsPerStore = getEventFnsPerStore(
@@ -49,7 +57,7 @@ export function handleActionPerStore<TActionName extends Exclude<ActionName, 'st
 
     // create the abort mechanism
     type StopExecution = boolean | 'revert'
-    let stopExecution: StopExecution = false
+    let stopExecution = false as StopExecution
     /**
      * The abort mechanism for the entire store chain. When executed in handleAction() it won't go to the next store in executionOrder.
      *
@@ -62,11 +70,10 @@ export function handleActionPerStore<TActionName extends Exclude<ActionName, 'st
     const onNextStoresSuccess: EventFnSuccess[] = []
 
     // handle and await each action in sequence
-    let result = (payload as unknown) as ActionResultTernary<TActionName, T>
+    let result: void | PlainObject | PlainObject[] | Modified<Payload> = payload
     for (const [i, storeName] of storesToExecute.entries()) {
       // find the action on the plugin
-      const pluginAction = globalConfig.stores[storeName]
-        .actions[actionName] as PluginActionTernary<TActionName> // prettier-ignore
+      const pluginAction = globalConfig.stores[storeName].actions[actionName]
       const pluginModuleConfig: PluginModuleConfig = moduleConfig?.configPerStore[storeName] || {}
       const eventNameFnsMap = eventFnsMapWithDefaults(eventFnsPerStore[storeName])
       // the plugin action
@@ -83,7 +90,7 @@ export function handleActionPerStore<TActionName extends Exclude<ActionName, 'st
             onNextStoresSuccess,
           })
       // handle reverting
-      if ((stopExecution as StopExecution) === 'revert') {
+      if (stopExecution === 'revert') {
         const storesToRevert = storesToExecute.slice(0, i)
         storesToRevert.reverse()
         for (const storeToRevert of storesToRevert) {
@@ -93,10 +100,8 @@ export function handleActionPerStore<TActionName extends Exclude<ActionName, 'st
           const eventNameFnsMap = eventFnsMapWithDefaults(eventFnsPerStore[storeToRevert])
           // handle and await each eventFn in sequence
           for (const fn of eventNameFnsMap.revert) {
-            const eventResult = fn({ payload, result, actionName })
-            const eventResultResolved = isPromise(eventResult) ? await eventResult : eventResult
-            if (!isUndefined(eventResultResolved))
-              result = (eventResultResolved as unknown) as ActionResultTernary<TActionName, T>
+            const eventResult = await fn({ payload, result, actionName })
+            if (!isUndefined(eventResult)) result = eventResult
           }
         }
         // return result early to prevent going to the next store
@@ -104,12 +109,11 @@ export function handleActionPerStore<TActionName extends Exclude<ActionName, 'st
       }
 
       // handle abortion
-      if ((stopExecution as StopExecution) === true) {
+      if (stopExecution === true) {
         // return result early to prevent going to the next store
         return result
       }
     }
     return result
   }
-  return (action as unknown) as ActionTernary<TActionName>
 }

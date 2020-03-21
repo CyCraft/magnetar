@@ -2,7 +2,7 @@ import { O } from 'ts-toolbelt'
 import { VueSyncConfig } from '..'
 import { ModuleConfig } from '../CreateModule'
 import { getEventFnsPerStore } from '../getEventFnsPerStore'
-import { handleAction } from './handleAction'
+import { handleStream } from './handleStream'
 import { EventFnsPerStore, eventFnsMapWithDefaults } from '../types/events'
 import { ActionType, ActionConfig, VueSyncStreamAction } from '../types/actions'
 import { PluginModuleConfig, OnNextStoresStream } from '../types/plugins'
@@ -15,7 +15,6 @@ export function handleStreamPerStore (
   // returns the action the dev can call with myModule.insert() etc.
   return function<T extends object> (payload: T, actionConfig: ActionConfig = {}): Promise<void> {
     // get all the config needed to perform this action
-    const onError = actionConfig.onError || moduleConfig.onError || globalConfig.onError
     const eventFnsPerStore: EventFnsPerStore = getEventFnsPerStore(
       globalConfig,
       moduleConfig,
@@ -41,11 +40,15 @@ export function handleStreamPerStore (
       deleted: [],
     }
 
-    const streamPromisePerStore: { [storeName: string]: Promise<void> } = {}
-
-    function stopExecutionAfterAction (): void {
-      throw new Error('Manually aborted')
-    }
+    const streamInfoPerStore: {
+      [storeName: string]:
+        | {
+            streaming: Promise<void>
+            stop: () => void
+          }
+        | undefined
+        | void
+    } = {}
 
     // handle and await each action in sequence
     for (const storeName of storesToExecute) {
@@ -55,22 +58,23 @@ export function handleStreamPerStore (
       const eventNameFnsMap = eventFnsMapWithDefaults(eventFnsPerStore[storeName])
       // the plugin action
       if (pluginAction) {
-        const streamPromise = handleAction({
-          pluginAction,
-          pluginModuleConfig,
-          payload, // should always use the payload as passed originally for clarity
-          eventNameFnsMap,
-          onError,
-          actionName: 'stream',
-          stopExecutionAfterAction,
-          onNextStoresStream,
-        })
-        streamPromisePerStore[storeName] = streamPromise
+        streamInfoPerStore[storeName] =
+          handleStream({
+            pluginAction,
+            pluginModuleConfig,
+            payload, // should always use the payload as passed originally for clarity
+            eventNameFnsMap,
+            actionName: 'stream',
+            onNextStoresStream,
+          }) || ({} as any)
       }
     }
-    const promises = Object.values(streamPromisePerStore)
+    const streamInfoArray = Object.values(streamInfoPerStore)
+    const streamPromises = streamInfoArray
+      .map(streamInfo => (streamInfo ? streamInfo.streaming : null))
+      .filter(Boolean)
     return new Promise((resolve, reject) => {
-      Promise.all(promises)
+      Promise.all(streamPromises)
         // todo: why can I not just write then(resolve)
         .then(() => resolve())
         .catch(reject)

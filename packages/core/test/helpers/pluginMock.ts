@@ -15,10 +15,15 @@ import { Modified } from '../../src/types/base'
 import pathToProp from 'path-to-prop'
 import { bulbasaur, charmander, flareon } from './pokemon'
 import { EventFnSuccess } from '../../src/types/events'
+import { isArray } from 'is-what'
 
 // there are two interfaces to be defined & exported by each plugin
 // - VueSyncPluginConfig
 // - VueSyncPluginModuleConfig
+
+function isUndefined (payload: any): payload is undefined | void {
+  return payload === undefined
+}
 
 export interface VueSyncPluginConfig {
   storeName: string
@@ -37,11 +42,14 @@ function isModuleCollection (moduleConfig: VueSyncPluginModuleConfig): boolean {
 
 function createStreamAction (moduleData: PlainObject, storeName: string): PluginStreamAction {
   // this is a `PluginAction`:
-  return async (
-    payload: PlainObject = {},
+  return (
+    payload: void | PlainObject = {},
     pluginModuleConfig: VueSyncPluginModuleConfig,
     onNextStoresStream: OnNextStoresStream
-  ): Promise<void> => {
+  ):
+    | void
+    | { streaming: Promise<void>; stop: () => void }
+    | Promise<void | { streaming: Promise<void>; stop: () => void }> => {
     // this is custom logic to be implemented by the plugin author
     const { path } = pluginModuleConfig
     const db = pathToProp(moduleData, path)
@@ -105,20 +113,24 @@ function createStreamAction (moduleData: PlainObject, storeName: string): Plugin
       }, waitTime)
     })
     // this mocks the opening of the stream
-    return new Promise((resolve, reject) => {
+    let stopStreaming
+    const streaming: Promise<void> = new Promise((resolve, reject): void => {
+      stopStreaming = resolve
       setTimeout(() => {
         // this mocks an error during execution
-        if (payload.shouldFail === storeName) {
+        if (payload && payload.shouldFail === storeName) {
           const errorToThrow: VueSyncError = {
             payload,
             message: 'fail',
           }
           reject(errorToThrow)
-        } else {
-          // integrate logic to close the stream & resolve this promise
         }
       }, 1)
     })
+    function stop (): void {
+      stopStreaming()
+    }
+    return { streaming, stop }
   }
 }
 
@@ -129,10 +141,10 @@ function createGetAction (
 ): PluginGetAction {
   // this is a `PluginAction`:
   return async (
-    payload: PlainObject = {},
+    payload: void | PlainObject = {},
     pluginModuleConfig: VueSyncPluginModuleConfig,
     onNextStoresSuccess: EventFnSuccess[]
-  ): Promise<PlainObject[] | PlainObject> => {
+  ): Promise<void | PlainObject | PlainObject[]> => {
     // this is custom logic to be implemented by the plugin author
     makeDataSnapshot()
     const { path } = pluginModuleConfig
@@ -148,8 +160,7 @@ function createGetAction (
         Object.keys(db).forEach(key => delete db[key])
         if (isCollection) {
           // this mocks data to be replaced in 'pokedex'
-          console.log('result → ', result)
-          result.forEach(doc => (db[doc.id] = doc))
+          if (isArray(result)) result.forEach(doc => (db[doc.id] = doc))
         } else {
           // this mocks data to be replaced in 'data/trainer'
           Object.entries(result).forEach(([key, value]) => {
@@ -164,7 +175,7 @@ function createGetAction (
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         // this mocks an error during execution
-        if (payload.shouldFail === storeName) {
+        if (payload && payload.shouldFail === storeName) {
           const errorToThrow: VueSyncError = {
             payload,
             message: 'fail',
@@ -172,7 +183,7 @@ function createGetAction (
           reject(errorToThrow)
         } else {
           const db = pathToProp(moduleData, path)
-          let dataRetrieved: PlainObject[] | PlainObject
+          let dataRetrieved: PlainObject | PlainObject[]
           // this mocks data returned from 'pokedex'
           if (path === 'pokedex') {
             // this is to mock different data in the local store opposed to the remote one
@@ -204,10 +215,11 @@ function createWriteAction (
   storeName: string
 ): PluginWriteAction {
   // this is a `PluginAction`:
-  return async <T extends PlainObject>(
-    payload: T,
+  return async (
+    payload: PlainObject | void,
     pluginModuleConfig: VueSyncPluginModuleConfig
-  ): Promise<Modified<T>> => {
+  ): Promise<Modified<PlainObject>> => {
+    if (!payload) return
     // this is custom logic to be implemented by the plugin author
     const { path } = pluginModuleConfig
     const isCollection = isModuleCollection(pluginModuleConfig)
@@ -252,13 +264,14 @@ function createRevertAction (
   restoreDataSnapshot: any
 ): PluginRevertAction {
   // this is a `PluginRevertAction`:
-  return function<T extends PlainObject> (
+  return function revert (
     actionName: ActionName,
-    payload: T,
+    payload: PlainObject | void,
     pluginModuleConfig: VueSyncPluginModuleConfig
-  ): Promise<T> {
+  ): Promise<PlainObject | void> {
     // this is custom logic to be implemented by the plugin author
     return new Promise((resolve, reject) => {
+      if (isUndefined(payload)) return resolve(payload)
       setTimeout(() => {
         // this mocks an error during execution
         if (payload.shouldFailOnRevert === storeName) {
@@ -306,8 +319,7 @@ export const VueSyncGenericPlugin = (config: VueSyncPluginConfig): PluginInstanc
 
   // this is triggered on every module that is registered, every module should have something similar
   function setModuleDataReference<T extends PlainObject> (
-    moduleConfig: VueSyncPluginModuleConfig,
-    previousStoreData: T
+    moduleConfig: VueSyncPluginModuleConfig
   ): Modified<T> {
     const { path, initialData } = moduleConfig
     const initialModuleData = nestify({ [dots(path)]: initialData || {} })
