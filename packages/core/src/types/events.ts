@@ -6,35 +6,39 @@ import { Modified, PlainObject } from './base'
 // events
 export type EventName = 'before' | 'success' | 'error' | 'revert'
 
-export type EventFnBefore<TActionNameDefault extends ActionName = ActionName> = <
-  Payload extends PlainObject | undefined | void,
-  TActionName extends TActionNameDefault
->(args: {
-  payload: Payload
+export type EventFnBefore<
+  TActionNameDefault extends ActionName = ActionName,
+  PayloadPassed extends PlainObject | undefined | void = PlainObject
+> = <Payload extends PlainObject | undefined | void, TActionName extends TActionNameDefault>(args: {
+  payload: Payload | PayloadPassed
   actionName: TActionName
   abort: TActionName extends 'stream' ? void : () => void
-}) => undefined | void | Modified<Payload> | Promise<undefined | void | Modified<Payload>>
+}) =>
+  | undefined
+  | void
+  | Modified<Payload | PayloadPassed>
+  | Promise<undefined | void | Modified<Payload | PayloadPassed>>
 
-export type EventFnSuccess<TActionNameDefault extends ActionName = ActionName> = <
-  Payload extends PlainObject | undefined | void,
-  TActionName extends TActionNameDefault
->(args: {
-  payload: Modified<Payload>
+export type EventFnSuccess<
+  TActionNameDefault extends ActionName = ActionName,
+  PayloadPassed extends PlainObject | undefined | void = PlainObject
+> = <Payload extends PlainObject | undefined | void, TActionName extends TActionNameDefault>(args: {
+  payload: Modified<Payload | PayloadPassed>
   actionName: TActionName
-  result: void | PlainObject | PlainObject[] | Modified<Payload>
+  result: void | PlainObject | PlainObject[] | Modified<Payload | PayloadPassed>
   abort: TActionName extends 'stream' ? void : () => void
 }) =>
   | void
   | PlainObject
   | PlainObject[]
-  | Modified<Payload>
-  | Promise<void | PlainObject | PlainObject[] | Modified<Payload>>
+  | Modified<Payload | PayloadPassed>
+  | Promise<void | PlainObject | PlainObject[] | Modified<Payload | PayloadPassed>>
 
-export type EventFnError<TActionNameDefault extends ActionName = ActionName> = <
-  Payload extends PlainObject | undefined | void,
-  TActionName extends TActionNameDefault
->(args: {
-  payload: Modified<Payload>
+export type EventFnError<
+  TActionNameDefault extends ActionName = ActionName,
+  PayloadPassed extends PlainObject | undefined | void = PlainObject
+> = <Payload extends PlainObject | undefined | void, TActionName extends TActionNameDefault>(args: {
+  payload: Modified<Payload | PayloadPassed>
   actionName: TActionName
   error: VueSyncError
   abort: TActionName extends 'stream' ? void : () => void
@@ -42,22 +46,22 @@ export type EventFnError<TActionNameDefault extends ActionName = ActionName> = <
   | void
   | PlainObject
   | PlainObject[]
-  | Modified<Payload>
-  | Promise<void | PlainObject | PlainObject[] | Modified<Payload>>
+  | Modified<Payload | PayloadPassed>
+  | Promise<void | PlainObject | PlainObject[] | Modified<Payload | PayloadPassed>>
 
-export type EventFnRevert<TActionNameDefault extends ActionName = ActionName> = <
-  Payload extends PlainObject | undefined | void,
-  TActionName extends TActionNameDefault
->(args: {
+export type EventFnRevert<
+  TActionNameDefault extends ActionName = ActionName,
+  PayloadPassed extends PlainObject | undefined | void = PlainObject
+> = <Payload extends PlainObject | undefined | void, TActionName extends TActionNameDefault>(args: {
   payload: Payload
   actionName: TActionName
-  result: void | PlainObject | PlainObject[] | Modified<Payload>
+  result: void | PlainObject | PlainObject[] | Modified<Payload | PayloadPassed>
 }) =>
   | void
   | PlainObject
   | PlainObject[]
-  | Modified<Payload>
-  | Promise<void | PlainObject | PlainObject[] | Modified<Payload>>
+  | Modified<Payload | PayloadPassed>
+  | Promise<void | PlainObject | PlainObject[] | Modified<Payload | PayloadPassed>>
 
 export type EventFn = EventFnBefore | EventFnSuccess | EventFnError | EventFnRevert
 

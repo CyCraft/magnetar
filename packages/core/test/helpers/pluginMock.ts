@@ -15,7 +15,7 @@ import { Modified } from '../../src/types/base'
 import pathToProp from 'path-to-prop'
 import { bulbasaur, charmander, flareon } from './pokemon'
 import { EventFnSuccess } from '../../src/types/events'
-import { isArray } from 'is-what'
+import { isArray, isPlainObject } from 'is-what'
 
 // there are two interfaces to be defined & exported by each plugin
 // - VueSyncPluginConfig
@@ -156,16 +156,18 @@ function createGetAction (
       const { path } = pluginModuleConfig
       const db = pathToProp(moduleData, path)
       onNextStoresSuccess.push(({ result }) => {
-        if (!result) return
+        if (isUndefined(result)) return
         Object.keys(db).forEach(key => delete db[key])
         if (isCollection) {
           // this mocks data to be replaced in 'pokedex'
           if (isArray(result)) result.forEach(doc => (db[doc.id] = doc))
         } else {
           // this mocks data to be replaced in 'data/trainer'
-          Object.entries(result).forEach(([key, value]) => {
-            db[key] = value
-          })
+          if (isPlainObject(result)) {
+            Object.entries(result).forEach(([key, value]) => {
+              db[key] = value
+            })
+          }
         }
       })
     }
@@ -215,11 +217,11 @@ function createWriteAction (
   storeName: string
 ): PluginWriteAction {
   // this is a `PluginAction`:
-  return async (
-    payload: PlainObject | void,
+  return async function<Payload extends PlainObject | void> (
+    payload: Payload,
     pluginModuleConfig: VueSyncPluginModuleConfig
-  ): Promise<Modified<PlainObject>> => {
-    if (!payload) return
+  ): Promise<Modified<Payload>> {
+    if (!isPlainObject(payload)) return
     // this is custom logic to be implemented by the plugin author
     const { path } = pluginModuleConfig
     const isCollection = isModuleCollection(pluginModuleConfig)
@@ -251,7 +253,7 @@ function createWriteAction (
               })
             }
           }
-          resolve(payload)
+          resolve(payload as Modified<Payload>)
         }
       }, 1)
     })

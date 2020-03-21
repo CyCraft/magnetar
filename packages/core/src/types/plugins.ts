@@ -48,13 +48,13 @@ export type PluginStreamAction = <Payload extends object | void>(
 export type PluginGetAction = <Payload extends object | void>(
   payload: Payload,
   pluginModuleConfig: PluginModuleConfig,
-  onNextStoresSuccess: EventFnSuccess[]
+  onNextStoresSuccess: EventFnSuccess<'get', Payload>[]
 ) => void | PlainObject | PlainObject[] | Promise<void | PlainObject | PlainObject[]>
 
-export type PluginWriteAction = <Payload extends object | void>(
+export type PluginWriteAction = <Payload extends object>(
   payload: Payload,
   pluginModuleConfig: PluginModuleConfig,
-  onNextStoresSuccess: EventFnSuccess[]
+  onNextStoresSuccess: EventFnSuccess<Exclude<ActionName, 'get' | 'stream'>, Payload>[]
 ) => Modified<Payload> | Promise<Modified<Payload>>
 
 // the revert action is a bit different, receives the ActionName

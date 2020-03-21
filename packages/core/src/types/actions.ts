@@ -31,17 +31,17 @@ export function isWriteAction (actionName: ActionName): actionName is ActionName
 }
 
 // this is what the dev can provide as second param when executing any action in addition to the payload
-export type ActionConfig<TActionName extends ActionName = ActionName> = Partial<
-  O.Overwrite<SharedConfig<TActionName>, { executionOrder: StoreName[] }>
+export type ActionConfig<TActionName extends ActionName = ActionName, Payload = object> = Partial<
+  O.Overwrite<SharedConfig<TActionName, Payload>, { executionOrder: StoreName[] }>
 >
 
 // these are the action types exposed to the dev via a VueSyncModule, it's what the dev will end up calling.
-export type VueSyncStreamAction = <T extends object>(payload?: T, actionConfig?: ActionConfig<'stream'>) => Promise<void> // prettier-ignore
-export type VueSyncGetAction = <T extends object>(
-                                  payload?: T,
-                                  actionConfig?: ActionConfig<'get'>
+export type VueSyncStreamAction = <Payload extends object>(payload?: Payload, actionConfig?: ActionConfig<'stream', Payload>) => Promise<void> // prettier-ignore
+export type VueSyncGetAction = <Payload extends object>(
+                                  payload?: Payload,
+                                  actionConfig?: ActionConfig<'get', Payload>
                                 ) => Promise<PlainObject | PlainObject[] | void | undefined> // prettier-ignore
-export type VueSyncWriteAction = <T extends object>(payload: T, actionConfig?: ActionConfig<Exclude<ActionName, 'get' | 'stream'>>) => Promise<Modified<T>> // prettier-ignore
+export type VueSyncWriteAction = <Payload extends object>(payload: Payload, actionConfig?: ActionConfig<Exclude<ActionName, 'get' | 'stream'>, Payload>) => Promise<Modified<Payload>> // prettier-ignore
 
 export type ActionTernary<TActionName extends ActionName> = TActionName extends 'stream'
   ? VueSyncStreamAction
