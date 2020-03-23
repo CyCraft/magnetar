@@ -35,7 +35,7 @@ export async function handleStream<Payload extends PlainObject> (args: {
     onNextStoresStream,
   } = args
 
-  let payloadAfterBeforeEvent: Modified<Payload> = payload // the payload throughout the stages
+  let payloadAfterBeforeEvent: Modified<Payload> | PlainObject = payload // the payload throughout the stages
   // handle and await each eventFn in sequence
   for (const fn of on.before) {
     const eventResult = await fn({ payload: payloadAfterBeforeEvent, actionName, abort: undefined })

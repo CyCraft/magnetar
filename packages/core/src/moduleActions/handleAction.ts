@@ -58,7 +58,7 @@ export async function handleAction<Payload extends PlainObject> (args: {
   const abort = (): void => {
     abortExecution = true
   }
-  let payloadAfterBeforeEvent: Modified<Payload> = payload // the payload throughout the stages
+  let payloadAfterBeforeEvent: PlainObject | Modified<Payload> = payload // the payload throughout the stages
   // handle and await each eventFn in sequence
   for (const fn of on.before) {
     const eventResult = await fn({ payload: payloadAfterBeforeEvent, actionName, abort })

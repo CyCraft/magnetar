@@ -42,6 +42,8 @@ export function CreateModuleWithContext (
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<VueSyncConfig>
 ): VueSyncModuleInstance {
+  const openStreams: { [identifier: string]: () => void } = {}
+
   const actions = Object.entries(actionNameTypeMap).reduce(
     (carry, [actionName, actionType]: [ActionName, ActionType]) => {
       if (isWriteAction(actionName)) {
@@ -51,7 +53,12 @@ export function CreateModuleWithContext (
         carry[actionName] = handleActionPerStore(moduleConfig, globalConfig, actionName, actionType)
       }
       if (actionName === 'stream') {
-        carry[actionName] = handleStreamPerStore(moduleConfig, globalConfig, actionType)
+        carry[actionName] = handleStreamPerStore(
+          moduleConfig,
+          globalConfig,
+          actionType,
+          openStreams
+        )
       }
       return carry
     },
@@ -70,8 +77,6 @@ export function CreateModuleWithContext (
     const { setModuleDataReference } = globalConfig.stores[storeName]
     data[storeName] = setModuleDataReference(pluginModuleConfig)
   }
-
-  const openStreams: { [identifier: string]: () => void } = {}
 
   return {
     data,

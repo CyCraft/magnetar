@@ -1,6 +1,7 @@
 import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
 import { bulbasaur, charmander, squirtle, flareon } from './helpers/pokemon'
+import { waitMs } from './helpers/wait'
 
 test('write: insert (collection module)', async t => {
   const { pokedexModule } = createVueSyncInstance()
@@ -41,23 +42,14 @@ test('read: stream (collection module)', async t => {
   const { pokedexModule } = createVueSyncInstance()
   t.deepEqual(pokedexModule.data.local, { '001': bulbasaur })
   t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur })
-  pokedexModule.stream()
-  function closeAfter1sec () {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        // use `close()` to close the stream
-        // the promise returned from this is the same promise as the one returned in `closed`
-        // close() // prettier-ignore
-        //   .then(resolve)
-        //   .catch(error => {})
-        resolve()
-      }, 1000)
-    })
-  }
-
-  await closeAfter1sec()
-
+  const streamPayload = {}
+  pokedexModule.stream(streamPayload)
+  await waitMs(600)
+  pokedexModule.openStreams[JSON.stringify(streamPayload)]()
   t.deepEqual(pokedexModule.data.local, { '001': bulbasaur, '136': flareon })
+  await waitMs(1000)
+  t.deepEqual(pokedexModule.data.local, { '001': bulbasaur, '136': flareon })
+  // '004': charmander should come in 3rd, but doesn't because we closed the stream
 })
 
 test('read: get (collection)', async t => {

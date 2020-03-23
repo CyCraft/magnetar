@@ -10,10 +10,14 @@ import { PluginModuleConfig, OnNextStoresStream } from '../types/plugins'
 export function handleStreamPerStore (
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<VueSyncConfig>,
-  actionType: ActionType
+  actionType: ActionType,
+  openStreams: { [identifier: string]: () => void }
 ): VueSyncStreamAction {
   // returns the action the dev can call with myModule.insert() etc.
-  return function<T extends object> (payload: T, actionConfig: ActionConfig = {}): Promise<void> {
+  return async function<T extends object> (
+    payload: T,
+    actionConfig: ActionConfig = {}
+  ): Promise<void> {
     // get all the config needed to perform this action
     const eventFnsPerStore: EventFnsPerStore = getEventFnsPerStore(
       globalConfig,
@@ -41,13 +45,7 @@ export function handleStreamPerStore (
     }
 
     const streamInfoPerStore: {
-      [storeName: string]:
-        | {
-            streaming: Promise<void>
-            stop: () => void
-          }
-        | undefined
-        | void
+      [storeName: string]: { streaming: Promise<void>; stop: () => void }
     } = {}
 
     // handle and await each action in sequence
@@ -58,21 +56,26 @@ export function handleStreamPerStore (
       const eventNameFnsMap = eventFnsMapWithDefaults(eventFnsPerStore[storeName])
       // the plugin action
       if (pluginAction) {
-        streamInfoPerStore[storeName] =
-          handleStream({
-            pluginAction,
-            pluginModuleConfig,
-            payload, // should always use the payload as passed originally for clarity
-            eventNameFnsMap,
-            actionName: 'stream',
-            onNextStoresStream,
-          }) || ({} as any)
+        const streamInfo = await handleStream({
+          pluginAction,
+          pluginModuleConfig,
+          payload, // should always use the payload as passed originally for clarity
+          eventNameFnsMap,
+          actionName: 'stream',
+          onNextStoresStream,
+        })
+        if (streamInfo) streamInfoPerStore[storeName] = streamInfo
       }
     }
-    const streamInfoArray = Object.values(streamInfoPerStore)
-    const streamPromises = streamInfoArray
-      .map(streamInfo => (streamInfo ? streamInfo.streaming : null))
-      .filter(Boolean)
+    const streamPromises = Object.entries(streamInfoPerStore).map(([storeName, streamInfo]) => {
+      // return the streaming promises
+      return streamInfo.streaming
+    })
+    // create a function to stop all streams
+    const identifier = JSON.stringify(payload)
+    openStreams[identifier] = (): void =>
+      Object.values(streamInfoPerStore).forEach(({ stop }) => stop())
+    // return all the stream promises as one promise
     return new Promise((resolve, reject) => {
       Promise.all(streamPromises)
         // todo: why can I not just write then(resolve)

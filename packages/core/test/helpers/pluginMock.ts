@@ -90,32 +90,39 @@ function createStreamAction (moduleData: PlainObject, storeName: string): Plugin
     let dataRetrieved = []
     // this mocks data returned from 'pokedex'
     if (path === 'pokedex') {
-      // this is to mock different data in the local store opposed to the remote one
-      dataRetrieved = storeName === 'local' ? [bulbasaur, charmander] : [bulbasaur, flareon]
+      dataRetrieved = [bulbasaur, flareon, charmander]
     } else if (path === 'data/trainer') {
       // this mocks data returned from 'data/trainer'
-      dataRetrieved =
-        // this is to mock different data in the local store opposed to the remote one
-        storeName === 'local'
-          ? [{ name: 'Luca', age: 10, colour: 'blue' }]
-          : [{ name: 'Luca', age: 10, dream: 'job' }]
+      dataRetrieved = [
+        { name: 'Luca', age: 10 },
+        { name: 'Luca', age: 10, dream: 'job' },
+        { name: 'Luca', age: 10, dream: 'job', colour: 'blue' },
+      ]
       Object.entries(dataRetrieved).forEach(([key, value]) => {
         db[key] = value
       })
     }
+    const stopStreaming = {
+      stopped: false,
+      stop: () => {},
+    }
     // this mocks actually data coming in at different intervals
     dataRetrieved.forEach((data, i) => {
-      const waitTime = 50 + i * 10
+      const waitTime = 10 + i * 500
       setTimeout(() => {
+        console.log('waitTime → ', waitTime, 'stopStreaming.stopped → ', stopStreaming.stopped)
+        // mock when the stream is already stopped
+        if (stopStreaming.stopped) return
+        // else go head and insert stuff based on the passed param: onNextStoresStream
         for (const inserted of onNextStoresStream.inserted) {
           inserted(data)
         }
       }, waitTime)
     })
     // this mocks the opening of the stream
-    let stopStreaming
+
     const streaming: Promise<void> = new Promise((resolve, reject): void => {
-      stopStreaming = resolve
+      stopStreaming.stop = resolve
       setTimeout(() => {
         // this mocks an error during execution
         if (payload && payload.shouldFail === storeName) {
@@ -128,7 +135,8 @@ function createStreamAction (moduleData: PlainObject, storeName: string): Plugin
       }, 1)
     })
     function stop (): void {
-      stopStreaming()
+      stopStreaming.stopped = true
+      stopStreaming.stop()
     }
     return { streaming, stop }
   }
