@@ -106,11 +106,10 @@ function createStreamAction (moduleData: PlainObject, storeName: string): Plugin
       stopped: false,
       stop: () => {},
     }
-    // this mocks actually data coming in at different intervals
+    // this mocks actual data coming in at different intervals
     dataRetrieved.forEach((data, i) => {
       const waitTime = 10 + i * 500
       setTimeout(() => {
-        console.log('waitTime → ', waitTime, 'stopStreaming.stopped → ', stopStreaming.stopped)
         // mock when the stream is already stopped
         if (stopStreaming.stopped) return
         // else go head and insert stuff based on the passed param: onNextStoresStream

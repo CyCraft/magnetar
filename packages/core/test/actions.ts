@@ -45,11 +45,29 @@ test('read: stream (collection module)', async t => {
   const streamPayload = {}
   pokedexModule.stream(streamPayload)
   await waitMs(600)
-  pokedexModule.openStreams[JSON.stringify(streamPayload)]()
+  // close the stream:
+  const unsubscribe = pokedexModule.openStreams[JSON.stringify(streamPayload)]
+  unsubscribe()
   t.deepEqual(pokedexModule.data.local, { '001': bulbasaur, '136': flareon })
   await waitMs(1000)
   t.deepEqual(pokedexModule.data.local, { '001': bulbasaur, '136': flareon })
   // '004': charmander should come in 3rd, but doesn't because we closed the stream
+})
+
+test('read: stream (doc module)', async t => {
+  const { trainerModule } = createVueSyncInstance()
+  t.deepEqual(trainerModule.data.local, { name: 'Luca', age: 10 })
+  t.deepEqual(trainerModule.data.remote, { name: 'Luca', age: 10 })
+  const streamPayload = {}
+  trainerModule.stream(streamPayload)
+  await waitMs(600)
+  // close the stream:
+  const unsubscribe = trainerModule.openStreams[JSON.stringify(streamPayload)]
+  unsubscribe()
+  t.deepEqual(trainerModule.data.local, { name: 'Luca', age: 10, dream: 'job' })
+  await waitMs(1000)
+  t.deepEqual(trainerModule.data.local, { name: 'Luca', age: 10, dream: 'job' })
+  // {colour: 'blue'} should come in 3rd, but doesn't because we closed the stream
 })
 
 test('read: get (collection)', async t => {
