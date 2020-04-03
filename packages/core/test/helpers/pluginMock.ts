@@ -83,6 +83,7 @@ function createStreamAction (moduleData: PlainObject, storeName: string): Plugin
       onNextStoresStream.inserted.push(inserted)
       onNextStoresStream.merged.push(merged)
       // in this case, the local store doesn't have a real-time connection, so we return early
+      // local store's only job is to pass its onNextStoresStream functions
       return
     }
 
@@ -112,7 +113,7 @@ function createStreamAction (moduleData: PlainObject, storeName: string): Plugin
       setTimeout(() => {
         // mock when the stream is already stopped
         if (stopStreaming.stopped) return
-        // else go head and insert stuff based on the passed param: onNextStoresStream
+        // else go ahead and insert stuff based on the passed param: onNextStoresStream
         for (const inserted of onNextStoresStream.inserted) {
           inserted(data)
         }
@@ -277,7 +278,7 @@ function createRevertAction (
     actionName: ActionName,
     payload: PlainObject | void,
     pluginModuleConfig: VueSyncPluginModuleConfig
-  ): Promise<PlainObject | void> {
+  ): Promise<void> {
     // this is custom logic to be implemented by the plugin author
     return new Promise((resolve, reject) => {
       if (isUndefined(payload)) return resolve(payload)
@@ -345,7 +346,7 @@ export const VueSyncGenericPlugin = (config: VueSyncPluginConfig): PluginInstanc
   const _merge: PluginWriteAction = createWriteAction(data, 'merge', storeName)
   // const assign: PluginWriteAction = createWriteAction(data, 'assign', storeName)
   // const replace: PluginWriteAction = createWriteAction(data, 'replace', storeName)
-  const _delete: PluginWriteAction = createWriteAction(data, 'delete', storeName)
+  // const _delete: PluginWriteAction = createWriteAction(data, 'delete', storeName)
   const revert: PluginRevertAction = createRevertAction(data, storeName, restoreDataSnapshot)
 
   // the plugin function must return a `PluginInstance`
@@ -360,7 +361,7 @@ export const VueSyncGenericPlugin = (config: VueSyncPluginConfig): PluginInstanc
       merge: _merge,
       // assign,
       // replace,
-      delete: _delete,
+      // delete: _delete,
     },
   }
   return instance

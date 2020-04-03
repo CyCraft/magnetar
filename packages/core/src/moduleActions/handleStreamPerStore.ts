@@ -14,12 +14,9 @@ export function handleStreamPerStore (
   openStreams: { [identifier: string]: () => void }
 ): VueSyncStreamAction {
   // returns the action the dev can call with myModule.insert() etc.
-  return async function<T extends object> (
-    payload: T,
-    actionConfig: ActionConfig = {}
-  ): Promise<void> {
+  return async function (payload?: object, actionConfig: ActionConfig = {}): Promise<void> {
     // get all the config needed to perform this action
-    const eventFnsPerStore: EventFnsPerStore = getEventFnsPerStore(
+    const eventFnsPerStore: EventFnsPerStore<'stream'> = getEventFnsPerStore(
       globalConfig,
       moduleConfig,
       actionConfig
@@ -53,7 +50,7 @@ export function handleStreamPerStore (
       // find the action on the plugin
       const pluginAction = globalConfig.stores[storeName].actions['stream']
       const pluginModuleConfig: PluginModuleConfig = moduleConfig?.configPerStore[storeName] || {}
-      const eventNameFnsMap = eventFnsMapWithDefaults(eventFnsPerStore[storeName])
+      const eventNameFnsMap = eventFnsMapWithDefaults<'stream'>(eventFnsPerStore[storeName])
       // the plugin action
       if (pluginAction) {
         const streamInfo = await handleStream({

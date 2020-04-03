@@ -3,7 +3,7 @@ import { VueSyncConfig } from '..'
 import { ModuleConfig } from '../CreateModule'
 import { getEventFnsPerStore } from '../getEventFnsPerStore'
 import { handleAction } from './handleAction'
-import { EventFnsPerStore, eventFnsMapWithDefaults, EventFnSuccess } from '../types/events'
+import { EventFnsPerStore, eventFnsMapWithDefaults, EventFnSuccessTernary } from '../types/events'
 import {
   ActionType,
   ActionConfig,
@@ -11,9 +11,9 @@ import {
   ActionTernary,
   VueSyncGetAction,
   VueSyncWriteAction,
+  VueSyncDeleteAction,
 } from '../types/actions'
 import { PluginModuleConfig } from '../types/plugins'
-import { Modified, PlainObject } from '../types/base'
 
 function isUndefined (payload: any): payload is undefined | void {
   return payload === undefined
@@ -31,12 +31,12 @@ export function handleActionPerStore (
   globalConfig: O.Compulsory<VueSyncConfig>,
   actionName: Exclude<ActionName, 'stream'>,
   actionType: ActionType
-): VueSyncGetAction | VueSyncWriteAction {
+): VueSyncGetAction | VueSyncWriteAction | VueSyncDeleteAction {
   // returns the action the dev can call with myModule.insert() etc.
-  return async function<Payload extends object> (
-    payload: Payload,
+  return async function (
+    payload?: void | object | string | string[],
     actionConfig: ActionConfig = {}
-  ): Promise<void | PlainObject | PlainObject[] | Modified<Payload>> {
+  ): Promise<void | object | object[]> {
     // get all the config needed to perform this action
     const onError = actionConfig.onError || moduleConfig.onError || globalConfig.onError
     const eventFnsPerStore: EventFnsPerStore = getEventFnsPerStore(
@@ -67,10 +67,10 @@ export function handleActionPerStore (
     }
 
     // a mutatable array of successevents which is to be triggered after each store
-    const onNextStoresSuccess: EventFnSuccess[] = []
+    const onNextStoresSuccess: EventFnSuccessTernary[] = []
 
     // handle and await each action in sequence
-    let result: void | PlainObject | PlainObject[] | Modified<Payload> = payload
+    let result: void | object | object[]
     for (const [i, storeName] of storesToExecute.entries()) {
       // find the action on the plugin
       const pluginAction = globalConfig.stores[storeName].actions[actionName]

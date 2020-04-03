@@ -1,12 +1,13 @@
 import { isVueSyncError, ActionName } from '../types/actions'
-import { SharedConfig, Modified, PlainObject } from '../types/base'
-import { EventNameFnsMap, EventFnSuccess } from '../types/events'
+import { SharedConfig, PlainObject } from '../types/base'
+import { EventNameFnsMap, EventFnSuccessTernary, EventFnSuccess } from '../types/events'
 import { O } from 'ts-toolbelt'
 import {
   PluginModuleConfig,
   PluginActionTernary,
   PluginGetAction,
   PluginWriteAction,
+  PluginDeleteAction,
 } from '../types/plugins'
 
 function isUndefined (payload: any): payload is undefined | void {
@@ -14,33 +15,33 @@ function isUndefined (payload: any): payload is undefined | void {
 }
 
 export function handleAction<
-  Payload extends PlainObject,
+  Payload extends void | PlainObject | string | string[],
   TActionName extends Exclude<ActionName, 'stream'>
 > (args: {
   pluginAction: PluginActionTernary<TActionName>
   pluginModuleConfig: PluginModuleConfig
   payload: Payload
-  eventNameFnsMap: O.Compulsory<EventNameFnsMap>
+  eventNameFnsMap: O.Compulsory<EventNameFnsMap<TActionName>>
   onError: SharedConfig['onError']
   actionName: TActionName
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
-  onNextStoresSuccess: EventFnSuccess[]
-}): Promise<void | PlainObject | PlainObject[] | Modified<Payload>>
+  onNextStoresSuccess: EventFnSuccessTernary<TActionName>[]
+}): Promise<void | PlainObject | PlainObject[]>
 
 /**
  * handleAction is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success (4) optional: onNextStoresSuccess.
  * in any event/hook it's possible for the dev to modify the result & also abort the execution chain, which prevents calling handleAction on the next store as well
  */
-export async function handleAction<Payload extends PlainObject> (args: {
-  pluginAction: PluginGetAction | PluginWriteAction
+export async function handleAction (args: {
+  pluginAction: PluginGetAction | PluginWriteAction | PluginDeleteAction
   pluginModuleConfig: PluginModuleConfig
-  payload: Payload
-  eventNameFnsMap: O.Compulsory<EventNameFnsMap>
+  payload: void | PlainObject | string | string[]
+  eventNameFnsMap: O.Compulsory<EventNameFnsMap<Exclude<ActionName, 'stream'>>>
   onError: SharedConfig['onError']
   actionName: Exclude<ActionName, 'stream'>
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
   onNextStoresSuccess: EventFnSuccess[]
-}): Promise<PlainObject | PlainObject[] | void | undefined | Modified<Payload>> {
+}): Promise<void | PlainObject | PlainObject[]> {
   const {
     pluginAction,
     pluginModuleConfig,
@@ -58,7 +59,7 @@ export async function handleAction<Payload extends PlainObject> (args: {
   const abort = (): void => {
     abortExecution = true
   }
-  let payloadAfterBeforeEvent: PlainObject | Modified<Payload> = payload // the payload throughout the stages
+  let payloadAfterBeforeEvent: PlainObject | string | string[] | void = payload // the payload throughout the stages
   // handle and await each eventFn in sequence
   for (const fn of on.before) {
     const eventResult = await fn({ payload: payloadAfterBeforeEvent, actionName, abort })
@@ -71,15 +72,11 @@ export async function handleAction<Payload extends PlainObject> (args: {
     // return the proper return type based on the ActionName
     return payloadAfterBeforeEvent
   }
-  let result: PlainObject | PlainObject[] | void | Modified<Payload> = payloadAfterBeforeEvent
+  let result: PlainObject | PlainObject[] | void = payloadAfterBeforeEvent
   try {
     // triggering the action provided by the plugin
     // @ts-ignore
-    result = await pluginAction(
-      result as Modified<Payload>,
-      pluginModuleConfig,
-      onNextStoresSuccess
-    )
+    result = await pluginAction(result, pluginModuleConfig, onNextStoresSuccess)
   } catch (error) {
     if (!isVueSyncError(error)) throw new Error(error)
     // handle and await each eventFn in sequence

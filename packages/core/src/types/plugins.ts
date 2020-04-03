@@ -1,4 +1,4 @@
-import { ActionName } from './actions'
+import { ActionName, ActionNameWrite } from './actions'
 import { PlainObject, Modified } from './base'
 import { EventFnSuccess } from './events'
 
@@ -18,7 +18,7 @@ export interface PluginInstance {
     merge?: PluginWriteAction
     assign?: PluginWriteAction
     replace?: PluginWriteAction
-    delete?: PluginWriteAction
+    delete?: PluginDeleteAction
   }
   revert: PluginRevertAction // the action that reverts other actions on error
   setModuleDataReference: <T extends any>(moduleConfig: PluginModuleConfig) => Modified<T>
@@ -36,8 +36,8 @@ export type OnNextStoresStream = {
   deleted: ((payload: object | string) => void)[]
 }
 
-export type PluginStreamAction = <Payload extends object | void>(
-  payload: Payload,
+export type PluginStreamAction = (
+  payload: object | void,
   pluginModuleConfig: PluginModuleConfig,
   onNextStoresStream: OnNextStoresStream
 ) =>
@@ -45,32 +45,35 @@ export type PluginStreamAction = <Payload extends object | void>(
   | { streaming: Promise<void>; stop: () => void }
   | Promise<void | { streaming: Promise<void>; stop: () => void }>
 
-export type PluginGetAction = <Payload extends object | void>(
-  payload: Payload,
+export type PluginGetAction = (
+  payload: object | void,
   pluginModuleConfig: PluginModuleConfig,
-  onNextStoresSuccess: EventFnSuccess<'get', Payload>[]
+  onNextStoresSuccess: EventFnSuccess<'get'>[]
 ) => void | PlainObject | PlainObject[] | Promise<void | PlainObject | PlainObject[]>
+
+export type PluginDeleteAction = (
+  payload: string | string[],
+  pluginModuleConfig: PluginModuleConfig,
+  onNextStoresSuccess: EventFnSuccess<'delete'>[]
+) => void | Promise<void>
 
 export type PluginWriteAction = <Payload extends object>(
   payload: Payload,
   pluginModuleConfig: PluginModuleConfig,
-  onNextStoresSuccess: EventFnSuccess<Exclude<ActionName, 'get' | 'stream'>, Payload>[]
+  onNextStoresSuccess: EventFnSuccess<ActionNameWrite>[]
 ) => Modified<Payload> | Promise<Modified<Payload>>
 
 // the revert action is a bit different, receives the ActionName
-export type PluginRevertAction = <Payload extends object | void>(
+export type PluginRevertAction = (
   actionName: ActionName,
-  payload: Payload,
+  payload: object | void | string | string[],
   pluginModuleConfig: PluginModuleConfig
-) =>
-  | void
-  | PlainObject
-  | PlainObject[]
-  | Modified<Payload>
-  | Promise<void | PlainObject | PlainObject[] | Modified<Payload>>
+) => void | Promise<void>
 
 export type PluginActionTernary<TActionName extends ActionName> = TActionName extends 'stream'
   ? PluginStreamAction
   : TActionName extends 'get'
   ? PluginGetAction
+  : TActionName extends 'delete'
+  ? PluginDeleteAction
   : PluginWriteAction

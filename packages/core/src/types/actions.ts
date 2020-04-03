@@ -1,15 +1,21 @@
-import { PlainObject, SharedConfig, StoreName, Modified } from './base'
+import { PlainObject, StoreName, Modified } from './base'
 import { isAnyObject } from 'is-what'
-import { O } from 'ts-toolbelt'
+import {
+  EventFnBeforeTernary,
+  EventFnSuccessTernary,
+  EventFnErrorTernary,
+  EventFnRevertTernary,
+} from './events'
 
 // these are all the actions that Vue Sync aims to streamline, whichever plugin is used
 // these actions are executable from a `VueSyncModule` and handled by each plugin individually
 export type ActionNameRead = 'get' | 'stream'
-export type ActionNameWrite = 'insert' | 'merge' | 'assign' | 'replace' | 'delete'
+export type ActionNameWrite = 'insert' | 'merge' | 'assign' | 'replace'
+export type ActionNameDelete = 'delete'
 export type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign' | 'replace' | 'delete'
 
 // there are two action types for easier setting the execution order
-export type ActionType = 'read' | 'write'
+export type ActionType = 'read' | 'write' | 'delete'
 
 export const actionNameTypeMap: { [action in ActionName]: ActionType } = {
   get: 'read',
@@ -18,7 +24,7 @@ export const actionNameTypeMap: { [action in ActionName]: ActionType } = {
   merge: 'write',
   assign: 'write',
   replace: 'write',
-  delete: 'write',
+  delete: 'delete',
 }
 
 export function isReadAction (actionName: ActionName): actionName is ActionNameRead {
@@ -31,24 +37,37 @@ export function isWriteAction (actionName: ActionName): actionName is ActionName
 }
 
 // this is what the dev can provide as second param when executing any action in addition to the payload
-export type ActionConfig<TActionName extends ActionName = ActionName, Payload = object> = Partial<
-  O.Overwrite<SharedConfig<TActionName, Payload>, { executionOrder: StoreName[] }>
->
+export type ActionConfig<TActionName extends ActionName = ActionName> = {
+  executionOrder?: StoreName[]
+  onError?: 'stop' | 'continue' | 'revert'
+  on?: {
+    [storeName: string]: {
+      before?: EventFnBeforeTernary<TActionName>
+      success?: EventFnSuccessTernary<TActionName>
+      error?: EventFnErrorTernary<TActionName>
+      revert?: EventFnRevertTernary<TActionName>
+    }
+  }
+}
 
 // these are the action types exposed to the dev via a VueSyncModule, it's what the dev will end up calling.
-export type VueSyncStreamAction = <Payload extends object>(payload?: Payload, actionConfig?: ActionConfig<'stream', Payload>) => Promise<void> // prettier-ignore
+export type VueSyncStreamAction = <Payload extends object>(payload?: Payload, actionConfig?: ActionConfig<'stream'>) => Promise<void> // prettier-ignore
 
-export type VueSyncGetAction = <Payload extends object>(
+export type VueSyncGetAction = <Payload extends void | object>(
   payload?: Payload,
-  actionConfig?: ActionConfig<'get', Payload>
+  actionConfig?: ActionConfig<'get'>
 ) => Promise<PlainObject | PlainObject[] | void | undefined>
 
-export type VueSyncWriteAction = <Payload extends object>(payload: Payload, actionConfig?: ActionConfig<Exclude<ActionName, 'get' | 'stream'>, Payload>) => Promise<Modified<Payload>> // prettier-ignore
+export type VueSyncWriteAction = <Payload extends object>(payload: Payload, actionConfig?: ActionConfig<ActionNameWrite>) => Promise<Modified<Payload>> // prettier-ignore
+
+export type VueSyncDeleteAction = (ids: string | string[], actionConfig?: ActionConfig<'delete'>) => Promise<void> // prettier-ignore
 
 export type ActionTernary<TActionName extends ActionName> = TActionName extends 'stream'
   ? VueSyncStreamAction
   : TActionName extends 'get'
   ? VueSyncGetAction
+  : TActionName extends 'delete'
+  ? VueSyncDeleteAction
   : VueSyncWriteAction
 
 export type VueSyncError = {

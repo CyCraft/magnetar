@@ -2,9 +2,10 @@ import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
 import { bulbasaur, charmander, squirtle, flareon } from './helpers/pokemon'
 import { waitMs } from './helpers/wait'
+import { VueSyncModuleInstance } from '../src/CreateModule'
 
 test('write: insert (collection module)', async t => {
-  const { pokedexModule } = createVueSyncInstance()
+  const pokedexModule: VueSyncModuleInstance = createVueSyncInstance().pokedexModule
   const insertPayload = squirtle
   t.deepEqual(pokedexModule.data.local['007'], undefined)
   t.deepEqual(pokedexModule.data.remote['007'], undefined)

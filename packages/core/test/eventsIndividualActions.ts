@@ -3,7 +3,7 @@ import { createVueSyncInstance } from './helpers/createVueSyncInstance'
 import { squirtle, bulbasaur, charmander, flareon } from './helpers/pokemon'
 import { isArray } from 'is-what'
 
-test('emits before & success events', async t => {
+test('insert: emits before & success events', async t => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = squirtle
   let ranAllEvents = []
@@ -44,7 +44,7 @@ test('emits before & success events', async t => {
   t.is(ranAllEvents.length, 4)
 })
 
-test('can abort in before events', async t => {
+test('insert: can abort in before events', async t => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = squirtle
   const result = await pokedexModule.insert(insertPayload, {
@@ -66,7 +66,7 @@ test('can abort in before events', async t => {
   t.deepEqual(result, insertPayload)
 })
 
-test('can abort in success events', async t => {
+test('insert: can abort in success events', async t => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = squirtle
   let ranAllEvents = []
@@ -93,7 +93,7 @@ test('can abort in success events', async t => {
   t.is(ranAllEvents.length, 2)
 })
 
-test('write: can mutate payload via events -- should not carry over modification to payload over multiple stores', async t => {
+test('insert: can mutate payload via events -- should not carry over modification to payload over multiple stores', async t => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = squirtle
   t.is(pokedexModule.data.local['007'], undefined)
@@ -135,7 +135,7 @@ test('write: can mutate payload via events -- should not carry over modification
   t.deepEqual(result, { ...squirtle, trait: 'water resistance', strength: 9000 })
 })
 
-test('read: can mutate payload via events -- can apply defaults to remote data to be carried over to local store', async t => {
+test('get: can mutate payload via events -- can apply defaults to remote data to be carried over to local store', async t => {
   // get resolves once all stores have given a response with data
   const { pokedexModule } = createVueSyncInstance()
   t.deepEqual(pokedexModule.data.local, { '001': bulbasaur })

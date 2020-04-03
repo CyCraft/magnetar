@@ -7,6 +7,7 @@ import {
   VueSyncGetAction,
   isWriteAction,
   VueSyncStreamAction,
+  VueSyncDeleteAction,
 } from './types/actions'
 import { SharedConfig, PlainObject } from './types/base'
 import { VueSyncConfig } from '.'
@@ -15,7 +16,7 @@ import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
 
 export type VueSyncModuleInstance = {
   data: {
-    [storeName: string]: PlainObject
+    [storeName: string]: { [idOrProp: string]: any }
   }
   openStreams: { [identifier: string]: () => void }
   get?: VueSyncGetAction
@@ -24,7 +25,7 @@ export type VueSyncModuleInstance = {
   merge?: VueSyncWriteAction
   assign?: VueSyncWriteAction
   replace?: VueSyncWriteAction
-  delete?: VueSyncWriteAction
+  delete?: VueSyncDeleteAction
 }
 
 // this is what the dev passes when creating a module
@@ -46,9 +47,6 @@ export function CreateModuleWithContext (
 
   const actions = Object.entries(actionNameTypeMap).reduce(
     (carry, [actionName, actionType]: [ActionName, ActionType]) => {
-      if (isWriteAction(actionName)) {
-        carry[actionName] = handleActionPerStore(moduleConfig, globalConfig, actionName, actionType)
-      }
       if (actionName === 'get') {
         carry[actionName] = handleActionPerStore(moduleConfig, globalConfig, actionName, actionType)
       }
@@ -59,6 +57,12 @@ export function CreateModuleWithContext (
           actionType,
           openStreams
         )
+      }
+      if (actionName === 'delete') {
+        carry[actionName] = handleActionPerStore(moduleConfig, globalConfig, actionName, actionType)
+      }
+      if (isWriteAction(actionName)) {
+        carry[actionName] = handleActionPerStore(moduleConfig, globalConfig, actionName, actionType)
       }
       return carry
     },

@@ -9,7 +9,7 @@ export type StoreName = string
 export type Modified<T> = T extends object ? O.Merge<Partial<T>, PlainObject> : T
 
 // the shared config which can be set globally < per module < or per action.
-export type SharedConfig<TActionName extends ActionName = ActionName, Payload = object> = {
+export type SharedConfig = {
   executionOrder: {
     [actionType in ActionType]?: StoreName[]
   } &
@@ -19,10 +19,10 @@ export type SharedConfig<TActionName extends ActionName = ActionName, Payload = 
   onError: 'stop' | 'continue' | 'revert'
   on: {
     [storeName: string]: {
-      before?: EventFnBefore<TActionName, Payload>
-      success?: EventFnSuccess<TActionName, Payload>
-      error?: EventFnError<TActionName, Payload>
-      revert?: EventFnRevert<TActionName, Payload>
+      before?: EventFnBefore
+      success?: EventFnSuccess
+      error?: EventFnError
+      revert?: EventFnRevert
     }
   }
 }

@@ -1,5 +1,5 @@
 import { isVueSyncError } from '../types/actions'
-import { Modified, PlainObject } from '../types/base'
+import { PlainObject } from '../types/base'
 import { EventNameFnsMap } from '../types/events'
 import { O } from 'ts-toolbelt'
 import { PluginModuleConfig, OnNextStoresStream, PluginStreamAction } from '../types/plugins'
@@ -11,11 +11,11 @@ function isUndefined (payload: any): payload is undefined | void {
 /**
  * handleStream is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success
  */
-export async function handleStream<Payload extends PlainObject> (args: {
+export async function handleStream (args: {
   pluginAction: PluginStreamAction
   pluginModuleConfig: PluginModuleConfig
-  payload: Payload
-  eventNameFnsMap: O.Compulsory<EventNameFnsMap>
+  payload: PlainObject
+  eventNameFnsMap: O.Compulsory<EventNameFnsMap<'stream'>>
   actionName: 'stream'
   onNextStoresStream: OnNextStoresStream
 }): Promise<
@@ -35,7 +35,7 @@ export async function handleStream<Payload extends PlainObject> (args: {
     onNextStoresStream,
   } = args
 
-  let payloadAfterBeforeEvent: Modified<Payload> | PlainObject = payload // the payload throughout the stages
+  let payloadAfterBeforeEvent: PlainObject = payload // the payload throughout the stages
   // handle and await each eventFn in sequence
   for (const fn of on.before) {
     const eventResult = await fn({ payload: payloadAfterBeforeEvent, actionName, abort: undefined })
@@ -66,7 +66,7 @@ export async function handleStream<Payload extends PlainObject> (args: {
   }
   // handle and await each eventFn in sequence
   for (const fn of on.success) {
-    await fn({ payload: payloadAfterBeforeEvent, result: streaming, actionName, abort: undefined })
+    await fn({ payload: payloadAfterBeforeEvent, result: undefined, actionName, abort: undefined })
   }
   return {
     streaming,
