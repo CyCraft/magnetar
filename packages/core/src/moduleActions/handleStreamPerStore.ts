@@ -1,10 +1,10 @@
 import { O } from 'ts-toolbelt'
 import { VueSyncConfig } from '..'
 import { ModuleConfig } from '../CreateModule'
-import { getEventNameFnsMap } from '../getEventNameFnsMap'
 import { handleStream } from './handleStream'
 import { ActionType, ActionConfig, VueSyncStreamAction } from '../types/actions'
 import { PluginModuleConfig, OnStream } from '../types/plugins'
+import { getEventNameFnsMap } from '../types/events'
 
 export function handleStreamPerStore (
   moduleConfig: ModuleConfig,
@@ -15,7 +15,7 @@ export function handleStreamPerStore (
   // returns the action the dev can call with myModule.insert() etc.
   return async function (payload?: object, actionConfig: ActionConfig = {}): Promise<void> {
     // get all the config needed to perform this action
-    const eventNameFnsMap = getEventNameFnsMap(globalConfig, moduleConfig, actionConfig)
+    const eventNameFnsMap = getEventNameFnsMap(globalConfig.on, moduleConfig.on, actionConfig.on)
     const storesToExecute: string[] =
       actionConfig.executionOrder ||
       (moduleConfig.executionOrder || {})['stream'] ||
@@ -59,7 +59,7 @@ export function handleStreamPerStore (
         if (streamInfo) streamInfoPerStore[storeName] = streamInfo
       }
     }
-    const streamPromises = Object.entries(streamInfoPerStore).map(([storeName, streamInfo]) => {
+    const streamPromises = Object.values(streamInfoPerStore).map(streamInfo => {
       // return the streaming promises
       return streamInfo.streaming
     })

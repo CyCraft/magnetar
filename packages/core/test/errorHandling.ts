@@ -10,7 +10,6 @@ test('write + onError: abort (default) -- emits fail events & aborts execution b
       on: {
         error: ({ payload, storeName }) => {
           if (storeName === 'local') {
-            // @ts-ignore
             t.deepEqual(payload, insertPayload)
           }
         },
@@ -34,7 +33,6 @@ test('write + onError: abort (default) -- fail in second store plugin does not p
         error: ({ payload, storeName }) => {
           if (storeName === 'local') t.fail()
           if (storeName === 'remote') {
-            // @ts-ignore
             t.deepEqual(payload, insertPayload)
           }
         },
@@ -55,14 +53,12 @@ test('write + onError: continue', async t => {
       on: {
         error: ({ payload, storeName }) => {
           if (storeName === 'local') {
-            // @ts-ignore
             t.deepEqual(payload, insertPayload)
           }
           if (storeName === 'remote') t.fail()
         },
         success: ({ payload, storeName }) => {
           if (storeName === 'remote') {
-            // @ts-ignore
             t.deepEqual(payload, insertPayload)
           }
         },
@@ -92,13 +88,11 @@ test('write + onError: revert', async t => {
         error: ({ payload, storeName }) => {
           if (storeName === 'local') t.fail()
           if (storeName === 'remote') {
-            // @ts-ignore
             t.deepEqual(payload, insertPayload)
           }
         },
       },
     })
-    // @ts-ignore
     t.deepEqual(result, insertPayload)
   } catch (e) {
     t.fail()
@@ -115,7 +109,6 @@ test('write + onError: revert - will not go to next store', async t => {
       on: {
         error: ({ payload, storeName }) => {
           if (storeName === 'local') {
-            // @ts-ignore
             t.deepEqual(payload, insertPayload)
           }
         },
@@ -129,7 +122,6 @@ test('write + onError: revert - will not go to next store', async t => {
         },
       },
     })
-    // @ts-ignore
     t.deepEqual(result, insertPayload)
   } catch (e) {
     t.fail()
@@ -146,7 +138,6 @@ test('get + onError: abort (default) -- emits fail events & aborts execution by 
       on: {
         error: ({ payload, storeName }) => {
           if (storeName === 'local') {
-            // @ts-ignore
             t.deepEqual(payload, getPayload)
           }
         },
@@ -172,7 +163,6 @@ test('get + onError: abort (default) -- fail in second store plugin does not pre
         error: ({ payload, storeName }) => {
           if (storeName === 'local') t.fail()
           if (storeName === 'remote') {
-            // @ts-ignore
             t.deepEqual(payload, getPayload)
           }
         },
@@ -195,14 +185,12 @@ test('get + onError: continue', async t => {
       on: {
         error: ({ payload, storeName }) => {
           if (storeName === 'local') {
-            // @ts-ignore
             t.deepEqual(payload, getPayload)
           }
           if (storeName === 'remote') t.fail()
         },
         success: ({ payload, result, storeName }) => {
           if (storeName === 'remote') {
-            // @ts-ignore
             t.deepEqual(payload, getPayload)
             // even though the local store failed, we got the result of the remote store
             t.deepEqual(result, [bulbasaur, flareon])
@@ -238,13 +226,11 @@ test('get + onError: revert', async t => {
         error: ({ payload, storeName }) => {
           if (storeName === 'local') t.fail()
           if (storeName === 'remote') {
-            // @ts-ignore
             t.deepEqual(payload, getPayload)
           }
         },
       },
     })
-    // @ts-ignore
     t.deepEqual(result, undefined)
   } catch (e) {
     t.fail()
@@ -262,7 +248,6 @@ test('get + onError: revert - will not go to next store', async t => {
       on: {
         error: ({ payload, storeName }) => {
           if (storeName === 'local') {
-            // @ts-ignore
             t.deepEqual(payload, getPayload)
           }
         },
@@ -276,7 +261,6 @@ test('get + onError: revert - will not go to next store', async t => {
         },
       },
     })
-    // @ts-ignore
     t.deepEqual(result, undefined)
   } catch (e) {
     t.fail()

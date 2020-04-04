@@ -1,6 +1,6 @@
 import { isVueSyncError, ActionName, isWriteAction } from '../types/actions'
 import { SharedConfig, PlainObject } from '../types/base'
-import { EventNameFnsMap, EventFnSuccessTernary, EventFnSuccess } from '../types/events'
+import { EventNameFnsMap, EventFnSuccess } from '../types/events'
 import {
   PluginModuleConfig,
   PluginActionTernary,
@@ -8,10 +8,6 @@ import {
   PluginWriteAction,
   PluginDeleteAction,
 } from '../types/plugins'
-
-function isUndefined (payload: any): payload is undefined | void {
-  return payload === undefined
-}
 
 export function handleAction<
   Payload extends void | PlainObject | string | string[],
@@ -24,7 +20,7 @@ export function handleAction<
   onError: SharedConfig['onError']
   actionName: TActionName
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
-  onNextStoresSuccess: EventFnSuccessTernary<TActionName>[]
+  onNextStoresSuccess: EventFnSuccess[]
   storeName: string
 }): Promise<void | PlainObject | PlainObject[]>
 
@@ -61,13 +57,9 @@ export async function handleAction (args: {
   const abort = (): void => {
     abortExecution = true
   }
-  let payloadAfterBeforeEvent: PlainObject | string | string[] | void = payload // the payload throughout the stages
   // handle and await each eventFn in sequence
   for (const fn of on.before) {
-    // @ts-ignore
-    const eventResult = await fn({ payload: payloadAfterBeforeEvent, actionName, storeName, abort })
-    // overwrite the result with whatever the dev returns in the event function, as long as it's not undefined
-    if (!isUndefined(eventResult)) payloadAfterBeforeEvent = eventResult
+    await fn({ payload, actionName, storeName, abort })
   }
   // abort?
   if (abortExecution) {
@@ -75,22 +67,19 @@ export async function handleAction (args: {
     // return the proper return type based on the ActionName
     if (actionName === 'delete' || actionName === 'get') return
     // @ts-ignore
-    return payloadAfterBeforeEvent
+    return payload
   }
   // @ts-ignore
-  let result: PlainObject | PlainObject[] | void = isWriteAction(actionName)
-    ? payloadAfterBeforeEvent
-    : undefined
+  let result: PlainObject | PlainObject[] | void = isWriteAction(actionName) ? payload : undefined
   try {
     // triggering the action provided by the plugin
     // @ts-ignore
-    result = await pluginAction(payloadAfterBeforeEvent, pluginModuleConfig, onNextStoresSuccess)
+    result = await pluginAction(payload, pluginModuleConfig, onNextStoresSuccess)
   } catch (error) {
     if (!isVueSyncError(error)) throw new Error(error)
     // handle and await each eventFn in sequence
     for (const fn of on.error) {
-      // @ts-ignore
-      await fn({ payload: payloadAfterBeforeEvent, actionName, storeName, abort, error })
+      await fn({ payload, actionName, storeName, abort, error })
     }
     // abort?
     if (abortExecution || onError === 'stop') {
@@ -104,13 +93,11 @@ export async function handleAction (args: {
   }
   // handle and await each eventFn in sequence
   for (const fn of on.success) {
-    // @ts-ignore
-    await fn({ payload: payloadAfterBeforeEvent, result, actionName, storeName, abort })
+    await fn({ payload, result, actionName, storeName, abort })
   }
   // handle and await each "onNextStoresSuccess" eventFn in sequence (besides the ones just added of course)
   for (const fn of successEventsToExecute) {
-    // @ts-ignore
-    await fn({ payload: payloadAfterBeforeEvent, result, actionName, storeName, abort })
+    await fn({ payload, result, actionName, storeName, abort })
   }
   // abort?
   if (abortExecution) {

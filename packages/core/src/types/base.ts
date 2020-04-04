@@ -1,6 +1,6 @@
-import { ActionType, ActionName } from './actions'
 import { EventFnBefore, EventFnSuccess, EventFnError, EventFnRevert } from './events'
 import { O } from 'ts-toolbelt'
+import { ModifyWritePayload, ModifyDeletePayload } from './modifyPayload'
 
 // atomic types
 export type PlainObject = { [key: string]: any }
@@ -11,18 +11,24 @@ export type Modified<T> = T extends object ? O.Merge<Partial<T>, PlainObject> : 
 // the shared config which can be set globally < per module < or per action.
 export type SharedConfig = {
   executionOrder: {
-    [actionType in ActionType]?: StoreName[]
-  } &
-    {
-      [action in ActionName]?: StoreName[]
-    }
+    read?: StoreName[]
+    write?: StoreName[]
+    delete?: StoreName[]
+    get?: StoreName[]
+    stream?: StoreName[]
+    insert?: StoreName[]
+    merge?: StoreName[]
+    assign?: StoreName[]
+    replace?: StoreName[]
+  }
   onError: 'stop' | 'continue' | 'revert'
   modifyPayloadOn: {
-    insert?: (payload: object) => object
-    merge?: (payload: object) => object
-    assign?: (payload: object) => object
-    replace?: (payload: object) => object
-    delete?: (payload: string | string[]) => string | string[]
+    insert?: ModifyWritePayload
+    merge?: ModifyWritePayload
+    assign?: ModifyWritePayload
+    replace?: ModifyWritePayload
+    write?: ModifyWritePayload
+    delete?: ModifyDeletePayload
   }
   on: {
     before?: EventFnBefore
@@ -31,20 +37,3 @@ export type SharedConfig = {
     revert?: EventFnRevert
   }
 }
-// export interface SharedConfig {
-//   executionOrder: {
-//     [actionType in ActionType]?: StoreName[]
-//   } &
-//     {
-//       [action in ActionName]?: StoreName[]
-//     }
-//   onError: 'stop' | 'continue' | 'revert'
-//   on: {
-//     [storeName: string]: {
-//       before?: EventFnBefore<ActionName>
-//       success?: EventFnSuccess
-//       error?: EventFnError
-//       revert?: EventFnRevert
-//     }
-//   }
-// }

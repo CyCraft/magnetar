@@ -1,11 +1,7 @@
 import { PlainObject, StoreName, Modified } from './base'
 import { isAnyObject } from 'is-what'
-import {
-  EventFnBeforeTernary,
-  EventFnSuccessTernary,
-  EventFnErrorTernary,
-  EventFnRevertTernary,
-} from './events'
+import { ModifyWritePayload, ModifyDeletePayload } from './modifyPayload'
+import { EventFnBefore, EventFnSuccess, EventFnError, EventFnRevert } from './events'
 
 // these are all the actions that Vue Sync aims to streamline, whichever plugin is used
 // these actions are executable from a `VueSyncModule` and handled by each plugin individually
@@ -41,17 +37,18 @@ export type ActionConfig<TActionName extends ActionName = ActionName> = {
   executionOrder?: StoreName[]
   onError?: 'stop' | 'continue' | 'revert'
   modifyPayloadOn?: {
-    insert?: (payload: object) => object
-    merge?: (payload: object) => object
-    assign?: (payload: object) => object
-    replace?: (payload: object) => object
-    delete?: (payload: string | string[]) => string | string[]
+    insert?: ModifyWritePayload
+    merge?: ModifyWritePayload
+    assign?: ModifyWritePayload
+    replace?: ModifyWritePayload
+    write?: ModifyWritePayload
+    delete?: ModifyDeletePayload
   }
   on?: {
-    before?: EventFnBeforeTernary<TActionName>
-    success?: EventFnSuccessTernary<TActionName>
-    error?: EventFnErrorTernary<TActionName>
-    revert?: EventFnRevertTernary<TActionName>
+    before?: EventFnBefore
+    success?: EventFnSuccess
+    error?: EventFnError
+    revert?: EventFnRevert
   }
 }
 

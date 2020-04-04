@@ -275,7 +275,6 @@ function createRevertAction (
           if (actionType === 'write') {
             const { path } = pluginModuleConfig
             const db = pathToProp(moduleData, path)
-            console.log('db[payload.id] → ', db[payload.id])
             db[payload.id] = undefined
           }
           // this mocks data reverted during a read
