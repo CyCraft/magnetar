@@ -8,14 +8,14 @@ test('write + onError: abort (default) -- emits fail events & aborts execution b
   try {
     await pokedexModule.insert(insertPayload, {
       on: {
-        local: {
-          error: ({ payload }) => {
+        error: ({ payload, storeName }) => {
+          if (storeName === 'local') {
             // @ts-ignore
             t.deepEqual(payload, insertPayload)
-          },
+          }
         },
-        remote: {
-          before: () => { t.fail() } // prettier-ignore
+        before: ({ storeName }) => {
+          if (storeName === 'remote') t.fail()
         },
       },
     })
@@ -31,14 +31,12 @@ test('write + onError: abort (default) -- fail in second store plugin does not p
   try {
     await pokedexModule.insert(insertPayload, {
       on: {
-        local: {
-          error: () => { t.fail() } // prettier-ignore
-        },
-        remote: {
-          error: ({ payload }) => {
+        error: ({ payload, storeName }) => {
+          if (storeName === 'local') t.fail()
+          if (storeName === 'remote') {
             // @ts-ignore
             t.deepEqual(payload, insertPayload)
-          },
+          }
         },
       },
     })
@@ -55,18 +53,18 @@ test('write + onError: continue', async t => {
     await pokedexModule.insert(insertPayload, {
       onError: 'continue',
       on: {
-        local: {
-          error: ({ payload }) => {
+        error: ({ payload, storeName }) => {
+          if (storeName === 'local') {
             // @ts-ignore
             t.deepEqual(payload, insertPayload)
-          },
+          }
+          if (storeName === 'remote') t.fail()
         },
-        remote: {
-          error: () => { t.fail() }, // prettier-ignore
-          success: ({ payload }) => {
+        success: ({ payload, storeName }) => {
+          if (storeName === 'remote') {
             // @ts-ignore
             t.deepEqual(payload, insertPayload)
-          },
+          }
         },
       },
     })
@@ -83,21 +81,20 @@ test('write + onError: revert', async t => {
     const result = await pokedexModule.insert(insertPayload, {
       onError: 'revert',
       on: {
-        local: {
-          error: () => { t.fail() }, // prettier-ignore
-          success: () => {},
-          revert: ({ payload, result, actionName }) => {
+        revert: ({ payload, result, actionName, storeName }) => {
+          if (storeName === 'local') {
             t.is(actionName, 'insert')
-          },
+          }
         },
-        remote: {
-          before: () => {
-            t.deepEqual(pokedexModule.data.local['testid'], insertPayload)
-          },
-          error: ({ payload }) => {
+        before: ({ storeName }) => {
+          if (storeName === 'remote') t.deepEqual(pokedexModule.data.local['testid'], insertPayload)
+        },
+        error: ({ payload, storeName }) => {
+          if (storeName === 'local') t.fail()
+          if (storeName === 'remote') {
             // @ts-ignore
             t.deepEqual(payload, insertPayload)
-          },
+          }
         },
       },
     })
@@ -116,18 +113,19 @@ test('write + onError: revert - will not go to next store', async t => {
     const result = await pokedexModule.insert(insertPayload, {
       onError: 'revert',
       on: {
-        local: {
-          error: ({ payload }) => {
+        error: ({ payload, storeName }) => {
+          if (storeName === 'local') {
             // @ts-ignore
             t.deepEqual(payload, insertPayload)
-          },
-          revert: () => { t.fail() } // prettier-ignore
+          }
         },
-        remote: {
-          before: ({ payload }) => {
+        revert: ({ storeName }) => {
+          if (storeName === 'local') t.fail()
+        },
+        before: ({ payload, storeName }) => {
+          if (storeName === 'remote') {
             t.fail()
-            return payload
-          },
+          }
         },
       },
     })
@@ -146,14 +144,14 @@ test('get + onError: abort (default) -- emits fail events & aborts execution by 
   try {
     await pokedexModule.get(getPayload, {
       on: {
-        local: {
-          error: ({ payload }) => {
+        error: ({ payload, storeName }) => {
+          if (storeName === 'local') {
             // @ts-ignore
             t.deepEqual(payload, getPayload)
-          },
+          }
         },
-        remote: {
-          before: () => { t.fail() } // prettier-ignore
+        before: ({ storeName }) => {
+          if (storeName === 'remote') t.fail()
         },
       },
     })
@@ -171,14 +169,12 @@ test('get + onError: abort (default) -- fail in second store plugin does not pre
   try {
     result = await pokedexModule.get(getPayload, {
       on: {
-        local: {
-          error: () => { t.fail() } // prettier-ignore
-        },
-        remote: {
-          error: ({ payload }) => {
+        error: ({ payload, storeName }) => {
+          if (storeName === 'local') t.fail()
+          if (storeName === 'remote') {
             // @ts-ignore
             t.deepEqual(payload, getPayload)
-          },
+          }
         },
       },
     })
@@ -197,20 +193,20 @@ test('get + onError: continue', async t => {
     const result = await pokedexModule.get(getPayload, {
       onError: 'continue',
       on: {
-        local: {
-          error: ({ payload }) => {
+        error: ({ payload, storeName }) => {
+          if (storeName === 'local') {
             // @ts-ignore
             t.deepEqual(payload, getPayload)
-          },
+          }
+          if (storeName === 'remote') t.fail()
         },
-        remote: {
-          error: () => { t.fail() }, // prettier-ignore
-          success: ({ payload, result }) => {
+        success: ({ payload, result, storeName }) => {
+          if (storeName === 'remote') {
             // @ts-ignore
             t.deepEqual(payload, getPayload)
             // even though the local store failed, we got the result of the remote store
             t.deepEqual(result, [bulbasaur, flareon])
-          },
+          }
         },
       },
     })
@@ -231,21 +227,20 @@ test('get + onError: revert', async t => {
     const result = await pokedexModule.get(getPayload, {
       onError: 'revert',
       on: {
-        local: {
-          error: () => { t.fail() }, // prettier-ignore
-          success: () => {},
-          revert: ({ payload, result, actionName }) => {
+        revert: ({ payload, result, actionName, storeName }) => {
+          if (storeName === 'local') {
             t.is(actionName, 'get')
-          },
+          }
         },
-        remote: {
-          before: () => {
-            t.deepEqual(pokedexModule.data.local, { '001': bulbasaur })
-          },
-          error: ({ payload }) => {
+        before: ({ storeName }) => {
+          if (storeName === 'remote') t.deepEqual(pokedexModule.data.local, { '001': bulbasaur })
+        },
+        error: ({ payload, storeName }) => {
+          if (storeName === 'local') t.fail()
+          if (storeName === 'remote') {
             // @ts-ignore
             t.deepEqual(payload, getPayload)
-          },
+          }
         },
       },
     })
@@ -265,18 +260,19 @@ test('get + onError: revert - will not go to next store', async t => {
     const result = await pokedexModule.get(getPayload, {
       onError: 'revert',
       on: {
-        local: {
-          error: ({ payload }) => {
+        error: ({ payload, storeName }) => {
+          if (storeName === 'local') {
             // @ts-ignore
             t.deepEqual(payload, getPayload)
-          },
-          revert: () => { t.fail() } // prettier-ignore
+          }
         },
-        remote: {
-          before: ({ payload }) => {
+        revert: ({ storeName }) => {
+          if (storeName === 'local') t.fail()
+        },
+        before: ({ payload, storeName }) => {
+          if (storeName === 'remote') {
             t.fail()
-            return payload
-          },
+          }
         },
       },
     })

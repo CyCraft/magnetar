@@ -69,12 +69,14 @@ export type EventFnRevertTernary<
 export type EventFnWriteBefore = (args: {
   payload: PlainObject
   actionName: ActionNameWrite
+  storeName: string
   abort: () => void
 }) => void | PlainObject | Promise<void | PlainObject>
 
 export type EventFnWriteSuccess = (args: {
   payload: PlainObject
   actionName: ActionNameWrite
+  storeName: string
   result: void | PlainObject
   abort: () => void
 }) => void | Promise<void>
@@ -82,6 +84,7 @@ export type EventFnWriteSuccess = (args: {
 export type EventFnWriteError = (args: {
   payload: PlainObject
   actionName: ActionNameWrite
+  storeName: string
   error: VueSyncError
   abort: () => void
 }) => void | Promise<void>
@@ -89,18 +92,21 @@ export type EventFnWriteError = (args: {
 export type EventFnWriteRevert = (args: {
   payload: PlainObject
   actionName: ActionNameWrite
+  storeName: string
   result: void | PlainObject
 }) => void | Promise<void>
 
 export type EventFnGetBefore = (args: {
   payload: PlainObject
   actionName: 'get'
+  storeName: string
   abort: () => void
 }) => void | PlainObject | Promise<void | PlainObject>
 
 export type EventFnGetSuccess = (args: {
   payload: PlainObject | void
   actionName: 'get'
+  storeName: string
   result: void | PlainObject | PlainObject[]
   abort: () => void
 }) => void | Promise<void>
@@ -108,6 +114,7 @@ export type EventFnGetSuccess = (args: {
 export type EventFnGetError = (args: {
   payload: PlainObject | void
   actionName: 'get'
+  storeName: string
   error: VueSyncError
   abort: () => void
 }) => void | Promise<void>
@@ -115,18 +122,21 @@ export type EventFnGetError = (args: {
 export type EventFnGetRevert = (args: {
   payload: void | PlainObject
   actionName: 'get'
+  storeName: string
   result: void | PlainObject | PlainObject[]
 }) => void | Promise<void>
 
 export type EventFnStreamBefore = (args: {
   payload: void | PlainObject
   actionName: 'stream'
+  storeName: string
   abort: void
 }) => void | PlainObject | Promise<void | PlainObject>
 
 export type EventFnStreamSuccess = (args: {
   payload: void | PlainObject
   actionName: 'stream'
+  storeName: string
   result: void
   abort: void
 }) => void | Promise<void>
@@ -134,6 +144,7 @@ export type EventFnStreamSuccess = (args: {
 export type EventFnStreamError = (args: {
   payload: void | PlainObject
   actionName: 'stream'
+  storeName: string
   error: VueSyncError
   abort: void
 }) => void | Promise<void>
@@ -141,12 +152,14 @@ export type EventFnStreamError = (args: {
 export type EventFnDeleteBefore = (args: {
   payload: string | string[]
   actionName: 'delete'
+  storeName: string
   abort: () => void
 }) => void | string | string[] | Promise<void | string | string[]>
 
 export type EventFnDeleteSuccess = (args: {
   payload: string | string[]
   actionName: 'delete'
+  storeName: string
   result: void
   abort: () => void
 }) => void | Promise<void>
@@ -154,6 +167,7 @@ export type EventFnDeleteSuccess = (args: {
 export type EventFnDeleteError = (args: {
   payload: string | string[]
   actionName: 'delete'
+  storeName: string
   error: VueSyncError
   abort: () => void
 }) => void | Promise<void>
@@ -161,6 +175,7 @@ export type EventFnDeleteError = (args: {
 export type EventFnDeleteRevert = (args: {
   payload: string | string[]
   actionName: 'delete'
+  storeName: string
   result: void
 }) => void | Promise<void>
 
@@ -175,18 +190,14 @@ export type EventFnTernary<TEventName extends EventName = EventName> = TEventNam
   : EventFnRevert
 
 export type EventNameFnsMap<TActionName extends ActionName = ActionName> = {
-  before?: EventFnBeforeTernary<TActionName>[]
-  success?: EventFnSuccessTernary<TActionName>[]
-  error?: EventFnErrorTernary<TActionName>[]
-  revert?: EventFnRevertTernary<TActionName>[]
+  before: EventFnBeforeTernary<TActionName>[]
+  success: EventFnSuccessTernary<TActionName>[]
+  error: EventFnErrorTernary<TActionName>[]
+  revert: EventFnRevertTernary<TActionName>[]
 }
 
 export function eventFnsMapWithDefaults<TActionName extends ActionName = ActionName> (
-  eventNameFnsMap: EventNameFnsMap = {}
+  eventNameFnsMap: Partial<EventNameFnsMap> = {}
 ): O.Compulsory<EventNameFnsMap<TActionName>> {
   return merge({ before: [], success: [], error: [], revert: [] }, eventNameFnsMap)
-}
-
-export type EventFnsPerStore<TActionName extends ActionName = ActionName> = {
-  [storeName: string]: EventNameFnsMap<TActionName>
 }

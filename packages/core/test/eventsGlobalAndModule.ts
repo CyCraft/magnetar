@@ -10,18 +10,30 @@ test('emits global, module and action events', async t => {
       read: ['local'],
       write: ['local'],
     },
-    on: { local: { before: ({ payload }) => ({ ...payload, addedInGlobal: true }) } },
+    on: {
+      before: ({ payload, storeName }) => {
+        if (storeName === 'local') return { ...payload, addedInGlobal: true }
+      },
+    },
   })
   const usersModule = vueSync.createModule({
     configPerStore: {
       local: { path: 'users' }, // path for vuex
     },
-    on: { local: { before: ({ payload }) => ({ ...payload, addedInModule: true }) } },
+    on: {
+      before: ({ payload, storeName }) => {
+        if (storeName === 'local') return { ...payload, addedInModule: true }
+      },
+    },
   })
   const insertPayload = { name: 'luca' }
 
   const result = await usersModule.insert(insertPayload, {
-    on: { local: { before: ({ payload }) => ({ ...payload, addedInAction: true }) } },
+    on: {
+      before: ({ payload, storeName }) => {
+        if (storeName === 'local') return { ...payload, addedInAction: true }
+      },
+    },
   })
   t.deepEqual(result, {
     ...insertPayload,

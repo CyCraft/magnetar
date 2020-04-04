@@ -1,7 +1,6 @@
 import { isVueSyncError } from '../types/actions'
 import { PlainObject } from '../types/base'
 import { EventNameFnsMap } from '../types/events'
-import { O } from 'ts-toolbelt'
 import { PluginModuleConfig, OnStream, PluginStreamAction } from '../types/plugins'
 
 function isUndefined (payload: any): payload is undefined | void {
@@ -15,9 +14,10 @@ export async function handleStream (args: {
   pluginAction: PluginStreamAction
   pluginModuleConfig: PluginModuleConfig
   payload: PlainObject
-  eventNameFnsMap: O.Compulsory<EventNameFnsMap<'stream'>>
+  eventNameFnsMap: EventNameFnsMap
   actionName: 'stream'
   onStream: OnStream
+  storeName: string
 }): Promise<
   | {
       streaming: Promise<void>
@@ -33,12 +33,16 @@ export async function handleStream (args: {
     eventNameFnsMap: on,
     actionName,
     onStream,
+    storeName,
   } = args
+  // no aborting possible in stream actions
+  const abort = undefined
 
   let payloadAfterBeforeEvent: PlainObject = payload // the payload throughout the stages
   // handle and await each eventFn in sequence
   for (const fn of on.before) {
-    const eventResult = await fn({ payload: payloadAfterBeforeEvent, actionName, abort: undefined })
+    // @ts-ignore
+    const eventResult = await fn({ payload: payloadAfterBeforeEvent, actionName, storeName, abort })
     // overwrite the result with whatever the dev returns in the event function, as long as it's not undefined
     if (!isUndefined(eventResult)) payloadAfterBeforeEvent = eventResult
   }
@@ -61,12 +65,14 @@ export async function handleStream (args: {
     if (!isVueSyncError(error)) throw new Error(error)
     // handle and await each eventFn in sequence
     for (const fn of on.error) {
-      await fn({ payload: payloadAfterBeforeEvent, actionName, error, abort: undefined })
+      // @ts-ignore
+      await fn({ payload: payloadAfterBeforeEvent, actionName, storeName, error, abort })
     }
   }
   // handle and await each eventFn in sequence
   for (const fn of on.success) {
-    await fn({ payload: payloadAfterBeforeEvent, result: undefined, actionName, abort: undefined })
+    // @ts-ignore
+    await fn({ payload: payloadAfterBeforeEvent, result: undefined, actionName, storeName, abort })
   }
   return {
     streaming,

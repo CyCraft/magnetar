@@ -1,9 +1,8 @@
 import { O } from 'ts-toolbelt'
 import { VueSyncConfig } from '..'
 import { ModuleConfig } from '../CreateModule'
-import { getEventFnsPerStore } from '../getEventFnsPerStore'
+import { getEventNameFnsMap } from '../getEventNameFnsMap'
 import { handleStream } from './handleStream'
-import { EventFnsPerStore, eventFnsMapWithDefaults } from '../types/events'
 import { ActionType, ActionConfig, VueSyncStreamAction } from '../types/actions'
 import { PluginModuleConfig, OnStream } from '../types/plugins'
 
@@ -16,11 +15,7 @@ export function handleStreamPerStore (
   // returns the action the dev can call with myModule.insert() etc.
   return async function (payload?: object, actionConfig: ActionConfig = {}): Promise<void> {
     // get all the config needed to perform this action
-    const eventFnsPerStore: EventFnsPerStore<'stream'> = getEventFnsPerStore(
-      globalConfig,
-      moduleConfig,
-      actionConfig
-    )
+    const eventNameFnsMap = getEventNameFnsMap(globalConfig, moduleConfig, actionConfig)
     const storesToExecute: string[] =
       actionConfig.executionOrder ||
       (moduleConfig.executionOrder || {})['stream'] ||
@@ -50,7 +45,6 @@ export function handleStreamPerStore (
       // find the action on the plugin
       const pluginAction = globalConfig.stores[storeName].actions['stream']
       const pluginModuleConfig: PluginModuleConfig = moduleConfig?.configPerStore[storeName] || {}
-      const eventNameFnsMap = eventFnsMapWithDefaults<'stream'>(eventFnsPerStore[storeName])
       // the plugin action
       if (pluginAction) {
         const streamInfo = await handleStream({
@@ -60,6 +54,7 @@ export function handleStreamPerStore (
           eventNameFnsMap,
           actionName: 'stream',
           onStream,
+          storeName,
         })
         if (streamInfo) streamInfoPerStore[storeName] = streamInfo
       }

@@ -17,13 +17,18 @@ export type SharedConfig = {
       [action in ActionName]?: StoreName[]
     }
   onError: 'stop' | 'continue' | 'revert'
+  modifyPayloadOn: {
+    insert?: (payload: object) => object
+    merge?: (payload: object) => object
+    assign?: (payload: object) => object
+    replace?: (payload: object) => object
+    delete?: (payload: string | string[]) => string | string[]
+  }
   on: {
-    [storeName: string]: {
-      before?: EventFnBefore
-      success?: EventFnSuccess
-      error?: EventFnError
-      revert?: EventFnRevert
-    }
+    before?: EventFnBefore
+    success?: EventFnSuccess
+    error?: EventFnError
+    revert?: EventFnRevert
   }
 }
 // export interface SharedConfig {

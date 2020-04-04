@@ -40,13 +40,18 @@ export function isWriteAction (actionName: ActionName): actionName is ActionName
 export type ActionConfig<TActionName extends ActionName = ActionName> = {
   executionOrder?: StoreName[]
   onError?: 'stop' | 'continue' | 'revert'
+  modifyPayloadOn?: {
+    insert?: (payload: object) => object
+    merge?: (payload: object) => object
+    assign?: (payload: object) => object
+    replace?: (payload: object) => object
+    delete?: (payload: string | string[]) => string | string[]
+  }
   on?: {
-    [storeName: string]: {
-      before?: EventFnBeforeTernary<TActionName>
-      success?: EventFnSuccessTernary<TActionName>
-      error?: EventFnErrorTernary<TActionName>
-      revert?: EventFnRevertTernary<TActionName>
-    }
+    before?: EventFnBeforeTernary<TActionName>
+    success?: EventFnSuccessTernary<TActionName>
+    error?: EventFnErrorTernary<TActionName>
+    revert?: EventFnRevertTernary<TActionName>
   }
 }
 

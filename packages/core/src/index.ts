@@ -22,6 +22,7 @@ function configWithDefaults (config: VueSyncConfig): O.Compulsory<VueSyncConfig>
     },
     onError: 'stop',
     on: {},
+    modifyPayloadOn: {},
   }
   const merged = merge(defaults, config)
   return merged

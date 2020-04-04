@@ -72,17 +72,15 @@ test('read: get (collection)', async t => {
       {},
       {
         on: {
-          local: {
-            success: ({ result }) => {
+          success: ({ result, storeName }) => {
+            if (storeName === 'local') {
               // here we check if the data returned at this point is actually what that store plugin should return
               t.deepEqual(pokedexModule.data.local, { '001': bulbasaur })
-            },
-          },
-          remote: {
-            success: ({ result }) => {
+            }
+            if (storeName === 'remote') {
               // here we check if the data returned at this point is actually what that store plugin should return
               t.deepEqual(result, [bulbasaur, flareon])
-            },
+            }
           },
         },
       }
@@ -104,12 +102,12 @@ test('read: get (document)', async t => {
       {},
       {
         on: {
-          local: {
-            success: ({ result }) => {
+          success: ({ result, storeName }) => {
+            if (storeName === 'local') {
               // here we check if the data returned at this point is actually what that store plugin should return
               t.deepEqual(result, undefined)
               t.deepEqual(trainerModule.data.local, { name: 'Luca', age: 10 })
-            },
+            }
           },
         },
       }

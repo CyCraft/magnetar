@@ -1,9 +1,9 @@
 import { O } from 'ts-toolbelt'
 import { VueSyncConfig } from '..'
 import { ModuleConfig } from '../CreateModule'
-import { getEventFnsPerStore } from '../getEventFnsPerStore'
+import { getEventNameFnsMap } from '../getEventNameFnsMap'
 import { handleAction } from './handleAction'
-import { EventFnsPerStore, eventFnsMapWithDefaults, EventFnSuccessTernary } from '../types/events'
+import { eventFnsMapWithDefaults, EventFnSuccessTernary } from '../types/events'
 import {
   ActionType,
   ActionConfig,
@@ -39,11 +39,7 @@ export function handleActionPerStore (
   ): Promise<void | object | object[]> {
     // get all the config needed to perform this action
     const onError = actionConfig.onError || moduleConfig.onError || globalConfig.onError
-    const eventFnsPerStore: EventFnsPerStore = getEventFnsPerStore(
-      globalConfig,
-      moduleConfig,
-      actionConfig
-    )
+    const eventNameFnsMap = getEventNameFnsMap(globalConfig, moduleConfig, actionConfig)
     const storesToExecute: string[] =
       actionConfig.executionOrder ||
       (moduleConfig.executionOrder || {})[actionName] ||
@@ -75,9 +71,6 @@ export function handleActionPerStore (
       // find the action on the plugin
       const pluginAction = globalConfig.stores[storeName].actions[actionName]
       const pluginModuleConfig: PluginModuleConfig = moduleConfig?.configPerStore[storeName] || {}
-      const eventNameFnsMap = eventFnsMapWithDefaults<Exclude<ActionName, 'stream'>>(
-        eventFnsPerStore[storeName]
-      )
       // the plugin action
       result = !pluginAction
         ? result
@@ -90,6 +83,7 @@ export function handleActionPerStore (
             actionName,
             stopExecutionAfterAction,
             onNextStoresSuccess,
+            storeName,
           })
       // handle reverting
       if (stopExecution === 'revert') {
@@ -98,9 +92,7 @@ export function handleActionPerStore (
         for (const storeToRevert of storesToRevert) {
           const pluginRevertAction = globalConfig.stores[storeToRevert].revert
           await pluginRevertAction(actionName, payload, pluginModuleConfig)
-          // revert eventFns
-          const eventNameFnsMap = eventFnsMapWithDefaults(eventFnsPerStore[storeToRevert])
-          // handle and await each eventFn in sequence
+          // revert eventFns, handle and await each eventFn in sequence
           for (const fn of eventNameFnsMap.revert) {
             //@ts-ignore
             await fn({ payload, result, actionName })

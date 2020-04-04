@@ -1,7 +1,6 @@
 import { isVueSyncError, ActionName, isWriteAction } from '../types/actions'
 import { SharedConfig, PlainObject } from '../types/base'
 import { EventNameFnsMap, EventFnSuccessTernary, EventFnSuccess } from '../types/events'
-import { O } from 'ts-toolbelt'
 import {
   PluginModuleConfig,
   PluginActionTernary,
@@ -21,11 +20,12 @@ export function handleAction<
   pluginAction: PluginActionTernary<TActionName>
   pluginModuleConfig: PluginModuleConfig
   payload: Payload
-  eventNameFnsMap: O.Compulsory<EventNameFnsMap<TActionName>>
+  eventNameFnsMap: EventNameFnsMap
   onError: SharedConfig['onError']
   actionName: TActionName
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
   onNextStoresSuccess: EventFnSuccessTernary<TActionName>[]
+  storeName: string
 }): Promise<void | PlainObject | PlainObject[]>
 
 /**
@@ -36,11 +36,12 @@ export async function handleAction (args: {
   pluginAction: PluginGetAction | PluginWriteAction | PluginDeleteAction
   pluginModuleConfig: PluginModuleConfig
   payload: void | PlainObject | string | string[]
-  eventNameFnsMap: O.Compulsory<EventNameFnsMap<Exclude<ActionName, 'stream'>>>
+  eventNameFnsMap: EventNameFnsMap
   onError: SharedConfig['onError']
   actionName: Exclude<ActionName, 'stream'>
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
   onNextStoresSuccess: EventFnSuccess[]
+  storeName: string
 }): Promise<void | PlainObject | PlainObject[]> {
   const {
     pluginAction,
@@ -51,6 +52,7 @@ export async function handleAction (args: {
     actionName,
     stopExecutionAfterAction,
     onNextStoresSuccess,
+    storeName,
   } = args
   const successEventsToExecute = [...onNextStoresSuccess]
 
@@ -63,7 +65,7 @@ export async function handleAction (args: {
   // handle and await each eventFn in sequence
   for (const fn of on.before) {
     // @ts-ignore
-    const eventResult = await fn({ payload: payloadAfterBeforeEvent, actionName, abort })
+    const eventResult = await fn({ payload: payloadAfterBeforeEvent, actionName, storeName, abort })
     // overwrite the result with whatever the dev returns in the event function, as long as it's not undefined
     if (!isUndefined(eventResult)) payloadAfterBeforeEvent = eventResult
   }
@@ -88,7 +90,7 @@ export async function handleAction (args: {
     // handle and await each eventFn in sequence
     for (const fn of on.error) {
       // @ts-ignore
-      await fn({ payload: payloadAfterBeforeEvent, actionName, abort, error })
+      await fn({ payload: payloadAfterBeforeEvent, actionName, storeName, abort, error })
     }
     // abort?
     if (abortExecution || onError === 'stop') {
@@ -103,12 +105,12 @@ export async function handleAction (args: {
   // handle and await each eventFn in sequence
   for (const fn of on.success) {
     // @ts-ignore
-    await fn({ payload: payloadAfterBeforeEvent, result, actionName, abort })
+    await fn({ payload: payloadAfterBeforeEvent, result, actionName, storeName, abort })
   }
   // handle and await each "onNextStoresSuccess" eventFn in sequence (besides the ones just added of course)
   for (const fn of successEventsToExecute) {
     // @ts-ignore
-    await fn({ payload: payloadAfterBeforeEvent, result, actionName, abort })
+    await fn({ payload: payloadAfterBeforeEvent, result, actionName, storeName, abort })
   }
   // abort?
   if (abortExecution) {
