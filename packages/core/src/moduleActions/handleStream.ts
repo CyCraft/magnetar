@@ -2,7 +2,7 @@ import { isVueSyncError } from '../types/actions'
 import { PlainObject } from '../types/base'
 import { EventNameFnsMap } from '../types/events'
 import { O } from 'ts-toolbelt'
-import { PluginModuleConfig, OnNextStoresStream, PluginStreamAction } from '../types/plugins'
+import { PluginModuleConfig, OnStream, PluginStreamAction } from '../types/plugins'
 
 function isUndefined (payload: any): payload is undefined | void {
   return payload === undefined
@@ -17,7 +17,7 @@ export async function handleStream (args: {
   payload: PlainObject
   eventNameFnsMap: O.Compulsory<EventNameFnsMap<'stream'>>
   actionName: 'stream'
-  onNextStoresStream: OnNextStoresStream
+  onStream: OnStream
 }): Promise<
   | {
       streaming: Promise<void>
@@ -32,7 +32,7 @@ export async function handleStream (args: {
     payload,
     eventNameFnsMap: on,
     actionName,
-    onNextStoresStream,
+    onStream,
   } = args
 
   let payloadAfterBeforeEvent: PlainObject = payload // the payload throughout the stages
@@ -52,7 +52,7 @@ export async function handleStream (args: {
     const streamResponsePlugin = await pluginStreamAction(
       payloadAfterBeforeEvent,
       pluginModuleConfig,
-      onNextStoresStream
+      onStream
     )
     if (!streamResponsePlugin) return undefined
     streaming = streamResponsePlugin.streaming

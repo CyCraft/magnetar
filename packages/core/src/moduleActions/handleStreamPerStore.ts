@@ -5,7 +5,7 @@ import { getEventFnsPerStore } from '../getEventFnsPerStore'
 import { handleStream } from './handleStream'
 import { EventFnsPerStore, eventFnsMapWithDefaults } from '../types/events'
 import { ActionType, ActionConfig, VueSyncStreamAction } from '../types/actions'
-import { PluginModuleConfig, OnNextStoresStream } from '../types/plugins'
+import { PluginModuleConfig, OnStream } from '../types/plugins'
 
 export function handleStreamPerStore (
   moduleConfig: ModuleConfig,
@@ -33,7 +33,7 @@ export function handleStreamPerStore (
     }
 
     // a mutatable array of successevents which is to be triggered each time a next store triggers a successevent
-    const onNextStoresStream: OnNextStoresStream = {
+    const onStream: OnStream = {
       inserted: [],
       merged: [],
       assigned: [],
@@ -59,7 +59,7 @@ export function handleStreamPerStore (
           payload, // should always use the payload as passed originally for clarity
           eventNameFnsMap,
           actionName: 'stream',
-          onNextStoresStream,
+          onStream,
         })
         if (streamInfo) streamInfoPerStore[storeName] = streamInfo
       }

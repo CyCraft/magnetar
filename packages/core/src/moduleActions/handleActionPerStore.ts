@@ -15,9 +15,9 @@ import {
 } from '../types/actions'
 import { PluginModuleConfig } from '../types/plugins'
 
-function isUndefined (payload: any): payload is undefined | void {
-  return payload === undefined
-}
+// function isUndefined (payload: any): payload is undefined | void {
+//   return payload === undefined
+// }
 
 export function handleActionPerStore<TActionName extends Exclude<ActionName, 'stream'>> (
   moduleConfig: ModuleConfig,
@@ -67,7 +67,7 @@ export function handleActionPerStore (
     }
 
     // a mutatable array of successevents which is to be triggered after each store
-    const onNextStoresSuccess: EventFnSuccessTernary[] = []
+    const onNextStoresSuccess: EventFnSuccessTernary<Exclude<ActionName, 'stream'>>[] = []
 
     // handle and await each action in sequence
     let result: void | object | object[]
@@ -75,7 +75,9 @@ export function handleActionPerStore (
       // find the action on the plugin
       const pluginAction = globalConfig.stores[storeName].actions[actionName]
       const pluginModuleConfig: PluginModuleConfig = moduleConfig?.configPerStore[storeName] || {}
-      const eventNameFnsMap = eventFnsMapWithDefaults(eventFnsPerStore[storeName])
+      const eventNameFnsMap = eventFnsMapWithDefaults<Exclude<ActionName, 'stream'>>(
+        eventFnsPerStore[storeName]
+      )
       // the plugin action
       result = !pluginAction
         ? result
@@ -95,13 +97,13 @@ export function handleActionPerStore (
         storesToRevert.reverse()
         for (const storeToRevert of storesToRevert) {
           const pluginRevertAction = globalConfig.stores[storeToRevert].revert
-          result = await pluginRevertAction(actionName, result, pluginModuleConfig)
+          await pluginRevertAction(actionName, payload, pluginModuleConfig)
           // revert eventFns
           const eventNameFnsMap = eventFnsMapWithDefaults(eventFnsPerStore[storeToRevert])
           // handle and await each eventFn in sequence
           for (const fn of eventNameFnsMap.revert) {
-            const eventResult = await fn({ payload, result, actionName })
-            if (!isUndefined(eventResult)) result = eventResult
+            //@ts-ignore
+            await fn({ payload, result, actionName })
           }
         }
         // return result early to prevent going to the next store

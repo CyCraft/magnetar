@@ -1,21 +1,28 @@
 import { merge } from 'merge-anything'
 import { copy } from 'copy-anything'
 import { nestifyObject as nestify } from 'nestify-anything'
-import { ActionName, VueSyncError, actionNameTypeMap } from '../../src/types/actions'
+import { isArray, isPlainObject } from 'is-what'
+import { waitMs } from './wait'
+import { writeActionFactory } from './pluginMockLocalActions'
+import {
+  ActionName,
+  VueSyncError,
+  actionNameTypeMap,
+  ActionNameWrite,
+} from '../../src/types/actions'
 import {
   PluginInstance,
   PluginRevertAction,
   PluginGetAction,
   PluginWriteAction,
   PluginStreamAction,
-  OnNextStoresStream,
+  OnStream,
 } from '../../src/types/plugins'
 import { PlainObject } from '../../types/types/base'
 import { Modified } from '../../src/types/base'
 import pathToProp from 'path-to-prop'
 import { bulbasaur, charmander, flareon } from './pokemon'
 import { EventFnSuccess } from '../../src/types/events'
-import { isArray, isPlainObject } from 'is-what'
 
 // there are two interfaces to be defined & exported by each plugin
 // - VueSyncPluginConfig
@@ -36,7 +43,7 @@ export interface VueSyncPluginModuleConfig {
 function dots (path: string): string { return path.replace(/\//g, '.') } // prettier-ignore
 function isOdd (number: number) { return number % 2 === 1 } // prettier-ignore
 function isEven (number: number) { return number % 2 === 0 } // prettier-ignore
-function isModuleCollection (moduleConfig: VueSyncPluginModuleConfig): boolean {
+export function isModuleCollection (moduleConfig: VueSyncPluginModuleConfig): boolean {
   return isOdd(moduleConfig.path.split('/').length)
 }
 
@@ -45,19 +52,18 @@ function createStreamAction (moduleData: PlainObject, storeName: string): Plugin
   return (
     payload: void | PlainObject = {},
     pluginModuleConfig: VueSyncPluginModuleConfig,
-    onNextStoresStream: OnNextStoresStream
+    onNextStoresStream: OnStream
   ):
-    | void
     | { streaming: Promise<void>; stop: () => void }
-    | Promise<void | { streaming: Promise<void>; stop: () => void }> => {
+    | Promise<{ streaming: Promise<void>; stop: () => void }> => {
     // this is custom logic to be implemented by the plugin author
     const { path } = pluginModuleConfig
     const db = pathToProp(moduleData, path)
+    const isCollection = isModuleCollection(pluginModuleConfig)
 
     // let's pass a new event that will make sure this plugin's data is kept up to date with the server data
     // this mocks how the result from the next store (the remote store) should update this local store per action type
     if (storeName === 'local') {
-      const isCollection = isModuleCollection(pluginModuleConfig)
       const inserted = (payload: PlainObject) => {
         if (isCollection) {
           // this mocks data inserted into 'pokedex'
@@ -157,6 +163,15 @@ function createGetAction (
     makeDataSnapshot()
     const { path } = pluginModuleConfig
 
+    // this mocks an error during execution
+    if (payload && payload.shouldFail === storeName) {
+      const errorToThrow: VueSyncError = {
+        payload,
+        message: 'fail',
+      }
+      throw errorToThrow
+    }
+
     // let's pass a new event that will make sure this plugin's data is kept up to date with the server data
     // this mocks how the result from the next store (the remote store) should be merged into the local stores
     if (storeName === 'local') {
@@ -178,6 +193,7 @@ function createGetAction (
           }
         }
       })
+      return
     }
     // in case of a local store that doesn't fetch from anywhere, not even from cach, we could return early here
 
@@ -185,35 +201,21 @@ function createGetAction (
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         // this mocks an error during execution
-        if (payload && payload.shouldFail === storeName) {
-          const errorToThrow: VueSyncError = {
-            payload,
-            message: 'fail',
-          }
-          reject(errorToThrow)
-        } else {
-          const db = pathToProp(moduleData, path)
-          let dataRetrieved: PlainObject | PlainObject[]
-          // this mocks data returned from 'pokedex'
-          if (path === 'pokedex') {
+        const db = pathToProp(moduleData, path)
+        let dataRetrieved: PlainObject | PlainObject[]
+        // this mocks data returned from 'pokedex'
+        if (path === 'pokedex') {
+          // this is to mock different data in the local store opposed to the remote one
+          dataRetrieved = storeName === 'local' ? [bulbasaur, charmander] : [bulbasaur, flareon]
+        } else if (path === 'data/trainer') {
+          // this mocks data returned from 'data/trainer'
+          dataRetrieved =
             // this is to mock different data in the local store opposed to the remote one
-            dataRetrieved = storeName === 'local' ? [bulbasaur, charmander] : [bulbasaur, flareon]
-            dataRetrieved.forEach(p => {
-              db[p.id] = p
-            })
-          } else if (path === 'data/trainer') {
-            // this mocks data returned from 'data/trainer'
-            dataRetrieved =
-              // this is to mock different data in the local store opposed to the remote one
-              storeName === 'local'
-                ? { name: 'Luca', age: 10, colour: 'blue' }
-                : { name: 'Luca', age: 10, dream: 'job' }
-            Object.entries(dataRetrieved).forEach(([key, value]) => {
-              db[key] = value
-            })
-          }
-          resolve(dataRetrieved)
+            storeName === 'local'
+              ? { name: 'Luca', age: 10, colour: 'blue' }
+              : { name: 'Luca', age: 10, dream: 'job' }
         }
+        resolve(dataRetrieved)
       }, 1)
     })
   }
@@ -221,50 +223,27 @@ function createGetAction (
 
 function createWriteAction (
   moduleData: PlainObject,
-  actionName: string,
+  actionName: ActionNameWrite,
   storeName: string
 ): PluginWriteAction {
-  // this is a `PluginAction`:
-  return async function<Payload extends PlainObject | void> (
-    payload: Payload,
+  // PluginWriteAction for the 'local' store:
+  if (storeName === 'local') return writeActionFactory(moduleData, actionName, storeName)
+  // PluginWriteAction for the 'remote' store:
+  return async function (
+    payload: PlainObject,
     pluginModuleConfig: VueSyncPluginModuleConfig
-  ): Promise<Modified<Payload>> {
-    if (!isPlainObject(payload)) return
-    // this is custom logic to be implemented by the plugin author
-    const { path } = pluginModuleConfig
-    const isCollection = isModuleCollection(pluginModuleConfig)
-    const shouldFail =
-      payload.shouldFail === storeName || (actionName === 'insert' && !isCollection)
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        // this mocks an error during execution
-        if (shouldFail) {
-          const errorToThrow: VueSyncError = {
-            payload,
-            message: 'fail',
-          }
-          reject(errorToThrow)
-        } else {
-          const db = pathToProp(moduleData, path)
-          // this mocks data inserted into 'pokedex'
-          if (actionName === 'insert') {
-            db[payload.id] = payload
-          }
-          if (actionName === 'merge') {
-            // this mocks data merged into 'pokedex'
-            if (isCollection) {
-              db[payload.id] = merge(db[payload.id], payload)
-            } else {
-              // this mocks data merged into 'data/trainer'
-              Object.entries(payload).forEach(([key, value]) => {
-                db[key] = merge(db[key], value)
-              })
-            }
-          }
-          resolve(payload as Modified<Payload>)
-        }
-      }, 1)
-    })
+  ): Promise<PlainObject> {
+    await waitMs(1)
+    // this mocks an error during execution
+    const shouldFail = payload.shouldFail === storeName
+    if (shouldFail) {
+      const errorToThrow: VueSyncError = {
+        payload,
+        message: 'fail',
+      }
+      throw errorToThrow
+    }
+    return payload
   }
 }
 
@@ -296,13 +275,14 @@ function createRevertAction (
           if (actionType === 'write') {
             const { path } = pluginModuleConfig
             const db = pathToProp(moduleData, path)
+            console.log('db[payload.id] → ', db[payload.id])
             db[payload.id] = undefined
           }
           // this mocks data reverted during a read
           if (actionType === 'read') {
             restoreDataSnapshot()
           }
-          resolve({ ...payload, reverted: { actionName, storeName } })
+          resolve()
         }
       }, 1)
     })

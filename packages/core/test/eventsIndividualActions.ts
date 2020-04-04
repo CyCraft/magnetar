@@ -20,7 +20,6 @@ test('insert: emits before & success events', async t => {
           // @ts-ignore
           t.deepEqual(payload, insertPayload)
           ranAllEvents.push(1)
-          return payload
         },
       },
       remote: {
@@ -34,7 +33,6 @@ test('insert: emits before & success events', async t => {
           // @ts-ignore
           t.deepEqual(payload, insertPayload)
           ranAllEvents.push(1)
-          return payload
         },
       },
     },
@@ -80,7 +78,6 @@ test('insert: can abort in success events', async t => {
         success: ({ payload, abort }) => {
           ranAllEvents.push(1)
           abort()
-          return payload
         },
       },
       remote: {
@@ -97,7 +94,6 @@ test('insert: can mutate payload via events -- should not carry over modificatio
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = squirtle
   t.is(pokedexModule.data.local['007'], undefined)
-  t.is(pokedexModule.data.remote['007'], undefined)
   const result = await pokedexModule.insert(insertPayload, {
     on: {
       local: {
@@ -109,7 +105,6 @@ test('insert: can mutate payload via events -- should not carry over modificatio
         success: ({ payload }) => {
           // @ts-ignore
           t.deepEqual(payload, { ...squirtle, level: 1 })
-          return { ...payload, sunglasses: true }
         },
       },
       remote: {
@@ -121,7 +116,6 @@ test('insert: can mutate payload via events -- should not carry over modificatio
         success: ({ payload }) => {
           // @ts-ignore
           t.deepEqual(payload, { ...squirtle, trait: 'water resistance' })
-          return { ...payload, strength: 9000 }
         },
       },
     },
@@ -129,17 +123,14 @@ test('insert: can mutate payload via events -- should not carry over modificatio
   // @ts-ignore
   // should be the same payload as AFTER the "before event":
   t.deepEqual(pokedexModule.data.local['007'], { ...squirtle, level: 1 })
-  // should be the same payload as AFTER the "before event":
-  t.deepEqual(pokedexModule.data.remote['007'], { ...squirtle, trait: 'water resistance' })
   // should be the same payload as AFTER the "succes event" of the last store:
-  t.deepEqual(result, { ...squirtle, trait: 'water resistance', strength: 9000 })
+  t.deepEqual(result, { ...squirtle, trait: 'water resistance' })
 })
 
 test('get: can mutate payload via events -- can apply defaults to remote data to be carried over to local store', async t => {
   // get resolves once all stores have given a response with data
   const { pokedexModule } = createVueSyncInstance()
   t.deepEqual(pokedexModule.data.local, { '001': bulbasaur })
-  t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur })
   try {
     const result = await pokedexModule.get(
       {},
@@ -156,10 +147,9 @@ test('get: can mutate payload via events -- can apply defaults to remote data to
             success: ({ result }) => {
               // here we check if the data returned at this point is actually what that store plugin should return
               t.deepEqual(result, [bulbasaur, flareon])
-              t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur, '136': flareon })
               if (!isArray(result)) return
               // can apply defaults to the remote data
-              return result.map(pokemon => ({ ...pokemon, seen: true }))
+              // return result.map(pokemon => ({ ...pokemon, seen: true }))
             },
           },
         },
@@ -173,8 +163,6 @@ test('get: can mutate payload via events -- can apply defaults to remote data to
   } catch (error) {
     t.fail(error)
   }
-  // the remote store SHOULD NOT have the applied defaults
-  t.deepEqual(pokedexModule.data.remote, { '001': bulbasaur, '136': flareon })
   // the local store should have updated its data to the whatever was returned in the remote success event (via the plugin's onNextStoresSuccess handler)
   // therefore: the local store SHOULD HAVE the applied defaults
   t.deepEqual(pokedexModule.data.local, {

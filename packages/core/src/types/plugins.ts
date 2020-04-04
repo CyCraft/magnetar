@@ -1,6 +1,6 @@
 import { ActionName, ActionNameWrite } from './actions'
 import { PlainObject, Modified } from './base'
-import { EventFnSuccess } from './events'
+import { EventFnSuccessTernary } from './events'
 
 // stores / plugins
 
@@ -20,6 +20,13 @@ export interface PluginInstance {
     replace?: PluginWriteAction
     delete?: PluginDeleteAction
   }
+  // OnStream: {
+  //   inserted: ((payload: object) => void)[]
+  //   merged: ((payload: object) => void)[]
+  //   assigned: ((payload: object) => void)[]
+  //   replaced: ((payload: object) => void)[]
+  //   deleted: ((payload: object | string) => void)[]
+  // }
   revert: PluginRevertAction // the action that reverts other actions on error
   setModuleDataReference: <T extends any>(moduleConfig: PluginModuleConfig) => Modified<T>
   config: { [key: string]: any } // any other config the plugin needs which is passed by the dev
@@ -28,7 +35,7 @@ export interface PluginInstance {
 // the `PluginModuleConfig` is the extra config of a plugin when a module is instanciated
 export type PluginModuleConfig = PlainObject
 
-export type OnNextStoresStream = {
+export type OnStream = {
   inserted: ((payload: object) => void)[]
   merged: ((payload: object) => void)[]
   assigned: ((payload: object) => void)[]
@@ -39,7 +46,7 @@ export type OnNextStoresStream = {
 export type PluginStreamAction = (
   payload: object | void,
   pluginModuleConfig: PluginModuleConfig,
-  onNextStoresStream: OnNextStoresStream
+  onNextStoresStream: OnStream
 ) =>
   | void
   | { streaming: Promise<void>; stop: () => void }
@@ -48,20 +55,27 @@ export type PluginStreamAction = (
 export type PluginGetAction = (
   payload: object | void,
   pluginModuleConfig: PluginModuleConfig,
-  onNextStoresSuccess: EventFnSuccess<'get'>[]
+  onNextStoresSuccess: EventFnSuccessTernary<'get'>[]
 ) => void | PlainObject | PlainObject[] | Promise<void | PlainObject | PlainObject[]>
 
 export type PluginDeleteAction = (
   payload: string | string[],
   pluginModuleConfig: PluginModuleConfig,
-  onNextStoresSuccess: EventFnSuccess<'delete'>[]
+  onNextStoresSuccess: EventFnSuccessTernary<'delete'>[]
 ) => void | Promise<void>
 
-export type PluginWriteAction = <Payload extends object>(
-  payload: Payload,
+export type PluginWriteAction = (
+  payload: PlainObject,
   pluginModuleConfig: PluginModuleConfig,
-  onNextStoresSuccess: EventFnSuccess<ActionNameWrite>[]
-) => Modified<Payload> | Promise<Modified<Payload>>
+  onNextStoresSuccess: EventFnSuccessTernary<ActionNameWrite>[]
+) => PlainObject | Promise<PlainObject>
+
+// todo: I can't get this to work properly when trying to implement it in the pluginMock...
+// export type PluginWriteAction = <Payload extends object>(
+//   payload: Payload,
+//   pluginModuleConfig: PluginModuleConfig,
+//   onNextStoresSuccess: EventFnSuccessTernary<ActionNameWrite>[]
+// ) => O.Merge<Partial<Payload>, PlainObject> | Promise<O.Merge<Partial<Payload>, PlainObject>>
 
 // the revert action is a bit different, receives the ActionName
 export type PluginRevertAction = (
