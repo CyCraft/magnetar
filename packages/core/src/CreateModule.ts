@@ -12,8 +12,8 @@ import { handleActionPerStore } from './moduleActions/handleActionPerStore'
 import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
 import { throwIfNoDataStoreName } from './helpers/throwFns'
 
-export type VueSyncModuleInstance = {
-  data: { [idOrProp: string]: any }
+export type VueSyncModuleInstance<DataStructure = { [idOrProp: string]: any }> = {
+  data: DataStructure
   openStreams: { [identifier: string]: () => void }
   get?: VueSyncGetAction
   stream?: VueSyncStreamAction
@@ -37,10 +37,10 @@ export type ModuleConfig = O.Merge<
   }
 >
 
-export function CreateModuleWithContext (
+export function CreateModuleWithContext<DataStructure> (
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<VueSyncConfig>
-): VueSyncModuleInstance {
+): VueSyncModuleInstance<DataStructure> {
   const openStreams: { [identifier: string]: () => void } = {}
 
   const actions = {
@@ -58,7 +58,7 @@ export function CreateModuleWithContext (
   throwIfNoDataStoreName(dataStoreName)
   const pluginModuleConfig = moduleConfig?.configPerStore[dataStoreName] || {}
   const { setModuleDataReference } = globalConfig.stores[dataStoreName]
-  const data = setModuleDataReference(pluginModuleConfig)
+  const data = setModuleDataReference<DataStructure>(pluginModuleConfig)
 
   return {
     data,

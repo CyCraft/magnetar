@@ -5,7 +5,7 @@ import { waitMs } from './helpers/wait'
 import { VueSyncModuleInstance } from '../src/CreateModule'
 
 test('write: insert (collection module)', async t => {
-  const pokedexModule: VueSyncModuleInstance = createVueSyncInstance().pokedexModule
+  const pokedexModule = createVueSyncInstance().pokedexModule
   const insertPayload = squirtle
   t.deepEqual(pokedexModule.data['007'], undefined)
   const result = await pokedexModule.insert(insertPayload).catch(t.fail)
@@ -14,7 +14,7 @@ test('write: insert (collection module)', async t => {
 })
 
 test('write: insert multiple (collection module)', async t => {
-  const pokedexModule: VueSyncModuleInstance = createVueSyncInstance().pokedexModule
+  const pokedexModule = createVueSyncInstance().pokedexModule
   const insertPayload = [charmander, squirtle]
   t.deepEqual(pokedexModule.data['004'], undefined)
   t.deepEqual(pokedexModule.data['007'], undefined)
@@ -25,7 +25,7 @@ test('write: insert multiple (collection module)', async t => {
 })
 
 test('delete: (collection module)', async t => {
-  const pokedexModule: VueSyncModuleInstance = createVueSyncInstance().pokedexModule
+  const pokedexModule = createVueSyncInstance().pokedexModule
   const deletePayload = '001'
   t.deepEqual(pokedexModule.data['001'], bulbasaur)
   const result = await pokedexModule.delete(deletePayload).catch(t.fail)
@@ -34,7 +34,7 @@ test('delete: (collection module)', async t => {
 })
 
 test('delete: multiple (collection module)', async t => {
-  const pokedexModule: VueSyncModuleInstance = createVueSyncInstance().pokedexModule
+  const pokedexModule = createVueSyncInstance().pokedexModule
   const deletePayload = ['001']
   t.deepEqual(pokedexModule.data['001'], bulbasaur)
   const result = await pokedexModule.delete(deletePayload).catch(t.fail)

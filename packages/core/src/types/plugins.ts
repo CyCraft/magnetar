@@ -23,7 +23,9 @@ export interface PluginInstance {
     delete?: PluginDeleteAction
   }
   revert: PluginRevertAction // the action that reverts other actions on error
-  setModuleDataReference: (moduleConfig: PluginModuleConfig) => { [idOrProp: string]: any }
+  setModuleDataReference: <DataStructure = { [idOrProp: string]: any }>(
+    moduleConfig: PluginModuleConfig
+  ) => DataStructure
   config: { [key: string]: any } // any other config the plugin needs which is passed by the dev
 }
 

@@ -33,7 +33,9 @@ export interface VueSyncInstance {
 }
 
 // this is the `CreateModule` action exposed on the VueSync instance
-export type CreateModule = (moduleConfig: ModuleConfig) => VueSyncModuleInstance
+export type CreateModule = <DataStructure>(
+  moduleConfig: ModuleConfig
+) => VueSyncModuleInstance<DataStructure>
 
 export function VueSync (vueSyncConfig: VueSyncConfig): VueSyncInstance {
   // the passed VueSyncConfig is merged onto defaults
