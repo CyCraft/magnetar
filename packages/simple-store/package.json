@@ -1,0 +1,47 @@
+{
+  "name": "@vue-sync/simple-store",
+  "version": "0.0.0",
+  "description": "A simple local store plugin to use with Vue Sync.",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "typings": "types/index.d.ts",
+  "scripts": {
+    "build": "npm run lint && npm run test && npm run rollup",
+    "test": "ava --verbose",
+    "test--only": "ava --verbose --match='*only:*'",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "rollup": "rollup -c build.js"
+  },
+  "keywords": ["vue-sync"],
+  "author": "Luca Ban - Mesqueeb",
+  "license": "MIT",
+  "homepage": "https://github.com/vue-sync/simple-store#readme",
+  "peerDependencies": {
+    "@vue-sync/core": "0.0.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.26.0",
+    "@typescript-eslint/parser": "^2.26.0",
+    "@vue-sync/core": "0.0.0",
+    "ava": "^3.5.2",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-tree-shaking": "^1.8.0",
+    "rollup": "^2.3.3",
+    "rollup-plugin-typescript2": "^0.27.0",
+    "ts-node": "^8.8.2",
+    "typescript": "^3.8.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vue-sync/simple-store.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vue-sync/simple-store/issues"
+  },
+  "ava": {
+    "extensions": ["ts"],
+    "require": ["ts-node/register"],
+    "timeout": "30s"
+  }
+}
