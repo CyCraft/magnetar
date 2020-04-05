@@ -1,10 +1,27 @@
-import { merge } from 'merge-anything'
 import { PlainObject } from './base'
-import { ActionName } from './actions'
 import { O } from 'ts-toolbelt'
 
-export type ModifyWritePayload = (payload: PlainObject) => PlainObject
-export type ModifyDeletePayload = (payload: string | string[]) => string | string[]
+export type ModifyWritePayload = (
+  payload: PlainObject,
+  context: { storeName: string }
+) => PlainObject
+export type ModifyDeletePayload = (payload: string, context: { storeName: string }) => string
+export type ModifyReadPayload = (
+  payload: PlainObject | void,
+  context: { storeName: string }
+) => PlainObject | void
+
+export type ModifyPayloadFnMap = {
+  insert?: ModifyWritePayload
+  merge?: ModifyWritePayload
+  assign?: ModifyWritePayload
+  replace?: ModifyWritePayload
+  write?: ModifyWritePayload
+  delete?: ModifyDeletePayload
+  read?: ModifyReadPayload
+  stream?: ModifyReadPayload
+  get?: ModifyReadPayload
+}
 
 export type ModifyPayloadFnsMap = {
   insert: ModifyWritePayload[]
@@ -13,50 +30,25 @@ export type ModifyPayloadFnsMap = {
   replace: ModifyWritePayload[]
   write: ModifyWritePayload[]
   delete: ModifyDeletePayload[]
-}
-
-export function modifyPayloadFnsMapWithDefaults (
-  modifyPayloadActionFnsMap: Partial<ModifyPayloadFnsMap> = {}
-): ModifyPayloadFnsMap {
-  return merge(
-    {
-      insert: [],
-      merge: [],
-      assign: [],
-      replace: [],
-      write: [],
-      delete: [],
-    },
-    modifyPayloadActionFnsMap
-  )
+  read: ModifyReadPayload[]
+  stream: ModifyReadPayload[]
+  get: ModifyReadPayload[]
 }
 
 export function getModifyPayloadFnsMap (
-  ...onMaps: ({
-    insert?: ModifyWritePayload
-    merge?: ModifyWritePayload
-    assign?: ModifyWritePayload
-    replace?: ModifyWritePayload
-    write?: ModifyWritePayload
-    delete?: ModifyDeletePayload
-  } | void)[]
-): O.Omit<ModifyPayloadFnsMap, 'write'> {
-  const modifyPayloadFnsMap = modifyPayloadFnsMapWithDefaults()
-  const result = onMaps.reduce((carry, onPerAction) => {
-    if (!onPerAction) return carry
-    Object.entries(onPerAction).forEach(
-      ([eventName, eventFn]: [ActionName | 'write', ModifyWritePayload | ModifyDeletePayload]) => {
-        if (eventName === 'write') {
-          carry.insert.push(eventFn as ModifyWritePayload)
-          carry.merge.push(eventFn as ModifyWritePayload)
-          carry.assign.push(eventFn as ModifyWritePayload)
-          carry.replace.push(eventFn as ModifyWritePayload)
-        } else {
-          carry[eventName].push(eventFn)
-        }
-      }
-    )
-    return carry
-  }, modifyPayloadFnsMap)
+  ...onMaps: (ModifyPayloadFnMap | void)[]
+): O.Omit<ModifyPayloadFnsMap, 'write' | 'read'> {
+  const _onMaps = onMaps.filter(Boolean) as ModifyPayloadFnMap[]
+  const writeFns = _onMaps.flatMap(on => on.write ?? [])
+  const readFns = _onMaps.flatMap(on => on.read ?? [])
+  const result = {
+    insert: _onMaps.flatMap(on => on.insert ?? []).concat(writeFns),
+    merge: _onMaps.flatMap(on => on.merge ?? []).concat(writeFns),
+    assign: _onMaps.flatMap(on => on.assign ?? []).concat(writeFns),
+    replace: _onMaps.flatMap(on => on.replace ?? []).concat(writeFns),
+    delete: _onMaps.flatMap(on => on.delete ?? []),
+    stream: _onMaps.flatMap(on => on.stream ?? []).concat(readFns),
+    get: _onMaps.flatMap(on => on.get ?? []).concat(readFns),
+  }
   return result
 }

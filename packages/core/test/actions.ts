@@ -8,16 +8,54 @@ test('write: insert (collection module)', async t => {
   const pokedexModule: VueSyncModuleInstance = createVueSyncInstance().pokedexModule
   const insertPayload = squirtle
   t.deepEqual(pokedexModule.data.local['007'], undefined)
-  const result = await pokedexModule.insert(insertPayload)
+  const result = await pokedexModule.insert(insertPayload).catch(t.fail)
   t.deepEqual(result, insertPayload)
   t.deepEqual(pokedexModule.data.local['007'], insertPayload)
+})
+
+test('write: insert multiple (collection module)', async t => {
+  const pokedexModule: VueSyncModuleInstance = createVueSyncInstance().pokedexModule
+  const insertPayload = [charmander, squirtle]
+  t.deepEqual(pokedexModule.data.local['004'], undefined)
+  t.deepEqual(pokedexModule.data.local['007'], undefined)
+  const result = await pokedexModule.insert(insertPayload).catch(t.fail)
+  t.deepEqual(result, insertPayload)
+  t.deepEqual(pokedexModule.data.local['004'], charmander)
+  t.deepEqual(pokedexModule.data.local['007'], squirtle)
+})
+
+test('delete: (collection module)', async t => {
+  const pokedexModule: VueSyncModuleInstance = createVueSyncInstance().pokedexModule
+  const deletePayload = '001'
+  t.deepEqual(pokedexModule.data.local['001'], bulbasaur)
+  const result = await pokedexModule.delete(deletePayload).catch(t.fail)
+  t.deepEqual(result, undefined)
+  t.deepEqual(pokedexModule.data.local['001'], undefined)
+})
+
+test('delete: multiple (collection module)', async t => {
+  const pokedexModule: VueSyncModuleInstance = createVueSyncInstance().pokedexModule
+  const deletePayload = ['001']
+  t.deepEqual(pokedexModule.data.local['001'], bulbasaur)
+  const result = await pokedexModule.delete(deletePayload).catch(t.fail)
+  t.deepEqual(result, undefined)
+  t.deepEqual(pokedexModule.data.local['001'], undefined)
+})
+
+test('delete: (document module)', async t => {
+  const trainerModule: VueSyncModuleInstance = createVueSyncInstance().trainerModule
+  const deletePayload = 'age'
+  t.deepEqual(trainerModule.data.local.age, 10)
+  const result = await trainerModule.delete(deletePayload).catch(t.fail)
+  t.deepEqual(result, undefined)
+  t.deepEqual(trainerModule.data.local.age, undefined)
 })
 
 test('write: merge (collection module)', async t => {
   const { pokedexModule } = createVueSyncInstance()
   const mergePayload = { id: '001', type: { alt: 'Leaf' } }
   t.deepEqual(pokedexModule.data.local['001'], bulbasaur)
-  const result = await pokedexModule.merge(mergePayload)
+  const result = await pokedexModule.merge(mergePayload).catch(t.fail)
   t.deepEqual(result, mergePayload)
   const mergedResult = { name: 'Bulbasaur', id: '001', type: { grass: 'Grass', alt: 'Leaf' } }
   t.deepEqual(pokedexModule.data.local['001'], mergedResult)
@@ -28,7 +66,7 @@ test('write: merge (document module)', async t => {
   const mergePayload = { nickName: 'Mesqueeb' }
   const trainer = { name: 'Luca', age: 10 }
   t.deepEqual(trainerModule.data.local, trainer)
-  const result = await trainerModule.merge(mergePayload)
+  const result = await trainerModule.merge(mergePayload).catch(t.fail)
   t.deepEqual(result, mergePayload)
   t.deepEqual(trainerModule.data.local, { name: 'Luca', age: 10, nickName: 'Mesqueeb' })
 })
@@ -37,7 +75,8 @@ test('read: stream (collection module)', async t => {
   const { pokedexModule } = createVueSyncInstance()
   t.deepEqual(pokedexModule.data.local, { '001': bulbasaur })
   const streamPayload = {}
-  pokedexModule.stream(streamPayload)
+  // do not await, because it only resolves when the stream is closed
+  pokedexModule.stream(streamPayload).catch(t.fail)
   await waitMs(600)
   // close the stream:
   const unsubscribe = pokedexModule.openStreams[JSON.stringify(streamPayload)]
@@ -52,7 +91,8 @@ test('read: stream (doc module)', async t => {
   const { trainerModule } = createVueSyncInstance()
   t.deepEqual(trainerModule.data.local, { name: 'Luca', age: 10 })
   const streamPayload = {}
-  trainerModule.stream(streamPayload)
+  // do not await, because it only resolves when the stream is closed
+  trainerModule.stream(streamPayload).catch(t.fail)
   await waitMs(600)
   // close the stream:
   const unsubscribe = trainerModule.openStreams[JSON.stringify(streamPayload)]

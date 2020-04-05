@@ -1,6 +1,7 @@
-import { EventFnBefore, EventFnSuccess, EventFnError, EventFnRevert } from './events'
 import { O } from 'ts-toolbelt'
-import { ModifyWritePayload, ModifyDeletePayload } from './modifyPayload'
+import { EventNameFnMap } from './events'
+import { ModifyPayloadFnMap } from './modifyPayload'
+import { ModifyReadResponseFnMap } from './modifyReadResponse'
 
 // atomic types
 export type PlainObject = { [key: string]: any }
@@ -22,18 +23,7 @@ export type SharedConfig = {
     replace?: StoreName[]
   }
   onError: 'stop' | 'continue' | 'revert'
-  modifyPayloadOn: {
-    insert?: ModifyWritePayload
-    merge?: ModifyWritePayload
-    assign?: ModifyWritePayload
-    replace?: ModifyWritePayload
-    write?: ModifyWritePayload
-    delete?: ModifyDeletePayload
-  }
-  on: {
-    before?: EventFnBefore
-    success?: EventFnSuccess
-    error?: EventFnError
-    revert?: EventFnRevert
-  }
+  modifyPayloadOn: ModifyPayloadFnMap
+  modifyReadResponseOn: ModifyReadResponseFnMap
+  on: EventNameFnMap
 }

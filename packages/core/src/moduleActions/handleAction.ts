@@ -1,28 +1,13 @@
 import { isVueSyncError, ActionName, isWriteAction } from '../types/actions'
 import { SharedConfig, PlainObject } from '../types/base'
-import { EventNameFnsMap, EventFnSuccess } from '../types/events'
+import { EventNameFnsMap } from '../types/events'
 import {
   PluginModuleConfig,
-  PluginActionTernary,
   PluginGetAction,
   PluginWriteAction,
   PluginDeleteAction,
+  MustExecuteOnGet,
 } from '../types/plugins'
-
-export function handleAction<
-  Payload extends void | PlainObject | string | string[],
-  TActionName extends Exclude<ActionName, 'stream'>
-> (args: {
-  pluginAction: PluginActionTernary<TActionName>
-  pluginModuleConfig: PluginModuleConfig
-  payload: Payload
-  eventNameFnsMap: EventNameFnsMap
-  onError: SharedConfig['onError']
-  actionName: TActionName
-  stopExecutionAfterAction: (arg?: boolean | 'revert') => void
-  onNextStoresSuccess: EventFnSuccess[]
-  storeName: string
-}): Promise<void | PlainObject | PlainObject[]>
 
 /**
  * handleAction is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success (4) optional: onNextStoresSuccess.
@@ -31,13 +16,13 @@ export function handleAction<
 export async function handleAction (args: {
   pluginAction: PluginGetAction | PluginWriteAction | PluginDeleteAction
   pluginModuleConfig: PluginModuleConfig
-  payload: void | PlainObject | string | string[]
+  payload: void | PlainObject | PlainObject[] | string | string[]
   eventNameFnsMap: EventNameFnsMap
   onError: SharedConfig['onError']
   actionName: Exclude<ActionName, 'stream'>
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
-  onNextStoresSuccess: EventFnSuccess[]
   storeName: string
+  mustExecuteOnGet: MustExecuteOnGet
 }): Promise<void | PlainObject | PlainObject[]> {
   const {
     pluginAction,
@@ -47,11 +32,9 @@ export async function handleAction (args: {
     onError,
     actionName,
     stopExecutionAfterAction,
-    onNextStoresSuccess,
     storeName,
+    mustExecuteOnGet,
   } = args
-  const successEventsToExecute = [...onNextStoresSuccess]
-
   // create abort mechanism for current scope
   let abortExecution = false
   const abort = (): void => {
@@ -74,7 +57,7 @@ export async function handleAction (args: {
   try {
     // triggering the action provided by the plugin
     // @ts-ignore
-    result = await pluginAction(payload, pluginModuleConfig, onNextStoresSuccess)
+    result = await pluginAction(payload, pluginModuleConfig, mustExecuteOnGet)
   } catch (error) {
     if (!isVueSyncError(error)) throw new Error(error)
     // handle and await each eventFn in sequence
@@ -93,10 +76,6 @@ export async function handleAction (args: {
   }
   // handle and await each eventFn in sequence
   for (const fn of on.success) {
-    await fn({ payload, result, actionName, storeName, abort })
-  }
-  // handle and await each "onNextStoresSuccess" eventFn in sequence (besides the ones just added of course)
-  for (const fn of successEventsToExecute) {
     await fn({ payload, result, actionName, storeName, abort })
   }
   // abort?

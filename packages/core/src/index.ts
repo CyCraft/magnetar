@@ -23,6 +23,7 @@ function configWithDefaults (config: VueSyncConfig): O.Compulsory<VueSyncConfig>
     onError: 'stop',
     on: {},
     modifyPayloadOn: {},
+    modifyReadResponseOn: {},
   }
   const merged = merge(defaults, config)
   return merged

@@ -15,6 +15,7 @@ export function createVueSyncInstance (): {
     executionOrder: {
       read: ['local', 'remote'],
       write: ['local', 'remote'],
+      delete: ['local', 'remote'],
     },
   })
   const getInitialDataCollection = () => ({

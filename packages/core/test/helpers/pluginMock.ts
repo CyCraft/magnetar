@@ -1,9 +1,18 @@
 import { merge } from 'merge-anything'
 import { copy } from 'copy-anything'
 import { nestifyObject as nestify } from 'nestify-anything'
-import { isArray, isPlainObject } from 'is-what'
-import { waitMs } from './wait'
-import { writeActionFactory } from './pluginMockLocalActions'
+import {
+  writeActionFactory as writeActionFactoryLocal,
+  deleteActionFactory as deleteActionFactoryLocal,
+  getActionFactory as getActionFactoryLocal,
+  streamActionFactory as streamActionFactoryLocal,
+} from './pluginMockActionsLocal'
+import {
+  writeActionFactory as writeActionFactoryRemote,
+  deleteActionFactory as deleteActionFactoryRemote,
+  getActionFactory as getActionFactoryRemote,
+  streamActionFactory as streamActionFactoryRemote,
+} from './pluginMockActionsRemote'
 import {
   ActionName,
   VueSyncError,
@@ -16,13 +25,11 @@ import {
   PluginGetAction,
   PluginWriteAction,
   PluginStreamAction,
-  OnStream,
+  PluginDeleteAction,
 } from '../../src/types/plugins'
 import { PlainObject } from '../../types/types/base'
 import { Modified } from '../../src/types/base'
 import pathToProp from 'path-to-prop'
-import { bulbasaur, charmander, flareon } from './pokemon'
-import { EventFnSuccess } from '../../src/types/events'
 
 // there are two interfaces to be defined & exported by each plugin
 // - VueSyncPluginConfig
@@ -47,178 +54,22 @@ export function isModuleCollection (moduleConfig: VueSyncPluginModuleConfig): bo
   return isOdd(moduleConfig.path.split('/').length)
 }
 
-function createStreamAction (moduleData: PlainObject, storeName: string): PluginStreamAction {
-  // this is a `PluginAction`:
-  return (
-    payload: void | PlainObject = {},
-    pluginModuleConfig: VueSyncPluginModuleConfig,
-    onNextStoresStream: OnStream
-  ):
-    | { streaming: Promise<void>; stop: () => void }
-    | Promise<{ streaming: Promise<void>; stop: () => void }> => {
-    // this is custom logic to be implemented by the plugin author
-    const { path } = pluginModuleConfig
-    const db = pathToProp(moduleData, path)
-    const isCollection = isModuleCollection(pluginModuleConfig)
-
-    // let's pass a new event that will make sure this plugin's data is kept up to date with the server data
-    // this mocks how the result from the next store (the remote store) should update this local store per action type
-    if (storeName === 'local') {
-      const inserted = (payload: PlainObject) => {
-        if (isCollection) {
-          // this mocks data inserted into 'pokedex'
-          db[payload.id] = payload
-        } else {
-          // this mocks data inserted into 'data/trainer' (each prop is replaced with whatever came from the server)
-          Object.entries(payload).forEach(([key, value]) => {
-            db[key] = value
-          })
-        }
-      }
-      const merged = (payload: PlainObject) => {
-        if (isCollection) {
-          // this mocks data merged into 'pokedex'
-          db[payload.id] = merge(db[payload.id], payload)
-        } else {
-          // this mocks data merged into 'data/trainer'
-          Object.entries(payload).forEach(([key, value]) => {
-            db[key] = merge(db[key], value)
-          })
-        }
-      }
-      onNextStoresStream.inserted.push(inserted)
-      onNextStoresStream.merged.push(merged)
-      // in this case, the local store doesn't have a real-time connection, so we return early
-      // local store's only job is to pass its onNextStoresStream functions
-      return
-    }
-
-    // otherwise if we are trying to mock the remote store plugin we'll mock opening a stream
-    let dataRetrieved = []
-    // this mocks data returned from 'pokedex'
-    if (path === 'pokedex') {
-      dataRetrieved = [bulbasaur, flareon, charmander]
-    } else if (path === 'data/trainer') {
-      // this mocks data returned from 'data/trainer'
-      dataRetrieved = [
-        { name: 'Luca', age: 10 },
-        { name: 'Luca', age: 10, dream: 'job' },
-        { name: 'Luca', age: 10, dream: 'job', colour: 'blue' },
-      ]
-      Object.entries(dataRetrieved).forEach(([key, value]) => {
-        db[key] = value
-      })
-    }
-    const stopStreaming = {
-      stopped: false,
-      stop: () => {},
-    }
-    // this mocks actual data coming in at different intervals
-    dataRetrieved.forEach((data, i) => {
-      const waitTime = 10 + i * 500
-      setTimeout(() => {
-        // mock when the stream is already stopped
-        if (stopStreaming.stopped) return
-        // else go ahead and insert stuff based on the passed param: onNextStoresStream
-        for (const inserted of onNextStoresStream.inserted) {
-          inserted(data)
-        }
-      }, waitTime)
-    })
-    // this mocks the opening of the stream
-
-    const streaming: Promise<void> = new Promise((resolve, reject): void => {
-      stopStreaming.stop = resolve
-      setTimeout(() => {
-        // this mocks an error during execution
-        if (payload && payload.shouldFail === storeName) {
-          const errorToThrow: VueSyncError = {
-            payload,
-            message: 'fail',
-          }
-          reject(errorToThrow)
-        }
-      }, 1)
-    })
-    function stop (): void {
-      stopStreaming.stopped = true
-      stopStreaming.stop()
-    }
-    return { streaming, stop }
-  }
-}
-
 function createGetAction (
   moduleData: PlainObject,
   storeName: string,
   makeDataSnapshot: any
 ): PluginGetAction {
-  // this is a `PluginAction`:
-  return async (
-    payload: void | PlainObject = {},
-    pluginModuleConfig: VueSyncPluginModuleConfig,
-    onNextStoresSuccess: EventFnSuccess[]
-  ): Promise<void | PlainObject | PlainObject[]> => {
-    // this is custom logic to be implemented by the plugin author
-    makeDataSnapshot()
-    const { path } = pluginModuleConfig
+  // PluginGetAction for the 'local' store:
+  if (storeName === 'local') return getActionFactoryLocal(moduleData, storeName, makeDataSnapshot)
+  // PluginGetAction for the 'remote' store:
+  return getActionFactoryRemote(moduleData, storeName, makeDataSnapshot)
+}
 
-    // this mocks an error during execution
-    if (payload && payload.shouldFail === storeName) {
-      const errorToThrow: VueSyncError = {
-        payload,
-        message: 'fail',
-      }
-      throw errorToThrow
-    }
-
-    // let's pass a new event that will make sure this plugin's data is kept up to date with the server data
-    // this mocks how the result from the next store (the remote store) should be merged into the local stores
-    if (storeName === 'local') {
-      const isCollection = isModuleCollection(pluginModuleConfig)
-      const { path } = pluginModuleConfig
-      const db = pathToProp(moduleData, path)
-      onNextStoresSuccess.push(({ result }) => {
-        if (isUndefined(result)) return
-        Object.keys(db).forEach(key => delete db[key])
-        if (isCollection) {
-          // this mocks data to be replaced in 'pokedex'
-          if (isArray(result)) result.forEach(doc => (db[doc.id] = doc))
-        } else {
-          // this mocks data to be replaced in 'data/trainer'
-          if (isPlainObject(result)) {
-            Object.entries(result).forEach(([key, value]) => {
-              db[key] = value
-            })
-          }
-        }
-      })
-      return
-    }
-    // in case of a local store that doesn't fetch from anywhere, not even from cach, we could return early here
-
-    // otherwise fetch from cache/or from a remote store with logic you implement here
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        // this mocks an error during execution
-        const db = pathToProp(moduleData, path)
-        let dataRetrieved: PlainObject | PlainObject[]
-        // this mocks data returned from 'pokedex'
-        if (path === 'pokedex') {
-          // this is to mock different data in the local store opposed to the remote one
-          dataRetrieved = storeName === 'local' ? [bulbasaur, charmander] : [bulbasaur, flareon]
-        } else if (path === 'data/trainer') {
-          // this mocks data returned from 'data/trainer'
-          dataRetrieved =
-            // this is to mock different data in the local store opposed to the remote one
-            storeName === 'local'
-              ? { name: 'Luca', age: 10, colour: 'blue' }
-              : { name: 'Luca', age: 10, dream: 'job' }
-        }
-        resolve(dataRetrieved)
-      }, 1)
-    })
-  }
+function createStreamAction (moduleData: PlainObject, storeName: string): PluginStreamAction {
+  // PluginStreamAction for the 'local' store:
+  if (storeName === 'local') return streamActionFactoryLocal(moduleData, storeName)
+  // PluginStreamAction for the 'remote' store:
+  return streamActionFactoryRemote(moduleData, storeName)
 }
 
 function createWriteAction (
@@ -227,24 +78,16 @@ function createWriteAction (
   storeName: string
 ): PluginWriteAction {
   // PluginWriteAction for the 'local' store:
-  if (storeName === 'local') return writeActionFactory(moduleData, actionName, storeName)
+  if (storeName === 'local') return writeActionFactoryLocal(moduleData, actionName, storeName)
   // PluginWriteAction for the 'remote' store:
-  return async function (
-    payload: PlainObject,
-    pluginModuleConfig: VueSyncPluginModuleConfig
-  ): Promise<PlainObject> {
-    await waitMs(1)
-    // this mocks an error during execution
-    const shouldFail = payload.shouldFail === storeName
-    if (shouldFail) {
-      const errorToThrow: VueSyncError = {
-        payload,
-        message: 'fail',
-      }
-      throw errorToThrow
-    }
-    return payload
-  }
+  return writeActionFactoryRemote(moduleData, actionName, storeName)
+}
+
+function createDeleteAction (moduleData: PlainObject, storeName: string): PluginDeleteAction {
+  // PluginDeleteAction for the 'local' store:
+  if (storeName === 'local') return deleteActionFactoryLocal(moduleData, storeName)
+  // PluginDeleteAction for the 'remote' store:
+  return deleteActionFactoryRemote(moduleData, storeName)
 }
 
 function createRevertAction (
@@ -325,7 +168,7 @@ export const VueSyncGenericPlugin = (config: VueSyncPluginConfig): PluginInstanc
   const _merge: PluginWriteAction = createWriteAction(data, 'merge', storeName)
   // const assign: PluginWriteAction = createWriteAction(data, 'assign', storeName)
   // const replace: PluginWriteAction = createWriteAction(data, 'replace', storeName)
-  // const _delete: PluginWriteAction = createWriteAction(data, 'delete', storeName)
+  const _delete: PluginDeleteAction = createDeleteAction(data, storeName)
   const revert: PluginRevertAction = createRevertAction(data, storeName, restoreDataSnapshot)
 
   // the plugin function must return a `PluginInstance`
@@ -340,7 +183,7 @@ export const VueSyncGenericPlugin = (config: VueSyncPluginConfig): PluginInstanc
       merge: _merge,
       // assign,
       // replace,
-      // delete: _delete,
+      delete: _delete,
     },
   }
   return instance

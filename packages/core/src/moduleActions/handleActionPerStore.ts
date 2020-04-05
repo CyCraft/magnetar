@@ -2,7 +2,7 @@ import { O } from 'ts-toolbelt'
 import { VueSyncConfig } from '..'
 import { ModuleConfig } from '../CreateModule'
 import { handleAction } from './handleAction'
-import { EventFnSuccess, getEventNameFnsMap } from '../types/events'
+import { getEventNameFnsMap } from '../types/events'
 import {
   ActionType,
   ActionConfig,
@@ -12,8 +12,12 @@ import {
   VueSyncWriteAction,
   VueSyncDeleteAction,
 } from '../types/actions'
-import { PluginModuleConfig } from '../types/plugins'
+import { PluginModuleConfig, MustExecuteOnGet } from '../types/plugins'
 import { getModifyPayloadFnsMap } from '../types/modifyPayload'
+import { OnAddedFn, getModifyReadResponseFnsMap } from '../types/modifyReadResponse'
+import { executeOnFns } from '../helpers/executeOnFns'
+import { throwIfNoFnsToExecute } from '../helpers/throwFns'
+import { PlainObject } from '../types/base'
 
 export function handleActionPerStore<TActionName extends Exclude<ActionName, 'stream'>> (
   moduleConfig: ModuleConfig,
@@ -30,7 +34,7 @@ export function handleActionPerStore (
 ): VueSyncGetAction | VueSyncWriteAction | VueSyncDeleteAction {
   // returns the action the dev can call with myModule.insert() etc.
   return async function (
-    payload?: void | object | string | string[],
+    payload?: void | object | object[] | string | string[],
     actionConfig: ActionConfig = {}
   ): Promise<void | object | object[]> {
     // get all the config needed to perform this action
@@ -40,6 +44,11 @@ export function handleActionPerStore (
       moduleConfig.modifyPayloadOn,
       actionConfig.modifyPayloadOn
     )
+    const modifyReadResponseMap = getModifyReadResponseFnsMap(
+      globalConfig.modifyReadResponseOn,
+      moduleConfig.modifyReadResponseOn,
+      actionConfig.modifyReadResponseOn
+    )
     const eventNameFnsMap = getEventNameFnsMap(globalConfig.on, moduleConfig.on, actionConfig.on)
     const storesToExecute: string[] =
       actionConfig.executionOrder ||
@@ -48,14 +57,11 @@ export function handleActionPerStore (
       (globalConfig.executionOrder || {})[actionName] ||
       (globalConfig.executionOrder || {})[actionType] ||
       []
-    if (storesToExecute.length === 0) {
-      throw new Error('None of your store plugins have implemented this function.')
-    }
-    // update the payload in case it's a write or delete action
-    if (actionType !== 'read') {
-      for (const modifyFn of modifyPayloadFnsMap[actionName]) {
-        payload = modifyFn(payload)
-      }
+    throwIfNoFnsToExecute(storesToExecute)
+    // update the payload
+    for (const modifyFn of modifyPayloadFnsMap[actionName]) {
+      // @ts-ignore
+      payload = modifyFn(payload)
     }
 
     // create the abort mechanism
@@ -69,8 +75,12 @@ export function handleActionPerStore (
       stopExecution = trueOrRevert
     }
 
-    // a mutatable array of successevents which is to be triggered after each store
-    const onNextStoresSuccess: EventFnSuccess[] = []
+    // each plugin's 'get' action will need to trigger at least one of the 'mustExecuteOnGet' functions
+    const doOnAddedFns: OnAddedFn[] = modifyReadResponseMap.added
+    const mustExecuteOnGet: MustExecuteOnGet = {
+      added: (_payload, _meta) => executeOnFns(doOnAddedFns, _payload, [_meta]),
+      registerDoOnAdded: (_onAddedFn: OnAddedFn) => doOnAddedFns.push(_onAddedFn),
+    }
 
     // handle and await each action in sequence
     let result: void | object | object[]
@@ -89,9 +99,10 @@ export function handleActionPerStore (
             onError,
             actionName,
             stopExecutionAfterAction,
-            onNextStoresSuccess,
             storeName,
+            mustExecuteOnGet,
           })
+
       // handle reverting
       if (stopExecution === 'revert') {
         const storesToRevert = storesToExecute.slice(0, i)

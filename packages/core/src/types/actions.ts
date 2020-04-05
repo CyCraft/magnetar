@@ -1,7 +1,6 @@
-import { PlainObject, StoreName, Modified } from './base'
+import { PlainObject, StoreName, Modified, SharedConfig } from './base'
 import { isAnyObject } from 'is-what'
-import { ModifyWritePayload, ModifyDeletePayload } from './modifyPayload'
-import { EventFnBefore, EventFnSuccess, EventFnError, EventFnRevert } from './events'
+import { O } from 'ts-toolbelt'
 
 // these are all the actions that Vue Sync aims to streamline, whichever plugin is used
 // these actions are executable from a `VueSyncModule` and handled by each plugin individually
@@ -33,36 +32,19 @@ export function isWriteAction (actionName: ActionName): actionName is ActionName
 }
 
 // this is what the dev can provide as second param when executing any action in addition to the payload
-export type ActionConfig<TActionName extends ActionName = ActionName> = {
-  executionOrder?: StoreName[]
-  onError?: 'stop' | 'continue' | 'revert'
-  modifyPayloadOn?: {
-    insert?: ModifyWritePayload
-    merge?: ModifyWritePayload
-    assign?: ModifyWritePayload
-    replace?: ModifyWritePayload
-    write?: ModifyWritePayload
-    delete?: ModifyDeletePayload
-  }
-  on?: {
-    before?: EventFnBefore
-    success?: EventFnSuccess
-    error?: EventFnError
-    revert?: EventFnRevert
-  }
-}
+export type ActionConfig = O.Merge<{ executionOrder?: StoreName[] }, Partial<SharedConfig>>
 
 // these are the action types exposed to the dev via a VueSyncModule, it's what the dev will end up calling.
-export type VueSyncStreamAction = <Payload extends object>(payload?: Payload, actionConfig?: ActionConfig<'stream'>) => Promise<void> // prettier-ignore
+export type VueSyncStreamAction = <Payload extends object>(payload?: Payload, actionConfig?: ActionConfig) => Promise<void> // prettier-ignore
 
 export type VueSyncGetAction = <Payload extends void | object>(
   payload?: Payload,
-  actionConfig?: ActionConfig<'get'>
+  actionConfig?: ActionConfig
 ) => Promise<PlainObject | PlainObject[] | void | undefined>
 
-export type VueSyncWriteAction = <Payload extends object>(payload: Payload, actionConfig?: ActionConfig<ActionNameWrite>) => Promise<Modified<Payload>> // prettier-ignore
+export type VueSyncWriteAction = <Payload extends object | object[]>(payload: Payload, actionConfig?: ActionConfig) => Promise<Modified<Payload>> // prettier-ignore
 
-export type VueSyncDeleteAction = (ids: string | string[], actionConfig?: ActionConfig<'delete'>) => Promise<void> // prettier-ignore
+export type VueSyncDeleteAction = (payload: object | object[] | string | string[], actionConfig?: ActionConfig) => Promise<void> // prettier-ignore
 
 export type ActionTernary<TActionName extends ActionName> = TActionName extends 'stream'
   ? VueSyncStreamAction
@@ -73,7 +55,7 @@ export type ActionTernary<TActionName extends ActionName> = TActionName extends 
   : VueSyncWriteAction
 
 export type VueSyncError = {
-  payload: PlainObject
+  payload: PlainObject | PlainObject[] | string | string[] | void
   message: string
   code?: number
   errors?: VueSyncError[]

@@ -1,10 +1,14 @@
 import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
 import { bulbasaur, flareon, squirtle } from './helpers/pokemon'
+import { waitMs } from './helpers/wait'
 
-test('get: can mutate payload', async t => {
+test('get: can mutate payload & read response', async t => {
   function addSeen (payload) {
-    if (!('seen' in payload)) return { ...payload, seen: true }
+    return { ...payload, seen: true }
+  }
+  function addToken (payload) {
+    return { ...payload, auth: 'Bearer 123123' }
   }
   // get resolves once all stores have given a response with data
   const { pokedexModule } = createVueSyncInstance()
@@ -14,7 +18,15 @@ test('get: can mutate payload', async t => {
       {},
       {
         modifyPayloadOn: {
-          write: addSeen,
+          read: addToken,
+        },
+        modifyReadResponseOn: {
+          added: addSeen,
+        },
+        on: {
+          success: ({ payload }) => {
+            t.deepEqual(payload, { auth: 'Bearer 123123' })
+          },
         },
       }
     )
@@ -32,6 +44,37 @@ test('get: can mutate payload', async t => {
     '001': { ...bulbasaur, seen: true },
     '136': { ...flareon, seen: true },
   })
+})
+
+test('stream: can mutate payload & read response', async t => {
+  function addSeen (payload) {
+    return { ...payload, seen: true }
+  }
+  function addToken (payload) {
+    return { ...payload, auth: 'Bearer 123123' }
+  }
+  const { pokedexModule } = createVueSyncInstance()
+  t.deepEqual(pokedexModule.data.local, { '001': bulbasaur })
+  pokedexModule.stream(
+    {},
+    {
+      modifyPayloadOn: {
+        read: addToken,
+      },
+      modifyReadResponseOn: {
+        added: addSeen,
+      },
+      on: {
+        before: ({ payload }) => {
+          t.deepEqual(payload, { auth: 'Bearer 123123' })
+        },
+      },
+    }
+  )
+  await waitMs(600)
+  // the local store SHOULD HAVE the applied defaults
+  t.deepEqual(pokedexModule.data.local['001'], { ...bulbasaur, seen: true })
+  t.deepEqual(pokedexModule.data.local['136'], { ...flareon, seen: true })
 })
 
 test('insert: can mutate payload', async t => {
