@@ -6,6 +6,7 @@ test('emits global, module and action events', async t => {
   const local = VueSyncGenericPlugin({ storeName: 'local' })
   const ranAllEvents: any[] = []
   const vueSync = VueSync({
+    dataStoreName: 'local',
     stores: { local },
     executionOrder: {
       read: ['local'],
@@ -43,6 +44,7 @@ test('emits global, module and action events', async t => {
 test('can modify payload in global, module and action settings', async t => {
   const local = VueSyncGenericPlugin({ storeName: 'local' })
   const vueSync = VueSync({
+    dataStoreName: 'local',
     stores: { local },
     executionOrder: {
       read: ['local'],

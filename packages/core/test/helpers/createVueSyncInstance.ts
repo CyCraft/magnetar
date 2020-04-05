@@ -11,6 +11,7 @@ export function createVueSyncInstance (): {
   const local = VueSyncGenericPlugin({ storeName: 'local' })
   const remote = VueSyncGenericPlugin({ storeName: 'remote' })
   const vueSync = VueSync({
+    dataStoreName: 'local',
     stores: { local, remote },
     executionOrder: {
       read: ['local', 'remote'],

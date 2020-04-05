@@ -12,7 +12,7 @@ test('get: can mutate payload & read response', async t => {
   }
   // get resolves once all stores have given a response with data
   const { pokedexModule } = createVueSyncInstance()
-  t.deepEqual(pokedexModule.data.local, { '001': bulbasaur })
+  t.deepEqual(pokedexModule.data, { '001': bulbasaur })
   try {
     const result = await pokedexModule.get(
       {},
@@ -40,7 +40,7 @@ test('get: can mutate payload & read response', async t => {
   }
   // the local store should have updated its data to the whatever was returned in the remote success event (via the plugin's onNextStoresSuccess handler)
   // therefore: the local store SHOULD HAVE the applied defaults
-  t.deepEqual(pokedexModule.data.local, {
+  t.deepEqual(pokedexModule.data, {
     '001': { ...bulbasaur, seen: true },
     '136': { ...flareon, seen: true },
   })
@@ -54,7 +54,7 @@ test('stream: can mutate payload & read response', async t => {
     return { ...payload, auth: 'Bearer 123123' }
   }
   const { pokedexModule } = createVueSyncInstance()
-  t.deepEqual(pokedexModule.data.local, { '001': bulbasaur })
+  t.deepEqual(pokedexModule.data, { '001': bulbasaur })
   pokedexModule.stream(
     {},
     {
@@ -73,8 +73,8 @@ test('stream: can mutate payload & read response', async t => {
   )
   await waitMs(600)
   // the local store SHOULD HAVE the applied defaults
-  t.deepEqual(pokedexModule.data.local['001'], { ...bulbasaur, seen: true })
-  t.deepEqual(pokedexModule.data.local['136'], { ...flareon, seen: true })
+  t.deepEqual(pokedexModule.data['001'], { ...bulbasaur, seen: true })
+  t.deepEqual(pokedexModule.data['136'], { ...flareon, seen: true })
 })
 
 test('insert: can mutate payload', async t => {
@@ -83,7 +83,7 @@ test('insert: can mutate payload', async t => {
   }
   // get resolves once all stores have given a response with data
   const { pokedexModule } = createVueSyncInstance()
-  t.deepEqual(pokedexModule.data.local, { '001': bulbasaur })
+  t.deepEqual(pokedexModule.data, { '001': bulbasaur })
   try {
     const result = await pokedexModule.insert(squirtle, {
       modifyPayloadOn: {
@@ -97,7 +97,7 @@ test('insert: can mutate payload', async t => {
   }
   // the local store should have updated its data to the whatever was returned in the remote success event (via the plugin's onNextStoresSuccess handler)
   // therefore: the local store SHOULD HAVE the applied defaults
-  t.deepEqual(pokedexModule.data.local, {
+  t.deepEqual(pokedexModule.data, {
     '001': { ...bulbasaur },
     '007': { ...squirtle, seen: true },
   })

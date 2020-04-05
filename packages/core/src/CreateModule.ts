@@ -1,11 +1,8 @@
 import { O } from 'ts-toolbelt'
 import {
   actionNameTypeMap,
-  ActionName,
-  ActionType,
   VueSyncWriteAction,
   VueSyncGetAction,
-  isWriteAction,
   VueSyncStreamAction,
   VueSyncDeleteAction,
 } from './types/actions'
@@ -13,11 +10,10 @@ import { SharedConfig, PlainObject } from './types/base'
 import { VueSyncConfig } from '.'
 import { handleActionPerStore } from './moduleActions/handleActionPerStore'
 import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
+import { throwIfNoDataStoreName } from './helpers/throwFns'
 
 export type VueSyncModuleInstance = {
-  data: {
-    [storeName: string]: { [idOrProp: string]: any }
-  }
+  data: { [idOrProp: string]: any }
   openStreams: { [identifier: string]: () => void }
   get?: VueSyncGetAction
   stream?: VueSyncStreamAction
@@ -32,7 +28,9 @@ export type VueSyncModuleInstance = {
 export type ModuleConfig = O.Merge<
   Partial<SharedConfig>,
   {
-    // custom config per store plugin
+    /**
+     * custom config per store plugin
+     */
     configPerStore?: {
       [storeName: string]: PlainObject
     }
@@ -45,42 +43,22 @@ export function CreateModuleWithContext (
 ): VueSyncModuleInstance {
   const openStreams: { [identifier: string]: () => void } = {}
 
-  const actions = Object.entries(actionNameTypeMap).reduce(
-    (carry, [actionName, actionType]: [ActionName, ActionType]) => {
-      if (actionName === 'get') {
-        carry[actionName] = handleActionPerStore(moduleConfig, globalConfig, actionName, actionType)
-      }
-      if (actionName === 'stream') {
-        carry[actionName] = handleStreamPerStore(
-          moduleConfig,
-          globalConfig,
-          actionType,
-          openStreams
-        )
-      }
-      if (actionName === 'delete') {
-        carry[actionName] = handleActionPerStore(moduleConfig, globalConfig, actionName, actionType)
-      }
-      if (isWriteAction(actionName)) {
-        carry[actionName] = handleActionPerStore(moduleConfig, globalConfig, actionName, actionType)
-      }
-      return carry
-    },
-    {} as VueSyncModuleInstance
-  )
+  const actions = {
+    insert: handleActionPerStore(moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert),
+    merge: handleActionPerStore(moduleConfig, globalConfig, 'merge', actionNameTypeMap.merge),
+    assign: handleActionPerStore(moduleConfig, globalConfig, 'assign', actionNameTypeMap.assign),
+    replace: handleActionPerStore(moduleConfig, globalConfig, 'replace', actionNameTypeMap.replace),
+    delete: handleActionPerStore(moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete),
+    get: handleActionPerStore(moduleConfig, globalConfig, 'get', actionNameTypeMap.get),
+    stream: handleStreamPerStore(moduleConfig, globalConfig, actionNameTypeMap.stream, openStreams),
+  }
 
   // each store in write order will get the chance to initialise data
-  const data: { [storeName: string]: PlainObject } = {}
-  const storesToInitialise =
-    globalConfig.executionOrder?.write ||
-    globalConfig.executionOrder?.insert ||
-    Object.keys(globalConfig.stores)
-  for (const storeName of storesToInitialise) {
-    // save a reference to the dataReference of each the store plugin
-    const pluginModuleConfig = moduleConfig?.configPerStore[storeName] || {}
-    const { setModuleDataReference } = globalConfig.stores[storeName]
-    data[storeName] = setModuleDataReference(pluginModuleConfig)
-  }
+  const dataStoreName = moduleConfig.dataStoreName || globalConfig.dataStoreName
+  throwIfNoDataStoreName(dataStoreName)
+  const pluginModuleConfig = moduleConfig?.configPerStore[dataStoreName] || {}
+  const { setModuleDataReference } = globalConfig.stores[dataStoreName]
+  const data = setModuleDataReference(pluginModuleConfig)
 
   return {
     data,

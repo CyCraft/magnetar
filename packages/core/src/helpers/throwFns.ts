@@ -1,4 +1,5 @@
 import { StreamResponse, DoOnReadFns } from '../types/plugins'
+import { isFullString } from 'is-what'
 
 export function logError (errorMessage: string): void {
   console.error('[vue-sync error]\n', errorMessage)
@@ -30,4 +31,11 @@ export function throwIfNoFnsToExecute (storesToExecute: string[]): void {
     logError(errorMessage)
     throw new Error(errorMessage)
   }
+}
+
+export function throwIfNoDataStoreName (dataStoreName: string): void {
+  if (isFullString(dataStoreName)) return
+  const errorMessage = `No 'dataStoreName' provided.`
+  logError(errorMessage)
+  throw new Error(errorMessage)
 }

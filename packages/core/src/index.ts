@@ -6,12 +6,8 @@ import { PluginInstance } from './types/plugins'
 
 // this is what the dev passes as config to instanciate VueSync
 export type VueSyncConfig = O.Merge<
-  Partial<SharedConfig>,
-  {
-    stores: {
-      [storeName: string]: PluginInstance
-    }
-  }
+  O.Compulsory<Partial<SharedConfig>, 'dataStoreName'>,
+  { stores: { [storeName: string]: PluginInstance } }
 >
 
 function configWithDefaults (config: VueSyncConfig): O.Compulsory<VueSyncConfig> {
@@ -24,6 +20,7 @@ function configWithDefaults (config: VueSyncConfig): O.Compulsory<VueSyncConfig>
     on: {},
     modifyPayloadOn: {},
     modifyReadResponseOn: {},
+    dataStoreName: '',
   }
   const merged = merge(defaults, config)
   return merged

@@ -26,4 +26,8 @@ export type SharedConfig = {
   modifyPayloadOn: ModifyPayloadFnMap
   modifyReadResponseOn: ModifyReadResponseFnMap
   on: EventNameFnMap
+  /**
+   * the storeName of the plugin that will keep your local data cache for usage with your client.
+   */
+  dataStoreName: StoreName
 }

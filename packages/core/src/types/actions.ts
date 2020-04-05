@@ -32,7 +32,10 @@ export function isWriteAction (actionName: ActionName): actionName is ActionName
 }
 
 // this is what the dev can provide as second param when executing any action in addition to the payload
-export type ActionConfig = O.Merge<{ executionOrder?: StoreName[] }, Partial<SharedConfig>>
+export type ActionConfig = O.Merge<
+  { executionOrder?: StoreName[] },
+  Partial<O.Omit<SharedConfig, 'dataStoreName'>>
+>
 
 // these are the action types exposed to the dev via a VueSyncModule, it's what the dev will end up calling.
 export type VueSyncStreamAction = <Payload extends object>(payload?: Payload, actionConfig?: ActionConfig) => Promise<void> // prettier-ignore
