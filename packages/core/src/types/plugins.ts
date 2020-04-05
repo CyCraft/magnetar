@@ -1,5 +1,5 @@
 import { ActionName } from './actions'
-import { PlainObject, Modified } from './base'
+import { PlainObject } from './base'
 import { isPlainObject } from 'is-what'
 import { OnAddedFn, OnModifiedFn, OnRemovedFn } from './modifyReadResponse'
 import { O } from 'ts-toolbelt'
@@ -23,7 +23,7 @@ export interface PluginInstance {
     delete?: PluginDeleteAction
   }
   revert: PluginRevertAction // the action that reverts other actions on error
-  setModuleDataReference: <T extends any>(moduleConfig: PluginModuleConfig) => Modified<T>
+  setModuleDataReference: (moduleConfig: PluginModuleConfig) => { [idOrProp: string]: any }
   config: { [key: string]: any } // any other config the plugin needs which is passed by the dev
 }
 

@@ -6,19 +6,16 @@ import {
   deleteActionFactory as deleteActionFactoryLocal,
   getActionFactory as getActionFactoryLocal,
   streamActionFactory as streamActionFactoryLocal,
+  revertActionFactory as revertActionFactoryLocal,
 } from './pluginMockActionsLocal'
 import {
   writeActionFactory as writeActionFactoryRemote,
   deleteActionFactory as deleteActionFactoryRemote,
   getActionFactory as getActionFactoryRemote,
   streamActionFactory as streamActionFactoryRemote,
+  revertActionFactory as revertActionFactoryRemote,
 } from './pluginMockActionsRemote'
-import {
-  ActionName,
-  VueSyncError,
-  actionNameTypeMap,
-  ActionNameWrite,
-} from '../../src/types/actions'
+import { ActionName } from '../../src/types/actions'
 import {
   PluginInstance,
   PluginRevertAction,
@@ -28,113 +25,59 @@ import {
   PluginDeleteAction,
 } from '../../src/types/plugins'
 import { PlainObject } from '../../types/types/base'
-import { Modified } from '../../src/types/base'
 import pathToProp from 'path-to-prop'
 
 // there are two interfaces to be defined & exported by each plugin
-// - VueSyncPluginConfig
-// - VueSyncPluginModuleConfig
+// - StorePluginConfig
+// - StorePluginModuleConfig
 
-function isUndefined (payload: any): payload is undefined | void {
-  return payload === undefined
-}
-
-export interface VueSyncPluginConfig {
+export interface StorePluginConfig {
   storeName: string
 }
-export interface VueSyncPluginModuleConfig {
+export interface StorePluginModuleConfig {
   path: string
   initialData?: PlainObject
 }
 
 function dots (path: string): string { return path.replace(/\//g, '.') } // prettier-ignore
 function isOdd (number: number) { return number % 2 === 1 } // prettier-ignore
-function isEven (number: number) { return number % 2 === 0 } // prettier-ignore
-export function isModuleCollection (moduleConfig: VueSyncPluginModuleConfig): boolean {
+export function isModuleCollection (moduleConfig: StorePluginModuleConfig): boolean {
   return isOdd(moduleConfig.path.split('/').length)
 }
 
-function createGetAction (
+function actionFactory (
   moduleData: PlainObject,
+  actionName: ActionName | 'revert',
   storeName: string,
-  makeDataSnapshot: any
-): PluginGetAction {
-  // PluginGetAction for the 'local' store:
-  if (storeName === 'local') return getActionFactoryLocal(moduleData, storeName, makeDataSnapshot)
-  // PluginGetAction for the 'remote' store:
-  return getActionFactoryRemote(moduleData, storeName, makeDataSnapshot)
-}
-
-function createStreamAction (moduleData: PlainObject, storeName: string): PluginStreamAction {
-  // PluginStreamAction for the 'local' store:
-  if (storeName === 'local') return streamActionFactoryLocal(moduleData, storeName)
-  // PluginStreamAction for the 'remote' store:
-  return streamActionFactoryRemote(moduleData, storeName)
-}
-
-function createWriteAction (
-  moduleData: PlainObject,
-  actionName: ActionNameWrite,
-  storeName: string
-): PluginWriteAction {
-  // PluginWriteAction for the 'local' store:
-  if (storeName === 'local') return writeActionFactoryLocal(moduleData, actionName, storeName)
-  // PluginWriteAction for the 'remote' store:
-  return writeActionFactoryRemote(moduleData, actionName, storeName)
-}
-
-function createDeleteAction (moduleData: PlainObject, storeName: string): PluginDeleteAction {
-  // PluginDeleteAction for the 'local' store:
-  if (storeName === 'local') return deleteActionFactoryLocal(moduleData, storeName)
-  // PluginDeleteAction for the 'remote' store:
-  return deleteActionFactoryRemote(moduleData, storeName)
-}
-
-function createRevertAction (
-  moduleData: PlainObject,
-  storeName: string,
+  makeDataSnapshot: any,
   restoreDataSnapshot: any
-): PluginRevertAction {
-  // this is a `PluginRevertAction`:
-  return function revert (
-    actionName: ActionName,
-    payload: PlainObject | void,
-    pluginModuleConfig: VueSyncPluginModuleConfig
-  ): Promise<void> {
-    // this is custom logic to be implemented by the plugin author
-    return new Promise((resolve, reject) => {
-      if (isUndefined(payload)) return resolve(payload)
-      setTimeout(() => {
-        // this mocks an error during execution
-        if (payload.shouldFailOnRevert === storeName) {
-          const errorToThrow: VueSyncError = {
-            payload,
-            message: 'revert failed',
-          }
-          reject(errorToThrow)
-        } else {
-          const actionType = actionNameTypeMap[actionName]
-          // this mocks data reverted during a write
-          if (actionType === 'write') {
-            const { path } = pluginModuleConfig
-            const db = pathToProp(moduleData, path)
-            db[payload.id] = undefined
-          }
-          // this mocks data reverted during a read
-          if (actionType === 'read') {
-            restoreDataSnapshot()
-          }
-          resolve()
-        }
-      }, 1)
-    })
+): any {
+  const storeNameActionNameFnMap = {
+    local: {
+      insert: writeActionFactoryLocal,
+      merge: writeActionFactoryLocal,
+      delete: deleteActionFactoryLocal,
+      get: getActionFactoryLocal,
+      stream: streamActionFactoryLocal,
+      revert: revertActionFactoryLocal,
+    },
+    remote: {
+      insert: writeActionFactoryRemote,
+      merge: writeActionFactoryRemote,
+      delete: deleteActionFactoryRemote,
+      get: getActionFactoryRemote,
+      stream: streamActionFactoryRemote,
+      revert: revertActionFactoryRemote,
+    },
   }
+  const f = storeNameActionNameFnMap[storeName][actionName]
+  return f(moduleData, actionName, storeName, makeDataSnapshot, restoreDataSnapshot)
 }
 
 // a Vue Sync plugin is a single function that returns a `PluginInstance`
 // the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
 // each action must have the proper for both collection and doc type modules
-export const VueSyncGenericPlugin = (config: VueSyncPluginConfig): PluginInstance => {
+export const VueSyncGenericPlugin = (config: StorePluginConfig): PluginInstance => {
   const { storeName } = config
 
   // this is the local state of the plugin, each plugin should have something similar
@@ -150,9 +93,8 @@ export const VueSyncGenericPlugin = (config: VueSyncPluginConfig): PluginInstanc
   }
 
   // this is triggered on every module that is registered, every module should have something similar
-  function setModuleDataReference<T extends PlainObject> (
-    moduleConfig: VueSyncPluginModuleConfig
-  ): Modified<T> {
+  // prettier-ignore
+  function setModuleDataReference (moduleConfig: StorePluginModuleConfig): { [idOrProp: string]: any } {
     const { path, initialData } = moduleConfig
     const initialModuleData = nestify({ [dots(path)]: initialData || {} })
     Object.entries(initialModuleData).forEach(([key, value]) => {
@@ -162,14 +104,14 @@ export const VueSyncGenericPlugin = (config: VueSyncPluginConfig): PluginInstanc
   }
 
   // the plugin must try to implement logic for every `ActionName`
-  const get: PluginGetAction = createGetAction(data, storeName, makeDataSnapshot)
-  const stream: PluginStreamAction = createStreamAction(data, storeName)
-  const insert: PluginWriteAction = createWriteAction(data, 'insert', storeName)
-  const _merge: PluginWriteAction = createWriteAction(data, 'merge', storeName)
-  // const assign: PluginWriteAction = createWriteAction(data, 'assign', storeName)
-  // const replace: PluginWriteAction = createWriteAction(data, 'replace', storeName)
-  const _delete: PluginDeleteAction = createDeleteAction(data, storeName)
-  const revert: PluginRevertAction = createRevertAction(data, storeName, restoreDataSnapshot)
+  const get: PluginGetAction = actionFactory(data, 'get', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const stream: PluginStreamAction = actionFactory(data, 'stream', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const insert: PluginWriteAction = actionFactory(data, 'insert', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const _merge: PluginWriteAction = actionFactory(data, 'merge', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const _delete: PluginDeleteAction = actionFactory(data, 'delete', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const revert: PluginRevertAction = actionFactory(data, 'revert', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  // const assign: PluginWriteAction = actionFactory(data, 'assign', storeName, makeDataSnapshot, restoreDataSnapshot)
+  // const replace: PluginWriteAction = actionFactory(data, 'replace', storeName, makeDataSnapshot, restoreDataSnapshot)
 
   // the plugin function must return a `PluginInstance`
   const instance: PluginInstance = {

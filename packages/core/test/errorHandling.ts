@@ -19,7 +19,7 @@ test('write + onError: abort (default) -- emits fail events & aborts execution b
       },
     })
   } catch (e) {
-    t.deepEqual(e, { message: 'fail', payload: insertPayload })
+    t.deepEqual(e, { message: 'failed', payload: insertPayload })
   }
   t.is(pokedexModule.data['testid'], undefined)
 })
@@ -39,7 +39,7 @@ test('write + onError: abort (default) -- fail in second store plugin does not p
       },
     })
   } catch (e) {
-    t.deepEqual(e, { message: 'fail', payload: insertPayload })
+    t.deepEqual(e, { message: 'failed', payload: insertPayload })
   }
   t.deepEqual(pokedexModule.data['testid'], insertPayload)
 })
@@ -147,7 +147,7 @@ test('get + onError: abort (default) -- emits fail events & aborts execution by 
       },
     })
   } catch (e) {
-    t.deepEqual(e, { message: 'fail', payload: getPayload })
+    t.deepEqual(e, { message: 'failed', payload: getPayload })
   }
   t.deepEqual(pokedexModule.data, { '001': bulbasaur })
 })
@@ -169,7 +169,7 @@ test('get + onError: abort (default) -- fail in second store plugin does not pre
       },
     })
   } catch (e) {
-    t.deepEqual(e, { message: 'fail', payload: getPayload })
+    t.deepEqual(e, { message: 'failed', payload: getPayload })
   }
   t.deepEqual(result, undefined)
   t.deepEqual(pokedexModule.data, { '001': bulbasaur })

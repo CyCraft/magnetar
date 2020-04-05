@@ -1,7 +1,6 @@
-import pathToProp from 'path-to-prop'
 import { PlainObject } from '../../src/types/base'
-import { ActionNameWrite, VueSyncError } from '../../src/types/actions'
-import { VueSyncPluginModuleConfig, isModuleCollection } from './pluginMock'
+import { ActionName } from '../../src/types/actions'
+import { StorePluginModuleConfig, isModuleCollection } from './pluginMock'
 import {
   PluginWriteAction,
   PluginDeleteAction,
@@ -11,31 +10,25 @@ import {
   DoOnRead,
   PluginGetAction,
   MustExecuteOnGet,
+  PluginRevertAction,
 } from '../../src/types/plugins'
-import { merge } from 'merge-anything'
-import { isArray, isString } from 'is-what'
 import { waitMs } from './wait'
 import { bulbasaur, flareon, charmander } from './pokemon'
+import { throwIfEmulatedError } from './throwFns'
 
 export function writeActionFactory (
   moduleData: PlainObject,
-  actionName: ActionNameWrite,
-  storeName: string
+  actionName: ActionName | 'revert',
+  storeName: string,
+  makeDataSnapshot?: any,
+  restoreDataSnapshot?: any
 ): PluginWriteAction {
   return async function (
     payload: PlainObject | PlainObject[],
-    pluginModuleConfig: VueSyncPluginModuleConfig
+    pluginModuleConfig: StorePluginModuleConfig
   ): Promise<PlainObject | PlainObject[]> {
     // this mocks an error during execution
-    const shouldFailProp = isArray(payload) ? payload[0].shouldFail : payload.shouldFail
-    const shouldFail = shouldFailProp === storeName
-    if (shouldFail) {
-      const errorToThrow: VueSyncError = {
-        payload,
-        message: 'fail',
-      }
-      throw errorToThrow
-    }
+    throwIfEmulatedError(payload, storeName)
     // this is custom logic to be implemented by the plugin author
     await waitMs(1)
     // this mocks an error during execution
@@ -45,23 +38,17 @@ export function writeActionFactory (
 
 export function deleteActionFactory (
   moduleData: PlainObject,
-  storeName: string
+  actionName: ActionName | 'revert',
+  storeName: string,
+  makeDataSnapshot?: any,
+  restoreDataSnapshot?: any
 ): PluginDeleteAction {
   return async function (
     payload: PlainObject | PlainObject[] | string | string[],
-    pluginModuleConfig: VueSyncPluginModuleConfig
+    pluginModuleConfig: StorePluginModuleConfig
   ): Promise<void> {
-    const payloadArray = isArray(payload) ? payload : [payload]
     // this mocks an error during execution
-    const shouldFailProp = isString(payloadArray[0]) ? payloadArray[0] : payloadArray[0].shouldFail
-    const shouldFail = shouldFailProp === storeName
-    if (shouldFail) {
-      const errorToThrow: VueSyncError = {
-        payload,
-        message: 'fail',
-      }
-      throw errorToThrow
-    }
+    throwIfEmulatedError(payload, storeName)
     // this is custom logic to be implemented by the plugin author
     await waitMs(1)
     // this mocks an error during execution
@@ -70,12 +57,14 @@ export function deleteActionFactory (
 
 export function getActionFactory (
   moduleData: PlainObject,
+  actionName: ActionName | 'revert',
   storeName: string,
-  makeDataSnapshot: any
+  makeDataSnapshot?: any,
+  restoreDataSnapshot?: any
 ): PluginGetAction {
   return async (
     payload: void | PlainObject = {},
-    pluginModuleConfig: VueSyncPluginModuleConfig,
+    pluginModuleConfig: StorePluginModuleConfig,
     mustExecuteOnGet: MustExecuteOnGet
   ): Promise<void | PlainObject | PlainObject[]> => {
     // this is custom logic to be implemented by the plugin author
@@ -85,13 +74,7 @@ export function getActionFactory (
     const isDocument = !isCollection
 
     // this mocks an error during execution
-    if (payload && payload.shouldFail === storeName) {
-      const errorToThrow: VueSyncError = {
-        payload,
-        message: 'fail',
-      }
-      throw errorToThrow
-    }
+    throwIfEmulatedError(payload, storeName)
     // fetch from cache/or from a remote store with logic you implement here
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -113,11 +96,14 @@ export function getActionFactory (
 
 export function streamActionFactory (
   moduleData: PlainObject,
-  storeName: string
+  actionName: ActionName | 'revert',
+  storeName: string,
+  makeDataSnapshot?: any,
+  restoreDataSnapshot?: any
 ): PluginStreamAction {
   return (
     payload: void | PlainObject = {},
-    pluginModuleConfig: VueSyncPluginModuleConfig,
+    pluginModuleConfig: StorePluginModuleConfig,
     mustExecuteOnRead: MustExecuteOnRead
   ): StreamResponse | DoOnRead | Promise<StreamResponse | DoOnRead> => {
     // this is custom logic to be implemented by the plugin author
@@ -153,13 +139,7 @@ export function streamActionFactory (
       stopStreaming.stop = resolve
       setTimeout(() => {
         // this mocks an error during execution
-        if (payload && payload.shouldFail === storeName) {
-          const errorToThrow: VueSyncError = {
-            payload,
-            message: 'fail',
-          }
-          reject(errorToThrow)
-        }
+        throwIfEmulatedError(payload, storeName)
       }, 1)
     })
     function stop (): void {
@@ -167,5 +147,23 @@ export function streamActionFactory (
       stopStreaming.stop()
     }
     return { streaming, stop }
+  }
+}
+
+export function revertActionFactory (
+  moduleData: PlainObject,
+  actionName: ActionName | 'revert',
+  storeName: string,
+  makeDataSnapshot?: any,
+  restoreDataSnapshot?: any
+): PluginRevertAction {
+  // this is a `PluginRevertAction`:
+  return async function revert (
+    actionName: ActionName,
+    payload: PlainObject | PlainObject[] | string | string[] | void,
+    pluginModuleConfig: StorePluginModuleConfig
+  ): Promise<void> {
+    // this is custom logic to be implemented by the plugin author
+    await waitMs(1)
   }
 }
