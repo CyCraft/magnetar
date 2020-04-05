@@ -12,14 +12,7 @@ import {
 } from '../types/plugins'
 import { getEventNameFnsMap } from '../types/events'
 import { getModifyPayloadFnsMap } from '../types/modifyPayload'
-import {
-  getModifyReadResponseFnsMap,
-  OnRemovedFn,
-  OnModifiedFn,
-  OnAddedFn,
-  ModifyReadResponseFnsMap,
-} from '../types/modifyReadResponse'
-import { PlainObject } from '../types/base'
+import { getModifyReadResponseFnsMap } from '../types/modifyReadResponse'
 import { executeOnFns } from '../helpers/executeOnFns'
 import { throwOnIncompleteStreamResponses, throwIfNoFnsToExecute } from '../helpers/throwFns'
 

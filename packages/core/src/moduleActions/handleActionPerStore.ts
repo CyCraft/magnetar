@@ -17,7 +17,6 @@ import { getModifyPayloadFnsMap } from '../types/modifyPayload'
 import { OnAddedFn, getModifyReadResponseFnsMap } from '../types/modifyReadResponse'
 import { executeOnFns } from '../helpers/executeOnFns'
 import { throwIfNoFnsToExecute } from '../helpers/throwFns'
-import { PlainObject } from '../types/base'
 
 export function handleActionPerStore<TActionName extends Exclude<ActionName, 'stream'>> (
   moduleConfig: ModuleConfig,
