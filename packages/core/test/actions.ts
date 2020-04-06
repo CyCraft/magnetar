@@ -5,7 +5,7 @@ import { waitMs } from './helpers/wait'
 import { VueSyncModuleInstance } from '../src/CreateModule'
 
 test('write: insert (collection module)', async t => {
-  const pokedexModule = createVueSyncInstance().pokedexModule
+  const { pokedexModule } = createVueSyncInstance()
   const insertPayload = squirtle
   t.deepEqual(pokedexModule.data['007'], undefined)
   const result = await pokedexModule.insert(insertPayload).catch(t.fail)
@@ -13,8 +13,18 @@ test('write: insert (collection module)', async t => {
   t.deepEqual(pokedexModule.data['007'], insertPayload)
 })
 
+// test('only:write: insert (collection module) creates submodules', async t => {
+//   const { pokedexModule } = createVueSyncInstance()
+//   const insertPayload = squirtle
+//   t.deepEqual(pokedexModule.data['007'], undefined)
+//   const result = await pokedexModule.insert(insertPayload).catch(t.fail)
+//   t.deepEqual(result, insertPayload)
+//   const newSubModule = pokedexModule.doc('007')
+//   t.deepEqual(newSubModule.data, insertPayload)
+// })
+
 test('write: insert multiple (collection module)', async t => {
-  const pokedexModule = createVueSyncInstance().pokedexModule
+  const { pokedexModule } = createVueSyncInstance()
   const insertPayload = [charmander, squirtle]
   t.deepEqual(pokedexModule.data['004'], undefined)
   t.deepEqual(pokedexModule.data['007'], undefined)
@@ -25,7 +35,7 @@ test('write: insert multiple (collection module)', async t => {
 })
 
 test('delete: (collection module)', async t => {
-  const pokedexModule = createVueSyncInstance().pokedexModule
+  const { pokedexModule } = createVueSyncInstance()
   const deletePayload = '001'
   t.deepEqual(pokedexModule.data['001'], bulbasaur)
   const result = await pokedexModule.delete(deletePayload).catch(t.fail)
@@ -34,7 +44,7 @@ test('delete: (collection module)', async t => {
 })
 
 test('delete: multiple (collection module)', async t => {
-  const pokedexModule = createVueSyncInstance().pokedexModule
+  const { pokedexModule } = createVueSyncInstance()
   const deletePayload = ['001']
   t.deepEqual(pokedexModule.data['001'], bulbasaur)
   const result = await pokedexModule.delete(deletePayload).catch(t.fail)
@@ -43,7 +53,7 @@ test('delete: multiple (collection module)', async t => {
 })
 
 test('delete: (document module)', async t => {
-  const trainerModule: VueSyncModuleInstance = createVueSyncInstance().trainerModule
+  const { trainerModule } = createVueSyncInstance()
   const deletePayload = 'age'
   t.deepEqual(trainerModule.data.age, 10)
   const result = await trainerModule.delete(deletePayload).catch(t.fail)
@@ -60,6 +70,19 @@ test('write: merge (collection module)', async t => {
   const mergedResult = { name: 'Bulbasaur', id: '001', type: { grass: 'Grass', alt: 'Leaf' } }
   t.deepEqual(pokedexModule.data['001'], mergedResult)
 })
+
+// test('only:write: merge (sub-doc module)', async t => {
+//   const { pokedexModule } = createVueSyncInstance()
+//   const mergePayload = { type: { alt: 'Leaf' } }
+//   t.deepEqual(pokedexModule.data['001'], bulbasaur)
+//   const result = await pokedexModule
+//     .doc('001')
+//     .merge(mergePayload)
+//     .catch(t.fail)
+//   t.deepEqual(result, mergePayload)
+//   const mergedResult = { name: 'Bulbasaur', id: '001', type: { grass: 'Grass', alt: 'Leaf' } }
+//   t.deepEqual(pokedexModule.data['001'].data, mergedResult)
+// })
 
 test('write: merge (document module)', async t => {
   const { trainerModule } = createVueSyncInstance()

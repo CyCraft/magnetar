@@ -94,7 +94,7 @@ export const VueSyncGenericPlugin = (config: StorePluginConfig): PluginInstance 
 
   // this is triggered on every module that is registered, every module should have something similar
   // prettier-ignore
-  function setModuleDataReference (moduleConfig: StorePluginModuleConfig): { [idOrProp: string]: any } {
+  function setModuleDataReference (moduleConfig: StorePluginModuleConfig) {
     const { path, initialData } = moduleConfig
     const initialModuleData = nestify({ [dots(path)]: initialData || {} })
     Object.entries(initialModuleData).forEach(([key, value]) => {
