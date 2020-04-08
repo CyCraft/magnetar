@@ -24,6 +24,7 @@ export interface PluginInstance {
     merge?: PluginWriteAction
     assign?: PluginWriteAction
     replace?: PluginWriteAction
+    deleteProp?: PluginDeletePropAction
     delete?: PluginDeleteAction
   }
   /**

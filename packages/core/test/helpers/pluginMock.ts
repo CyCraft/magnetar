@@ -1,8 +1,7 @@
-import { merge } from 'merge-anything'
 import { copy } from 'copy-anything'
-import { nestifyObject as nestify } from 'nestify-anything'
 import {
   writeActionFactory as writeActionFactoryLocal,
+  deletePropActionFactory as deletePropActionFactoryLocal,
   deleteActionFactory as deleteActionFactoryLocal,
   getActionFactory as getActionFactoryLocal,
   streamActionFactory as streamActionFactoryLocal,
@@ -10,6 +9,7 @@ import {
 } from './pluginMockActionsLocal'
 import {
   writeActionFactory as writeActionFactoryRemote,
+  deletePropActionFactory as deletePropActionFactoryRemote,
   deleteActionFactory as deleteActionFactoryRemote,
   getActionFactory as getActionFactoryRemote,
   streamActionFactory as streamActionFactoryRemote,
@@ -24,11 +24,9 @@ import {
   PluginStreamAction,
   PluginDeleteAction,
   VueSyncPlugin,
-  PluginModuleConfig,
+  PluginDeletePropAction,
 } from '../../src/types/plugins'
 import { PlainObject } from '../../types/types/base'
-import pathToProp from 'path-to-prop'
-import { isArray } from 'is-what'
 
 // there are two interfaces to be defined & exported by each plugin
 // - StorePluginConfig
@@ -42,8 +40,6 @@ export interface StorePluginModuleConfig {
   initialData?: PlainObject | [string, PlainObject][]
 }
 
-function dots (path: string): string { return path.replace(/\//g, '.') } // prettier-ignore
-
 function actionFactory (
   moduleData: PlainObject,
   actionName: ActionName | 'revert',
@@ -55,6 +51,7 @@ function actionFactory (
     local: {
       insert: writeActionFactoryLocal,
       merge: writeActionFactoryLocal,
+      deleteProp: deletePropActionFactoryLocal,
       delete: deleteActionFactoryLocal,
       get: getActionFactoryLocal,
       stream: streamActionFactoryLocal,
@@ -63,6 +60,7 @@ function actionFactory (
     remote: {
       insert: writeActionFactoryRemote,
       merge: writeActionFactoryRemote,
+      deleteProp: deletePropActionFactoryRemote,
       delete: deleteActionFactoryRemote,
       get: getActionFactoryRemote,
       stream: streamActionFactoryRemote,
@@ -127,6 +125,7 @@ export const VueSyncGenericPlugin: VueSyncPlugin = (config: StorePluginConfig): 
   const stream: PluginStreamAction = actionFactory(data, 'stream', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
   const insert: PluginWriteAction = actionFactory(data, 'insert', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
   const _merge: PluginWriteAction = actionFactory(data, 'merge', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const deleteProp: PluginDeletePropAction = actionFactory(data, 'deleteProp', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
   const _delete: PluginDeleteAction = actionFactory(data, 'delete', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
   const revert: PluginRevertAction = actionFactory(data, 'revert', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
   // const assign: PluginWriteAction = actionFactory(data, 'assign', storeName, makeDataSnapshot, restoreDataSnapshot)
@@ -140,6 +139,7 @@ export const VueSyncGenericPlugin: VueSyncPlugin = (config: StorePluginConfig): 
       stream,
       insert,
       merge: _merge,
+      deleteProp,
       // assign,
       // replace,
       delete: _delete,

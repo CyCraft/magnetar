@@ -12,6 +12,7 @@ import {
   PluginGetAction,
   MustExecuteOnGet,
   PluginRevertAction,
+  PluginDeletePropAction,
 } from '../../src/types/plugins'
 import { waitMs } from './wait'
 import { bulbasaur, flareon, charmander } from './pokemon'
@@ -47,6 +48,29 @@ export function writeActionFactory (
     if (actionName === 'insert') {
       return docId
     }
+  }
+}
+
+export function deletePropActionFactory (
+  moduleData: PlainObject,
+  actionName: ActionName | 'revert',
+  storeName: string,
+  makeDataSnapshot?: any,
+  restoreDataSnapshot?: any
+): PluginDeletePropAction {
+  return async function (
+    payload: string | string[],
+    modulePath: string,
+    pluginModuleConfig: StorePluginModuleConfig
+  ): Promise<void> {
+    // this mocks an error during execution
+    throwIfEmulatedError(payload, storeName)
+    // this is custom logic to be implemented by the plugin author
+    await waitMs(1)
+
+    const isCollection = isCollectionModule(modulePath)
+    // `deleteProp` action cannot be executed on collections
+    if (isCollection) throw new Error('An non-existent action was triggered on a collection')
   }
 }
 

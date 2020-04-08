@@ -7,6 +7,7 @@ import {
   PluginWriteAction,
   PluginDeleteAction,
   MustExecuteOnGet,
+  PluginDeletePropAction,
 } from '../types/plugins'
 
 /**
@@ -15,7 +16,7 @@ import {
  */
 export async function handleAction (args: {
   modulePath: string
-  pluginAction: PluginGetAction | PluginWriteAction | PluginDeleteAction
+  pluginAction: PluginGetAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction
   pluginModuleConfig: PluginModuleConfig
   payload: void | PlainObject | PlainObject[] | string | string[]
   eventNameFnsMap: EventNameFnsMap

@@ -18,7 +18,7 @@ test('write: insert (document)', async t => {
   t.deepEqual(vueSync.collection('pokedex').doc('007').data, insertPayload)
 })
 
-test('only:write: insert (collection) → random ID', async t => {
+test('write: insert (collection) → random ID', async t => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
   const insertPayload = squirtle
   const moduleFromResult = await pokedexModule.insert(insertPayload).catch(t.fail)
@@ -36,7 +36,7 @@ test('only:write: insert (collection) → random ID', async t => {
   t.deepEqual(pokedexModule.data.get(newId), insertPayload)
 })
 
-test('deleteProp: (document)', async t => {
+test('only:deleteProp: (document)', async t => {
   const { trainerModule } = createVueSyncInstance()
   const deletePayload = 'age'
   t.deepEqual(trainerModule.data.age, 10)

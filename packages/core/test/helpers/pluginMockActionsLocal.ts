@@ -13,6 +13,7 @@ import {
   PluginGetAction,
   MustExecuteOnGet,
   PluginRevertAction,
+  PluginDeletePropAction,
 } from '../../src/types/plugins'
 import { merge } from 'merge-anything'
 import { isArray, isString } from 'is-what'
@@ -58,6 +59,41 @@ export function writeActionFactory (
       Object.entries(payload).forEach(([key, value]) => {
         docData[key] = merge(docData[key], value)
       })
+    }
+  }
+}
+
+export function deletePropActionFactory (
+  moduleData: PlainObject,
+  actionName: 'deleteProp',
+  storeName: string,
+  makeDataSnapshot?: any,
+  restoreDataSnapshot?: any
+): PluginDeletePropAction {
+  return function (
+    payload: string | string[],
+    modulePath: string,
+    pluginModuleConfig: StorePluginModuleConfig
+  ): void {
+    // this mocks an error during execution
+    throwIfEmulatedError(payload, storeName)
+    // this is custom logic to be implemented by the plugin author
+
+    const isCollection = isCollectionModule(modulePath)
+    // `deleteProp` action cannot be executed on collections
+    if (isCollection) throw new Error('An non-existent action was triggered on a collection')
+
+    const collectionPath = modulePath.split('/').slice(0, -1).join('/') // prettier-ignore
+    const docId = modulePath.split('/').slice(-1)[0]
+    const collectionMap = moduleData[collectionPath]
+    const docData = collectionMap.get(docId)
+
+    const payloadArray = isArray(payload) ? payload : [payload]
+    for (const propToDelete of payloadArray) {
+      console.log(`propToDelete → `, propToDelete)
+      console.log(`1 docData → `, docData)
+      delete docData[propToDelete]
+      console.log(`2 docData → `, docData)
     }
   }
 }
