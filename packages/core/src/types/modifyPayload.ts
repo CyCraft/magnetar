@@ -5,7 +5,7 @@ export type ModifyWritePayload = (
   payload: PlainObject,
   context: { storeName: string }
 ) => PlainObject
-export type ModifyDeletePayload = (payload: string, context: { storeName: string }) => string
+export type ModifyDeletePropPayload = (payload: string, context: { storeName: string }) => string
 export type ModifyReadPayload = (
   payload: PlainObject | void,
   context: { storeName: string }
@@ -17,7 +17,7 @@ export type ModifyPayloadFnMap = {
   assign?: ModifyWritePayload
   replace?: ModifyWritePayload
   write?: ModifyWritePayload
-  delete?: ModifyDeletePayload
+  deleteProp?: ModifyDeletePropPayload
   read?: ModifyReadPayload
   stream?: ModifyReadPayload
   get?: ModifyReadPayload
@@ -29,7 +29,7 @@ export type ModifyPayloadFnsMap = {
   assign: ModifyWritePayload[]
   replace: ModifyWritePayload[]
   write: ModifyWritePayload[]
-  delete: ModifyDeletePayload[]
+  deleteProp: ModifyDeletePropPayload[]
   read: ModifyReadPayload[]
   stream: ModifyReadPayload[]
   get: ModifyReadPayload[]
@@ -41,12 +41,14 @@ export function getModifyPayloadFnsMap (
   const _onMaps = onMaps.filter(Boolean) as ModifyPayloadFnMap[]
   const writeFns = _onMaps.flatMap(on => on.write ?? [])
   const readFns = _onMaps.flatMap(on => on.read ?? [])
+  // const deleteFns = _onMaps.flatMap(on => on.delete ?? [])
   const result = {
     insert: _onMaps.flatMap(on => on.insert ?? []).concat(writeFns),
     merge: _onMaps.flatMap(on => on.merge ?? []).concat(writeFns),
     assign: _onMaps.flatMap(on => on.assign ?? []).concat(writeFns),
     replace: _onMaps.flatMap(on => on.replace ?? []).concat(writeFns),
-    delete: _onMaps.flatMap(on => on.delete ?? []),
+    deleteProp: _onMaps.flatMap(on => on.deleteProp ?? []),
+    // delete: deleteFns,
     stream: _onMaps.flatMap(on => on.stream ?? []).concat(readFns),
     get: _onMaps.flatMap(on => on.get ?? []).concat(readFns),
   }

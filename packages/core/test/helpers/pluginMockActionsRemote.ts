@@ -1,6 +1,7 @@
+import { isCollectionModule } from '../../src'
 import { PlainObject } from '../../src/types/base'
 import { ActionName } from '../../src/types/actions'
-import { StorePluginModuleConfig, isModuleCollection } from './pluginMock'
+import { StorePluginModuleConfig } from './pluginMock'
 import {
   PluginWriteAction,
   PluginDeleteAction,
@@ -24,15 +25,28 @@ export function writeActionFactory (
   restoreDataSnapshot?: any
 ): PluginWriteAction {
   return async function (
-    payload: PlainObject | PlainObject[],
+    payload: PlainObject,
+    modulePath: string,
     pluginModuleConfig: StorePluginModuleConfig
-  ): Promise<PlainObject | PlainObject[]> {
+  ): Promise<string | void> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storeName)
     // this is custom logic to be implemented by the plugin author
     await waitMs(1)
-    // this mocks an error during execution
-    return payload
+
+    const isCollection = isCollectionModule(modulePath)
+
+    if (actionName === 'insert' && isCollection) {
+      const id = `${Math.random()}${Math.random()}${Math.random()}`
+      return id
+    }
+    // any write action other than `insert` cannot be executed on collections
+    if (isCollection) throw new Error('An non-existent action was triggered on a collection')
+
+    const docId = modulePath.split('/').slice(-1)[0]
+    if (actionName === 'insert') {
+      return docId
+    }
   }
 }
 
@@ -44,7 +58,8 @@ export function deleteActionFactory (
   restoreDataSnapshot?: any
 ): PluginDeleteAction {
   return async function (
-    payload: PlainObject | PlainObject[] | string | string[],
+    payload: void,
+    modulePath: string,
     pluginModuleConfig: StorePluginModuleConfig
   ): Promise<void> {
     // this mocks an error during execution
@@ -64,13 +79,13 @@ export function getActionFactory (
 ): PluginGetAction {
   return async (
     payload: void | PlainObject = {},
+    modulePath: string,
     pluginModuleConfig: StorePluginModuleConfig,
     mustExecuteOnGet: MustExecuteOnGet
   ): Promise<void | PlainObject | PlainObject[]> => {
     // this is custom logic to be implemented by the plugin author
     makeDataSnapshot()
-    const { path } = pluginModuleConfig
-    const isCollection = isModuleCollection(pluginModuleConfig)
+    const isCollection = isCollectionModule(modulePath)
     const isDocument = !isCollection
 
     // this mocks an error during execution
@@ -103,11 +118,12 @@ export function streamActionFactory (
 ): PluginStreamAction {
   return (
     payload: void | PlainObject = {},
+    modulePath: string,
     pluginModuleConfig: StorePluginModuleConfig,
     mustExecuteOnRead: MustExecuteOnRead
   ): StreamResponse | DoOnRead | Promise<StreamResponse | DoOnRead> => {
     // this is custom logic to be implemented by the plugin author
-    const isCollection = isModuleCollection(pluginModuleConfig)
+    const isCollection = isCollectionModule(modulePath)
     const isDocument = !isCollection
     // we'll mock opening a stream
 
@@ -159,9 +175,10 @@ export function revertActionFactory (
 ): PluginRevertAction {
   // this is a `PluginRevertAction`:
   return async function revert (
-    actionName: ActionName,
     payload: PlainObject | PlainObject[] | string | string[] | void,
-    pluginModuleConfig: StorePluginModuleConfig
+    modulePath: string,
+    pluginModuleConfig: StorePluginModuleConfig,
+    actionName: ActionName
   ): Promise<void> {
     // this is custom logic to be implemented by the plugin author
     await waitMs(1)

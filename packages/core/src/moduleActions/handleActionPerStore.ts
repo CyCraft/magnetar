@@ -1,6 +1,4 @@
 import { O } from 'ts-toolbelt'
-import { VueSyncConfig } from '..'
-import { ModuleConfig } from '../CreateModule'
 import { handleAction } from './handleAction'
 import { getEventNameFnsMap } from '../types/events'
 import {
@@ -11,28 +9,33 @@ import {
   VueSyncGetAction,
   VueSyncWriteAction,
   VueSyncDeleteAction,
+  VueSyncDeletePropAction,
 } from '../types/actions'
 import { PluginModuleConfig, MustExecuteOnGet } from '../types/plugins'
 import { getModifyPayloadFnsMap } from '../types/modifyPayload'
 import { OnAddedFn, getModifyReadResponseFnsMap } from '../types/modifyReadResponse'
 import { executeOnFns } from '../helpers/executeOnFns'
 import { throwIfNoFnsToExecute } from '../helpers/throwFns'
+import { ModuleConfig, GlobalConfig } from '../types/base'
+import { isFullString } from 'is-what'
 
 export function handleActionPerStore<TActionName extends Exclude<ActionName, 'stream'>> (
+  modulePath: string,
   moduleConfig: ModuleConfig,
-  globalConfig: O.Compulsory<VueSyncConfig>,
+  globalConfig: O.Compulsory<GlobalConfig>,
   actionName: TActionName,
   actionType: ActionType
 ): ActionTernary<TActionName>
 
 export function handleActionPerStore (
+  modulePath: string,
   moduleConfig: ModuleConfig,
-  globalConfig: O.Compulsory<VueSyncConfig>,
+  globalConfig: O.Compulsory<GlobalConfig>,
   actionName: Exclude<ActionName, 'stream'>,
   actionType: ActionType
-): VueSyncGetAction | VueSyncWriteAction | VueSyncDeleteAction {
+): VueSyncGetAction | VueSyncWriteAction | VueSyncDeleteAction | VueSyncDeletePropAction {
   // returns the action the dev can call with myModule.insert() etc.
-  return async function (
+  return async function write (
     payload?: void | object | object[] | string | string[],
     actionConfig: ActionConfig = {}
   ): Promise<void | object | object[]> {
@@ -68,7 +71,6 @@ export function handleActionPerStore (
     let stopExecution = false as StopExecution
     /**
      * The abort mechanism for the entire store chain. When executed in handleAction() it won't go to the next store in executionOrder.
-     *
      */
     function stopExecutionAfterAction (trueOrRevert: StopExecution = true): void {
       stopExecution = trueOrRevert
@@ -86,11 +88,13 @@ export function handleActionPerStore (
     for (const [i, storeName] of storesToExecute.entries()) {
       // find the action on the plugin
       const pluginAction = globalConfig.stores[storeName].actions[actionName]
-      const pluginModuleConfig: PluginModuleConfig = moduleConfig?.configPerStore[storeName] || {}
+      const moduleConfigPerStore = moduleConfig?.configPerStore || {}
+      const pluginModuleConfig: PluginModuleConfig = moduleConfigPerStore[storeName] || {}
       // the plugin action
       result = !pluginAction
         ? result
         : await handleAction({
+            modulePath,
             pluginAction,
             pluginModuleConfig,
             payload, // should always use the payload as passed originally for clarity
@@ -101,14 +105,18 @@ export function handleActionPerStore (
             storeName,
             mustExecuteOnGet,
           })
-
+      // update the modulePath if a doc with random ID was inserted in a collection
+      // if this is the case the result will be a string - the randomly genererated ID
+      if (actionName === 'insert' && isFullString(result)) {
+        modulePath = `${modulePath}/${result}`
+      }
       // handle reverting
       if (stopExecution === 'revert') {
         const storesToRevert = storesToExecute.slice(0, i)
         storesToRevert.reverse()
         for (const storeToRevert of storesToRevert) {
           const pluginRevertAction = globalConfig.stores[storeToRevert].revert
-          await pluginRevertAction(actionName, payload, pluginModuleConfig)
+          await pluginRevertAction(payload, modulePath, pluginModuleConfig, actionName)
           // revert eventFns, handle and await each eventFn in sequence
           for (const fn of eventNameFnsMap.revert) {
             await fn({ payload, result, actionName, storeName })

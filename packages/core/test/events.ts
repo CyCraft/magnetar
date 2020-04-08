@@ -30,7 +30,6 @@ test('insert: emits before & success events', async t => {
       },
     },
   })
-  t.deepEqual(result, insertPayload)
   t.is(ranAllEvents.length, 4)
 })
 
@@ -53,7 +52,6 @@ test('insert: can abort in before events', async t => {
       },
     },
   })
-  t.deepEqual(result, insertPayload)
 })
 
 test('insert: can abort in success events', async t => {
@@ -76,6 +74,5 @@ test('insert: can abort in success events', async t => {
       },
     },
   })
-  t.deepEqual(result, insertPayload)
   t.is(ranAllEvents.length, 2)
 })

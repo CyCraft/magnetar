@@ -18,10 +18,7 @@ test('emits global, module and action events', async t => {
       },
     },
   })
-  const usersModule = vueSync.createModule({
-    configPerStore: {
-      local: { path: 'users' }, // path for vuex
-    },
+  const usersModule = vueSync.collection('users', {
     on: {
       before: ({ payload, storeName }) => {
         if (storeName === 'local') ranAllEvents.push(payload)
@@ -37,7 +34,7 @@ test('emits global, module and action events', async t => {
       },
     },
   })
-  t.deepEqual(result, insertPayload)
+  t.deepEqual(result.data, insertPayload)
   t.deepEqual(ranAllEvents, [insertPayload, insertPayload, insertPayload])
 })
 
@@ -56,10 +53,7 @@ test('can modify payload in global, module and action settings', async t => {
       },
     },
   })
-  const usersModule = vueSync.createModule({
-    configPerStore: {
-      local: { path: 'users' }, // path for vuex
-    },
+  const usersModule = vueSync.collection('users', {
     modifyPayloadOn: {
       insert: payload => {
         return { ...payload, addedInModule: true }
@@ -75,7 +69,7 @@ test('can modify payload in global, module and action settings', async t => {
       },
     },
   })
-  t.deepEqual(result, {
+  t.deepEqual(result.data, {
     ...insertPayload,
     addedInModule: true,
     addedInGlobal: true,

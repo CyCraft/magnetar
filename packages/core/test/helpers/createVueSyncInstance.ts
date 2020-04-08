@@ -1,21 +1,26 @@
 import { VueSyncGenericPlugin } from './pluginMock'
 import { VueSync, VueSyncInstance } from '../../src'
-import { VueSyncModuleInstance } from '../../src/CreateModule'
+import { CollectionInstance } from '../../src/Collection'
 import { bulbasaur } from './pokemon'
+import { DocInstance } from '../../src/Doc'
 
-interface PokedexModuleData {
-  [id: string]: {
-    id: string
-    name: string
-    type?: {
-      [type: string]: string | undefined | null
-    }
-    seen?: boolean
-    shouldFail?: string
+const getInitialDataCollection = () => [
+  // doc entries
+  ['001', bulbasaur],
+]
+const getInitialDataDocument = () => ({ name: 'Luca', age: 10 })
+
+export interface PokedexModuleData {
+  id?: string
+  name: string
+  type?: {
+    [type: string]: string | undefined | null
   }
+  seen?: boolean
+  shouldFail?: string
 }
 
-interface TrainerModuleData {
+export interface TrainerModuleData {
   name: string
   age?: number
   nickName?: string
@@ -24,8 +29,8 @@ interface TrainerModuleData {
 }
 
 export function createVueSyncInstance (): {
-  pokedexModule: VueSyncModuleInstance<PokedexModuleData>
-  trainerModule: VueSyncModuleInstance<TrainerModuleData>
+  pokedexModule: CollectionInstance<PokedexModuleData>
+  trainerModule: DocInstance<TrainerModuleData>
   vueSync: VueSyncInstance
 } {
   const local = VueSyncGenericPlugin({ storeName: 'local' })
@@ -39,21 +44,16 @@ export function createVueSyncInstance (): {
       delete: ['local', 'remote'],
     },
   })
-  const getInitialDataCollection = () => ({
-    // doc
-    '001': bulbasaur,
-  })
-  const getInitialDataDocument = () => ({ name: 'Luca', age: 10 })
-  const pokedexModule = vueSync.createModule<PokedexModuleData>({
+  const pokedexModule = vueSync.collection<PokedexModuleData>('pokedex', {
     configPerStore: {
-      local: { path: 'pokedex', initialData: getInitialDataCollection() }, // path for the plugin
-      remote: { path: 'pokedex', initialData: getInitialDataCollection() }, // path for the plugin
+      local: { initialData: getInitialDataCollection() }, // path for the plugin
+      remote: {}, // path for the plugin
     },
   })
-  const trainerModule = vueSync.createModule<TrainerModuleData>({
+  const trainerModule = vueSync.doc<TrainerModuleData>('data/trainer', {
     configPerStore: {
-      local: { path: 'data/trainer', initialData: getInitialDataDocument() }, // path for the plugin
-      remote: { path: 'data/trainer', initialData: getInitialDataDocument() }, // path for the plugin
+      local: { initialData: getInitialDataDocument() }, // path for the plugin
+      remote: {}, // path for the plugin
     },
   })
   return { pokedexModule, trainerModule, vueSync }

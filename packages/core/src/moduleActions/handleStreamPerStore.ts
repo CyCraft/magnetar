@@ -1,6 +1,4 @@
 import { O } from 'ts-toolbelt'
-import { VueSyncConfig } from '..'
-import { ModuleConfig } from '../CreateModule'
 import { handleStream } from './handleStream'
 import { ActionType, ActionConfig, VueSyncStreamAction } from '../types/actions'
 import {
@@ -15,10 +13,12 @@ import { getModifyPayloadFnsMap } from '../types/modifyPayload'
 import { getModifyReadResponseFnsMap } from '../types/modifyReadResponse'
 import { executeOnFns } from '../helpers/executeOnFns'
 import { throwOnIncompleteStreamResponses, throwIfNoFnsToExecute } from '../helpers/throwFns'
+import { ModuleConfig, GlobalConfig } from '../types/base'
 
 export function handleStreamPerStore (
+  modulePath: string,
   moduleConfig: ModuleConfig,
-  globalConfig: O.Compulsory<VueSyncConfig>,
+  globalConfig: O.Compulsory<GlobalConfig>,
   actionType: ActionType,
   openStreams: { [identifier: string]: () => void }
 ): VueSyncStreamAction {
@@ -75,6 +75,7 @@ export function handleStreamPerStore (
       // the plugin action
       if (pluginAction) {
         const result = await handleStream({
+          modulePath,
           pluginAction,
           pluginModuleConfig,
           payload, // should always use the payload as passed originally for clarity

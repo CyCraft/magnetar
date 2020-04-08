@@ -8,6 +8,7 @@ import { O } from 'ts-toolbelt'
  * handleStream is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success
  */
 export async function handleStream (args: {
+  modulePath: string
   pluginAction: PluginStreamAction
   pluginModuleConfig: PluginModuleConfig
   payload: PlainObject | void
@@ -17,6 +18,7 @@ export async function handleStream (args: {
   mustExecuteOnRead: O.Compulsory<DoOnRead>
 }): Promise<StreamResponse | DoOnRead> {
   const {
+    modulePath,
     pluginAction,
     pluginModuleConfig,
     payload,
@@ -38,7 +40,7 @@ export async function handleStream (args: {
   try {
     // triggering the action provided by the plugin
     const pluginStreamAction = pluginAction as PluginStreamAction
-    result = await pluginStreamAction(payload, pluginModuleConfig, mustExecuteOnRead)
+    result = await pluginStreamAction(payload, modulePath, pluginModuleConfig, mustExecuteOnRead)
   } catch (error) {
     if (!isVueSyncError(error)) throw new Error(error)
     // handle and await each eventFn in sequence

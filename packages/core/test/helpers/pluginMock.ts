@@ -23,9 +23,12 @@ import {
   PluginWriteAction,
   PluginStreamAction,
   PluginDeleteAction,
+  VueSyncPlugin,
+  PluginModuleConfig,
 } from '../../src/types/plugins'
 import { PlainObject } from '../../types/types/base'
 import pathToProp from 'path-to-prop'
+import { isArray } from 'is-what'
 
 // there are two interfaces to be defined & exported by each plugin
 // - StorePluginConfig
@@ -35,15 +38,11 @@ export interface StorePluginConfig {
   storeName: string
 }
 export interface StorePluginModuleConfig {
-  path: string
-  initialData?: PlainObject
+  path?: string
+  initialData?: PlainObject | [string, PlainObject][]
 }
 
 function dots (path: string): string { return path.replace(/\//g, '.') } // prettier-ignore
-function isOdd (number: number) { return number % 2 === 1 } // prettier-ignore
-export function isModuleCollection (moduleConfig: StorePluginModuleConfig): boolean {
-  return isOdd(moduleConfig.path.split('/').length)
-}
 
 function actionFactory (
   moduleData: PlainObject,
@@ -74,14 +73,14 @@ function actionFactory (
   return f(moduleData, actionName, storeName, makeDataSnapshot, restoreDataSnapshot)
 }
 
+// this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
+const data: PlainObject = {}
+
 // a Vue Sync plugin is a single function that returns a `PluginInstance`
 // the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
 // each action must have the proper for both collection and doc type modules
-export const VueSyncGenericPlugin = (config: StorePluginConfig): PluginInstance => {
+export const VueSyncGenericPlugin: VueSyncPlugin = (config: StorePluginConfig): PluginInstance => {
   const { storeName } = config
-
-  // this is the local state of the plugin, each plugin should have something similar
-  const data: PlainObject = {}
 
   // this mocks some sort of data snapshot restore functionality of the plugin
   const dataSnapshots = []
@@ -92,15 +91,35 @@ export const VueSyncGenericPlugin = (config: StorePluginConfig): PluginInstance 
     Object.keys(last.pokedex).forEach(key => (data.pokedex[key] = last.pokedex[key]))
   }
 
-  // this is triggered on every module that is registered, every module should have something similar
-  // prettier-ignore
-  function setModuleDataReference (moduleConfig: StorePluginModuleConfig) {
-    const { path, initialData } = moduleConfig
-    const initialModuleData = nestify({ [dots(path)]: initialData || {} })
-    Object.entries(initialModuleData).forEach(([key, value]) => {
-      data[key] = merge(data[key], value)
-    })
-    return pathToProp(data, path)
+  /**
+   * This must be provided by Store Plugins that have "local" data. It is triggered upon instantiating a collection.
+   */
+  const returnCollectionData = (modulePath: string, moduleConfig: StorePluginModuleConfig = {}) => {
+    const { initialData } = moduleConfig
+    const collectionDB = data[modulePath] || new Map()
+    if (initialData && !data[modulePath]) {
+      for (const [docId, docData] of initialData) {
+        collectionDB.set(docId, docData)
+      }
+    }
+    data[modulePath] = collectionDB
+    return data[modulePath]
+  }
+  /**
+   * This must be provided by Store Plugins that have "local" data. It is triggered upon instantiating a doc.
+   */
+  const returnDocData = (modulePath: string, moduleConfig: StorePluginModuleConfig = {}) => {
+    const collectionPath = modulePath
+      .split('/')
+      .slice(0, -1)
+      .join('/')
+    const docId = modulePath.split('/').slice(-1)[0]
+    const collectionDB = returnCollectionData(collectionPath)
+    if (collectionDB.get(docId) === undefined) {
+      const { initialData = {} } = moduleConfig
+      collectionDB.set(docId, initialData)
+    }
+    return collectionDB.get(docId)
   }
 
   // the plugin must try to implement logic for every `ActionName`
@@ -115,9 +134,7 @@ export const VueSyncGenericPlugin = (config: StorePluginConfig): PluginInstance 
 
   // the plugin function must return a `PluginInstance`
   const instance: PluginInstance = {
-    config,
     revert,
-    setModuleDataReference,
     actions: {
       get,
       stream,
@@ -127,6 +144,8 @@ export const VueSyncGenericPlugin = (config: StorePluginConfig): PluginInstance 
       // replace,
       delete: _delete,
     },
+    returnDocData,
+    returnCollectionData,
   }
   return instance
 }

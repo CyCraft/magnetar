@@ -14,6 +14,7 @@ import {
  * in any event/hook it's possible for the dev to modify the result & also abort the execution chain, which prevents calling handleAction on the next store as well
  */
 export async function handleAction (args: {
+  modulePath: string
   pluginAction: PluginGetAction | PluginWriteAction | PluginDeleteAction
   pluginModuleConfig: PluginModuleConfig
   payload: void | PlainObject | PlainObject[] | string | string[]
@@ -25,6 +26,7 @@ export async function handleAction (args: {
   mustExecuteOnGet: MustExecuteOnGet
 }): Promise<void | PlainObject | PlainObject[]> {
   const {
+    modulePath,
     pluginAction,
     pluginModuleConfig,
     payload,
@@ -57,7 +59,7 @@ export async function handleAction (args: {
   try {
     // triggering the action provided by the plugin
     // @ts-ignore
-    result = await pluginAction(payload, pluginModuleConfig, mustExecuteOnGet)
+    result = await pluginAction(payload, modulePath, pluginModuleConfig, mustExecuteOnGet)
   } catch (error) {
     if (!isVueSyncError(error)) throw new Error(error)
     // handle and await each eventFn in sequence

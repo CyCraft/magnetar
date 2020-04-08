@@ -1,7 +1,8 @@
 import pathToProp from 'path-to-prop'
+import { isCollectionModule } from '../../src'
 import { PlainObject } from '../../src/types/base'
 import { ActionName, actionNameTypeMap } from '../../src/types/actions'
-import { StorePluginModuleConfig, isModuleCollection } from './pluginMock'
+import { StorePluginModuleConfig } from './pluginMock'
 import {
   PluginWriteAction,
   PluginDeleteAction,
@@ -25,49 +26,39 @@ export function writeActionFactory (
   restoreDataSnapshot?: any
 ): PluginWriteAction {
   return function (
-    payload: PlainObject | PlainObject[],
+    payload: PlainObject,
+    modulePath: string,
     pluginModuleConfig: StorePluginModuleConfig
-  ): PlainObject | PlainObject[] {
+  ): string | void {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storeName)
     // this is custom logic to be implemented by the plugin author
-    const { path } = pluginModuleConfig
-    const isCollection = isModuleCollection(pluginModuleConfig)
-    const isDocument = !isCollection
-    const db = pathToProp(moduleData, path)
+    const isCollection = isCollectionModule(modulePath)
 
-    const docs = isArray(payload) ? payload : [payload]
-    const result: PlainObject[] = []
-    for (const doc of docs) {
-      if (actionName === 'insert') {
-        if (isCollection) {
-          const id = doc.id ?? String(Math.random())
-          db[id] = doc
-          result.push(doc)
-          db[id] = doc
-        }
-        if (isDocument) {
-          Object.entries(doc).forEach(([key, value]) => {
-            db[key] = merge(db[key], value)
-          })
-          result.push(db)
-        }
-      }
-
-      if (actionName === 'merge') {
-        if (isCollection) {
-          db[doc.id] = merge(db[doc.id], doc)
-          result.push(db[doc.id])
-        }
-        if (isDocument) {
-          Object.entries(doc).forEach(([key, value]) => {
-            db[key] = merge(db[key], value)
-          })
-          result.push(db)
-        }
-      }
+    if (actionName === 'insert' && isCollection) {
+      const id = `${Math.random()}${Math.random()}${Math.random()}`
+      const collectionPath = modulePath
+      const collectionMap = moduleData[collectionPath]
+      collectionMap.set(id, payload)
+      return id
     }
-    return isArray(payload) ? result : result[0]
+    // any write action other than `insert` cannot be executed on collections
+    if (isCollection) throw new Error('An non-existent action was triggered on a collection')
+
+    const collectionPath = modulePath.split('/').slice(0, -1).join('/') // prettier-ignore
+    const docId = modulePath.split('/').slice(-1)[0]
+    const collectionMap = moduleData[collectionPath]
+    const docData = collectionMap.get(docId)
+    if (actionName === 'insert') {
+      Object.entries(payload).forEach(([key, value]) => {
+        docData[key] = value
+      })
+    }
+    if (actionName === 'merge') {
+      Object.entries(payload).forEach(([key, value]) => {
+        docData[key] = merge(docData[key], value)
+      })
+    }
   }
 }
 
@@ -79,27 +70,26 @@ export function deleteActionFactory (
   restoreDataSnapshot?: any
 ): PluginDeleteAction {
   return function (
-    payload: PlainObject | PlainObject[] | string | string[],
+    payload: void,
+    modulePath: string,
     pluginModuleConfig: StorePluginModuleConfig
   ): void {
     const payloadArray = isArray(payload) ? payload : [payload]
     // this mocks an error during execution
     throwIfEmulatedError(payload, storeName)
     // this is custom logic to be implemented by the plugin author
-    const { path } = pluginModuleConfig
-    const isCollection = isModuleCollection(pluginModuleConfig)
-    const isDocument = !isCollection
-    const db = pathToProp(moduleData, path)
+    const isCollection = isCollectionModule(modulePath)
 
-    for (const idOrPayload of payloadArray) {
-      const id = isString(idOrPayload) ? idOrPayload : idOrPayload.id
-      if (isCollection) {
-        db[id] = undefined
-      }
-      if (isDocument) {
-        db[id] = undefined
-      }
-    }
+    // delete cannot be executed on collections
+    if (isCollection) throw new Error('An non-existent action was triggered on a collection')
+
+    const collectionPath = modulePath
+      .split('/')
+      .slice(0, -1)
+      .join('/')
+    const docId = modulePath.split('/').slice(-1)[0]
+    const collectionMap = moduleData[collectionPath]
+    collectionMap.delete(docId)
   }
 }
 
@@ -112,6 +102,7 @@ export function getActionFactory (
 ): PluginGetAction {
   return async (
     payload: void | PlainObject = {},
+    modulePath: string,
     pluginModuleConfig: StorePluginModuleConfig,
     mustExecuteOnGet: MustExecuteOnGet
   ): Promise<void | PlainObject | PlainObject[]> => {
@@ -121,9 +112,9 @@ export function getActionFactory (
     throwIfEmulatedError(payload, storeName)
     // let's pass a new event that will make sure this plugin's data is kept up to date with the server data
     // this mocks how the result from the next store (the remote store) should be merged into the local stores
-    mustExecuteOnGet.registerDoOnAdded((payload, meta) =>
-      writeActionFactory(moduleData, 'insert', storeName)(payload, pluginModuleConfig)
-    )
+    mustExecuteOnGet.registerDoOnAdded((payload, meta): void => {
+      writeActionFactory(moduleData, 'insert', storeName)(payload, modulePath, pluginModuleConfig)
+    })
     // in case of a local store that doesn't fetch from anywhere, not even from cach, we could return early here
     return
   }
@@ -138,6 +129,7 @@ export function streamActionFactory (
 ): PluginStreamAction {
   return (
     payload: void | PlainObject = {},
+    modulePath: string,
     pluginModuleConfig: StorePluginModuleConfig,
     mustExecuteOnRead: MustExecuteOnRead
   ): StreamResponse | DoOnRead | Promise<StreamResponse | DoOnRead> => {
@@ -147,12 +139,25 @@ export function streamActionFactory (
     // this mocks how the result from the next store (the remote store) should update this local store per action type
     // hover over the prop names below to see more info on when they are triggered:
     const doOnRead: DoOnRead = {
-      added: (payload, meta) =>
-        writeActionFactory(moduleData, 'insert', storeName)(payload, pluginModuleConfig),
-      modified: (payload, meta) =>
-        writeActionFactory(moduleData, 'insert', storeName)(payload, pluginModuleConfig),
-      removed: (payload, meta) =>
-        deleteActionFactory(moduleData, 'delete', storeName)(payload, pluginModuleConfig),
+      added: (payload, meta) => {
+        writeActionFactory(moduleData, 'insert', storeName)(payload, modulePath, pluginModuleConfig)
+      },
+      modified: (payload, meta) => {
+        writeActionFactory(moduleData, 'insert', storeName)(payload, modulePath, pluginModuleConfig)
+      },
+      removed: (payload, meta) => {
+        const isCollection = isCollectionModule(modulePath)
+        const pathToDelete = !isCollection
+          ? modulePath
+          : isString(payload)
+          ? `${modulePath}/${payload}`
+          : `${modulePath}/${payload.id}`
+        deleteActionFactory(moduleData, 'delete', storeName)(
+          undefined,
+          pathToDelete,
+          pluginModuleConfig
+        )
+      },
     }
     return doOnRead
   }
@@ -167,9 +172,10 @@ export function revertActionFactory (
 ): PluginRevertAction {
   // this is a `PluginRevertAction`:
   return function revert (
-    actionName: ActionName,
     payload: PlainObject | PlainObject[] | string | string[] | void,
-    pluginModuleConfig: StorePluginModuleConfig
+    modulePath: string,
+    pluginModuleConfig: StorePluginModuleConfig,
+    actionName: ActionName
   ): void {
     // this is custom logic to be implemented by the plugin author
     if (!payload) return
@@ -179,8 +185,7 @@ export function revertActionFactory (
     const actionType = actionNameTypeMap[actionName]
     // this mocks data reverted during a write
     if (actionType === 'write') {
-      const { path } = pluginModuleConfig
-      const db = pathToProp(moduleData, path)
+      const db = pathToProp(moduleData, modulePath)
       const docs = isArray(payload) ? payload : [payload]
       docs.forEach(doc => {
         db[doc.id] = undefined
