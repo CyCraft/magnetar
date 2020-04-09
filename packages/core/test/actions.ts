@@ -21,7 +21,7 @@ test('write: insert (document)', async t => {
 test('write: insert (collection) → random ID', async t => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
   const insertPayload = squirtle
-  const moduleFromResult = await pokedexModule.insert(insertPayload).catch(t.fail)
+  const moduleFromResult = await pokedexModule.insert(insertPayload).catch(e => t.fail(e.message)) // prettier-ignore
   // todo: why is moduleFromResult able to return void?
   if (!moduleFromResult) return t.fail()
   const newId = moduleFromResult.id
@@ -36,19 +36,19 @@ test('write: insert (collection) → random ID', async t => {
   t.deepEqual(pokedexModule.data.get(newId), insertPayload)
 })
 
-test('only:deleteProp: (document)', async t => {
+test('deleteProp: (document)', async t => {
   const { trainerModule } = createVueSyncInstance()
   const deletePayload = 'age'
   t.deepEqual(trainerModule.data.age, 10)
-  const result = await trainerModule.deleteProp(deletePayload).catch(t.fail)
+  const result = await trainerModule.deleteProp(deletePayload).catch(e => t.fail(e.message)) // prettier-ignore
   t.deepEqual(result, undefined)
   t.deepEqual(trainerModule.data.age, undefined)
 })
 
-test('delete: (document)', async t => {
+test('only:delete: (document)', async t => {
   const { trainerModule, vueSync } = createVueSyncInstance()
   t.deepEqual(trainerModule.data.age, 10)
-  const result = await trainerModule.delete().catch(t.fail)
+  const result = await trainerModule.delete().catch(e => t.fail(e.message)) // prettier-ignore
   t.deepEqual(result, undefined)
   t.deepEqual(trainerModule.data, undefined)
   t.deepEqual(vueSync.doc('data/trainer'), undefined)
@@ -59,7 +59,7 @@ test('write: merge (document)', async t => {
   const mergePayload = { id: '001', type: { alt: 'Leaf' } }
   const doc = pokedexModule.doc('001')
   t.deepEqual(doc.data, bulbasaur)
-  await doc.merge(mergePayload).catch(t.fail)
+  await doc.merge(mergePayload).catch(e => t.fail(e.message)) // prettier-ignore
   const mergedResult = { name: 'Bulbasaur', id: '001', type: { grass: 'Grass', alt: 'Leaf' } }
   t.deepEqual(pokedexModule.data['001'], mergedResult)
   t.deepEqual(doc.data, mergedResult)
@@ -71,7 +71,7 @@ test('read: stream (collection)', async t => {
   t.deepEqual(pokedexModule.data.size, 1)
   const streamPayload = {}
   // do not await, because it only resolves when the stream is closed
-  pokedexModule.stream(streamPayload).catch(t.fail)
+  pokedexModule.stream(streamPayload).catch(e => t.fail(e.message)) // prettier-ignore
   await waitMs(600)
   // close the stream:
   const unsubscribe = pokedexModule.openStreams[JSON.stringify(streamPayload)]
@@ -89,7 +89,7 @@ test('read: stream (doc)', async t => {
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
   const streamPayload = {}
   // do not await, because it only resolves when the stream is closed
-  trainerModule.stream(streamPayload).catch(t.fail)
+  trainerModule.stream(streamPayload).catch(e => t.fail(e.message)) // prettier-ignore
   await waitMs(600)
   // close the stream:
   const unsubscribe = trainerModule.openStreams[JSON.stringify(streamPayload)]

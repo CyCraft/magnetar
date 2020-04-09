@@ -27,6 +27,7 @@ import {
   PluginDeletePropAction,
 } from '../../src/types/plugins'
 import { PlainObject } from '../../types/types/base'
+import { getCollectionPathDocIdEntry } from '../../src/helpers/pathHelpers'
 
 // there are two interfaces to be defined & exported by each plugin
 // - StorePluginConfig
@@ -107,11 +108,7 @@ export const VueSyncGenericPlugin: VueSyncPlugin = (config: StorePluginConfig): 
    * This must be provided by Store Plugins that have "local" data. It is triggered upon instantiating a doc.
    */
   const returnDocData = (modulePath: string, moduleConfig: StorePluginModuleConfig = {}) => {
-    const collectionPath = modulePath
-      .split('/')
-      .slice(0, -1)
-      .join('/')
-    const docId = modulePath.split('/').slice(-1)[0]
+    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const collectionDB = returnCollectionData(collectionPath)
     if (collectionDB.get(docId) === undefined) {
       const { initialData = {} } = moduleConfig

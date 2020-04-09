@@ -18,6 +18,7 @@ import {
 import { merge } from 'merge-anything'
 import { isArray, isString } from 'is-what'
 import { throwIfEmulatedError } from './throwFns'
+import { getCollectionPathDocIdEntry } from '../../src/helpers/pathHelpers'
 
 export function writeActionFactory (
   moduleData: PlainObject,
@@ -46,8 +47,7 @@ export function writeActionFactory (
     // any write action other than `insert` cannot be executed on collections
     if (isCollection) throw new Error('An non-existent action was triggered on a collection')
 
-    const collectionPath = modulePath.split('/').slice(0, -1).join('/') // prettier-ignore
-    const docId = modulePath.split('/').slice(-1)[0]
+    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const collectionMap = moduleData[collectionPath]
     const docData = collectionMap.get(docId)
     if (actionName === 'insert') {
@@ -83,17 +83,13 @@ export function deletePropActionFactory (
     // `deleteProp` action cannot be executed on collections
     if (isCollection) throw new Error('An non-existent action was triggered on a collection')
 
-    const collectionPath = modulePath.split('/').slice(0, -1).join('/') // prettier-ignore
-    const docId = modulePath.split('/').slice(-1)[0]
+    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const collectionMap = moduleData[collectionPath]
     const docData = collectionMap.get(docId)
 
     const payloadArray = isArray(payload) ? payload : [payload]
     for (const propToDelete of payloadArray) {
-      console.log(`propToDelete → `, propToDelete)
-      console.log(`1 docData → `, docData)
       delete docData[propToDelete]
-      console.log(`2 docData → `, docData)
     }
   }
 }
@@ -110,22 +106,19 @@ export function deleteActionFactory (
     modulePath: string,
     pluginModuleConfig: StorePluginModuleConfig
   ): void {
-    const payloadArray = isArray(payload) ? payload : [payload]
     // this mocks an error during execution
     throwIfEmulatedError(payload, storeName)
     // this is custom logic to be implemented by the plugin author
-    const isCollection = isCollectionModule(modulePath)
 
+    const isCollection = isCollectionModule(modulePath)
     // delete cannot be executed on collections
     if (isCollection) throw new Error('An non-existent action was triggered on a collection')
 
-    const collectionPath = modulePath
-      .split('/')
-      .slice(0, -1)
-      .join('/')
-    const docId = modulePath.split('/').slice(-1)[0]
+    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const collectionMap = moduleData[collectionPath]
+    console.log(`1 collectionMap → `, collectionMap)
     collectionMap.delete(docId)
+    console.log(`2 collectionMap → `, collectionMap)
   }
 }
 
