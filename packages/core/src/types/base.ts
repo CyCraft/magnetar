@@ -8,7 +8,7 @@ import { PluginInstance } from './plugins'
 export type PlainObject = { [key: string]: any }
 export type StoreName = string
 
-export type Modified<T> = T extends object ? O.Merge<Partial<T>, PlainObject> : T
+export type DocMetadata = { data: PlainObject; id: string; exists: boolean; metadata?: PlainObject }
 
 /**
  * Shared config can be set globally < or per module < or per action.

@@ -1,15 +1,9 @@
 import { PlainObject } from './base'
 import { O } from 'ts-toolbelt'
 
-export type ModifyWritePayload = (
-  payload: PlainObject,
-  context: { storeName: string }
-) => PlainObject
-export type ModifyDeletePropPayload = (payload: string, context: { storeName: string }) => string
-export type ModifyReadPayload = (
-  payload: PlainObject | void,
-  context: { storeName: string }
-) => PlainObject | void
+export type ModifyWritePayload = (payload: PlainObject) => PlainObject
+export type ModifyDeletePropPayload = (payload: string | string[]) => string | string[]
+export type ModifyReadPayload = (payload: PlainObject | void) => PlainObject | void
 
 export type ModifyPayloadFnMap = {
   insert?: ModifyWritePayload
@@ -30,6 +24,7 @@ export type ModifyPayloadFnsMap = {
   replace: ModifyWritePayload[]
   write: ModifyWritePayload[]
   deleteProp: ModifyDeletePropPayload[]
+  delete: never[]
   read: ModifyReadPayload[]
   stream: ModifyReadPayload[]
   get: ModifyReadPayload[]
@@ -48,7 +43,7 @@ export function getModifyPayloadFnsMap (
     assign: _onMaps.flatMap(on => on.assign ?? []).concat(writeFns),
     replace: _onMaps.flatMap(on => on.replace ?? []).concat(writeFns),
     deleteProp: _onMaps.flatMap(on => on.deleteProp ?? []),
-    // delete: deleteFns,
+    delete: [] as never[], // delete has no payload
     stream: _onMaps.flatMap(on => on.stream ?? []).concat(readFns),
     get: _onMaps.flatMap(on => on.get ?? []).concat(readFns),
   }

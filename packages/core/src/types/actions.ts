@@ -1,7 +1,8 @@
-import { PlainObject, StoreName, Modified, SharedConfig } from './base'
+import { PlainObject, StoreName, SharedConfig } from './base'
 import { isAnyObject } from 'is-what'
 import { O } from 'ts-toolbelt'
 import { DocInstance } from '../Doc'
+import { CollectionInstance } from '../Collection'
 
 // these are all the actions that Vue Sync aims to streamline, whichever plugin is used
 // these actions are executable from a `VueSyncModule` and handled by each plugin individually
@@ -43,17 +44,39 @@ export type ActionConfig = O.Merge<
 
 // these are the action types exposed to the dev via a VueSyncModule, it's what the dev will end up calling.
 
-export type VueSyncStreamAction = (payload?: object | void, actionConfig?: ActionConfig) => Promise<void> // prettier-ignore
+export type VueSyncStreamAction = (
+  payload?: object | void,
+  actionConfig?: ActionConfig
+) => Promise<void>
 
-export type VueSyncGetAction = (payload?: object | void, actionConfig?: ActionConfig) => Promise<PlainObject | PlainObject[] | void | undefined> // prettier-ignore
+export type VueSyncGetAction<
+  DocDataType = PlainObject,
+  calledFrom extends 'collection' | 'doc' = 'collection' | 'doc'
+> = (
+  payload?: object | void,
+  actionConfig?: ActionConfig
+) => Promise<
+  calledFrom extends 'collection' ? CollectionInstance<DocDataType> : DocInstance<DocDataType>
+>
 
-export type VueSyncInsertAction<DocDataType> = (payload: object, actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>> // prettier-ignore
+export type VueSyncInsertAction<DocDataType = PlainObject> = (
+  payload: object,
+  actionConfig?: ActionConfig
+) => Promise<DocInstance<DocDataType>>
 
-export type VueSyncWriteAction = (payload: object, actionConfig?: ActionConfig) => Promise<void> // prettier-ignore
+export type VueSyncWriteAction<DocDataType = PlainObject> = (
+  payload: object,
+  actionConfig?: ActionConfig
+) => Promise<DocInstance<DocDataType>>
 
-export type VueSyncDeletePropAction = (payload: string | string[], actionConfig?: ActionConfig) => Promise<void> // prettier-ignore
+export type VueSyncDeletePropAction<DocDataType = PlainObject> = (
+  payload: string | string[],
+  actionConfig?: ActionConfig
+) => Promise<DocInstance<DocDataType>>
 
-export type VueSyncDeleteAction = (actionConfig?: ActionConfig) => Promise<void>
+export type VueSyncDeleteAction<DocDataType = PlainObject> = (
+  actionConfig?: ActionConfig
+) => Promise<DocInstance<DocDataType>>
 
 export type ActionTernary<TActionName extends ActionName> = TActionName extends 'stream'
   ? VueSyncStreamAction
@@ -63,6 +86,8 @@ export type ActionTernary<TActionName extends ActionName> = TActionName extends 
   ? VueSyncDeleteAction
   : TActionName extends 'deleteProp'
   ? VueSyncDeletePropAction
+  : TActionName extends 'insert'
+  ? VueSyncInsertAction
   : VueSyncWriteAction
 
 export type VueSyncError = {

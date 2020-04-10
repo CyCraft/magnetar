@@ -4,7 +4,7 @@ import { createCollectionWithContext, CollectionInstance } from './Collection'
 import { SharedConfig, GlobalConfig, ModuleConfig, PlainObject } from './types/base'
 import { createDocWithContext, DocInstance } from './Doc'
 
-export { isDocModule, isCollectionModule } from './helpers/isDocOrCollection'
+export { isDocModule, isCollectionModule } from './helpers/pathHelpers'
 
 function configWithDefaults (config: GlobalConfig): O.Compulsory<GlobalConfig> {
   const defaults: SharedConfig = {
@@ -34,7 +34,7 @@ export interface VueSyncInstance {
 /**
  * This is the type for calling `collection()`
  */
-export type CollectionFn = <DocDataType>(
+export type CollectionFn<DocDataTypeInherited = PlainObject> = <DocDataType = DocDataTypeInherited>(
   idOrPath: string,
   moduleConfig?: ModuleConfig
 ) => CollectionInstance<DocDataType>
@@ -67,7 +67,8 @@ export function VueSync (vueSyncConfig: GlobalConfig): VueSyncInstance {
       moduleConfig,
       globalConfig,
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      doc
+      doc,
+      collection
     )
     moduleMap.set(idOrPath, moduleInstance)
     return moduleInstance
@@ -86,6 +87,7 @@ export function VueSync (vueSyncConfig: GlobalConfig): VueSyncInstance {
       idOrPath,
       moduleConfig,
       globalConfig,
+      doc,
       collection
     )
     moduleMap.set(moduleInstance.id, moduleInstance)

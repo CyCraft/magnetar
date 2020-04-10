@@ -4,9 +4,9 @@ import { ActionType, ActionConfig, VueSyncStreamAction } from '../types/actions'
 import {
   PluginModuleConfig,
   StreamResponse,
-  DoOnReadFns,
-  isDoOnRead,
-  DoOnRead,
+  DoOnStreamFns,
+  isDoOnStream,
+  DoOnStream,
 } from '../types/plugins'
 import { getEventNameFnsMap } from '../types/events'
 import { getModifyPayloadFnsMap } from '../types/modifyPayload'
@@ -44,12 +44,14 @@ export function handleStreamPerStore (
       (globalConfig.executionOrder || {})[actionType] ||
       []
     throwIfNoFnsToExecute(storesToExecute)
+    // update the payload
+    for (const modifyFn of modifyPayloadFnsMap['stream']) {
+      payload = modifyFn(payload)
+    }
 
-    const streamInfoPerStore: {
-      [storeName: string]: StreamResponse
-    } = {}
+    const streamInfoPerStore: { [storeName: string]: StreamResponse } = {}
 
-    const doOnReadFns: DoOnReadFns = {
+    const doOnStreamFns: DoOnStreamFns = {
       added: modifyReadResponseMap.added,
       modified: modifyReadResponseMap.modified,
       removed: modifyReadResponseMap.removed,
@@ -57,10 +59,10 @@ export function handleStreamPerStore (
     /**
      * this is what must be executed by a plugin store that implemented "stream" functionality
      */
-    const mustExecuteOnRead: O.Compulsory<DoOnRead> = {
-      added: (_payload, _meta) => executeOnFns(doOnReadFns.added, _payload, [_meta]),
-      modified: (_payload, _meta) => executeOnFns(doOnReadFns.modified, _payload, [_meta]),
-      removed: (_payload, _meta) => executeOnFns(doOnReadFns.removed, _payload, [_meta]),
+    const mustExecuteOnRead: O.Compulsory<DoOnStream> = {
+      added: (_payload, _meta) => executeOnFns(doOnStreamFns.added, _payload, [_meta]),
+      modified: (_payload, _meta) => executeOnFns(doOnStreamFns.modified, _payload, [_meta]),
+      removed: (_payload, _meta) => executeOnFns(doOnStreamFns.removed, _payload, [_meta]),
     }
 
     // handle and await each action in sequence
@@ -68,10 +70,7 @@ export function handleStreamPerStore (
       // find the action on the plugin
       const pluginAction = globalConfig.stores[storeName].actions['stream']
       const pluginModuleConfig: PluginModuleConfig = moduleConfig?.configPerStore[storeName] || {}
-      // update the payload
-      for (const modifyFn of modifyPayloadFnsMap['stream']) {
-        payload = modifyFn(payload, { storeName })
-      }
+
       // the plugin action
       if (pluginAction) {
         const result = await handleStream({
@@ -85,19 +84,19 @@ export function handleStreamPerStore (
           mustExecuteOnRead,
         })
         // if the plugin action for stream returns a "do on read" result
-        if (isDoOnRead(result)) {
+        if (isDoOnStream(result)) {
           // register the functions we received: result
           for (const [doOn, doFn] of Object.entries(result)) {
-            doOnReadFns[doOn].push(doFn)
+            doOnStreamFns[doOn].push(doFn)
           }
         }
         // if the plugin action for stream returns a "stream response" result
-        if (!isDoOnRead(result)) {
+        if (!isDoOnStream(result)) {
           streamInfoPerStore[storeName] = result
         }
       }
     }
-    throwOnIncompleteStreamResponses(streamInfoPerStore, doOnReadFns)
+    throwOnIncompleteStreamResponses(streamInfoPerStore, doOnStreamFns)
     const streamPromises = Object.values(streamInfoPerStore).map(({ streaming }) => streaming)
     // create a function to stop all streams
     const identifier = JSON.stringify(payload)

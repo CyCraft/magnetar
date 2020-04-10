@@ -1,7 +1,12 @@
 import { isVueSyncError } from '../types/actions'
 import { PlainObject } from '../types/base'
 import { EventNameFnsMap } from '../types/events'
-import { PluginModuleConfig, PluginStreamAction, DoOnRead, StreamResponse } from '../types/plugins'
+import {
+  PluginModuleConfig,
+  PluginStreamAction,
+  DoOnStream,
+  StreamResponse,
+} from '../types/plugins'
 import { O } from 'ts-toolbelt'
 
 /**
@@ -15,8 +20,8 @@ export async function handleStream (args: {
   eventNameFnsMap: EventNameFnsMap
   actionName: 'stream'
   storeName: string
-  mustExecuteOnRead: O.Compulsory<DoOnRead>
-}): Promise<StreamResponse | DoOnRead> {
+  mustExecuteOnRead: O.Compulsory<DoOnStream>
+}): Promise<StreamResponse | DoOnStream> {
   const {
     modulePath,
     pluginAction,
@@ -35,11 +40,11 @@ export async function handleStream (args: {
     await fn({ payload, actionName, storeName, abort })
   }
 
-  let result: StreamResponse | DoOnRead
+  let result: StreamResponse | DoOnStream
 
   try {
     // triggering the action provided by the plugin
-    const pluginStreamAction = pluginAction as PluginStreamAction
+    const pluginStreamAction = pluginAction
     result = await pluginStreamAction(payload, modulePath, pluginModuleConfig, mustExecuteOnRead)
   } catch (error) {
     if (!isVueSyncError(error)) throw new Error(error)

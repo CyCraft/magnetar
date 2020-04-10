@@ -1,5 +1,7 @@
 import { ActionName, VueSyncError } from './actions'
 import { PlainObject } from './base'
+import { GetResponse } from './plugins'
+import { OnAddedFn } from './modifyReadResponse'
 
 // events
 export type EventName = 'before' | 'success' | 'error' | 'revert'
@@ -29,7 +31,7 @@ export type EventFnSuccess = (args: {
   payload: PlainObject | PlainObject[] | void | string | string[]
   actionName: ActionName
   storeName: string
-  result: void | PlainObject | PlainObject[]
+  result: void | string | GetResponse | OnAddedFn
   /**
    * stream actions: void // streams cannot be aborted in an event
    * others: () => void
@@ -63,7 +65,7 @@ export type EventFnRevert = (args: {
   payload: PlainObject | PlainObject[] | void | string | string[]
   actionName: ActionName
   storeName: string
-  result: void | PlainObject | PlainObject[]
+  result: void | string | GetResponse | OnAddedFn
 }) => void | Promise<void>
 
 export type EventFn = EventFnBefore | EventFnSuccess | EventFnError | EventFnRevert

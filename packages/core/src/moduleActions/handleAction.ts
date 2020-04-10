@@ -6,9 +6,11 @@ import {
   PluginGetAction,
   PluginWriteAction,
   PluginDeleteAction,
-  MustExecuteOnGet,
   PluginDeletePropAction,
+  PluginInsertAction,
+  GetResponse,
 } from '../types/plugins'
+import { OnAddedFn } from '../types/modifyReadResponse'
 
 /**
  * handleAction is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success (4) optional: onNextStoresSuccess.
@@ -16,7 +18,7 @@ import {
  */
 export async function handleAction (args: {
   modulePath: string
-  pluginAction: PluginGetAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction
+  pluginAction: PluginGetAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction // prettier-ignore
   pluginModuleConfig: PluginModuleConfig
   payload: void | PlainObject | PlainObject[] | string | string[]
   eventNameFnsMap: EventNameFnsMap
@@ -24,8 +26,7 @@ export async function handleAction (args: {
   actionName: Exclude<ActionName, 'stream'>
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
   storeName: string
-  mustExecuteOnGet: MustExecuteOnGet
-}): Promise<void | PlainObject | PlainObject[]> {
+}): Promise<void | string | GetResponse | OnAddedFn> {
   const {
     modulePath,
     pluginAction,
@@ -36,7 +37,6 @@ export async function handleAction (args: {
     actionName,
     stopExecutionAfterAction,
     storeName,
-    mustExecuteOnGet,
   } = args
   // create abort mechanism for current scope
   let abortExecution = false
@@ -50,17 +50,12 @@ export async function handleAction (args: {
   // abort?
   if (abortExecution) {
     stopExecutionAfterAction()
-    // return the proper return type based on the ActionName
-    if (actionName === 'delete' || actionName === 'get') return
-    // @ts-ignore
-    return payload
+    return
   }
-  // @ts-ignore
-  let result: PlainObject | PlainObject[] | void = isWriteAction(actionName) ? payload : undefined
+  let result: void | string | GetResponse | OnAddedFn
   try {
     // triggering the action provided by the plugin
-    // @ts-ignore
-    result = await pluginAction(payload, modulePath, pluginModuleConfig, mustExecuteOnGet)
+    result = await pluginAction(payload as any, modulePath, pluginModuleConfig)
   } catch (error) {
     if (!isVueSyncError(error)) throw new Error(error)
     // handle and await each eventFn in sequence
@@ -74,7 +69,7 @@ export async function handleAction (args: {
     }
     if (onError === 'revert') {
       stopExecutionAfterAction('revert')
-      return result
+      return
     }
   }
   // handle and await each eventFn in sequence

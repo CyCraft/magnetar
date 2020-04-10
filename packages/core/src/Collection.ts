@@ -10,8 +10,9 @@ import { handleActionPerStore } from './moduleActions/handleActionPerStore'
 import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
 import { throwIfNoDataStoreName, throwIfInvalidId } from './helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from './types/base'
-import { DocFn } from '.'
+import { DocFn, CollectionFn } from '.'
 import { DocInstance } from './Doc'
+import { executeSetupModulePerStore } from './helpers/moduleHelpers'
 
 export type CollectionInstance<DocDataType = { [prop: string]: any }> = {
   data: Map<string, DocDataType>
@@ -19,7 +20,7 @@ export type CollectionInstance<DocDataType = { [prop: string]: any }> = {
   id: string
   path: string
   openStreams: { [identifier: string]: () => void }
-  get?: VueSyncGetAction
+  get?: VueSyncGetAction<DocDataType, 'collection'>
   stream?: VueSyncStreamAction
   insert?: VueSyncInsertAction<DocDataType>
 }
@@ -28,7 +29,8 @@ export function createCollectionWithContext<DocDataType> (
   idOrPath: string,
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
-  docFn: DocFn<DocDataType>
+  docFn: DocFn<DocDataType>,
+  collectionFn: CollectionFn<DocDataType>
 ): CollectionInstance<DocDataType> {
   throwIfInvalidId(idOrPath, 'collection')
 
@@ -40,6 +42,12 @@ export function createCollectionWithContext<DocDataType> (
     return docFn(`${path}/${idOrPath}`, _moduleConfig)
   }
 
+  // function collection<DocDataType> (
+  //   idOrPath: string,
+  //   moduleConfig: ModuleConfig = {}
+  // ): CollectionInstance<DocDataType>
+
+  // we need to wrap insert so we can return the wrapped new doc for the inserted item!
   async function insert (
     payload: object,
     actionConfig: ActionConfig = {}
@@ -49,7 +57,9 @@ export function createCollectionWithContext<DocDataType> (
       moduleConfig,
       globalConfig,
       'insert',
-      actionNameTypeMap.insert
+      actionNameTypeMap.insert,
+      docFn,
+      collectionFn
     )
     const newId = ((await handleWriteActionPerStore(payload, actionConfig)) as unknown) as string
     return doc(newId)
@@ -57,17 +67,19 @@ export function createCollectionWithContext<DocDataType> (
 
   const actions = {
     insert,
-    get: handleActionPerStore(path, moduleConfig, globalConfig, 'get', actionNameTypeMap.get), // prettier-ignore
+    get: handleActionPerStore(path, moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn, collectionFn), // prettier-ignore
     stream: handleStreamPerStore(path, moduleConfig, globalConfig, actionNameTypeMap.stream, openStreams) // prettier-ignore
   }
+
+  // Every store will have its 'setupModule' function executed
+  executeSetupModulePerStore(globalConfig.stores, path, moduleConfig)
 
   // The store specified as 'dataStoreName' should return data
   const dataStoreName = moduleConfig.dataStoreName || globalConfig.dataStoreName
   throwIfNoDataStoreName(dataStoreName)
-  const { returnCollectionData } = globalConfig.stores[dataStoreName]
-  const moduleConfigPerStore = moduleConfig?.configPerStore || {}
-  const pluginModuleConfig = moduleConfigPerStore[dataStoreName] || {}
-  const data = returnCollectionData<DocDataType>(path, pluginModuleConfig)
+  const { getModuleData } = globalConfig.stores[dataStoreName]
+  const storeModuleConfig = moduleConfig?.configPerStore?.[dataStoreName] || {}
+  const data = getModuleData<DocDataType>(path, storeModuleConfig)
 
   const moduleInstance = {
     doc,
@@ -77,5 +89,6 @@ export function createCollectionWithContext<DocDataType> (
     openStreams,
     ...actions,
   }
+  // titian, how should I fix conditional return type in the cleanest way?
   return moduleInstance
 }

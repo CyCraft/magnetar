@@ -1,6 +1,6 @@
-import { StreamResponse, DoOnReadFns } from '../types/plugins'
+import { StreamResponse, DoOnStreamFns } from '../types/plugins'
 import { isFullString } from 'is-what'
-import { isDocModule, isCollectionModule } from './isDocOrCollection'
+import { isDocModule, isCollectionModule } from './pathHelpers'
 
 export function logError (errorMessage: string): void {
   console.error('[vue-sync error]\n', errorMessage)
@@ -13,15 +13,15 @@ export function logErrorAndThrow (errorMessage: string): void {
 
 export function throwOnIncompleteStreamResponses (
   streamInfoPerStore: { [storeName: string]: StreamResponse },
-  doOnReadFns: DoOnReadFns
+  doOnStreamFns: DoOnStreamFns
 ): void {
   const noStreamLogic = !Object.keys(streamInfoPerStore).length
   if (noStreamLogic) {
     const errorMessage = 'None of your store plugins have implemented logic to open a stream.'
     logErrorAndThrow(errorMessage)
   }
-  const noDoOnReadLogic = !Object.values(doOnReadFns).flat().length
-  if (noDoOnReadLogic) {
+  const noDoOnStreamLogic = !Object.values(doOnStreamFns).flat().length
+  if (noDoOnStreamLogic) {
     const errorMessage =
       'None of your store plugins have implemented logic to do something with the data coming in from streams.'
     logErrorAndThrow(errorMessage)

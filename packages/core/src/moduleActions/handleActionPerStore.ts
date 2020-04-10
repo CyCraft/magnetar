@@ -10,21 +10,34 @@ import {
   VueSyncWriteAction,
   VueSyncDeleteAction,
   VueSyncDeletePropAction,
+  VueSyncInsertAction,
 } from '../types/actions'
-import { PluginModuleConfig, MustExecuteOnGet } from '../types/plugins'
+import {
+  PluginModuleConfig,
+  GetResponse,
+  isDoOnGet,
+  isGetResponse,
+  DoOnGet,
+} from '../types/plugins'
 import { getModifyPayloadFnsMap } from '../types/modifyPayload'
 import { OnAddedFn, getModifyReadResponseFnsMap } from '../types/modifyReadResponse'
 import { executeOnFns } from '../helpers/executeOnFns'
 import { throwIfNoFnsToExecute } from '../helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from '../types/base'
-import { isFullString } from 'is-what'
+import { isFullString, isPlainObject, isFunction } from 'is-what'
+import { CollectionInstance } from '../Collection'
+import { DocInstance } from '../Doc'
+import { getCollectionPathDocIdEntry } from '../helpers/pathHelpers'
+import { CollectionFn, DocFn } from '..'
 
 export function handleActionPerStore<TActionName extends Exclude<ActionName, 'stream'>> (
   modulePath: string,
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
   actionName: TActionName,
-  actionType: ActionType
+  actionType: ActionType,
+  doc: DocFn, // actions executed on a "doc" will always return `doc()`
+  collection?: CollectionFn // actions executed on a "collection" will return `collection()` or `doc()`
 ): ActionTernary<TActionName>
 
 export function handleActionPerStore (
@@ -32,13 +45,20 @@ export function handleActionPerStore (
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
   actionName: Exclude<ActionName, 'stream'>,
-  actionType: ActionType
-): VueSyncGetAction | VueSyncWriteAction | VueSyncDeleteAction | VueSyncDeletePropAction {
+  actionType: ActionType,
+  doc: DocFn, // actions executed on a "doc" will always return `doc()`
+  collection?: CollectionFn // actions executed on a "collection" will return `collection()` or `doc()`
+):
+  | VueSyncGetAction
+  | VueSyncWriteAction
+  | VueSyncInsertAction
+  | VueSyncDeleteAction
+  | VueSyncDeletePropAction {
   // returns the action the dev can call with myModule.insert() etc.
-  return async function write (
-    payload?: void | object | object[] | string | string[],
+  return async function (
+    payload?: void | object | string | string[],
     actionConfig: ActionConfig = {}
-  ): Promise<void | object | object[]> {
+  ): Promise<DocInstance | CollectionInstance> {
     // get all the config needed to perform this action
     const onError = actionConfig.onError || moduleConfig.onError || globalConfig.onError
     const modifyPayloadFnsMap = getModifyPayloadFnsMap(
@@ -62,8 +82,7 @@ export function handleActionPerStore (
     throwIfNoFnsToExecute(storesToExecute)
     // update the payload
     for (const modifyFn of modifyPayloadFnsMap[actionName]) {
-      // @ts-ignore
-      payload = modifyFn(payload)
+      payload = modifyFn(payload as any)
     }
 
     // create the abort mechanism
@@ -76,23 +95,26 @@ export function handleActionPerStore (
       stopExecution = trueOrRevert
     }
 
-    // each plugin's 'get' action will need to trigger at least one of the 'mustExecuteOnGet' functions
-    const doOnAddedFns: OnAddedFn[] = modifyReadResponseMap.added
-    const mustExecuteOnGet: MustExecuteOnGet = {
-      added: (_payload, _meta) => executeOnFns(doOnAddedFns, _payload, [_meta]),
-      registerDoOnAdded: (_onAddedFn: OnAddedFn) => doOnAddedFns.push(_onAddedFn),
-    }
+    // each each time a store returns a `GetResponse` then all `doOnGetFns` need to be executed
+    const doOnGetFns: DoOnGet[] = modifyReadResponseMap.added
+
+    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
+    // check if this action was executed from a "collection" or a "doc"
+    const isDocModule = !!docId
+    const isCollectionModule = !isDocModule
 
     // handle and await each action in sequence
-    let result: void | object | object[]
+    let resultFromPlugin: void | string | GetResponse | OnAddedFn
     for (const [i, storeName] of storesToExecute.entries()) {
+      // a previous iteration stopped the execution:
+      if (stopExecution === 'revert' || stopExecution === true) break
       // find the action on the plugin
       const pluginAction = globalConfig.stores[storeName].actions[actionName]
       const moduleConfigPerStore = moduleConfig?.configPerStore || {}
       const pluginModuleConfig: PluginModuleConfig = moduleConfigPerStore[storeName] || {}
       // the plugin action
-      result = !pluginAction
-        ? result
+      resultFromPlugin = !pluginAction
+        ? resultFromPlugin
         : await handleAction({
             modulePath,
             pluginAction,
@@ -103,15 +125,9 @@ export function handleActionPerStore (
             actionName,
             stopExecutionAfterAction,
             storeName,
-            mustExecuteOnGet,
           })
-      // update the modulePath if a doc with random ID was inserted in a collection
-      // if this is the case the result will be a string - the randomly genererated ID
-      if (actionName === 'insert' && isFullString(result)) {
-        modulePath = `${modulePath}/${result}`
-      }
-      // handle reverting
-      if (stopExecution === 'revert') {
+      // handle reverting. stopExecution might have been modified by `handleAction`
+      if ((stopExecution as any) === 'revert') {
         const storesToRevert = storesToExecute.slice(0, i)
         storesToRevert.reverse()
         for (const storeToRevert of storesToRevert) {
@@ -119,19 +135,40 @@ export function handleActionPerStore (
           await pluginRevertAction(payload, modulePath, pluginModuleConfig, actionName)
           // revert eventFns, handle and await each eventFn in sequence
           for (const fn of eventNameFnsMap.revert) {
-            await fn({ payload, result, actionName, storeName })
+            await fn({ payload, result: resultFromPlugin, actionName, storeName })
           }
         }
-        // return result early to prevent going to the next store
-        return result
       }
 
-      // handle abortion
-      if (stopExecution === true) {
-        // return result early to prevent going to the next store
-        return result
+      // special handling for 'insert' (resultFromPlugin will always be `string`)
+      if (actionName === 'insert' && isFullString(resultFromPlugin)) {
+        // update the modulePath if a doc with random ID was inserted in a collection
+        // if this is the case the result will be a string - the randomly genererated ID
+        if (isCollectionModule) {
+          modulePath = `${modulePath}/${resultFromPlugin}`
+        }
+      }
+
+      // special handling for 'get' (resultFromPlugin will always be `GetResponse | OnAddedFn`)
+      if (actionName === 'get') {
+        if (isDoOnGet(resultFromPlugin)) {
+          doOnGetFns.push(resultFromPlugin)
+        }
+        if (isGetResponse(resultFromPlugin)) {
+          for (const docRetrieved of resultFromPlugin.docs) {
+            executeOnFns(doOnGetFns, docRetrieved.data, [docRetrieved])
+          }
+        }
       }
     }
-    return result
+    if (isDocModule) return doc(modulePath, moduleConfig)
+    // it's originally triggered on a "collection":
+    if (actionName === 'insert') {
+      // insert always returns a DocInstance, and the ID is now available on the modulePath which was modified
+      return doc(modulePath, moduleConfig)
+    }
+    // all other actions triggered on collections ('get' is the only possibility left)
+    // should return the collection:
+    return collection(modulePath, moduleConfig)
   }
 }
