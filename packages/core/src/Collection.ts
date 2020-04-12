@@ -46,9 +46,9 @@ export function createCollectionWithContext<DocDataType> (
   const get = handleActionPerStore(path, moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn, collectionFn) as VueSyncGetAction<DocDataType, 'collection'> //prettier-ignore
 
   const actions = {
-    insert,
+    stream: handleStreamPerStore(path, moduleConfig, globalConfig, actionNameTypeMap.stream, openStreams), // prettier-ignore
     get,
-    stream: handleStreamPerStore(path, moduleConfig, globalConfig, actionNameTypeMap.stream, openStreams) // prettier-ignore
+    insert,
   }
 
   // Every store will have its 'setupModule' function executed

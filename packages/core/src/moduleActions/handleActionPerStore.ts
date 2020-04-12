@@ -98,6 +98,7 @@ export function handleActionPerStore (
     // each each time a store returns a `GetResponse` then all `doOnGetFns` need to be executed
     const doOnGetFns: DoOnGet[] = modifyReadResponseMap.added
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     // check if this action was executed from a "collection" or a "doc"
     const isDocModule = !!docId
@@ -124,7 +125,6 @@ export function handleActionPerStore (
             actionName,
             stopExecutionAfterAction,
             storeName,
-            docFn,
           })
       // handle reverting. stopExecution might have been modified by `handleAction`
       if ((stopExecution as any) === 'revert') {

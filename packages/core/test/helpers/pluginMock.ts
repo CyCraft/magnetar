@@ -29,7 +29,7 @@ import {
   PluginDeletePropAction,
   PluginInsertAction,
 } from '../../src/types/plugins'
-import { PlainObject } from '../../types/types/base'
+import { PlainObject } from '../../src/types/base'
 import { getCollectionPathDocIdEntry } from '../../src/helpers/pathHelpers'
 
 // there are two interfaces to be defined & exported by each plugin

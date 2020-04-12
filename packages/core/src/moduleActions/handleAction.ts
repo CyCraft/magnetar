@@ -11,7 +11,6 @@ import {
   GetResponse,
 } from '../types/plugins'
 import { OnAddedFn } from '../types/modifyReadResponse'
-import { DocFn } from '..'
 
 /**
  * handleAction is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success (4) optional: onNextStoresSuccess.
@@ -27,7 +26,6 @@ export async function handleAction (args: {
   actionName: Exclude<ActionName, 'stream'>
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
   storeName: string
-  docFn: DocFn
 }): Promise<void | string | GetResponse | OnAddedFn> {
   const {
     modulePath,
@@ -39,7 +37,6 @@ export async function handleAction (args: {
     actionName,
     stopExecutionAfterAction,
     storeName,
-    docFn,
   } = args
   // create abort mechanism for current scope
   let abortExecution = false

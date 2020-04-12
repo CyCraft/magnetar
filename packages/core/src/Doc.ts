@@ -62,7 +62,13 @@ export function createDocWithContext<DocDataType> (
     deleteProp: (handleActionPerStore(path, moduleConfig, globalConfig, 'deleteProp', actionNameTypeMap.deleteProp, docFn) as VueSyncDeletePropAction<DocDataType>), // prettier-ignore
     delete: (handleActionPerStore(path, moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn) as VueSyncDeleteAction<DocDataType>), // prettier-ignore
     get: (handleActionPerStore(path, moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn) as VueSyncGetAction<DocDataType, 'doc'>), // prettier-ignore
-    stream: handleStreamPerStore(path, moduleConfig, globalConfig, actionNameTypeMap.stream, openStreams) // prettier-ignore
+    stream: handleStreamPerStore(
+      path,
+      moduleConfig,
+      globalConfig,
+      actionNameTypeMap.stream,
+      openStreams
+    ),
   }
 
   // Every store will have its 'setupModule' function executed
@@ -72,7 +78,7 @@ export function createDocWithContext<DocDataType> (
   const getModuleData = getDataFromDataStore<'doc', DocDataType>(path, moduleConfig, globalConfig)
 
   const dataHandler = {
-    get: function (target, key, proxyRef) {
+    get: function (target, key, proxyRef): any {
       if (key === 'data') return getModuleData<DocDataType>(path)
       return Reflect.get(target, key, proxyRef)
     },

@@ -13,6 +13,6 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/ban-ts-ignore': 'off',
     'tree-shaking/no-side-effects-in-initialization': 'error',
-    'comma-dangle': 'always-multiline',
+    'comma-dangle': ['warn', 'always-multiline'],
   },
 }

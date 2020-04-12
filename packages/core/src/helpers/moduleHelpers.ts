@@ -1,6 +1,6 @@
 import { GlobalConfig, ModuleConfig } from '../types/base'
 import { isFunction, isMap } from 'is-what'
-import { throwIfNoDataStoreName, logError, logErrorAndThrow } from './throwFns'
+import { throwIfNoDataStoreName, logErrorAndThrow } from './throwFns'
 import { isDocModule } from './pathHelpers'
 
 /**
@@ -15,7 +15,7 @@ export function executeSetupModulePerStore (
   globalConfigStores: GlobalConfig['stores'],
   modulePath: string,
   moduleConfig: ModuleConfig
-) {
+): void {
   for (const storeName in globalConfigStores) {
     const { setupModule } = globalConfigStores[storeName]
     if (isFunction(setupModule)) {

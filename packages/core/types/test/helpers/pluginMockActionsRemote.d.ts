@@ -1,0 +1,10 @@
+import { PlainObject } from '../../src/types/base';
+import { ActionName } from '../../src/types/actions';
+import { PluginWriteAction, PluginDeleteAction, PluginStreamAction, PluginGetAction, PluginRevertAction, PluginDeletePropAction, PluginInsertAction } from '../../src/types/plugins';
+export declare function writeActionFactory(moduleData: PlainObject, actionName: 'merge' | 'assign' | 'replace', storeName: string, makeDataSnapshot?: any, restoreDataSnapshot?: any): PluginWriteAction;
+export declare function insertActionFactory(moduleData: PlainObject, actionName: 'insert', storeName: string, makeDataSnapshot?: any, restoreDataSnapshot?: any): PluginInsertAction;
+export declare function deletePropActionFactory(moduleData: PlainObject, actionName: ActionName | 'revert', storeName: string, makeDataSnapshot?: any, restoreDataSnapshot?: any): PluginDeletePropAction;
+export declare function deleteActionFactory(moduleData: PlainObject, actionName: ActionName | 'revert', storeName: string, makeDataSnapshot?: any, restoreDataSnapshot?: any): PluginDeleteAction;
+export declare function getActionFactory(moduleData: PlainObject, actionName: ActionName | 'revert', storeName: string, makeDataSnapshot?: any, restoreDataSnapshot?: any): PluginGetAction;
+export declare function streamActionFactory(moduleData: PlainObject, actionName: ActionName | 'revert', storeName: string, makeDataSnapshot?: any, restoreDataSnapshot?: any): PluginStreamAction;
+export declare function revertActionFactory(moduleData: PlainObject, actionName: ActionName | 'revert', storeName: string, makeDataSnapshot?: any, restoreDataSnapshot?: any): PluginRevertAction;
