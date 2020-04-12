@@ -18,6 +18,8 @@ export type CollectionInstance<DocDataType = { [prop: string]: any }> = {
   id: string
   path: string
   openStreams: { [identifier: string]: () => void }
+
+  // actions
   get?: VueSyncGetAction<DocDataType, 'collection'>
   stream?: VueSyncStreamAction
   insert?: VueSyncInsertAction<DocDataType>

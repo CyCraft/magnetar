@@ -22,6 +22,8 @@ export type DocInstance<DocDataType = { [prop: string]: any }> = {
   id: string
   path: string
   openStreams: { [identifier: string]: () => void }
+
+  // actions
   get?: VueSyncGetAction<DocDataType, 'doc'>
   stream?: VueSyncStreamAction
   insert?: VueSyncInsertAction<DocDataType>
