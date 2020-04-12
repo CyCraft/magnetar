@@ -8,19 +8,23 @@ import {
   PluginStreamAction,
   MustExecuteOnRead,
   StreamResponse,
-  DoOnRead,
+  DoOnStream,
   PluginGetAction,
-  MustExecuteOnGet,
   PluginRevertAction,
   PluginDeletePropAction,
+  PluginInsertAction,
+  DoOnGet,
+  GetResponse,
 } from '../../src/types/plugins'
 import { waitMs } from './wait'
 import { bulbasaur, flareon, charmander } from './pokemon'
 import { throwIfEmulatedError } from './throwFns'
+import { getCollectionPathDocIdEntry } from '../../src/helpers/pathHelpers'
+import { generateRandomId } from './generateRandomId'
 
 export function writeActionFactory (
   moduleData: PlainObject,
-  actionName: ActionName | 'revert',
+  actionName: 'merge' | 'assign' | 'replace',
   storeName: string,
   makeDataSnapshot?: any,
   restoreDataSnapshot?: any
@@ -29,7 +33,30 @@ export function writeActionFactory (
     payload: PlainObject,
     modulePath: string,
     pluginModuleConfig: StorePluginModuleConfig
-  ): Promise<string | void> {
+  ): Promise<void> {
+    // this mocks an error during execution
+    throwIfEmulatedError(payload, storeName)
+    // this is custom logic to be implemented by the plugin author
+    await waitMs(1)
+
+    const isCollection = isCollectionModule(modulePath)
+    // any write action other than `insert` cannot be executed on collections
+    if (isCollection) throw new Error('An non-existent action was triggered on a collection')
+  }
+}
+
+export function insertActionFactory (
+  moduleData: PlainObject,
+  actionName: 'insert',
+  storeName: string,
+  makeDataSnapshot?: any,
+  restoreDataSnapshot?: any
+): PluginInsertAction {
+  return async function (
+    payload: PlainObject,
+    modulePath: string,
+    pluginModuleConfig: StorePluginModuleConfig
+  ): Promise<string> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storeName)
     // this is custom logic to be implemented by the plugin author
@@ -37,17 +64,12 @@ export function writeActionFactory (
 
     const isCollection = isCollectionModule(modulePath)
 
-    if (actionName === 'insert' && isCollection) {
-      const id = `${Math.random()}${Math.random()}${Math.random()}`
+    if (isCollection) {
+      const id = generateRandomId()
       return id
     }
-    // any write action other than `insert` cannot be executed on collections
-    if (isCollection) throw new Error('An non-existent action was triggered on a collection')
-
     const docId = modulePath.split('/').slice(-1)[0]
-    if (actionName === 'insert') {
-      return docId
-    }
+    return docId
   }
 }
 
@@ -104,11 +126,11 @@ export function getActionFactory (
   return async (
     payload: void | PlainObject = {},
     modulePath: string,
-    pluginModuleConfig: StorePluginModuleConfig,
-    mustExecuteOnGet: MustExecuteOnGet
-  ): Promise<void | PlainObject | PlainObject[]> => {
+    pluginModuleConfig: StorePluginModuleConfig
+  ): Promise<DoOnGet | GetResponse> => {
     // this is custom logic to be implemented by the plugin author
     makeDataSnapshot()
+    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const isCollection = isCollectionModule(modulePath)
     const isDocument = !isCollection
 
@@ -123,11 +145,10 @@ export function getActionFactory (
           : [{ name: 'Luca', age: 10, dream: 'job' }]
         // we must trigger `mustExecuteOnGet.added` for each document that was retrieved and return whatever that returns
         const results = dataRetrieved.map(_data => {
-          const _metaData = {}
-          return mustExecuteOnGet.added(_data, _metaData)
+          const _metaData = { data: _data, exists: true, id: _data.id || docId }
+          return _metaData
         })
-        const resultToReturn = isCollection ? results : results[0]
-        resolve(resultToReturn)
+        resolve({ docs: results })
       }, 1)
     })
   }
@@ -145,8 +166,9 @@ export function streamActionFactory (
     modulePath: string,
     pluginModuleConfig: StorePluginModuleConfig,
     mustExecuteOnRead: MustExecuteOnRead
-  ): StreamResponse | DoOnRead | Promise<StreamResponse | DoOnRead> => {
+  ): StreamResponse | DoOnStream | Promise<StreamResponse | DoOnStream> => {
     // this is custom logic to be implemented by the plugin author
+    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const isCollection = isCollectionModule(modulePath)
     const isDocument = !isCollection
     // we'll mock opening a stream
@@ -169,7 +191,7 @@ export function streamActionFactory (
         // mock when the stream is already stopped
         if (stopStreaming.stopped) return
         // else go ahead and actually trigger the mustExecuteOnRead function
-        const metaData = {}
+        const metaData = { data, id: data.id || docId, exists: true }
         mustExecuteOnRead.added(data, metaData)
       }, waitTime)
     })

@@ -1,4 +1,4 @@
-import test from 'ava'
+import test, { ExecutionContext } from 'ava'
 import {
   createVueSyncInstance,
   PokedexModuleData,
@@ -6,8 +6,11 @@ import {
 } from './helpers/createVueSyncInstance'
 import { bulbasaur, charmander, squirtle, flareon } from './helpers/pokemon'
 import { waitMs } from './helpers/wait'
+import { VueSync } from '../src'
+import { CollectionInstance } from '../src/Collection'
+import { DocInstance } from '../src/Doc'
 
-test('write: insert (document)', async t => {
+test('write: insert (document)', async (t: ExecutionContext) => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
   const insertPayload = squirtle
   t.deepEqual(pokedexModule.data.get('007'), undefined)
@@ -21,9 +24,13 @@ test('write: insert (document)', async t => {
 test('write: insert (collection) → random ID', async t => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
   const insertPayload = squirtle
-  const moduleFromResult = await pokedexModule.insert(insertPayload).catch(e => t.fail(e.message)) // prettier-ignore
-  // todo: why is moduleFromResult able to return void?
-  if (!moduleFromResult) return t.fail()
+
+  let moduleFromResult: DocInstance
+  try {
+    moduleFromResult = await pokedexModule.insert(insertPayload)
+  } catch (error) {
+    t.fail(error)
+  }
   const newId = moduleFromResult.id
   const moduleFromLookup = vueSync.doc(`pokedex/${newId}`)
   const pokedexModuleLookup = vueSync.collection('pokedex')
@@ -37,21 +44,49 @@ test('write: insert (collection) → random ID', async t => {
 })
 
 test('deleteProp: (document)', async t => {
-  const { trainerModule } = createVueSyncInstance()
+  const { trainerModule, vueSync } = createVueSyncInstance()
   const deletePayload = 'age'
+  const vueSyncDoc = vueSync.doc('data/trainer') // prettier-ignore
+  const vueSyncCollectionDoc = vueSync.collection('data').doc('trainer') // prettier-ignore
+  const vueSyncCollectionData = vueSync.collection('data').data // prettier-ignore
   t.deepEqual(trainerModule.data.age, 10)
-  const result = await trainerModule.deleteProp(deletePayload).catch(e => t.fail(e.message)) // prettier-ignore
-  t.deepEqual(result, undefined)
+
+  try {
+    const result = await trainerModule.deleteProp(deletePayload)
+    t.deepEqual(result.data, trainerModule.data)
+  } catch (error) {
+    t.fail(error)
+  }
+
   t.deepEqual(trainerModule.data.age, undefined)
+  t.deepEqual(vueSyncDoc.data.age, undefined)
+  t.deepEqual(vueSyncCollectionDoc.data.age, undefined)
+  t.deepEqual(vueSyncCollectionData.get('trainer').age, undefined)
 })
 
-test('only:delete: (document)', async t => {
+test('delete: (document)', async t => {
   const { trainerModule, vueSync } = createVueSyncInstance()
-  t.deepEqual(trainerModule.data.age, 10)
-  const result = await trainerModule.delete().catch(e => t.fail(e.message)) // prettier-ignore
-  t.deepEqual(result, undefined)
+  t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
+
+  const vueSyncCollectionDoc = vueSync.collection('data').doc('trainer')
+  const vueSyncDoc = vueSync.doc('data/trainer')
+  const vueSyncCollection = vueSync.collection('data')
+
+  try {
+    const result = await trainerModule.delete()
+    t.deepEqual(result.data, undefined)
+    t.deepEqual(result.id, trainerModule.id)
+  } catch (error) {
+    t.fail(error)
+  }
+
+  t.deepEqual(vueSyncCollection.data.get('trainer'), undefined)
+  t.deepEqual(vueSyncCollectionDoc.data, undefined)
+  t.deepEqual(vueSyncDoc.data, undefined)
   t.deepEqual(trainerModule.data, undefined)
-  t.deepEqual(vueSync.doc('data/trainer'), undefined)
+  t.deepEqual(vueSync.collection('data').doc('trainer').data, undefined)
+  t.deepEqual(vueSync.doc('data/trainer').data, undefined)
+  t.deepEqual(vueSync.collection('data').data.get('trainer'), undefined)
 })
 
 test('write: merge (document)', async t => {
@@ -61,7 +96,7 @@ test('write: merge (document)', async t => {
   t.deepEqual(doc.data, bulbasaur)
   await doc.merge(mergePayload).catch(e => t.fail(e.message)) // prettier-ignore
   const mergedResult = { name: 'Bulbasaur', id: '001', type: { grass: 'Grass', alt: 'Leaf' } }
-  t.deepEqual(pokedexModule.data['001'], mergedResult)
+  t.deepEqual(pokedexModule.data.get('001'), mergedResult)
   t.deepEqual(doc.data, mergedResult)
 })
 
@@ -115,15 +150,12 @@ test('read: get (collection)', async t => {
               // here we check if the data returned at this point is actually what that store plugin should return
               t.deepEqual(pokedexModule.data.get('001'), bulbasaur)
             }
-            if (storeName === 'remote') {
-              // here we check if the data returned at this point is actually what that store plugin should return
-              t.deepEqual(result, [bulbasaur, flareon])
-            }
           },
         },
       }
     )
-    t.deepEqual(result, [bulbasaur, flareon])
+    t.deepEqual(result.data.get('001'), bulbasaur)
+    t.deepEqual(result.data.get('136'), flareon)
   } catch (error) {
     t.fail(error)
   }
@@ -145,14 +177,13 @@ test('read: get (document)', async t => {
           success: ({ result, storeName }) => {
             if (storeName === 'local') {
               // here we check if the data returned at this point is actually what that store plugin should return
-              t.deepEqual(result, undefined)
               t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
             }
           },
         },
       }
     )
-    t.deepEqual(result, { name: 'Luca', age: 10, dream: 'job' })
+    t.deepEqual(result.data, { name: 'Luca', age: 10, dream: 'job' })
   } catch (error) {
     t.fail(error)
   }

@@ -1,12 +1,12 @@
 import { ActionName, VueSyncError } from './actions'
 import { PlainObject } from './base'
-import { GetResponse } from './plugins'
-import { OnAddedFn } from './modifyReadResponse'
+import { GetResponse, StreamResponse, DoOnStream, DoOnGet } from './plugins'
+import { O } from 'ts-toolbelt'
 
 // events
 export type EventName = 'before' | 'success' | 'error' | 'revert'
 
-export type EventFnBefore = (args: {
+type EventSharedPayload = {
   /**
    * write actions: PlainObject | PlainObject[]
    * delete actions: PlainObject | PlainObject[] | string | string[]
@@ -20,53 +20,25 @@ export type EventFnBefore = (args: {
    * others: () => void
    */
   abort: () => void | void
-}) => void | Promise<void>
+}
 
-export type EventFnSuccess = (args: {
-  /**
-   * write actions: PlainObject | PlainObject[]
-   * delete actions: PlainObject | PlainObject[] | string | string[]
-   * read actions: PlainObject | void
-   */
-  payload: PlainObject | PlainObject[] | void | string | string[]
-  actionName: ActionName
-  storeName: string
-  result: void | string | GetResponse | OnAddedFn
-  /**
-   * stream actions: void // streams cannot be aborted in an event
-   * others: () => void
-   */
-  abort: () => void | void
-}) => void | Promise<void>
+type EventPayloadPropResult = {
+  result: void | string | GetResponse | DoOnGet | StreamResponse | DoOnStream
+}
 
-export type EventFnError = (args: {
-  /**
-   * write actions: PlainObject | PlainObject[]
-   * delete actions: PlainObject | PlainObject[] | string | string[]
-   * read actions: PlainObject | void
-   */
-  payload: PlainObject | PlainObject[] | void | string | string[]
-  actionName: ActionName
-  storeName: string
-  error: VueSyncError
-  /**
-   * stream actions: void // streams cannot be aborted in an event
-   * others: () => void
-   */
-  abort: () => void | void
-}) => void | Promise<void>
+export type EventFnBefore = (args: O.Merge<EventSharedPayload, {}>) => void | Promise<void>
 
-export type EventFnRevert = (args: {
-  /**
-   * write actions: PlainObject | PlainObject[]
-   * delete actions: PlainObject | PlainObject[] | string | string[]
-   * read actions: PlainObject | void
-   */
-  payload: PlainObject | PlainObject[] | void | string | string[]
-  actionName: ActionName
-  storeName: string
-  result: void | string | GetResponse | OnAddedFn
-}) => void | Promise<void>
+export type EventFnSuccess = (
+  args: O.Merge<EventSharedPayload, EventPayloadPropResult>
+) => void | Promise<void>
+
+export type EventFnError = (
+  args: O.Merge<EventSharedPayload, { error: VueSyncError }>
+) => void | Promise<void>
+
+export type EventFnRevert = (
+  args: O.Merge<O.Omit<EventSharedPayload, 'abort'>, EventPayloadPropResult>
+) => void | Promise<void>
 
 export type EventFn = EventFnBefore | EventFnSuccess | EventFnError | EventFnRevert
 

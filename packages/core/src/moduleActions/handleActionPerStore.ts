@@ -24,7 +24,7 @@ import { OnAddedFn, getModifyReadResponseFnsMap } from '../types/modifyReadRespo
 import { executeOnFns } from '../helpers/executeOnFns'
 import { throwIfNoFnsToExecute } from '../helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from '../types/base'
-import { isFullString, isPlainObject, isFunction } from 'is-what'
+import { isFullString } from 'is-what'
 import { CollectionInstance } from '../Collection'
 import { DocInstance } from '../Doc'
 import { getCollectionPathDocIdEntry } from '../helpers/pathHelpers'
@@ -36,8 +36,8 @@ export function handleActionPerStore<TActionName extends Exclude<ActionName, 'st
   globalConfig: O.Compulsory<GlobalConfig>,
   actionName: TActionName,
   actionType: ActionType,
-  doc: DocFn, // actions executed on a "doc" will always return `doc()`
-  collection?: CollectionFn // actions executed on a "collection" will return `collection()` or `doc()`
+  docFn: DocFn, // actions executed on a "doc" will always return `doc()`
+  collectionFn?: CollectionFn // actions executed on a "collection" will return `collection()` or `doc()`
 ): ActionTernary<TActionName>
 
 export function handleActionPerStore (
@@ -46,8 +46,8 @@ export function handleActionPerStore (
   globalConfig: O.Compulsory<GlobalConfig>,
   actionName: Exclude<ActionName, 'stream'>,
   actionType: ActionType,
-  doc: DocFn, // actions executed on a "doc" will always return `doc()`
-  collection?: CollectionFn // actions executed on a "collection" will return `collection()` or `doc()`
+  docFn: DocFn, // actions executed on a "doc" will always return `doc()`
+  collectionFn?: CollectionFn // actions executed on a "collection" will return `collection()` or `doc()`
 ):
   | VueSyncGetAction
   | VueSyncWriteAction
@@ -110,8 +110,7 @@ export function handleActionPerStore (
       if (stopExecution === 'revert' || stopExecution === true) break
       // find the action on the plugin
       const pluginAction = globalConfig.stores[storeName].actions[actionName]
-      const moduleConfigPerStore = moduleConfig?.configPerStore || {}
-      const pluginModuleConfig: PluginModuleConfig = moduleConfigPerStore[storeName] || {}
+      const pluginModuleConfig: PluginModuleConfig = moduleConfig?.configPerStore?.[storeName] || {}
       // the plugin action
       resultFromPlugin = !pluginAction
         ? resultFromPlugin
@@ -125,6 +124,7 @@ export function handleActionPerStore (
             actionName,
             stopExecutionAfterAction,
             storeName,
+            docFn,
           })
       // handle reverting. stopExecution might have been modified by `handleAction`
       if ((stopExecution as any) === 'revert') {
@@ -144,7 +144,8 @@ export function handleActionPerStore (
       if (actionName === 'insert' && isFullString(resultFromPlugin)) {
         // update the modulePath if a doc with random ID was inserted in a collection
         // if this is the case the result will be a string - the randomly genererated ID
-        if (isCollectionModule) {
+        const alreadyAddedDocId = getCollectionPathDocIdEntry(modulePath)[1]
+        if (isCollectionModule && !alreadyAddedDocId) {
           modulePath = `${modulePath}/${resultFromPlugin}`
         }
       }
@@ -161,14 +162,17 @@ export function handleActionPerStore (
         }
       }
     }
-    if (isDocModule) return doc(modulePath, moduleConfig)
-    // it's originally triggered on a "collection":
+    // anything that's executed from a "doc" module:
+    if (isDocModule) return docFn(modulePath, moduleConfig)
+
+    // anything that's executed from a "collection" module:
     if (actionName === 'insert') {
-      // insert always returns a DocInstance, and the ID is now available on the modulePath which was modified
-      return doc(modulePath, moduleConfig)
+      // 'insert' always returns a DocInstance, and the ID is now available on the modulePath which was modified
+      // we do not pass the `moduleConfig`, because it's the moduleConfig of the "collection" in this case
+      return docFn(modulePath)
     }
     // all other actions triggered on collections ('get' is the only possibility left)
     // should return the collection:
-    return collection(modulePath, moduleConfig)
+    return collectionFn(modulePath, moduleConfig)
   }
 }

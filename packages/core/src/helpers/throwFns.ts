@@ -42,21 +42,20 @@ export function throwIfNoDataStoreName (dataStoreName: string): void {
   logErrorAndThrow(errorMessage)
 }
 
-export function throwIfInvalidId (id: string, moduleType: 'collection' | 'doc'): void {
+export function throwIfInvalidId (modulePath: string, moduleType: 'collection' | 'doc'): void {
   let errorMessage = ''
   if (moduleType === 'collection') {
-    if (!id)
+    if (!modulePath)
       errorMessage =
         'You must provide a collection id (or a "path" like so: collection/doc/collection).'
-    if (isDocModule(id))
-      errorMessage =
-        'Your collection id (or "path") must be of odd segments. The expected pattern is: collection/doc/collection ...'
+    if (isDocModule(modulePath))
+      errorMessage = `Your collection id (or "path") must be of odd segments. The expected pattern is: collection/doc/collection ... Yours was ${modulePath}`
   }
   if (moduleType === 'doc') {
-    if (!id) errorMessage = 'You must provide a document id (or a "path" like so: collection/doc).'
-    if (isCollectionModule(id))
-      errorMessage =
-        'Your collection id (or "path") must be of even segments. The expected pattern is: collection/doc/collection/doc ...'
+    if (!modulePath)
+      errorMessage = 'You must provide a document id (or a "path" like so: collection/doc).'
+    if (isCollectionModule(modulePath))
+      errorMessage = `Your collection id (or "path") must be of even segments. The expected pattern is: collection/doc/collection/doc ... Yours was ${modulePath}`
   }
   if (errorMessage) logErrorAndThrow(errorMessage)
 }

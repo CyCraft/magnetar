@@ -21,7 +21,7 @@ test('write + onError: abort (default) -- emits fail events & aborts execution b
   } catch (e) {
     t.deepEqual(e, { message: 'failed', payload: insertPayload })
   }
-  t.is(pokedexModule.data['testid'], undefined)
+  t.is(pokedexModule.data.get('testid'), undefined)
 })
 
 test('write + onError: abort (default) -- fail in second store plugin does not prevent execution first store plugin', async t => {
@@ -41,7 +41,7 @@ test('write + onError: abort (default) -- fail in second store plugin does not p
   } catch (e) {
     t.deepEqual(e, { message: 'failed', payload: insertPayload })
   }
-  t.deepEqual(pokedexModule.data['testid'], insertPayload)
+  t.deepEqual(pokedexModule.data.get('testid'), insertPayload)
 })
 
 test('write + onError: continue', async t => {
@@ -67,7 +67,7 @@ test('write + onError: continue', async t => {
   } catch (e) {
     t.fail()
   }
-  t.is(pokedexModule.data['testid'], undefined)
+  t.is(pokedexModule.data.get('testid'), undefined)
 })
 
 test('write + onError: revert', async t => {
@@ -83,7 +83,7 @@ test('write + onError: revert', async t => {
           }
         },
         before: ({ storeName }) => {
-          if (storeName === 'remote') t.deepEqual(pokedexModule.data['testid'], insertPayload)
+          if (storeName === 'remote') t.deepEqual(pokedexModule.data.get('testid'), insertPayload)
         },
         error: ({ payload, storeName }) => {
           if (storeName === 'local') t.fail()
@@ -94,9 +94,10 @@ test('write + onError: revert', async t => {
       },
     })
   } catch (e) {
-    t.fail()
+    console.error(e)
+    t.fail(e)
   }
-  t.is(pokedexModule.data['testid'], undefined)
+  t.is(pokedexModule.data.get('testid'), undefined)
 })
 
 test('write + onError: revert - will not go to next store', async t => {
@@ -124,7 +125,7 @@ test('write + onError: revert - will not go to next store', async t => {
   } catch (e) {
     t.fail()
   }
-  t.is(pokedexModule.data['testid'], undefined)
+  t.is(pokedexModule.data.get('testid'), undefined)
 })
 
 test('get + onError: abort (default) -- emits fail events & aborts execution by default', async t => {
@@ -191,18 +192,22 @@ test('get + onError: continue', async t => {
           if (storeName === 'remote') {
             t.deepEqual(payload, getPayload)
             // even though the local store failed, we got the result of the remote store
-            t.deepEqual(result, [bulbasaur, flareon])
+            t.deepEqual(
+              (result as any).docs.map(d => d.id),
+              ['001', '136']
+            )
           }
         },
       },
     })
-    // even though the local store failed, we got the result of the remote store
-    t.deepEqual(result, [bulbasaur, flareon])
+    t.deepEqual(result.data.get('001'), bulbasaur)
+    t.deepEqual(result.data.get('136'), undefined)
   } catch (e) {
     t.fail()
   }
   // the local store didn't succeed in applying its 'inserted' event, so its local data will be empty:
   t.deepEqual(pokedexModule.data.get('001'), bulbasaur)
+  t.deepEqual(pokedexModule.data.get('136'), undefined)
 })
 
 test('get + onError: revert', async t => {
@@ -229,7 +234,7 @@ test('get + onError: revert', async t => {
         },
       },
     })
-    t.deepEqual(result, undefined)
+    t.deepEqual(result.data.get('001'), bulbasaur)
   } catch (e) {
     t.fail()
   }
@@ -259,7 +264,7 @@ test('get + onError: revert - will not go to next store', async t => {
         },
       },
     })
-    t.deepEqual(result, undefined)
+    t.deepEqual(result.data.get('001'), bulbasaur)
   } catch (e) {
     t.fail()
   }

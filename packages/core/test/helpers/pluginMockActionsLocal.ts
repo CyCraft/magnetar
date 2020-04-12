@@ -1,4 +1,3 @@
-import pathToProp from 'path-to-prop'
 import { isCollectionModule } from '../../src'
 import { PlainObject } from '../../src/types/base'
 import { ActionName, actionNameTypeMap } from '../../src/types/actions'
@@ -8,21 +7,24 @@ import {
   PluginDeleteAction,
   PluginStreamAction,
   StreamResponse,
-  DoOnRead,
+  DoOnStream,
   MustExecuteOnRead,
   PluginGetAction,
-  MustExecuteOnGet,
   PluginRevertAction,
   PluginDeletePropAction,
+  PluginInsertAction,
+  GetResponse,
+  DoOnGet,
 } from '../../src/types/plugins'
 import { merge } from 'merge-anything'
 import { isArray, isString } from 'is-what'
 import { throwIfEmulatedError } from './throwFns'
 import { getCollectionPathDocIdEntry } from '../../src/helpers/pathHelpers'
+import { generateRandomId } from './generateRandomId'
 
 export function writeActionFactory (
   moduleData: PlainObject,
-  actionName: ActionName | 'revert',
+  actionName: 'merge' | 'assign' | 'replace',
   storeName: string,
   makeDataSnapshot?: any,
   restoreDataSnapshot?: any
@@ -31,35 +33,59 @@ export function writeActionFactory (
     payload: PlainObject,
     modulePath: string,
     pluginModuleConfig: StorePluginModuleConfig
-  ): string | void {
+  ): void {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storeName)
     // this is custom logic to be implemented by the plugin author
-    const isCollection = isCollectionModule(modulePath)
 
-    if (actionName === 'insert' && isCollection) {
-      const id = `${Math.random()}${Math.random()}${Math.random()}`
-      const collectionPath = modulePath
-      const collectionMap = moduleData[collectionPath]
-      collectionMap.set(id, payload)
-      return id
-    }
-    // any write action other than `insert` cannot be executed on collections
+    const isCollection = isCollectionModule(modulePath)
+    // write actions cannot be executed on collections
     if (isCollection) throw new Error('An non-existent action was triggered on a collection')
 
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const collectionMap = moduleData[collectionPath]
-    const docData = collectionMap.get(docId)
-    if (actionName === 'insert') {
-      Object.entries(payload).forEach(([key, value]) => {
-        docData[key] = value
-      })
-    }
+    if (!collectionMap.get(docId)) collectionMap.set(docId, {})
+    const docDataToMutate = collectionMap.get(docId)
     if (actionName === 'merge') {
       Object.entries(payload).forEach(([key, value]) => {
-        docData[key] = merge(docData[key], value)
+        docDataToMutate[key] = merge(docDataToMutate[key], value)
       })
     }
+  }
+}
+
+export function insertActionFactory (
+  moduleData: PlainObject,
+  actionName: 'insert',
+  storeName: string,
+  makeDataSnapshot?: any,
+  restoreDataSnapshot?: any
+): PluginInsertAction {
+  return function (
+    payload: PlainObject,
+    modulePath: string,
+    pluginModuleConfig: StorePluginModuleConfig
+  ): string {
+    // this mocks an error during execution
+    throwIfEmulatedError(payload, storeName)
+    // this is custom logic to be implemented by the plugin author
+
+    const isCollection = isCollectionModule(modulePath)
+    if (isCollection) {
+      const id = payload.id || generateRandomId()
+      const collectionPath = modulePath
+      moduleData[collectionPath].set(id, payload)
+      return id
+    }
+    // else it's a doc
+    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
+    const collectionMap = moduleData[collectionPath]
+    if (!collectionMap.get(docId)) collectionMap.set(docId, {})
+    const docDataToMutate = collectionMap.get(docId)
+    Object.entries(payload).forEach(([key, value]) => {
+      docDataToMutate[key] = value
+    })
+    return docId
   }
 }
 
@@ -115,10 +141,7 @@ export function deleteActionFactory (
     if (isCollection) throw new Error('An non-existent action was triggered on a collection')
 
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
-    const collectionMap = moduleData[collectionPath]
-    console.log(`1 collectionMap → `, collectionMap)
-    collectionMap.delete(docId)
-    console.log(`2 collectionMap → `, collectionMap)
+    moduleData[collectionPath].delete(docId)
   }
 }
 
@@ -132,20 +155,24 @@ export function getActionFactory (
   return async (
     payload: void | PlainObject = {},
     modulePath: string,
-    pluginModuleConfig: StorePluginModuleConfig,
-    mustExecuteOnGet: MustExecuteOnGet
-  ): Promise<void | PlainObject | PlainObject[]> => {
+    pluginModuleConfig: StorePluginModuleConfig
+  ): Promise<GetResponse | DoOnGet> => {
     // this is custom logic to be implemented by the plugin author
     makeDataSnapshot()
     // this mocks an error during execution
     throwIfEmulatedError(payload, storeName)
     // let's pass a new event that will make sure this plugin's data is kept up to date with the server data
     // this mocks how the result from the next store (the remote store) should be merged into the local stores
-    mustExecuteOnGet.registerDoOnAdded((payload, meta): void => {
-      writeActionFactory(moduleData, 'insert', storeName)(payload, modulePath, pluginModuleConfig)
-    })
+    const doOnGetAction: DoOnGet = (payload, meta): void => {
+      insertActionFactory(moduleData, 'insert', storeName)(payload, modulePath, pluginModuleConfig)
+      // return writeActionFactoryThatReturnsPayload(moduleData, 'insert', storeName)(
+      //   payload,
+      //   modulePath,
+      //   pluginModuleConfig
+      // )
+    }
     // in case of a local store that doesn't fetch from anywhere, not even from cach, we could return early here
-    return
+    return doOnGetAction
   }
 }
 
@@ -161,18 +188,18 @@ export function streamActionFactory (
     modulePath: string,
     pluginModuleConfig: StorePluginModuleConfig,
     mustExecuteOnRead: MustExecuteOnRead
-  ): StreamResponse | DoOnRead | Promise<StreamResponse | DoOnRead> => {
+  ): StreamResponse | DoOnStream | Promise<StreamResponse | DoOnStream> => {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storeName)
     // this is custom logic to be implemented by the plugin author
     // this mocks how the result from the next store (the remote store) should update this local store per action type
     // hover over the prop names below to see more info on when they are triggered:
-    const doOnRead: DoOnRead = {
+    const doOnStream: DoOnStream = {
       added: (payload, meta) => {
-        writeActionFactory(moduleData, 'insert', storeName)(payload, modulePath, pluginModuleConfig)
+        insertActionFactory(moduleData, 'insert', storeName)(payload, modulePath, pluginModuleConfig) // prettier-ignore
       },
       modified: (payload, meta) => {
-        writeActionFactory(moduleData, 'insert', storeName)(payload, modulePath, pluginModuleConfig)
+        insertActionFactory(moduleData, 'insert', storeName)(payload, modulePath, pluginModuleConfig) // prettier-ignore
       },
       removed: (payload, meta) => {
         const isCollection = isCollectionModule(modulePath)
@@ -188,7 +215,7 @@ export function streamActionFactory (
         )
       },
     }
-    return doOnRead
+    return doOnStream
   }
 }
 
@@ -212,17 +239,24 @@ export function revertActionFactory (
     // haven't implemented reverting deletions yet
     if (isString(payload) || (isArray(payload) && isString(payload[0]))) return
     const actionType = actionNameTypeMap[actionName]
-    // this mocks data reverted during a write
-    if (actionType === 'write') {
-      const db = pathToProp(moduleData, modulePath)
-      const docs = isArray(payload) ? payload : [payload]
-      docs.forEach(doc => {
-        db[doc.id] = undefined
-      })
-    }
     // this mocks data reverted during a read
     if (actionType === 'read') {
       restoreDataSnapshot()
+      return
     }
+    // this mocks data reverted during a write
+    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
+    const collectionMap = moduleData[collectionPath]
+    if (!docId) {
+      // collection
+      throw new Error(
+        `revert not yet implemented for insert on collection - payload: ${JSON.stringify(payload)}`
+      )
+    }
+    if (actionName === 'insert') {
+      collectionMap.delete(docId)
+      return
+    }
+    throw new Error('revert not yet implemented for this action')
   }
 }

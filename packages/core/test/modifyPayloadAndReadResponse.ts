@@ -31,10 +31,8 @@ test('get: can mutate payload & read response', async t => {
       }
     )
     // the remote result SHOULD HAVE the applied defaults
-    t.deepEqual(result, [
-      { ...bulbasaur, seen: true },
-      { ...flareon, seen: true },
-    ])
+    t.deepEqual(result.data.get('001'), { ...bulbasaur, seen: true })
+    t.deepEqual(result.data.get('136'), { ...flareon, seen: true })
   } catch (error) {
     t.fail(error)
   }
@@ -71,8 +69,8 @@ test('stream: can mutate payload & read response', async t => {
   )
   await waitMs(600)
   // the local store SHOULD HAVE the applied defaults
-  t.deepEqual(pokedexModule.data['001'], { ...bulbasaur, seen: true })
-  t.deepEqual(pokedexModule.data['136'], { ...flareon, seen: true })
+  t.deepEqual(pokedexModule.data.get('001'), { ...bulbasaur, seen: true })
+  t.deepEqual(pokedexModule.data.get('136'), { ...flareon, seen: true })
 })
 
 test('insert: can mutate payload', async t => {

@@ -14,7 +14,8 @@ export function executeOnFns<Payload extends any> (
   otherArgs: any[]
 ): Payload | void {
   for (const fn of fns) {
-    payload = fn(payload, ...otherArgs)
+    const result = fn(payload, ...otherArgs)
+    if (result) payload = result
   }
   return payload
 }
