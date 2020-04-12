@@ -1,5 +1,5 @@
 import { merge } from 'merge-anything';
-import { isAnyObject, isFunction, isPlainObject, isArray, isFullString, isMap } from 'is-what';
+import { isAnyObject, isPlainObject, isFunction, isArray, isFullString, isMap } from 'is-what';
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -108,6 +108,7 @@ var actionNameTypeMap = {
     deleteProp: 'write',
     "delete": 'delete',
 };
+
 function isVueSyncError(payload) {
     return isAnyObject(payload) && 'payload' in payload && 'message' in payload;
 }
@@ -1035,4 +1036,4 @@ function VueSync(vueSyncConfig) {
     return instance;
 }
 
-export { VueSync, isCollectionModule, isDocModule };
+export { VueSync, getCollectionPathDocIdEntry, isCollectionModule, isDoOnGet, isDoOnStream, isDocModule, isGetResponse, isVueSyncError };

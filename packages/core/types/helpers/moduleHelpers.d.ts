@@ -1,4 +1,4 @@
-import { GlobalConfig, ModuleConfig } from '../types/base';
+import { GlobalConfig, ModuleConfig } from '../types/config';
 /**
  * Executes 'setupModule' function per store, when the collection or doc is instantiated.
  *

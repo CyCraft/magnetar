@@ -17,8 +17,8 @@ import {
   streamActionFactory as streamActionFactoryRemote,
   revertActionFactory as revertActionFactoryRemote,
 } from './pluginMockActionsRemote'
-import { ActionName } from '../../src/types/actions'
 import {
+  ActionName,
   PluginInstance,
   PluginRevertAction,
   PluginGetAction,
@@ -28,9 +28,9 @@ import {
   VueSyncPlugin,
   PluginDeletePropAction,
   PluginInsertAction,
-} from '../../src/types/plugins'
-import { PlainObject } from '../../src/types/base'
-import { getCollectionPathDocIdEntry } from '../../src/helpers/pathHelpers'
+  getCollectionPathDocIdEntry,
+  PlainObject,
+} from '../../src/index'
 
 // there are two interfaces to be defined & exported by each plugin
 // - StorePluginConfig

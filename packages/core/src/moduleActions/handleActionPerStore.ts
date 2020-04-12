@@ -1,17 +1,17 @@
 import { O } from 'ts-toolbelt'
+import { isFullString } from 'is-what'
 import { handleAction } from './handleAction'
 import { getEventNameFnsMap } from '../types/events'
 import {
-  ActionType,
   ActionConfig,
-  ActionName,
-  ActionTernary,
   VueSyncGetAction,
   VueSyncWriteAction,
   VueSyncDeleteAction,
   VueSyncDeletePropAction,
   VueSyncInsertAction,
+  ActionName,
 } from '../types/actions'
+import { ActionType, ActionTernary } from '../types/actionsInternal'
 import {
   PluginModuleConfig,
   GetResponse,
@@ -23,12 +23,11 @@ import { getModifyPayloadFnsMap } from '../types/modifyPayload'
 import { OnAddedFn, getModifyReadResponseFnsMap } from '../types/modifyReadResponse'
 import { executeOnFns } from '../helpers/executeOnFns'
 import { throwIfNoFnsToExecute } from '../helpers/throwFns'
-import { ModuleConfig, GlobalConfig } from '../types/base'
-import { isFullString } from 'is-what'
+import { ModuleConfig, GlobalConfig } from '../types/config'
 import { CollectionInstance } from '../Collection'
 import { DocInstance } from '../Doc'
 import { getCollectionPathDocIdEntry } from '../helpers/pathHelpers'
-import { CollectionFn, DocFn } from '..'
+import { CollectionFn, DocFn } from '../VueSync'
 
 export function handleActionPerStore<TActionName extends Exclude<ActionName, 'stream'>> (
   modulePath: string,

@@ -112,6 +112,7 @@ var actionNameTypeMap = {
     deleteProp: 'write',
     "delete": 'delete',
 };
+
 function isVueSyncError(payload) {
     return isWhat.isAnyObject(payload) && 'payload' in payload && 'message' in payload;
 }
@@ -1040,5 +1041,10 @@ function VueSync(vueSyncConfig) {
 }
 
 exports.VueSync = VueSync;
+exports.getCollectionPathDocIdEntry = getCollectionPathDocIdEntry;
 exports.isCollectionModule = isCollectionModule;
+exports.isDoOnGet = isDoOnGet;
+exports.isDoOnStream = isDoOnStream;
 exports.isDocModule = isDocModule;
+exports.isGetResponse = isGetResponse;
+exports.isVueSyncError = isVueSyncError;

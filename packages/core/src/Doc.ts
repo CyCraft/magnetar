@@ -1,6 +1,5 @@
 import { O } from 'ts-toolbelt'
 import {
-  actionNameTypeMap,
   VueSyncWriteAction,
   VueSyncGetAction,
   VueSyncStreamAction,
@@ -8,11 +7,12 @@ import {
   VueSyncDeletePropAction,
   VueSyncInsertAction,
 } from './types/actions'
+import { actionNameTypeMap } from './types/actionsInternal'
 import { handleActionPerStore } from './moduleActions/handleActionPerStore'
 import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
 import { throwIfInvalidId } from './helpers/throwFns'
-import { ModuleConfig, GlobalConfig } from './types/base'
-import { CollectionFn, DocFn } from '.'
+import { ModuleConfig, GlobalConfig } from './types/config'
+import { CollectionFn, DocFn } from './VueSync'
 import { CollectionInstance } from './Collection'
 import { executeSetupModulePerStore, getDataFromDataStore } from './helpers/moduleHelpers'
 

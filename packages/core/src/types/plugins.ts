@@ -1,8 +1,8 @@
-import { ActionName } from './actions'
-import { PlainObject, DocMetadata } from './base'
-import { isPlainObject, isFunction, isArray } from 'is-what'
-import { OnAddedFn, OnModifiedFn, OnRemovedFn } from './modifyReadResponse'
 import { O } from 'ts-toolbelt'
+import { isPlainObject, isFunction, isArray } from 'is-what'
+import { ActionName } from './actions'
+import { PlainObject, DocMetadata } from './atoms'
+import { OnAddedFn, OnModifiedFn, OnRemovedFn } from './modifyReadResponse'
 
 // stores / plugins
 

@@ -1,5 +1,6 @@
+import { O } from 'ts-toolbelt'
 import { isVueSyncError } from '../types/actions'
-import { PlainObject } from '../types/base'
+import { PlainObject } from '../types/atoms'
 import { EventNameFnsMap } from '../types/events'
 import {
   PluginModuleConfig,
@@ -7,7 +8,6 @@ import {
   DoOnStream,
   StreamResponse,
 } from '../types/plugins'
-import { O } from 'ts-toolbelt'
 
 /**
  * handleStream is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success

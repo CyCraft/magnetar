@@ -3,16 +3,7 @@ import { ModifyPayloadFnMap } from './modifyPayload';
 import { ModifyReadResponseFnMap } from './modifyReadResponse';
 import { EventNameFnMap } from './events';
 import { PluginInstance } from './plugins';
-export declare type PlainObject = {
-    [key: string]: any;
-};
-export declare type StoreName = string;
-export declare type DocMetadata = {
-    data: PlainObject;
-    id: string;
-    exists: boolean;
-    metadata?: PlainObject;
-};
+import { StoreName, PlainObject } from './atoms';
 /**
  * Shared config can be set globally < or per module < or per action.
  */

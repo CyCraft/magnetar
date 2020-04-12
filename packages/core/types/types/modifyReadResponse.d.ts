@@ -1,4 +1,4 @@
-import { PlainObject, DocMetadata } from './base';
+import { PlainObject, DocMetadata } from './atoms';
 /**
  * Can be used to modify docs that come in from 'stream' or 'get' actions, before they are added to your store data. When returning `undefined` they will be discarded & won't be added to the store data.
  */

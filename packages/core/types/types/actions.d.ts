@@ -1,20 +1,16 @@
-import { PlainObject, StoreName, SharedConfig } from './base';
 import { O } from 'ts-toolbelt';
+import { SharedConfig } from './config';
+import { PlainObject, StoreName } from './atoms';
 import { DocInstance } from '../Doc';
 import { CollectionInstance } from '../Collection';
-export declare type ActionNameRead = 'get' | 'stream';
-export declare type ActionNameWrite = 'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp';
-export declare type ActionNameDelete = 'delete';
+/**
+ * these are all the actions that Vue Sync streamlines, whichever plugin is used
+ * these actions are executable from a `VueSyncModule` and handled by each plugin individually
+ */
 export declare type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp' | 'delete';
 /**
- * ActionType is only used as a shortcut to set the execution order in the global/module/action settings.
+ * this is what the dev can provide as second param when executing any action in addition to the payload
  */
-export declare type ActionType = 'read' | 'write' | 'delete';
-export declare const actionNameTypeMap: {
-    [action in ActionName]: ActionType;
-};
-export declare function isReadAction(actionName: ActionName): actionName is ActionNameRead;
-export declare function isWriteAction(actionName: ActionName): actionName is ActionNameWrite;
 export declare type ActionConfig = O.Merge<{
     executionOrder?: StoreName[];
 }, Partial<O.Omit<SharedConfig, 'dataStoreName'>>>;
@@ -24,7 +20,6 @@ export declare type VueSyncInsertAction<DocDataType = PlainObject> = (payload: o
 export declare type VueSyncWriteAction<DocDataType = PlainObject> = (payload: object, actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
 export declare type VueSyncDeletePropAction<DocDataType = PlainObject> = (payload: string | string[], actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
 export declare type VueSyncDeleteAction<DocDataType = PlainObject> = (actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
-export declare type ActionTernary<TActionName extends ActionName> = TActionName extends 'stream' ? VueSyncStreamAction : TActionName extends 'get' ? VueSyncGetAction : TActionName extends 'delete' ? VueSyncDeleteAction : TActionName extends 'deleteProp' ? VueSyncDeletePropAction : TActionName extends 'insert' ? VueSyncInsertAction : VueSyncWriteAction;
 export declare type VueSyncError = {
     payload: PlainObject | PlainObject[] | string | string[] | void;
     message: string;

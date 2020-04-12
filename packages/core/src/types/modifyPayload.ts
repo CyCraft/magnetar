@@ -1,5 +1,5 @@
-import { PlainObject } from './base'
 import { O } from 'ts-toolbelt'
+import { PlainObject } from './atoms'
 
 export type ModifyWritePayload = (payload: PlainObject) => PlainObject
 export type ModifyDeletePropPayload = (payload: string | string[]) => string | string[]

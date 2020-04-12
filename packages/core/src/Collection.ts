@@ -1,15 +1,11 @@
 import { O } from 'ts-toolbelt'
-import {
-  actionNameTypeMap,
-  VueSyncGetAction,
-  VueSyncStreamAction,
-  VueSyncInsertAction,
-} from './types/actions'
+import { VueSyncGetAction, VueSyncStreamAction, VueSyncInsertAction } from './types/actions'
+import { actionNameTypeMap } from './types/actionsInternal'
 import { handleActionPerStore } from './moduleActions/handleActionPerStore'
 import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
 import { throwIfInvalidId } from './helpers/throwFns'
-import { ModuleConfig, GlobalConfig } from './types/base'
-import { DocFn, CollectionFn } from '.'
+import { ModuleConfig, GlobalConfig } from './types/config'
+import { DocFn, CollectionFn } from './VueSync'
 import { executeSetupModulePerStore, getDataFromDataStore } from './helpers/moduleHelpers'
 
 export type CollectionInstance<DocDataType = { [prop: string]: any }> = {

@@ -1,7 +1,7 @@
 import { O } from 'ts-toolbelt';
 import { VueSyncGetAction, VueSyncStreamAction, VueSyncInsertAction } from './types/actions';
-import { ModuleConfig, GlobalConfig } from './types/base';
-import { DocFn, CollectionFn } from '.';
+import { ModuleConfig, GlobalConfig } from './types/config';
+import { DocFn, CollectionFn } from './VueSync';
 export declare type CollectionInstance<DocDataType = {
     [prop: string]: any;
 }> = {

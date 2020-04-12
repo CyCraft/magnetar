@@ -1,7 +1,7 @@
-import { ActionName, VueSyncError } from './actions'
-import { PlainObject } from './base'
-import { GetResponse, StreamResponse, DoOnStream, DoOnGet } from './plugins'
 import { O } from 'ts-toolbelt'
+import { ActionName, VueSyncError } from './actions'
+import { PlainObject } from './atoms'
+import { GetResponse, StreamResponse, DoOnStream, DoOnGet } from './plugins'
 
 // events
 export type EventName = 'before' | 'success' | 'error' | 'revert'

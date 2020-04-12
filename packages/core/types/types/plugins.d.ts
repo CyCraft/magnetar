@@ -1,7 +1,7 @@
-import { ActionName } from './actions';
-import { PlainObject, DocMetadata } from './base';
-import { OnAddedFn, OnModifiedFn, OnRemovedFn } from './modifyReadResponse';
 import { O } from 'ts-toolbelt';
+import { ActionName } from './actions';
+import { PlainObject, DocMetadata } from './atoms';
+import { OnAddedFn, OnModifiedFn, OnRemovedFn } from './modifyReadResponse';
 /**
  * A Plugin is a single function that returns a plugin instance. The pluginOptions can be anything the plugin might need to instantiate.
  */

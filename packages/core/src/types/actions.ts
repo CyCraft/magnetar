@@ -1,42 +1,19 @@
-import { PlainObject, StoreName, SharedConfig } from './base'
-import { isAnyObject } from 'is-what'
 import { O } from 'ts-toolbelt'
+import { isAnyObject } from 'is-what'
+import { SharedConfig } from './config'
+import { PlainObject, StoreName } from './atoms'
 import { DocInstance } from '../Doc'
 import { CollectionInstance } from '../Collection'
 
-// these are all the actions that Vue Sync aims to streamline, whichever plugin is used
-// these actions are executable from a `VueSyncModule` and handled by each plugin individually
-export type ActionNameRead = 'get' | 'stream'
-export type ActionNameWrite = 'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp'
-export type ActionNameDelete = 'delete'
+/**
+ * these are all the actions that Vue Sync streamlines, whichever plugin is used
+ * these actions are executable from a `VueSyncModule` and handled by each plugin individually
+ */
 export type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp' | 'delete' // prettier-ignore
 
 /**
- * ActionType is only used as a shortcut to set the execution order in the global/module/action settings.
+ * this is what the dev can provide as second param when executing any action in addition to the payload
  */
-export type ActionType = 'read' | 'write' | 'delete'
-
-export const actionNameTypeMap: { [action in ActionName]: ActionType } = {
-  get: 'read',
-  stream: 'read',
-  insert: 'write',
-  merge: 'write',
-  assign: 'write',
-  replace: 'write',
-  deleteProp: 'write',
-  delete: 'delete',
-}
-
-export function isReadAction (actionName: ActionName): actionName is ActionNameRead {
-  const actionType = actionNameTypeMap[actionName]
-  return actionType === 'read'
-}
-export function isWriteAction (actionName: ActionName): actionName is ActionNameWrite {
-  const actionType = actionNameTypeMap[actionName]
-  return actionType === 'write'
-}
-
-// this is what the dev can provide as second param when executing any action in addition to the payload
 export type ActionConfig = O.Merge<
   { executionOrder?: StoreName[] },
   Partial<O.Omit<SharedConfig, 'dataStoreName'>>
@@ -77,18 +54,6 @@ export type VueSyncDeletePropAction<DocDataType = PlainObject> = (
 export type VueSyncDeleteAction<DocDataType = PlainObject> = (
   actionConfig?: ActionConfig
 ) => Promise<DocInstance<DocDataType>>
-
-export type ActionTernary<TActionName extends ActionName> = TActionName extends 'stream'
-  ? VueSyncStreamAction
-  : TActionName extends 'get'
-  ? VueSyncGetAction
-  : TActionName extends 'delete'
-  ? VueSyncDeleteAction
-  : TActionName extends 'deleteProp'
-  ? VueSyncDeletePropAction
-  : TActionName extends 'insert'
-  ? VueSyncInsertAction
-  : VueSyncWriteAction
 
 export type VueSyncError = {
   payload: PlainObject | PlainObject[] | string | string[] | void

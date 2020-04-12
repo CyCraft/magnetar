@@ -1,6 +1,5 @@
-import { PlainObject } from '../../src/types/base'
+import { PlainObject, VueSyncError } from '../../src/index'
 import { isArray, isString } from 'is-what'
-import { VueSyncError } from '../../src/types/actions'
 
 export function throwIfEmulatedError (
   payload: PlainObject | PlainObject[] | string | string[] | void,

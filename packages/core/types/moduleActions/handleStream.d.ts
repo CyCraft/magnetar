@@ -1,7 +1,7 @@
-import { PlainObject } from '../types/base';
+import { O } from 'ts-toolbelt';
+import { PlainObject } from '../types/atoms';
 import { EventNameFnsMap } from '../types/events';
 import { PluginModuleConfig, PluginStreamAction, DoOnStream, StreamResponse } from '../types/plugins';
-import { O } from 'ts-toolbelt';
 /**
  * handleStream is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success
  */

@@ -1,6 +1,7 @@
 import { O } from 'ts-toolbelt'
 import { handleStream } from './handleStream'
-import { ActionType, ActionConfig, VueSyncStreamAction } from '../types/actions'
+import { ActionConfig, VueSyncStreamAction } from '../types/actions'
+import { ActionType } from '../types/actionsInternal'
 import {
   PluginModuleConfig,
   StreamResponse,
@@ -13,7 +14,7 @@ import { getModifyPayloadFnsMap } from '../types/modifyPayload'
 import { getModifyReadResponseFnsMap } from '../types/modifyReadResponse'
 import { executeOnFns } from '../helpers/executeOnFns'
 import { throwOnIncompleteStreamResponses, throwIfNoFnsToExecute } from '../helpers/throwFns'
-import { ModuleConfig, GlobalConfig } from '../types/base'
+import { ModuleConfig, GlobalConfig } from '../types/config'
 
 export function handleStreamPerStore (
   modulePath: string,

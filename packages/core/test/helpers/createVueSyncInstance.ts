@@ -1,8 +1,6 @@
 import { VueSyncGenericPlugin } from './pluginMock'
-import { VueSync, VueSyncInstance } from '../../src'
-import { CollectionInstance } from '../../src/Collection'
+import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '../../src/index'
 import { bulbasaur } from './pokemon'
-import { DocInstance } from '../../src/Doc'
 
 const getInitialDataCollection = () => [
   // doc entries

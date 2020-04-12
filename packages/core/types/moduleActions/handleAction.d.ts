@@ -1,5 +1,6 @@
 import { ActionName } from '../types/actions';
-import { SharedConfig, PlainObject } from '../types/base';
+import { SharedConfig } from '../types/config';
+import { PlainObject } from '../types/atoms';
 import { EventNameFnsMap } from '../types/events';
 import { PluginModuleConfig, PluginGetAction, PluginWriteAction, PluginDeleteAction, PluginDeletePropAction, PluginInsertAction, GetResponse } from '../types/plugins';
 import { OnAddedFn } from '../types/modifyReadResponse';

@@ -1,8 +1,6 @@
-import { isCollectionModule } from '../../src'
-import { PlainObject } from '../../src/types/base'
-import { ActionName } from '../../src/types/actions'
-import { StorePluginModuleConfig } from './pluginMock'
 import {
+  ActionName,
+  isCollectionModule,
   PluginWriteAction,
   PluginDeleteAction,
   PluginStreamAction,
@@ -15,11 +13,13 @@ import {
   PluginInsertAction,
   DoOnGet,
   GetResponse,
-} from '../../src/types/plugins'
+  getCollectionPathDocIdEntry,
+  PlainObject,
+} from '../../src/index'
+import { StorePluginModuleConfig } from './pluginMock'
 import { waitMs } from './wait'
 import { bulbasaur, flareon, charmander } from './pokemon'
 import { throwIfEmulatedError } from './throwFns'
-import { getCollectionPathDocIdEntry } from '../../src/helpers/pathHelpers'
 import { generateRandomId } from './generateRandomId'
 
 export function writeActionFactory (

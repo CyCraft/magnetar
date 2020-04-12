@@ -1,5 +1,5 @@
-import { PlainObject } from './base';
 import { O } from 'ts-toolbelt';
+import { PlainObject } from './atoms';
 export declare type ModifyWritePayload = (payload: PlainObject) => PlainObject;
 export declare type ModifyDeletePropPayload = (payload: string | string[]) => string | string[];
 export declare type ModifyReadPayload = (payload: PlainObject | void) => PlainObject | void;

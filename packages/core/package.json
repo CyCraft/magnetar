@@ -1,6 +1,6 @@
 {
   "name": "@vue-sync/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Vue-Sync core library.",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",

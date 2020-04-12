@@ -1,16 +1,10 @@
-import test, { ExecutionContext } from 'ava'
-import {
-  createVueSyncInstance,
-  PokedexModuleData,
-  TrainerModuleData,
-} from './helpers/createVueSyncInstance'
-import { bulbasaur, charmander, squirtle, flareon } from './helpers/pokemon'
+import test from 'ava'
+import { DocInstance } from '../src/index'
+import { createVueSyncInstance } from './helpers/createVueSyncInstance'
+import { bulbasaur, squirtle, flareon } from './helpers/pokemon'
 import { waitMs } from './helpers/wait'
-import { VueSync } from '../src'
-import { CollectionInstance } from '../src/Collection'
-import { DocInstance } from '../src/Doc'
 
-test('write: insert (document)', async (t: ExecutionContext) => {
+test('write: insert (document)', async t => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
   const insertPayload = squirtle
   t.deepEqual(pokedexModule.data.get('007'), undefined)

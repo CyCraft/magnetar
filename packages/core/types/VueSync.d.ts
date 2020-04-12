@@ -1,6 +1,7 @@
 import { O } from 'ts-toolbelt';
 import { CollectionInstance } from './Collection';
-import { GlobalConfig, ModuleConfig, PlainObject } from './types/base';
+import { GlobalConfig, ModuleConfig } from './types/config';
+import { PlainObject } from './types/atoms';
 import { DocInstance } from './Doc';
 export { isDocModule, isCollectionModule } from './helpers/pathHelpers';
 /**

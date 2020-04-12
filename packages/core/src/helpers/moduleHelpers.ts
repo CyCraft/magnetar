@@ -1,5 +1,5 @@
-import { GlobalConfig, ModuleConfig } from '../types/base'
 import { isFunction, isMap } from 'is-what'
+import { GlobalConfig, ModuleConfig } from '../types/config'
 import { throwIfNoDataStoreName, logErrorAndThrow } from './throwFns'
 import { isDocModule } from './pathHelpers'
 

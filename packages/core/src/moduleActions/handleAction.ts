@@ -1,5 +1,6 @@
 import { isVueSyncError, ActionName } from '../types/actions'
-import { SharedConfig, PlainObject } from '../types/base'
+import { SharedConfig } from '../types/config'
+import { PlainObject } from '../types/atoms'
 import { EventNameFnsMap } from '../types/events'
 import {
   PluginModuleConfig,

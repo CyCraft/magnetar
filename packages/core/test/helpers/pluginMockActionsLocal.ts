@@ -1,7 +1,5 @@
-import { isCollectionModule } from '../../src'
-import { PlainObject } from '../../src/types/base'
-import { ActionName, actionNameTypeMap } from '../../src/types/actions'
-import { StorePluginModuleConfig } from './pluginMock'
+import { merge } from 'merge-anything'
+import { isArray, isString } from 'is-what'
 import {
   PluginWriteAction,
   PluginDeleteAction,
@@ -15,11 +13,13 @@ import {
   PluginInsertAction,
   GetResponse,
   DoOnGet,
-} from '../../src/types/plugins'
-import { merge } from 'merge-anything'
-import { isArray, isString } from 'is-what'
+  getCollectionPathDocIdEntry,
+  isCollectionModule,
+  ActionName,
+  PlainObject,
+} from '../../src/index'
+import { StorePluginModuleConfig } from './pluginMock'
 import { throwIfEmulatedError } from './throwFns'
-import { getCollectionPathDocIdEntry } from '../../src/helpers/pathHelpers'
 import { generateRandomId } from './generateRandomId'
 
 export function writeActionFactory (
@@ -238,9 +238,8 @@ export function revertActionFactory (
     // strings are only possible during deletions
     // haven't implemented reverting deletions yet
     if (isString(payload) || (isArray(payload) && isString(payload[0]))) return
-    const actionType = actionNameTypeMap[actionName]
     // this mocks data reverted during a read
-    if (actionType === 'read') {
+    if (actionName === 'get' || actionName === 'stream') {
       restoreDataSnapshot()
       return
     }
