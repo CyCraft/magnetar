@@ -1,14 +1,5 @@
 import { copy } from 'copy-anything'
 import {
-  writeActionFactory,
-  insertActionFactory,
-  deletePropActionFactory,
-  deleteActionFactory,
-  getActionFactory,
-  streamActionFactory,
-  revertActionFactory,
-} from './pluginMockLocalActions'
-import {
   ActionName,
   PluginInstance,
   PluginRevertAction,
@@ -22,6 +13,15 @@ import {
   getCollectionPathDocIdEntry,
   PlainObject,
 } from '../../src/index'
+import {
+  writeActionFactory,
+  insertActionFactory,
+  deletePropActionFactory,
+  deleteActionFactory,
+  getActionFactory,
+  streamActionFactory,
+  revertActionFactory,
+} from './pluginMockLocalActions'
 
 // there are two interfaces to be defined & exported by each plugin
 // - StorePluginConfig
