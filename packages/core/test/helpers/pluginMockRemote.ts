@@ -22,6 +22,7 @@ import {
   streamActionFactory,
   revertActionFactory,
 } from './pluginMockRemoteActions'
+import { isArray } from 'is-what'
 
 // there are two interfaces to be defined & exported by each plugin
 // - StorePluginConfig
@@ -87,7 +88,7 @@ export const CreatePlugin: VueSyncPlugin = (
     // then do anything specific for your plugin, like setting initial data
     const { initialData } = moduleConfig
     if (!initialData) return
-    if (!docId) {
+    if (!docId && isArray(initialData)) {
       for (const [_docId, _docData] of initialData) {
         data[collectionPath].set(_docId, _docData)
       }
