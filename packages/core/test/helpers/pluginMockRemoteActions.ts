@@ -16,7 +16,7 @@ import {
   getCollectionPathDocIdEntry,
   PlainObject,
 } from '../../src/index'
-import { StorePluginModuleConfig } from './pluginMock'
+import { StorePluginModuleConfig, StorePluginConfig } from './pluginMockRemote'
 import { waitMs } from './wait'
 import { bulbasaur, flareon, charmander } from './pokemon'
 import { throwIfEmulatedError } from './throwFns'
@@ -25,7 +25,7 @@ import { generateRandomId } from './generateRandomId'
 export function writeActionFactory (
   moduleData: PlainObject,
   actionName: 'merge' | 'assign' | 'replace',
-  storeName: string,
+  storePluginConfig: StorePluginConfig,
   makeDataSnapshot?: any,
   restoreDataSnapshot?: any
 ): PluginWriteAction {
@@ -35,7 +35,7 @@ export function writeActionFactory (
     pluginModuleConfig: StorePluginModuleConfig
   ): Promise<void> {
     // this mocks an error during execution
-    throwIfEmulatedError(payload, storeName)
+    throwIfEmulatedError(payload, storePluginConfig)
     // this is custom logic to be implemented by the plugin author
     await waitMs(1)
 
@@ -48,7 +48,7 @@ export function writeActionFactory (
 export function insertActionFactory (
   moduleData: PlainObject,
   actionName: 'insert',
-  storeName: string,
+  storePluginConfig: StorePluginConfig,
   makeDataSnapshot?: any,
   restoreDataSnapshot?: any
 ): PluginInsertAction {
@@ -58,7 +58,7 @@ export function insertActionFactory (
     pluginModuleConfig: StorePluginModuleConfig
   ): Promise<string> {
     // this mocks an error during execution
-    throwIfEmulatedError(payload, storeName)
+    throwIfEmulatedError(payload, storePluginConfig)
     // this is custom logic to be implemented by the plugin author
     await waitMs(1)
 
@@ -76,7 +76,7 @@ export function insertActionFactory (
 export function deletePropActionFactory (
   moduleData: PlainObject,
   actionName: ActionName | 'revert',
-  storeName: string,
+  storePluginConfig: StorePluginConfig,
   makeDataSnapshot?: any,
   restoreDataSnapshot?: any
 ): PluginDeletePropAction {
@@ -86,7 +86,7 @@ export function deletePropActionFactory (
     pluginModuleConfig: StorePluginModuleConfig
   ): Promise<void> {
     // this mocks an error during execution
-    throwIfEmulatedError(payload, storeName)
+    throwIfEmulatedError(payload, storePluginConfig)
     // this is custom logic to be implemented by the plugin author
     await waitMs(1)
 
@@ -99,7 +99,7 @@ export function deletePropActionFactory (
 export function deleteActionFactory (
   moduleData: PlainObject,
   actionName: ActionName | 'revert',
-  storeName: string,
+  storePluginConfig: StorePluginConfig,
   makeDataSnapshot?: any,
   restoreDataSnapshot?: any
 ): PluginDeleteAction {
@@ -109,7 +109,7 @@ export function deleteActionFactory (
     pluginModuleConfig: StorePluginModuleConfig
   ): Promise<void> {
     // this mocks an error during execution
-    throwIfEmulatedError(payload, storeName)
+    throwIfEmulatedError(payload, storePluginConfig)
     // this is custom logic to be implemented by the plugin author
     await waitMs(1)
     // this mocks an error during execution
@@ -119,7 +119,7 @@ export function deleteActionFactory (
 export function getActionFactory (
   moduleData: PlainObject,
   actionName: ActionName | 'revert',
-  storeName: string,
+  storePluginConfig: StorePluginConfig,
   makeDataSnapshot?: any,
   restoreDataSnapshot?: any
 ): PluginGetAction {
@@ -135,7 +135,7 @@ export function getActionFactory (
     const isDocument = !isCollection
 
     // this mocks an error during execution
-    throwIfEmulatedError(payload, storeName)
+    throwIfEmulatedError(payload, storePluginConfig)
     // fetch from cache/or from a remote store with logic you implement here
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -157,7 +157,7 @@ export function getActionFactory (
 export function streamActionFactory (
   moduleData: PlainObject,
   actionName: ActionName | 'revert',
-  storeName: string,
+  storePluginConfig: StorePluginConfig,
   makeDataSnapshot?: any,
   restoreDataSnapshot?: any
 ): PluginStreamAction {
@@ -201,7 +201,7 @@ export function streamActionFactory (
       stopStreaming.stop = resolve
       setTimeout(() => {
         // this mocks an error during execution
-        throwIfEmulatedError(payload, storeName)
+        throwIfEmulatedError(payload, storePluginConfig)
       }, 1)
     })
     function stop (): void {
@@ -215,7 +215,7 @@ export function streamActionFactory (
 export function revertActionFactory (
   moduleData: PlainObject,
   actionName: ActionName | 'revert',
-  storeName: string,
+  storePluginConfig: StorePluginConfig,
   makeDataSnapshot?: any,
   restoreDataSnapshot?: any
 ): PluginRevertAction {

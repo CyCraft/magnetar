@@ -1,4 +1,5 @@
-import { VueSyncGenericPlugin } from './pluginMock'
+import { CreatePlugin as CreatePluginLocal } from './pluginMockLocal'
+import { CreatePlugin as CreatePluginRemote } from './pluginMockRemote'
 import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '../../src/index'
 import { bulbasaur } from './pokemon'
 
@@ -31,8 +32,8 @@ export function createVueSyncInstance (): {
   trainerModule: DocInstance<TrainerModuleData>
   vueSync: VueSyncInstance
 } {
-  const local = VueSyncGenericPlugin({ storeName: 'local' })
-  const remote = VueSyncGenericPlugin({ storeName: 'remote' })
+  const local = CreatePluginLocal({ storeName: 'local' })
+  const remote = CreatePluginRemote({ storeName: 'remote' })
   const vueSync = VueSync({
     dataStoreName: 'local',
     stores: { local, remote },

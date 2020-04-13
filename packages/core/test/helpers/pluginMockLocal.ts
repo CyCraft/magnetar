@@ -1,22 +1,13 @@
 import { copy } from 'copy-anything'
 import {
-  writeActionFactory as writeActionFactoryLocal,
-  insertActionFactory as insertActionFactoryLocal,
-  deletePropActionFactory as deletePropActionFactoryLocal,
-  deleteActionFactory as deleteActionFactoryLocal,
-  getActionFactory as getActionFactoryLocal,
-  streamActionFactory as streamActionFactoryLocal,
-  revertActionFactory as revertActionFactoryLocal,
-} from './pluginMockActionsLocal'
-import {
-  writeActionFactory as writeActionFactoryRemote,
-  insertActionFactory as insertActionFactoryRemote,
-  deletePropActionFactory as deletePropActionFactoryRemote,
-  deleteActionFactory as deleteActionFactoryRemote,
-  getActionFactory as getActionFactoryRemote,
-  streamActionFactory as streamActionFactoryRemote,
-  revertActionFactory as revertActionFactoryRemote,
-} from './pluginMockActionsRemote'
+  writeActionFactory,
+  insertActionFactory,
+  deletePropActionFactory,
+  deleteActionFactory,
+  getActionFactory,
+  streamActionFactory,
+  revertActionFactory,
+} from './pluginMockLocalActions'
 import {
   ActionName,
   PluginInstance,
@@ -47,40 +38,29 @@ export interface StorePluginModuleConfig {
 function actionFactory (
   moduleData: PlainObject,
   actionName: ActionName | 'revert',
-  storeName: string,
+  pluginConfig: StorePluginConfig,
   makeDataSnapshot: any,
   restoreDataSnapshot: any
 ): any {
   const storeNameActionNameFnMap = {
-    local: {
-      insert: insertActionFactoryLocal,
-      merge: writeActionFactoryLocal,
-      deleteProp: deletePropActionFactoryLocal,
-      delete: deleteActionFactoryLocal,
-      get: getActionFactoryLocal,
-      stream: streamActionFactoryLocal,
-      revert: revertActionFactoryLocal,
-    },
-    remote: {
-      insert: insertActionFactoryRemote,
-      merge: writeActionFactoryRemote,
-      deleteProp: deletePropActionFactoryRemote,
-      delete: deleteActionFactoryRemote,
-      get: getActionFactoryRemote,
-      stream: streamActionFactoryRemote,
-      revert: revertActionFactoryRemote,
-    },
+    insert: insertActionFactory,
+    merge: writeActionFactory,
+    deleteProp: deletePropActionFactory,
+    delete: deleteActionFactory,
+    get: getActionFactory,
+    stream: streamActionFactory,
+    revert: revertActionFactory,
   }
-  const f = storeNameActionNameFnMap[storeName][actionName]
-  return f(moduleData, actionName, storeName, makeDataSnapshot, restoreDataSnapshot)
+  const f = storeNameActionNameFnMap[actionName]
+  return f(moduleData, actionName, pluginConfig, makeDataSnapshot, restoreDataSnapshot)
 }
 
 // a Vue Sync plugin is a single function that returns a `PluginInstance`
 // the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
 // each action must have the proper for both collection and doc type modules
-export const VueSyncGenericPlugin: VueSyncPlugin = (config: StorePluginConfig): PluginInstance => {
-  const { storeName } = config
-
+export const CreatePlugin: VueSyncPlugin = (
+  storePluginConfig: StorePluginConfig
+): PluginInstance => {
   // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
   const data: PlainObject = {}
@@ -130,15 +110,15 @@ export const VueSyncGenericPlugin: VueSyncPlugin = (config: StorePluginConfig): 
   }
 
   // the plugin must try to implement logic for every `ActionName`
-  const get: PluginGetAction = actionFactory(data, 'get', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const stream: PluginStreamAction = actionFactory(data, 'stream', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const insert: PluginInsertAction = actionFactory(data, 'insert', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const _merge: PluginWriteAction = actionFactory(data, 'merge', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const deleteProp: PluginDeletePropAction = actionFactory(data, 'deleteProp', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const _delete: PluginDeleteAction = actionFactory(data, 'delete', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const revert: PluginRevertAction = actionFactory(data, 'revert', storeName, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  // const assign: PluginWriteAction = actionFactory(data, 'assign', storeName, makeDataSnapshot, restoreDataSnapshot)
-  // const replace: PluginWriteAction = actionFactory(data, 'replace', storeName, makeDataSnapshot, restoreDataSnapshot)
+  const get: PluginGetAction = actionFactory(data, 'get', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const stream: PluginStreamAction = actionFactory(data, 'stream', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const insert: PluginInsertAction = actionFactory(data, 'insert', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const _merge: PluginWriteAction = actionFactory(data, 'merge', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const deleteProp: PluginDeletePropAction = actionFactory(data, 'deleteProp', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const _delete: PluginDeleteAction = actionFactory(data, 'delete', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const revert: PluginRevertAction = actionFactory(data, 'revert', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  // const assign: PluginWriteAction = actionFactory(data, 'assign', storePluginConfig, makeDataSnapshot, restoreDataSnapshot)
+  // const replace: PluginWriteAction = actionFactory(data, 'replace', storePluginConfig, makeDataSnapshot, restoreDataSnapshot)
 
   // the plugin function must return a `PluginInstance`
   const instance: PluginInstance = {
