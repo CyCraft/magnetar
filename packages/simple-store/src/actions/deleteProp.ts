@@ -1,4 +1,5 @@
 import { isArray } from 'is-what'
+import pathToProp from 'path-to-prop'
 import {
   isCollectionModule,
   PlainObject,
@@ -29,7 +30,15 @@ export function deletePropActionFactory (
 
     const payloadArray = isArray(payload) ? payload : [payload]
     for (const propToDelete of payloadArray) {
-      delete docData[propToDelete]
+      const isNestedPropPath = /[./]/.test(propToDelete)
+      if (isNestedPropPath) {
+        const parts = propToDelete.split(/[./]/)
+        const lastPart = parts.pop()
+        const parentRef = pathToProp(docData, parts.join('.'))
+        delete parentRef[lastPart]
+      } else {
+        delete docData[propToDelete]
+      }
     }
   }
 }
