@@ -1,14 +1,19 @@
 import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
 import { bulbasaur } from './helpers/pokemon'
+import { isModuleDataEqual } from './helpers/compareModuleData'
 
 test('write: merge (document)', async t => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule, vueSync } = createVueSyncInstance()
   const mergePayload = { id: '001', type: { alt: 'Leaf' } }
-  const doc = pokedexModule.doc('001')
-  t.deepEqual(doc.data, bulbasaur)
-  await doc.merge(mergePayload).catch(e => t.fail(e.message)) // prettier-ignore
+  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur)
+
+  try {
+    await pokedexModule.doc('001').merge(mergePayload)
+  } catch (error) {
+    t.fail(error)
+  }
+
   const mergedResult = { name: 'Bulbasaur', id: '001', type: { grass: 'Grass', alt: 'Leaf' } }
-  t.deepEqual(pokedexModule.data.get('001'), mergedResult)
-  t.deepEqual(doc.data, mergedResult)
+  isModuleDataEqual(t, vueSync, 'pokedex/001', mergedResult)
 })
