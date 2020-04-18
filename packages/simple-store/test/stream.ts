@@ -6,7 +6,7 @@ import { isModuleDataEqual } from './helpers/compareModuleData'
 
 test('stream (collection)', async t => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
-  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur)
+  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur())
   t.deepEqual(pokedexModule.data.size, 1)
   const streamPayload = {}
 
@@ -18,8 +18,8 @@ test('stream (collection)', async t => {
   const unsubscribe = pokedexModule.openStreams[JSON.stringify(streamPayload)]
   unsubscribe()
 
-  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur)
-  isModuleDataEqual(t, vueSync, 'pokedex/136', flareon)
+  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur())
+  isModuleDataEqual(t, vueSync, 'pokedex/136', flareon())
   t.deepEqual(pokedexModule.data.size, 2)
   await waitMs(1000)
   t.deepEqual(pokedexModule.data.size, 2)

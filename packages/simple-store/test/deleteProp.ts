@@ -1,7 +1,6 @@
 import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
 import { isModuleDataEqual } from './helpers/compareModuleData'
-import { bulbasaur } from './helpers/pokemon'
 
 test('deleteProp', async t => {
   const { trainerModule, vueSync } = createVueSyncInstance()

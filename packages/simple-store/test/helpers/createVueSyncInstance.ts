@@ -5,7 +5,7 @@ import { bulbasaur } from './pokemon'
 
 const getInitialDataCollection = () => [
   // doc entries
-  ['001', bulbasaur],
+  ['001', bulbasaur()],
 ]
 const getInitialDataDocument = () => ({ name: 'Luca', age: 10 })
 

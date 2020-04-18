@@ -29,7 +29,8 @@ export function insertActionFactory (
     // else it's a doc
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const collectionMap = moduleData[collectionPath]
-    if (!collectionMap.get(docId)) collectionMap.set(docId, {})
+    // reset the doc to be able to overwrite
+    collectionMap.set(docId, {})
     const docDataToMutate = collectionMap.get(docId)
     Object.entries(payload).forEach(([key, value]) => {
       docDataToMutate[key] = value

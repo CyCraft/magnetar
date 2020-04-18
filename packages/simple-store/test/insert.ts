@@ -6,28 +6,28 @@ import { isModuleDataEqual } from './helpers/compareModuleData'
 
 test('insert (document)', async t => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
-  const insertPayload = squirtle
+  const payload = squirtle()
   isModuleDataEqual(t, vueSync, 'pokedex/007', undefined)
 
   try {
-    await pokedexModule.doc('007').insert(insertPayload)
+    await pokedexModule.doc('007').insert(payload)
   } catch (error) {
     t.fail(error)
   }
 
-  isModuleDataEqual(t, vueSync, 'pokedex/007', insertPayload)
+  isModuleDataEqual(t, vueSync, 'pokedex/007', payload)
 })
 
 test('insert (collection) → random ID', async t => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
-  const insertPayload = squirtle
+  const payload = squirtle()
 
   let moduleFromResult: DocInstance
   try {
-    moduleFromResult = await pokedexModule.insert(insertPayload)
+    moduleFromResult = await pokedexModule.insert(payload)
   } catch (error) {
     t.fail(error)
   }
   const newId = moduleFromResult.id
-  isModuleDataEqual(t, vueSync, `pokedex/${newId}`, insertPayload)
+  isModuleDataEqual(t, vueSync, `pokedex/${newId}`, payload)
 })

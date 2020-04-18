@@ -3,47 +3,47 @@ import { createVueSyncInstance } from './helpers/createVueSyncInstance'
 import { bulbasaur } from './helpers/pokemon'
 import { isModuleDataEqual } from './helpers/compareModuleData'
 
-test('merge (document)', async t => {
+test('merge', async t => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
-  const mergePayload = { id: '001', type: { alt: 'Leaf' } }
-  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur)
+  const payload = { type: { alt: 'Leaf' } }
+  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur())
 
   try {
-    await pokedexModule.doc('001').merge(mergePayload)
+    await pokedexModule.doc('001').merge(payload)
   } catch (error) {
     t.fail(error)
   }
 
-  const mergedResult = { name: 'Bulbasaur', id: '001', type: { grass: 'Grass', alt: 'Leaf' } }
-  isModuleDataEqual(t, vueSync, 'pokedex/001', mergedResult)
+  const expected = { id: '001', name: 'Bulbasaur', type: { grass: 'Grass', alt: 'Leaf' } }
+  isModuleDataEqual(t, vueSync, 'pokedex/001', expected)
 })
 
-test('assign (document)', async t => {
+test('assign', async t => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
-  const mergePayload = { id: '001', type: { alt: 'Leaf' } }
-  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur)
+  const payload = { type: { alt: 'Leaf' } }
+  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur())
 
   try {
-    await pokedexModule.doc('001').merge(mergePayload)
+    await pokedexModule.doc('001').assign(payload)
   } catch (error) {
     t.fail(error)
   }
 
-  const mergedResult = { name: 'Bulbasaur', id: '001', type: { grass: 'Grass', alt: 'Leaf' } }
-  isModuleDataEqual(t, vueSync, 'pokedex/001', mergedResult)
+  const expected = { id: '001', name: 'Bulbasaur', type: { alt: 'Leaf' } }
+  isModuleDataEqual(t, vueSync, 'pokedex/001', expected)
 })
 
-test('replace (document)', async t => {
+test('replace', async t => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
-  const mergePayload = { id: '001', type: { alt: 'Leaf' } }
-  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur)
+  const payload = { type: { alt: 'Leaf' } }
+  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur())
 
   try {
-    await pokedexModule.doc('001').merge(mergePayload)
+    await pokedexModule.doc('001').replace(payload)
   } catch (error) {
     t.fail(error)
   }
 
-  const mergedResult = { name: 'Bulbasaur', id: '001', type: { grass: 'Grass', alt: 'Leaf' } }
-  isModuleDataEqual(t, vueSync, 'pokedex/001', mergedResult)
+  const expected = { type: { alt: 'Leaf' } }
+  isModuleDataEqual(t, vueSync, 'pokedex/001', expected)
 })

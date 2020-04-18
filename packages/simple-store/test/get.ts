@@ -6,7 +6,7 @@ import { isModuleDataEqual } from './helpers/compareModuleData'
 test('get (collection)', async t => {
   // 'get' resolves once all stores have given a response with data
   const { pokedexModule, vueSync } = createVueSyncInstance()
-  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur)
+  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur())
   isModuleDataEqual(t, vueSync, 'pokedex/136', undefined)
   t.deepEqual(pokedexModule.data.size, 1)
 
@@ -16,8 +16,8 @@ test('get (collection)', async t => {
     t.fail(error)
   }
   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
-  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur)
-  isModuleDataEqual(t, vueSync, 'pokedex/136', flareon)
+  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur())
+  isModuleDataEqual(t, vueSync, 'pokedex/136', flareon())
   t.deepEqual(pokedexModule.data.size, 2)
 })
 
