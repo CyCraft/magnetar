@@ -4,7 +4,7 @@ import { bulbasaur, flareon } from './helpers/pokemon'
 import { waitMs } from './helpers/wait'
 import { isModuleDataEqual } from './helpers/compareModuleData'
 
-test('read: stream (collection)', async t => {
+test('stream (collection)', async t => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
   isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur)
   t.deepEqual(pokedexModule.data.size, 1)
@@ -26,7 +26,7 @@ test('read: stream (collection)', async t => {
   // '004': charmander should come in 3rd, but doesn't because we closed the stream
 })
 
-test('read: stream (doc)', async t => {
+test('stream (doc)', async t => {
   const { trainerModule, vueSync } = createVueSyncInstance()
   isModuleDataEqual(t, vueSync, 'data/trainer', { name: 'Luca', age: 10 })
   const streamPayload = {}

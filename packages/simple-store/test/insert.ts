@@ -4,7 +4,7 @@ import { squirtle } from './helpers/pokemon'
 import { DocInstance } from '@vue-sync/core'
 import { isModuleDataEqual } from './helpers/compareModuleData'
 
-test('write: insert (document)', async t => {
+test('insert (document)', async t => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
   const insertPayload = squirtle
   isModuleDataEqual(t, vueSync, 'pokedex/007', undefined)
@@ -18,7 +18,7 @@ test('write: insert (document)', async t => {
   isModuleDataEqual(t, vueSync, 'pokedex/007', insertPayload)
 })
 
-test('write: insert (collection) → random ID', async t => {
+test('insert (collection) → random ID', async t => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
   const insertPayload = squirtle
 

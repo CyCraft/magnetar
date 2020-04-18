@@ -3,7 +3,7 @@ import { createVueSyncInstance } from './helpers/createVueSyncInstance'
 import { bulbasaur, flareon } from './helpers/pokemon'
 import { isModuleDataEqual } from './helpers/compareModuleData'
 
-test('read: get (collection)', async t => {
+test('get (collection)', async t => {
   // 'get' resolves once all stores have given a response with data
   const { pokedexModule, vueSync } = createVueSyncInstance()
   isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur)
@@ -21,7 +21,7 @@ test('read: get (collection)', async t => {
   t.deepEqual(pokedexModule.data.size, 2)
 })
 
-test('read: get (document)', async t => {
+test('get (document)', async t => {
   // get resolves once all stores have given a response with data
   const { trainerModule, vueSync } = createVueSyncInstance()
   isModuleDataEqual(t, vueSync, 'data/trainer', { name: 'Luca', age: 10 })
