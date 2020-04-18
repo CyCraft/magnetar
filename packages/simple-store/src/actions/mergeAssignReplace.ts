@@ -26,11 +26,19 @@ export function writeActionFactory (
 
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const collectionMap = moduleData[collectionPath]
-    if (!collectionMap.get(docId)) collectionMap.set(docId, {})
+
+    // always start from an empty document on 'replace' or when the doc is non existent
+    if (actionName === 'replace' || !collectionMap.get(docId)) collectionMap.set(docId, {})
     const docDataToMutate = collectionMap.get(docId)
+
     if (actionName === 'merge') {
       Object.entries(payload).forEach(([key, value]) => {
         docDataToMutate[key] = merge(docDataToMutate[key], value)
+      })
+    }
+    if (actionName === 'assign' || actionName === 'replace') {
+      Object.entries(payload).forEach(([key, value]) => {
+        docDataToMutate[key] = value
       })
     }
   }
