@@ -14,5 +14,6 @@ module.exports = {
     '@typescript-eslint/ban-ts-ignore': 'off',
     'tree-shaking/no-side-effects-in-initialization': 'error',
     'comma-dangle': ['error', 'always-multiline'],
+    'no-unused-vars': 'off',
   },
 }

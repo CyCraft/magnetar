@@ -1,27 +1,17 @@
 import { copy } from 'copy-anything'
 import {
-  ActionName,
   PluginInstance,
-  PluginRevertAction,
-  PluginGetAction,
-  PluginWriteAction,
-  PluginStreamAction,
-  PluginDeleteAction,
   VueSyncPlugin,
-  PluginDeletePropAction,
-  PluginInsertAction,
   PlainObject,
   getCollectionPathDocIdEntry,
 } from '@vue-sync/core'
-import {
-  writeActionFactory,
-  insertActionFactory,
-  deletePropActionFactory,
-  deleteActionFactory,
-  getActionFactory,
-  streamActionFactory,
-  revertActionFactory,
-} from './actionFactories'
+import { writeActionFactory } from './actions/mergeAssignReplace'
+import { insertActionFactory } from './actions/insert'
+import { deletePropActionFactory } from './actions/deleteProp'
+import { deleteActionFactory } from './actions/delete'
+import { getActionFactory } from './actions/get'
+import { streamActionFactory } from './actions/stream'
+import { revertActionFactory } from './actions/revert'
 
 // there are two interfaces to be defined & exported by each plugin
 // - SimpleStoreConfig
@@ -33,26 +23,6 @@ export interface SimpleStoreConfig {
 export interface StorePluginModuleConfig {
   path?: string
   initialData?: PlainObject | [string, PlainObject][]
-}
-
-function actionFactory (
-  moduleData: PlainObject,
-  actionName: ActionName | 'revert',
-  simpleStoreConfig: SimpleStoreConfig,
-  makeDataSnapshot: any,
-  restoreDataSnapshot: any
-): any {
-  const storeNameActionNameFnMap = {
-    insert: insertActionFactory,
-    merge: writeActionFactory,
-    deleteProp: deletePropActionFactory,
-    delete: deleteActionFactory,
-    get: getActionFactory,
-    stream: streamActionFactory,
-    revert: revertActionFactory,
-  }
-  const f = storeNameActionNameFnMap[actionName]
-  return f(moduleData, actionName, simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot)
 }
 
 // a Vue Sync plugin is a single function that returns a `PluginInstance`
@@ -110,15 +80,16 @@ export const CreatePlugin: VueSyncPlugin = (
   }
 
   // the plugin must try to implement logic for every `ActionName`
-  const get: PluginGetAction = actionFactory(data, 'get', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const stream: PluginStreamAction = actionFactory(data, 'stream', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const insert: PluginInsertAction = actionFactory(data, 'insert', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const _merge: PluginWriteAction = actionFactory(data, 'merge', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const deleteProp: PluginDeletePropAction = actionFactory(data, 'deleteProp', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const _delete: PluginDeleteAction = actionFactory(data, 'delete', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const revert: PluginRevertAction = actionFactory(data, 'revert', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  // const assign: PluginWriteAction = actionFactory(data, 'assign', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot)
-  // const replace: PluginWriteAction = actionFactory(data, 'replace', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot)
+  const get = getActionFactory(data, simpleStoreConfig, makeDataSnapshot)
+  const stream = streamActionFactory(data, simpleStoreConfig, makeDataSnapshot)
+  const insert = insertActionFactory(data, simpleStoreConfig, makeDataSnapshot)
+  const _merge = writeActionFactory(data, simpleStoreConfig, makeDataSnapshot, 'merge')
+  const assign = writeActionFactory(data, simpleStoreConfig, makeDataSnapshot, 'assign')
+  const replace = writeActionFactory(data, simpleStoreConfig, makeDataSnapshot, 'replace')
+  const deleteProp = deletePropActionFactory(data, simpleStoreConfig, makeDataSnapshot)
+  const _delete = deleteActionFactory(data, simpleStoreConfig, makeDataSnapshot)
+
+  const revert = revertActionFactory(data, simpleStoreConfig, restoreDataSnapshot)
 
   // the plugin function must return a `PluginInstance`
   const instance: PluginInstance = {
@@ -128,9 +99,9 @@ export const CreatePlugin: VueSyncPlugin = (
       stream,
       insert,
       merge: _merge,
+      assign,
+      replace,
       deleteProp,
-      // assign,
-      // replace,
       delete: _delete,
     },
     setupModule,
