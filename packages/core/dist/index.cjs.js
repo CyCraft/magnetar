@@ -995,7 +995,7 @@ function configWithDefaults(config) {
             read: [],
             write: [],
         },
-        onError: 'stop',
+        onError: 'revert',
         on: {},
         modifyPayloadOn: {},
         modifyReadResponseOn: {},

@@ -13,7 +13,7 @@ function configWithDefaults (config: GlobalConfig): O.Compulsory<GlobalConfig> {
       read: [],
       write: [],
     },
-    onError: 'stop',
+    onError: 'revert',
     on: {},
     modifyPayloadOn: {},
     modifyReadResponseOn: {},

@@ -2,11 +2,12 @@ import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
 import { bulbasaur } from './helpers/pokemon'
 
-test('write + onError: abort (default) -- emits fail events & aborts execution by default', async t => {
+test('write + onError: stop -- emits fail events & aborts execution by default', async t => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = { id: 'testid', name: 'this should fail', shouldFail: 'local' }
   try {
     await pokedexModule.insert(insertPayload, {
+      onError: 'stop',
       on: {
         error: ({ payload, storeName }) => {
           if (storeName === 'local') {
@@ -24,11 +25,12 @@ test('write + onError: abort (default) -- emits fail events & aborts execution b
   t.is(pokedexModule.data.get('testid'), undefined)
 })
 
-test('write + onError: abort (default) -- fail in second store plugin does not prevent execution first store plugin', async t => {
+test('write + onError: stop -- fail in second store plugin does not prevent execution first store plugin', async t => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = { id: 'testid', name: 'this should fail', shouldFail: 'remote' }
   try {
     await pokedexModule.insert(insertPayload, {
+      onError: 'stop',
       on: {
         error: ({ payload, storeName }) => {
           if (storeName === 'local') t.fail()
@@ -128,12 +130,13 @@ test('write + onError: revert - will not go to next store', async t => {
   t.is(pokedexModule.data.get('testid'), undefined)
 })
 
-test('get + onError: abort (default) -- emits fail events & aborts execution by default', async t => {
+test('get + onError: stop -- emits fail events & aborts execution by default', async t => {
   const { pokedexModule } = createVueSyncInstance()
   const getPayload = { shouldFail: 'local' }
   t.deepEqual(pokedexModule.data.get('001'), bulbasaur())
   try {
     await pokedexModule.get(getPayload, {
+      onError: 'stop',
       on: {
         error: ({ payload, storeName }) => {
           if (storeName === 'local') {
@@ -151,13 +154,14 @@ test('get + onError: abort (default) -- emits fail events & aborts execution by 
   t.deepEqual(pokedexModule.data.get('001'), bulbasaur())
 })
 
-test('get + onError: abort (default) -- fail in second store plugin does not prevent execution first store plugin', async t => {
+test('get + onError: stop -- fail in second store plugin does not prevent execution first store plugin', async t => {
   const { pokedexModule } = createVueSyncInstance()
   const getPayload = { shouldFail: 'remote' }
   t.deepEqual(pokedexModule.data.get('001'), bulbasaur())
   let result: any
   try {
     result = await pokedexModule.get(getPayload, {
+      onError: 'stop',
       on: {
         error: ({ payload, storeName }) => {
           if (storeName === 'local') t.fail()

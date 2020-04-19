@@ -21,7 +21,7 @@ export type SharedConfig = {
     assign?: StoreName[]
     replace?: StoreName[]
   }
-  onError: 'stop' | 'continue' | 'revert'
+  onError: 'revert' | 'continue' | 'stop'
   modifyPayloadOn: ModifyPayloadFnMap
   modifyReadResponseOn: ModifyReadResponseFnMap
   on: EventNameFnMap
