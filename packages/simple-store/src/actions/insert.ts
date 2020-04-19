@@ -5,7 +5,7 @@ import {
   getCollectionPathDocIdEntry,
 } from '@vue-sync/core'
 import { StorePluginModuleConfig, SimpleStoreConfig } from '..'
-import { generateRandomId } from '../generateRandomId'
+import { isFullString } from 'is-what'
 
 export function insertActionFactory (
   moduleData: PlainObject,
@@ -21,7 +21,7 @@ export function insertActionFactory (
 
     const isCollection = isCollectionModule(modulePath)
     if (isCollection) {
-      const id = payload.id || generateRandomId()
+      const id = isFullString(payload.id) ? payload.id : simpleStoreConfig.generateRandomId()
       const collectionPath = modulePath
       moduleData[collectionPath].set(id, payload)
       return id
