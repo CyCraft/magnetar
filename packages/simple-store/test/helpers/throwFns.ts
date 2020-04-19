@@ -1,12 +1,11 @@
 import { PlainObject, VueSyncError } from '@vue-sync/core'
-import { isArray, isString, isPlainObject } from 'is-what'
-import { StorePluginConfig } from './pluginMockRemote'
+import { isArray, isPlainObject } from 'is-what'
 
 export function throwIfEmulatedError (
   payload: PlainObject | PlainObject[] | string | string[] | void,
-  storePluginConfig: StorePluginConfig
+  storePluginOptions: any
 ): void {
-  const { storeName } = storePluginConfig
+  const { storeName } = storePluginOptions
   if (!payload) return
   if (isArray(payload) && !payload.length) return
   const payloadArray = !isArray(payload) ? [payload] : payload

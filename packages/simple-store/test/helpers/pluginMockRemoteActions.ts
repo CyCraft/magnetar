@@ -16,18 +16,15 @@ import {
   getCollectionPathDocIdEntry,
   PlainObject,
 } from '@vue-sync/core'
-import { StorePluginModuleConfig, StorePluginConfig } from './pluginMockRemote'
+import { StorePluginModuleConfig, StorePluginOptions } from './pluginMockRemote'
 import { waitMs } from './wait'
 import { bulbasaur, flareon, charmander } from './pokemon'
 import { throwIfEmulatedError } from './throwFns'
 import { generateRandomId } from './generateRandomId'
 
 export function writeActionFactory (
-  moduleData: PlainObject,
-  actionName: 'merge' | 'assign' | 'replace',
-  storePluginConfig: StorePluginConfig,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
+  storePluginOptions: StorePluginOptions,
+  actionName: 'merge' | 'assign' | 'replace'
 ): PluginWriteAction {
   return async function (
     payload: PlainObject,
@@ -35,7 +32,7 @@ export function writeActionFactory (
     pluginModuleConfig: StorePluginModuleConfig
   ): Promise<void> {
     // this mocks an error during execution
-    throwIfEmulatedError(payload, storePluginConfig)
+    throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
     await waitMs(1)
 
@@ -45,20 +42,14 @@ export function writeActionFactory (
   }
 }
 
-export function insertActionFactory (
-  moduleData: PlainObject,
-  actionName: 'insert',
-  storePluginConfig: StorePluginConfig,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
-): PluginInsertAction {
+export function insertActionFactory (storePluginOptions: StorePluginOptions): PluginInsertAction {
   return async function (
     payload: PlainObject,
     modulePath: string,
     pluginModuleConfig: StorePluginModuleConfig
   ): Promise<string> {
     // this mocks an error during execution
-    throwIfEmulatedError(payload, storePluginConfig)
+    throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
     await waitMs(1)
 
@@ -74,11 +65,7 @@ export function insertActionFactory (
 }
 
 export function deletePropActionFactory (
-  moduleData: PlainObject,
-  actionName: ActionName | 'revert',
-  storePluginConfig: StorePluginConfig,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
+  storePluginOptions: StorePluginOptions
 ): PluginDeletePropAction {
   return async function (
     payload: string | string[],
@@ -86,7 +73,7 @@ export function deletePropActionFactory (
     pluginModuleConfig: StorePluginModuleConfig
   ): Promise<void> {
     // this mocks an error during execution
-    throwIfEmulatedError(payload, storePluginConfig)
+    throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
     await waitMs(1)
 
@@ -96,46 +83,33 @@ export function deletePropActionFactory (
   }
 }
 
-export function deleteActionFactory (
-  moduleData: PlainObject,
-  actionName: ActionName | 'revert',
-  storePluginConfig: StorePluginConfig,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
-): PluginDeleteAction {
+export function deleteActionFactory (storePluginOptions: StorePluginOptions): PluginDeleteAction {
   return async function (
     payload: void,
     modulePath: string,
     pluginModuleConfig: StorePluginModuleConfig
   ): Promise<void> {
     // this mocks an error during execution
-    throwIfEmulatedError(payload, storePluginConfig)
+    throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
     await waitMs(1)
     // this mocks an error during execution
   }
 }
 
-export function getActionFactory (
-  moduleData: PlainObject,
-  actionName: ActionName | 'revert',
-  storePluginConfig: StorePluginConfig,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
-): PluginGetAction {
+export function getActionFactory (storePluginOptions: StorePluginOptions): PluginGetAction {
   return async (
     payload: void | PlainObject = {},
     modulePath: string,
     pluginModuleConfig: StorePluginModuleConfig
   ): Promise<DoOnGet | GetResponse> => {
     // this is custom logic to be implemented by the plugin author
-    makeDataSnapshot()
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const isCollection = isCollectionModule(modulePath)
     const isDocument = !isCollection
 
     // this mocks an error during execution
-    throwIfEmulatedError(payload, storePluginConfig)
+    throwIfEmulatedError(payload, storePluginOptions)
     // fetch from cache/or from a remote store with logic you implement here
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -154,13 +128,7 @@ export function getActionFactory (
   }
 }
 
-export function streamActionFactory (
-  moduleData: PlainObject,
-  actionName: ActionName | 'revert',
-  storePluginConfig: StorePluginConfig,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
-): PluginStreamAction {
+export function streamActionFactory (storePluginOptions: StorePluginOptions): PluginStreamAction {
   return (
     payload: void | PlainObject = {},
     modulePath: string,
@@ -201,7 +169,7 @@ export function streamActionFactory (
       stopStreaming.stop = resolve
       setTimeout(() => {
         // this mocks an error during execution
-        throwIfEmulatedError(payload, storePluginConfig)
+        throwIfEmulatedError(payload, storePluginOptions)
       }, 1)
     })
     function stop (): void {
@@ -212,13 +180,7 @@ export function streamActionFactory (
   }
 }
 
-export function revertActionFactory (
-  moduleData: PlainObject,
-  actionName: ActionName | 'revert',
-  storePluginConfig: StorePluginConfig,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
-): PluginRevertAction {
+export function revertActionFactory (storePluginOptions: StorePluginOptions): PluginRevertAction {
   // this is a `PluginRevertAction`:
   return async function revert (
     payload: PlainObject | PlainObject[] | string | string[] | void,
