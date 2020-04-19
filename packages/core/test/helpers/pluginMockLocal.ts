@@ -64,7 +64,7 @@ export const CreatePlugin: VueSyncPlugin<StorePluginOptions> = (
 ): PluginInstance => {
   // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
-  const data: PlainObject = {}
+  const data: { [collectionPath: string]: Map<string, PlainObject> } = {}
 
   // this mocks some sort of data snapshot restore functionality of the plugin
   const dataSnapshots = []
@@ -101,13 +101,16 @@ export const CreatePlugin: VueSyncPlugin<StorePluginOptions> = (
   /**
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
    */
-  const getModuleData = (modulePath: string, moduleConfig: StorePluginModuleConfig = {}) => {
+  const getModuleData: PluginInstance['getModuleData'] = <DocDataType>(
+    modulePath: string,
+    moduleConfig: StorePluginModuleConfig = {}
+  ) => {
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const collectionDB = data[collectionPath]
     // if it's a collection, just return the collectionDB, which MUST be a map with id as keys and the docs as value
-    if (!docId) return collectionDB
+    if (!docId) return collectionDB as Map<string, DocDataType>
     // if it's a doc, return the specific doc
-    return collectionDB.get(docId)
+    return collectionDB.get(docId) as DocDataType
   }
 
   // the plugin must try to implement logic for every `ActionName`

@@ -23,11 +23,8 @@ import { throwIfEmulatedError } from './throwFns'
 import { generateRandomId } from './generateRandomId'
 
 export function writeActionFactory (
-  moduleData: PlainObject,
-  actionName: 'merge' | 'assign' | 'replace',
   storePluginOptions: StorePluginOptions,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
+  actionName: 'merge' | 'assign' | 'replace'
 ): PluginWriteAction {
   return async function (
     payload: PlainObject,
@@ -45,13 +42,7 @@ export function writeActionFactory (
   }
 }
 
-export function insertActionFactory (
-  moduleData: PlainObject,
-  actionName: 'insert',
-  storePluginOptions: StorePluginOptions,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
-): PluginInsertAction {
+export function insertActionFactory (storePluginOptions: StorePluginOptions): PluginInsertAction {
   return async function (
     payload: PlainObject,
     modulePath: string,
@@ -74,11 +65,7 @@ export function insertActionFactory (
 }
 
 export function deletePropActionFactory (
-  moduleData: PlainObject,
-  actionName: ActionName | 'revert',
-  storePluginOptions: StorePluginOptions,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
+  storePluginOptions: StorePluginOptions
 ): PluginDeletePropAction {
   return async function (
     payload: string | string[],
@@ -96,13 +83,7 @@ export function deletePropActionFactory (
   }
 }
 
-export function deleteActionFactory (
-  moduleData: PlainObject,
-  actionName: ActionName | 'revert',
-  storePluginOptions: StorePluginOptions,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
-): PluginDeleteAction {
+export function deleteActionFactory (storePluginOptions: StorePluginOptions): PluginDeleteAction {
   return async function (
     payload: void,
     modulePath: string,
@@ -116,20 +97,13 @@ export function deleteActionFactory (
   }
 }
 
-export function getActionFactory (
-  moduleData: PlainObject,
-  actionName: ActionName | 'revert',
-  storePluginOptions: StorePluginOptions,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
-): PluginGetAction {
+export function getActionFactory (storePluginOptions: StorePluginOptions): PluginGetAction {
   return async (
     payload: void | PlainObject = {},
     modulePath: string,
     pluginModuleConfig: StorePluginModuleConfig
   ): Promise<DoOnGet | GetResponse> => {
     // this is custom logic to be implemented by the plugin author
-    makeDataSnapshot()
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const isCollection = isCollectionModule(modulePath)
     const isDocument = !isCollection
@@ -154,13 +128,7 @@ export function getActionFactory (
   }
 }
 
-export function streamActionFactory (
-  moduleData: PlainObject,
-  actionName: ActionName | 'revert',
-  storePluginOptions: StorePluginOptions,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
-): PluginStreamAction {
+export function streamActionFactory (storePluginOptions: StorePluginOptions): PluginStreamAction {
   return (
     payload: void | PlainObject = {},
     modulePath: string,
@@ -212,13 +180,7 @@ export function streamActionFactory (
   }
 }
 
-export function revertActionFactory (
-  moduleData: PlainObject,
-  actionName: ActionName | 'revert',
-  storePluginOptions: StorePluginOptions,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
-): PluginRevertAction {
+export function revertActionFactory (storePluginOptions: StorePluginOptions): PluginRevertAction {
   // this is a `PluginRevertAction`:
   return async function revert (
     payload: PlainObject | PlainObject[] | string | string[] | void,

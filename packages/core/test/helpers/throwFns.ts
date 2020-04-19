@@ -1,16 +1,18 @@
-import { PlainObject, VueSyncError } from '../../src/index'
-import { isArray, isString } from 'is-what'
-import { StorePluginOptions } from './pluginMockLocal'
+import { PlainObject, VueSyncError } from '../../src'
+import { isArray, isPlainObject } from 'is-what'
 
 export function throwIfEmulatedError (
   payload: PlainObject | PlainObject[] | string | string[] | void,
-  storePluginOptions: StorePluginOptions
+  storePluginConfig: any
 ): void {
+  const { storeName } = storePluginConfig
   if (!payload) return
   if (isArray(payload) && !payload.length) return
-  const [firstEl] = !isArray(payload) ? [payload] : payload
-  const shouldFailProp = isString(firstEl) ? firstEl : firstEl.shouldFail
-  if (shouldFailProp !== storePluginOptions.storeName) return
+  const payloadArray = !isArray(payload) ? [payload] : payload
+  const shouldFail = payloadArray.some(
+    p => p === storeName || (isPlainObject(p) && p.shouldFail === storeName)
+  )
+  if (!shouldFail) return
   const errorToThrow: VueSyncError = {
     payload,
     message: 'failed',
