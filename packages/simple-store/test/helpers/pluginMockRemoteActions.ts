@@ -141,7 +141,7 @@ export function getActionFactory (
       setTimeout(() => {
         // this mocks an error during execution
         const dataRetrieved: PlainObject[] = isCollection
-          ? [bulbasaur, flareon]
+          ? [bulbasaur(), flareon()]
           : [{ name: 'Luca', age: 10, dream: 'job' }]
         // we must trigger `mustExecuteOnGet.added` for each document that was retrieved and return whatever that returns
         const results = dataRetrieved.map(_data => {
@@ -174,7 +174,7 @@ export function streamActionFactory (
     // we'll mock opening a stream
 
     const dataRetrieved = isCollection
-      ? [bulbasaur, flareon, charmander]
+      ? [bulbasaur(), flareon(), charmander()]
       : [
           { name: 'Luca', age: 10 },
           { name: 'Luca', age: 10, dream: 'job' },

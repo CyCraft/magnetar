@@ -2,6 +2,7 @@ import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '@vue-
 import { CreatePlugin } from '../../src/index'
 import { CreatePlugin as CreatePluginRemote } from './pluginMockRemote'
 import { bulbasaur } from './pokemon'
+import { generateRandomId } from './generateRandomId'
 
 const getInitialDataCollection = () => [
   // doc entries
@@ -32,7 +33,7 @@ export function createVueSyncInstance (): {
   trainerModule: DocInstance<TrainerModuleData>
   vueSync: VueSyncInstance
 } {
-  const local = CreatePlugin({ storeName: 'local' })
+  const local = CreatePlugin({ storeName: 'local', generateRandomId })
   const remote = CreatePluginRemote({ storeName: 'remote' })
   const vueSync = VueSync({
     dataStoreName: 'local',

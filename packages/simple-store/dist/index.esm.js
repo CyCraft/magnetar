@@ -1,7 +1,8 @@
 import { copy } from 'copy-anything';
 import { isCollectionModule, getCollectionPathDocIdEntry } from '@vue-sync/core';
 import { merge } from 'merge-anything';
-import { isArray, isString } from 'is-what';
+import { isFullString, isArray, isString } from 'is-what';
+import pathToProp from 'path-to-prop';
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -85,12 +86,7 @@ function __read(o, n) {
     return ar;
 }
 
-function generateRandomId() {
-    var genPart = function () { return String(Math.random()).slice(3, 6); };
-    return genPart() + genPart() + genPart();
-}
-
-function writeActionFactory(moduleData, actionName, simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot) {
+function writeActionFactory(moduleData, simpleStoreConfig, makeDataSnapshot, actionName) {
     return function (payload, modulePath, pluginModuleConfig) {
         // this is custom logic to be implemented by the plugin author
         var isCollection = isCollectionModule(modulePath);
@@ -99,7 +95,8 @@ function writeActionFactory(moduleData, actionName, simpleStoreConfig, makeDataS
             throw new Error('An non-existent action was triggered on a collection');
         var _a = __read(getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _a[0], docId = _a[1];
         var collectionMap = moduleData[collectionPath];
-        if (!collectionMap.get(docId))
+        // always start from an empty document on 'replace' or when the doc is non existent
+        if (actionName === 'replace' || !collectionMap.get(docId))
             collectionMap.set(docId, {});
         var docDataToMutate = collectionMap.get(docId);
         if (actionName === 'merge') {
@@ -108,14 +105,21 @@ function writeActionFactory(moduleData, actionName, simpleStoreConfig, makeDataS
                 docDataToMutate[key] = merge(docDataToMutate[key], value);
             });
         }
+        if (actionName === 'assign' || actionName === 'replace') {
+            Object.entries(payload).forEach(function (_a) {
+                var _b = __read(_a, 2), key = _b[0], value = _b[1];
+                docDataToMutate[key] = value;
+            });
+        }
     };
 }
-function insertActionFactory(moduleData, actionName, simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot) {
+
+function insertActionFactory(moduleData, simpleStoreConfig, makeDataSnapshot) {
     return function (payload, modulePath, pluginModuleConfig) {
         // this is custom logic to be implemented by the plugin author
         var isCollection = isCollectionModule(modulePath);
         if (isCollection) {
-            var id = payload.id || generateRandomId();
+            var id = isFullString(payload.id) ? payload.id : simpleStoreConfig.generateRandomId();
             var collectionPath_1 = modulePath;
             moduleData[collectionPath_1].set(id, payload);
             return id;
@@ -123,8 +127,8 @@ function insertActionFactory(moduleData, actionName, simpleStoreConfig, makeData
         // else it's a doc
         var _a = __read(getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _a[0], docId = _a[1];
         var collectionMap = moduleData[collectionPath];
-        if (!collectionMap.get(docId))
-            collectionMap.set(docId, {});
+        // reset the doc to be able to overwrite
+        collectionMap.set(docId, {});
         var docDataToMutate = collectionMap.get(docId);
         Object.entries(payload).forEach(function (_a) {
             var _b = __read(_a, 2), key = _b[0], value = _b[1];
@@ -133,7 +137,8 @@ function insertActionFactory(moduleData, actionName, simpleStoreConfig, makeData
         return docId;
     };
 }
-function deletePropActionFactory(moduleData, actionName, simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot) {
+
+function deletePropActionFactory(moduleData, simpleStoreConfig, makeDataSnapshot) {
     return function (payload, modulePath, pluginModuleConfig) {
         // this is custom logic to be implemented by the plugin author
         var e_1, _a;
@@ -148,7 +153,16 @@ function deletePropActionFactory(moduleData, actionName, simpleStoreConfig, make
         try {
             for (var payloadArray_1 = __values(payloadArray), payloadArray_1_1 = payloadArray_1.next(); !payloadArray_1_1.done; payloadArray_1_1 = payloadArray_1.next()) {
                 var propToDelete = payloadArray_1_1.value;
-                delete docData[propToDelete];
+                var isNestedPropPath = /[./]/.test(propToDelete);
+                if (isNestedPropPath) {
+                    var parts = propToDelete.split(/[./]/);
+                    var lastPart = parts.pop();
+                    var parentRef = pathToProp(docData, parts.join('.'));
+                    delete parentRef[lastPart];
+                }
+                else {
+                    delete docData[propToDelete];
+                }
             }
         }
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
@@ -160,7 +174,8 @@ function deletePropActionFactory(moduleData, actionName, simpleStoreConfig, make
         }
     };
 }
-function deleteActionFactory(moduleData, actionName, simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot) {
+
+function deleteActionFactory(moduleData, simpleStoreConfig, makeDataSnapshot) {
     return function (payload, modulePath, pluginModuleConfig) {
         // this is custom logic to be implemented by the plugin author
         var isCollection = isCollectionModule(modulePath);
@@ -171,7 +186,8 @@ function deleteActionFactory(moduleData, actionName, simpleStoreConfig, makeData
         moduleData[collectionPath]["delete"](docId);
     };
 }
-function getActionFactory(moduleData, actionName, simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot) {
+
+function getActionFactory(moduleData, simpleStoreConfig, makeDataSnapshot) {
     var _this = this;
     return function (payload, modulePath, pluginModuleConfig) {
         return __awaiter(_this, void 0, void 0, function () {
@@ -180,7 +196,7 @@ function getActionFactory(moduleData, actionName, simpleStoreConfig, makeDataSna
                 // this is custom logic to be implemented by the plugin author
                 makeDataSnapshot();
                 doOnGetAction = function (payload, meta) {
-                    insertActionFactory(moduleData)(payload, modulePath, pluginModuleConfig);
+                    insertActionFactory(moduleData, simpleStoreConfig)(payload, modulePath, pluginModuleConfig);
                     // return writeActionFactoryThatReturnsPayload(moduleData, 'insert', simpleStoreConfig)(
                     //   payload,
                     //   modulePath,
@@ -193,17 +209,18 @@ function getActionFactory(moduleData, actionName, simpleStoreConfig, makeDataSna
         });
     };
 }
-function streamActionFactory(moduleData, actionName, simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot) {
+
+function streamActionFactory(moduleData, simpleStoreConfig, makeDataSnapshot) {
     return function (payload, modulePath, pluginModuleConfig, mustExecuteOnRead) {
         // this is custom logic to be implemented by the plugin author
         // this mocks how the result from the next store (the remote store) should update this local store per action type
         // hover over the prop names below to see more info on when they are triggered:
         var doOnStream = {
             added: function (payload, meta) {
-                insertActionFactory(moduleData)(payload, modulePath, pluginModuleConfig); // prettier-ignore
+                insertActionFactory(moduleData, simpleStoreConfig)(payload, modulePath, pluginModuleConfig); // prettier-ignore
             },
             modified: function (payload, meta) {
-                insertActionFactory(moduleData)(payload, modulePath, pluginModuleConfig); // prettier-ignore
+                insertActionFactory(moduleData, simpleStoreConfig)(payload, modulePath, pluginModuleConfig); // prettier-ignore
             },
             removed: function (payload, meta) {
                 var isCollection = isCollectionModule(modulePath);
@@ -218,7 +235,8 @@ function streamActionFactory(moduleData, actionName, simpleStoreConfig, makeData
         return doOnStream;
     };
 }
-function revertActionFactory(moduleData, actionName, simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot) {
+
+function revertActionFactory(moduleData, simpleStoreConfig, restoreDataSnapshot) {
     // this is a `PluginRevertAction`:
     return function revert(payload, modulePath, pluginModuleConfig, actionName) {
         // this is custom logic to be implemented by the plugin author
@@ -248,19 +266,6 @@ function revertActionFactory(moduleData, actionName, simpleStoreConfig, makeData
     };
 }
 
-function actionFactory(moduleData, actionName, simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot) {
-    var storeNameActionNameFnMap = {
-        insert: insertActionFactory,
-        merge: writeActionFactory,
-        deleteProp: deletePropActionFactory,
-        "delete": deleteActionFactory,
-        get: getActionFactory,
-        stream: streamActionFactory,
-        revert: revertActionFactory,
-    };
-    var f = storeNameActionNameFnMap[actionName];
-    return f(moduleData, actionName, simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot);
-}
 // a Vue Sync plugin is a single function that returns a `PluginInstance`
 // the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
 // each action must have the proper for both collection and doc type modules
@@ -327,15 +332,15 @@ var CreatePlugin = function (simpleStoreConfig) {
         return collectionDB.get(docId);
     };
     // the plugin must try to implement logic for every `ActionName`
-    var get = actionFactory(data, 'get', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot); // prettier-ignore
-    var stream = actionFactory(data, 'stream', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot); // prettier-ignore
-    var insert = actionFactory(data, 'insert', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot); // prettier-ignore
-    var _merge = actionFactory(data, 'merge', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot); // prettier-ignore
-    var deleteProp = actionFactory(data, 'deleteProp', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot); // prettier-ignore
-    var _delete = actionFactory(data, 'delete', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot); // prettier-ignore
-    var revert = actionFactory(data, 'revert', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot); // prettier-ignore
-    // const assign: PluginWriteAction = actionFactory(data, 'assign', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot)
-    // const replace: PluginWriteAction = actionFactory(data, 'replace', simpleStoreConfig, makeDataSnapshot, restoreDataSnapshot)
+    var get = getActionFactory(data, simpleStoreConfig, makeDataSnapshot);
+    var stream = streamActionFactory(data, simpleStoreConfig);
+    var insert = insertActionFactory(data, simpleStoreConfig);
+    var _merge = writeActionFactory(data, simpleStoreConfig, makeDataSnapshot, 'merge');
+    var assign = writeActionFactory(data, simpleStoreConfig, makeDataSnapshot, 'assign');
+    var replace = writeActionFactory(data, simpleStoreConfig, makeDataSnapshot, 'replace');
+    var deleteProp = deletePropActionFactory(data);
+    var _delete = deleteActionFactory(data);
+    var revert = revertActionFactory(data, simpleStoreConfig, restoreDataSnapshot);
     // the plugin function must return a `PluginInstance`
     var instance = {
         revert: revert,
@@ -344,9 +349,9 @@ var CreatePlugin = function (simpleStoreConfig) {
             stream: stream,
             insert: insert,
             merge: _merge,
+            assign: assign,
+            replace: replace,
             deleteProp: deleteProp,
-            // assign,
-            // replace,
             "delete": _delete,
         },
         setupModule: setupModule,
