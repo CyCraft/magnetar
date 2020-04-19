@@ -46,6 +46,8 @@ function actionFactory (
   const storeNameActionNameFnMap = {
     insert: insertActionFactory,
     merge: writeActionFactory,
+    assign: writeActionFactory,
+    replace: writeActionFactory,
     deleteProp: deletePropActionFactory,
     delete: deleteActionFactory,
     get: getActionFactory,
@@ -53,6 +55,7 @@ function actionFactory (
     revert: revertActionFactory,
   }
   const f = storeNameActionNameFnMap[actionName]
+  // @ts-ignore
   return f(moduleData, actionName, pluginConfig, makeDataSnapshot, restoreDataSnapshot)
 }
 
@@ -118,8 +121,8 @@ export const CreatePlugin: VueSyncPlugin<StorePluginConfig> = (
   const deleteProp: PluginDeletePropAction = actionFactory(data, 'deleteProp', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
   const _delete: PluginDeleteAction = actionFactory(data, 'delete', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
   const revert: PluginRevertAction = actionFactory(data, 'revert', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  // const assign: PluginWriteAction = actionFactory(data, 'assign', storePluginConfig, makeDataSnapshot, restoreDataSnapshot)
-  // const replace: PluginWriteAction = actionFactory(data, 'replace', storePluginConfig, makeDataSnapshot, restoreDataSnapshot)
+  const assign: PluginWriteAction = actionFactory(data, 'assign', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const replace: PluginWriteAction = actionFactory(data, 'replace', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
 
   // the plugin function must return a `PluginInstance`
   const instance: PluginInstance = {
@@ -130,8 +133,8 @@ export const CreatePlugin: VueSyncPlugin<StorePluginConfig> = (
       insert,
       merge: _merge,
       deleteProp,
-      // assign,
-      // replace,
+      assign,
+      replace,
       delete: _delete,
     },
     setupModule,

@@ -6,12 +6,13 @@ import {
   getCollectionPathDocIdEntry,
 } from '@vue-sync/core'
 import { StorePluginModuleConfig, SimpleStoreConfig } from '..'
+import { MakeRestoreBackup } from '../CreatePlugin'
 
 export function writeActionFactory (
   moduleData: PlainObject,
   simpleStoreConfig: SimpleStoreConfig,
-  makeDataSnapshot: any,
-  actionName: 'merge' | 'assign' | 'replace'
+  actionName: 'merge' | 'assign' | 'replace',
+  makeBackup?: MakeRestoreBackup
 ): PluginWriteAction {
   return function (
     payload: PlainObject,
@@ -26,6 +27,8 @@ export function writeActionFactory (
 
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const collectionMap = moduleData[collectionPath]
+
+    if (makeBackup) makeBackup(collectionPath, docId)
 
     // always start from an empty document on 'replace' or when the doc is non existent
     if (actionName === 'replace' || !collectionMap.get(docId)) collectionMap.set(docId, {})

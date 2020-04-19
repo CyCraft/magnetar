@@ -7,11 +7,12 @@ import {
   getCollectionPathDocIdEntry,
 } from '@vue-sync/core'
 import { StorePluginModuleConfig, SimpleStoreConfig } from '..'
+import { MakeRestoreBackup } from '../CreatePlugin'
 
 export function deletePropActionFactory (
   moduleData: PlainObject,
   simpleStoreConfig: SimpleStoreConfig,
-  makeDataSnapshot: any
+  makeBackup?: MakeRestoreBackup
 ): PluginDeletePropAction {
   return function (
     payload: string | string[],
@@ -27,6 +28,8 @@ export function deletePropActionFactory (
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const collectionMap = moduleData[collectionPath]
     const docData = collectionMap.get(docId)
+
+    if (makeBackup) makeBackup(collectionPath, docId)
 
     const payloadArray = isArray(payload) ? payload : [payload]
     for (const propToDelete of payloadArray) {

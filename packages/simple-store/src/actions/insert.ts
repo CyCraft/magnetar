@@ -6,11 +6,12 @@ import {
 } from '@vue-sync/core'
 import { StorePluginModuleConfig, SimpleStoreConfig } from '..'
 import { isFullString } from 'is-what'
+import { MakeRestoreBackup } from '../CreatePlugin'
 
 export function insertActionFactory (
   moduleData: PlainObject,
   simpleStoreConfig: SimpleStoreConfig,
-  makeDataSnapshot?: any
+  makeBackup?: MakeRestoreBackup
 ): PluginInsertAction {
   return function (
     payload: PlainObject,
@@ -21,14 +22,20 @@ export function insertActionFactory (
 
     const isCollection = isCollectionModule(modulePath)
     if (isCollection) {
-      const id = isFullString(payload.id) ? payload.id : simpleStoreConfig.generateRandomId()
+      const docId = isFullString(payload.id) ? payload.id : simpleStoreConfig.generateRandomId()
       const collectionPath = modulePath
-      moduleData[collectionPath].set(id, payload)
-      return id
+
+      if (makeBackup) makeBackup(collectionPath, docId)
+
+      moduleData[collectionPath].set(docId, payload)
+      return docId
     }
     // else it's a doc
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const collectionMap = moduleData[collectionPath]
+
+    if (makeBackup) makeBackup(collectionPath, docId)
+
     // reset the doc to be able to overwrite
     collectionMap.set(docId, {})
     const docDataToMutate = collectionMap.get(docId)

@@ -5,11 +5,12 @@ import {
   getCollectionPathDocIdEntry,
 } from '@vue-sync/core'
 import { StorePluginModuleConfig, SimpleStoreConfig } from '..'
+import { MakeRestoreBackup } from '../CreatePlugin'
 
 export function deleteActionFactory (
   moduleData: PlainObject,
   simpleStoreConfig: SimpleStoreConfig,
-  makeDataSnapshot?: any
+  makeBackup?: MakeRestoreBackup
 ): PluginDeleteAction {
   return function (
     payload: void,
@@ -23,6 +24,8 @@ export function deleteActionFactory (
     if (isCollection) throw new Error('An non-existent action was triggered on a collection')
 
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
+    if (makeBackup) makeBackup(collectionPath, docId)
+
     moduleData[collectionPath].delete(docId)
   }
 }

@@ -31,3 +31,31 @@ test('insert (collection) → random ID', async t => {
   const newId = moduleFromResult.id
   isModuleDataEqual(t, vueSync, `pokedex/${newId}`, payload)
 })
+
+test('revert: insert (document)', async t => {
+  const { pokedexModule, vueSync } = createVueSyncInstance()
+  const payload = { ...squirtle(), shouldFail: 'remote' }
+  isModuleDataEqual(t, vueSync, 'pokedex/007', undefined)
+
+  try {
+    await pokedexModule.doc('007').insert(payload, { onError: 'revert' })
+  } catch (error) {
+    t.fail(error)
+  }
+
+  isModuleDataEqual(t, vueSync, 'pokedex/007', undefined)
+})
+
+test('revert: insert (collection) → random ID', async t => {
+  const { pokedexModule, vueSync } = createVueSyncInstance()
+  const payload = { ...squirtle(), shouldFail: 'remote' }
+
+  let moduleFromResult: DocInstance
+  try {
+    moduleFromResult = await pokedexModule.insert(payload, { onError: 'revert' })
+  } catch (error) {
+    t.fail(error)
+  }
+  const newId = moduleFromResult.id
+  isModuleDataEqual(t, vueSync, `pokedex/${newId}`, undefined)
+})

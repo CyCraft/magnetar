@@ -6,10 +6,12 @@ import {
   getCollectionPathDocIdEntry,
 } from '@vue-sync/core'
 import { StorePluginModuleConfig, SimpleStoreConfig } from '..'
+import { MakeRestoreBackup } from '../CreatePlugin'
 
 export function revertActionFactory (
   moduleData: PlainObject,
   simpleStoreConfig: SimpleStoreConfig,
+  restoreBackup: MakeRestoreBackup,
   restoreDataSnapshot: any
 ): PluginRevertAction {
   // this is a `PluginRevertAction`:
@@ -19,19 +21,25 @@ export function revertActionFactory (
     pluginModuleConfig: StorePluginModuleConfig,
     actionName: ActionName
   ): void {
-    // this is custom logic to be implemented by the plugin author
+    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
+    const collectionMap = moduleData[collectionPath]
+
+    if (
+      docId &&
+      ['insert', 'merge', 'assign', 'replace', 'delete', 'deleteProp'].includes(actionName)
+    ) {
+      restoreBackup(collectionPath, docId)
+      return
+    }
+
     if (!payload) return
     // strings are only possible during deletions
     // haven't implemented reverting deletions yet
     if (isString(payload) || (isArray(payload) && isString(payload[0]))) return
-    // this mocks data reverted during a read
     if (actionName === 'get' || actionName === 'stream') {
       restoreDataSnapshot()
       return
     }
-    // this mocks data reverted during a write
-    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
-    const collectionMap = moduleData[collectionPath]
     if (!docId) {
       // collection
       throw new Error(

@@ -47,3 +47,48 @@ test('replace', async t => {
   const expected = { type: { alt: 'Leaf' } }
   isModuleDataEqual(t, vueSync, 'pokedex/001', expected)
 })
+
+test('revert: merge', async t => {
+  const { pokedexModule, vueSync } = createVueSyncInstance()
+  const payload = { type: { alt: 'Leaf' }, shouldFail: 'remote' }
+  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur())
+
+  try {
+    await pokedexModule.doc('001').merge(payload, { onError: 'revert' })
+  } catch (error) {
+    t.fail(error)
+  }
+
+  const expected = bulbasaur()
+  isModuleDataEqual(t, vueSync, 'pokedex/001', expected)
+})
+
+test('revert: assign', async t => {
+  const { pokedexModule, vueSync } = createVueSyncInstance()
+  const payload = { type: { alt: 'Leaf' }, shouldFail: 'remote' }
+  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur())
+
+  try {
+    await pokedexModule.doc('001').assign(payload, { onError: 'revert' })
+  } catch (error) {
+    t.fail(error)
+  }
+
+  const expected = bulbasaur()
+  isModuleDataEqual(t, vueSync, 'pokedex/001', expected)
+})
+
+test('revert: replace', async t => {
+  const { pokedexModule, vueSync } = createVueSyncInstance()
+  const payload = { type: { alt: 'Leaf' }, shouldFail: 'remote' }
+  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur())
+
+  try {
+    await pokedexModule.doc('001').replace(payload, { onError: 'revert' })
+  } catch (error) {
+    t.fail(error)
+  }
+
+  const expected = bulbasaur()
+  isModuleDataEqual(t, vueSync, 'pokedex/001', expected)
+})

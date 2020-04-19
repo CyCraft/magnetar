@@ -21,7 +21,21 @@ test('get (collection)', async t => {
   t.deepEqual(pokedexModule.data.size, 2)
 })
 
-test('get (document)', async t => {
+test('get (document) - latest version', async t => {
+  // get resolves once all stores have given a response with data
+  const { trainerModule, vueSync } = createVueSyncInstance()
+  isModuleDataEqual(t, vueSync, 'data/trainer', { name: 'Luca', age: 10 })
+
+  try {
+    await trainerModule.get()
+  } catch (error) {
+    t.fail(error)
+  }
+  // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
+  isModuleDataEqual(t, vueSync, 'data/trainer', { name: 'Luca', age: 10, dream: 'job' })
+})
+
+test('get (document) by id', async t => {
   // get resolves once all stores have given a response with data
   const { trainerModule, vueSync } = createVueSyncInstance()
   isModuleDataEqual(t, vueSync, 'data/trainer', { name: 'Luca', age: 10 })

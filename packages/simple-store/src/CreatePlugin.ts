@@ -26,6 +26,8 @@ export interface StorePluginModuleConfig {
   initialData?: PlainObject | [string, PlainObject][]
 }
 
+export type MakeRestoreBackup = (collectionPath: string, docId: string) => void
+
 // a Vue Sync plugin is a single function that returns a `PluginInstance`
 // the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
 // each action must have the proper for both collection and doc type modules
@@ -34,9 +36,33 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreConfig> = (
 ): PluginInstance => {
   // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
-  const data: PlainObject = {}
+  const data: { [collectionPath: string]: Map<string, PlainObject> } = {}
 
-  // this mocks some sort of data snapshot restore functionality of the plugin
+  const dataBackups: { [collectionPath: string]: Map<string, PlainObject[]> } = {}
+  const makeBackup: MakeRestoreBackup = (collectionPath, docId) => {
+    // set the backup map for the collection
+    if (!(collectionPath in dataBackups)) dataBackups[collectionPath] = new Map()
+    const backupCollectionMap = dataBackups[collectionPath]
+    // set the backup array for the doc
+    if (!backupCollectionMap.has(docId)) backupCollectionMap.set(docId, [])
+    // make a backup of whatever is found in the data
+    const docBackup = copy(data[collectionPath].get(docId))
+    backupCollectionMap.get(docId).push(docBackup)
+  }
+
+  const restoreBackup: MakeRestoreBackup = (collectionPath, docId) => {
+    // set the backup map for the collection
+    if (!(collectionPath in dataBackups)) return
+    const backupCollectionMap = dataBackups[collectionPath]
+    // set the backup array for the doc
+    if (!backupCollectionMap.has(docId)) return
+    const docBackupArray = backupCollectionMap.get(docId)
+    if (!docBackupArray.length) return
+    // restore the backup of whatever is found and replace with the data
+    const docBackup = docBackupArray.pop()
+    data[collectionPath].set(docId, docBackup)
+  }
+
   const dataSnapshots = []
   const makeDataSnapshot = (): void => { dataSnapshots.push(copy(data)) } // prettier-ignore
   const restoreDataSnapshot = (): void => {
@@ -83,14 +109,14 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreConfig> = (
   // the plugin must try to implement logic for every `ActionName`
   const get = getActionFactory(data, simpleStoreConfig, makeDataSnapshot)
   const stream = streamActionFactory(data, simpleStoreConfig, makeDataSnapshot)
-  const insert = insertActionFactory(data, simpleStoreConfig, makeDataSnapshot)
-  const _merge = writeActionFactory(data, simpleStoreConfig, makeDataSnapshot, 'merge')
-  const assign = writeActionFactory(data, simpleStoreConfig, makeDataSnapshot, 'assign')
-  const replace = writeActionFactory(data, simpleStoreConfig, makeDataSnapshot, 'replace')
-  const deleteProp = deletePropActionFactory(data, simpleStoreConfig, makeDataSnapshot)
-  const _delete = deleteActionFactory(data, simpleStoreConfig, makeDataSnapshot)
+  const insert = insertActionFactory(data, simpleStoreConfig, makeBackup)
+  const _merge = writeActionFactory(data, simpleStoreConfig, 'merge', makeBackup)
+  const assign = writeActionFactory(data, simpleStoreConfig, 'assign', makeBackup)
+  const replace = writeActionFactory(data, simpleStoreConfig, 'replace', makeBackup)
+  const deleteProp = deletePropActionFactory(data, simpleStoreConfig, makeBackup)
+  const _delete = deleteActionFactory(data, simpleStoreConfig, makeBackup)
 
-  const revert = revertActionFactory(data, simpleStoreConfig, restoreDataSnapshot)
+  const revert = revertActionFactory(data, simpleStoreConfig, restoreBackup, restoreDataSnapshot)
 
   // the plugin function must return a `PluginInstance`
   const instance: PluginInstance = {

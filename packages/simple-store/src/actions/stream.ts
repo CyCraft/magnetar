@@ -22,8 +22,6 @@ export function streamActionFactory (
     pluginModuleConfig: StorePluginModuleConfig,
     mustExecuteOnRead: MustExecuteOnRead
   ): StreamResponse | DoOnStream | Promise<StreamResponse | DoOnStream> => {
-    // this is custom logic to be implemented by the plugin author
-    // this mocks how the result from the next store (the remote store) should update this local store per action type
     // hover over the prop names below to see more info on when they are triggered:
     const doOnStream: DoOnStream = {
       added: (payload, meta) => {
@@ -38,7 +36,7 @@ export function streamActionFactory (
           ? modulePath
           : isString(payload)
           ? `${modulePath}/${payload}`
-          : `${modulePath}/${payload.id}`
+          : `${modulePath}/${meta.id}`
         deleteActionFactory(moduleData, simpleStoreConfig)(
           undefined,
           pathToDelete,
