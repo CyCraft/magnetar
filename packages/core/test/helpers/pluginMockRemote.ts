@@ -25,10 +25,10 @@ import {
 import { isArray } from 'is-what'
 
 // there are two interfaces to be defined & exported by each plugin
-// - StorePluginConfig
+// - StorePluginOptions
 // - StorePluginModuleConfig
 
-export interface StorePluginConfig {
+export interface StorePluginOptions {
   storeName: string
 }
 export interface StorePluginModuleConfig {
@@ -39,7 +39,7 @@ export interface StorePluginModuleConfig {
 function actionFactory (
   moduleData: PlainObject,
   actionName: ActionName | 'revert',
-  pluginConfig: StorePluginConfig,
+  pluginConfig: StorePluginOptions,
   makeDataSnapshot: any,
   restoreDataSnapshot: any
 ): any {
@@ -59,8 +59,8 @@ function actionFactory (
 // a Vue Sync plugin is a single function that returns a `PluginInstance`
 // the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
 // each action must have the proper for both collection and doc type modules
-export const CreatePlugin: VueSyncPlugin = (
-  storePluginConfig: StorePluginConfig
+export const CreatePlugin: VueSyncPlugin<StorePluginOptions> = (
+  storePluginOptions: StorePluginOptions
 ): PluginInstance => {
   // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
@@ -111,15 +111,15 @@ export const CreatePlugin: VueSyncPlugin = (
   }
 
   // the plugin must try to implement logic for every `ActionName`
-  const get: PluginGetAction = actionFactory(data, 'get', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const stream: PluginStreamAction = actionFactory(data, 'stream', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const insert: PluginInsertAction = actionFactory(data, 'insert', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const _merge: PluginWriteAction = actionFactory(data, 'merge', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const deleteProp: PluginDeletePropAction = actionFactory(data, 'deleteProp', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const _delete: PluginDeleteAction = actionFactory(data, 'delete', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const revert: PluginRevertAction = actionFactory(data, 'revert', storePluginConfig, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  // const assign: PluginWriteAction = actionFactory(data, 'assign', storePluginConfig, makeDataSnapshot, restoreDataSnapshot)
-  // const replace: PluginWriteAction = actionFactory(data, 'replace', storePluginConfig, makeDataSnapshot, restoreDataSnapshot)
+  const get: PluginGetAction = actionFactory(data, 'get', storePluginOptions, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const stream: PluginStreamAction = actionFactory(data, 'stream', storePluginOptions, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const insert: PluginInsertAction = actionFactory(data, 'insert', storePluginOptions, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const _merge: PluginWriteAction = actionFactory(data, 'merge', storePluginOptions, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const deleteProp: PluginDeletePropAction = actionFactory(data, 'deleteProp', storePluginOptions, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const _delete: PluginDeleteAction = actionFactory(data, 'delete', storePluginOptions, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  const revert: PluginRevertAction = actionFactory(data, 'revert', storePluginOptions, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
+  // const assign: PluginWriteAction = actionFactory(data, 'assign', storePluginOptions, makeDataSnapshot, restoreDataSnapshot)
+  // const replace: PluginWriteAction = actionFactory(data, 'replace', storePluginOptions, makeDataSnapshot, restoreDataSnapshot)
 
   // the plugin function must return a `PluginInstance`
   const instance: PluginInstance = {

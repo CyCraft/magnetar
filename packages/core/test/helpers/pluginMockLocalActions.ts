@@ -18,14 +18,14 @@ import {
   ActionName,
   PlainObject,
 } from '../../src/index'
-import { StorePluginModuleConfig, StorePluginConfig } from './pluginMockLocal'
+import { StorePluginModuleConfig, StorePluginOptions } from './pluginMockLocal'
 import { throwIfEmulatedError } from './throwFns'
 import { generateRandomId } from './generateRandomId'
 
 export function writeActionFactory (
   moduleData: PlainObject,
   actionName: 'merge' | 'assign' | 'replace',
-  storePluginConfig: StorePluginConfig,
+  storePluginOptions: StorePluginOptions,
   makeDataSnapshot?: any,
   restoreDataSnapshot?: any
 ): PluginWriteAction {
@@ -35,7 +35,7 @@ export function writeActionFactory (
     pluginModuleConfig: StorePluginModuleConfig
   ): void {
     // this mocks an error during execution
-    throwIfEmulatedError(payload, storePluginConfig)
+    throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
 
     const isCollection = isCollectionModule(modulePath)
@@ -57,7 +57,7 @@ export function writeActionFactory (
 export function insertActionFactory (
   moduleData: PlainObject,
   actionName: 'insert',
-  storePluginConfig: StorePluginConfig,
+  storePluginOptions: StorePluginOptions,
   makeDataSnapshot?: any,
   restoreDataSnapshot?: any
 ): PluginInsertAction {
@@ -67,7 +67,7 @@ export function insertActionFactory (
     pluginModuleConfig: StorePluginModuleConfig
   ): string {
     // this mocks an error during execution
-    throwIfEmulatedError(payload, storePluginConfig)
+    throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
 
     const isCollection = isCollectionModule(modulePath)
@@ -92,7 +92,7 @@ export function insertActionFactory (
 export function deletePropActionFactory (
   moduleData: PlainObject,
   actionName: 'deleteProp',
-  storePluginConfig: StorePluginConfig,
+  storePluginOptions: StorePluginOptions,
   makeDataSnapshot?: any,
   restoreDataSnapshot?: any
 ): PluginDeletePropAction {
@@ -102,7 +102,7 @@ export function deletePropActionFactory (
     pluginModuleConfig: StorePluginModuleConfig
   ): void {
     // this mocks an error during execution
-    throwIfEmulatedError(payload, storePluginConfig)
+    throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
 
     const isCollection = isCollectionModule(modulePath)
@@ -123,7 +123,7 @@ export function deletePropActionFactory (
 export function deleteActionFactory (
   moduleData: PlainObject,
   actionName: ActionName | 'revert',
-  storePluginConfig: StorePluginConfig,
+  storePluginOptions: StorePluginOptions,
   makeDataSnapshot?: any,
   restoreDataSnapshot?: any
 ): PluginDeleteAction {
@@ -133,7 +133,7 @@ export function deleteActionFactory (
     pluginModuleConfig: StorePluginModuleConfig
   ): void {
     // this mocks an error during execution
-    throwIfEmulatedError(payload, storePluginConfig)
+    throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
 
     const isCollection = isCollectionModule(modulePath)
@@ -148,7 +148,7 @@ export function deleteActionFactory (
 export function getActionFactory (
   moduleData: PlainObject,
   actionName: ActionName | 'revert',
-  storePluginConfig: StorePluginConfig,
+  storePluginOptions: StorePluginOptions,
   makeDataSnapshot?: any,
   restoreDataSnapshot?: any
 ): PluginGetAction {
@@ -160,11 +160,11 @@ export function getActionFactory (
     // this is custom logic to be implemented by the plugin author
     makeDataSnapshot()
     // this mocks an error during execution
-    throwIfEmulatedError(payload, storePluginConfig)
+    throwIfEmulatedError(payload, storePluginOptions)
     // let's pass a new event that will make sure this plugin's data is kept up to date with the server data
     // this mocks how the result from the next store (the remote store) should be merged into the local stores
     const doOnGetAction: DoOnGet = (payload, meta): void => {
-      insertActionFactory(moduleData, 'insert', storePluginConfig)(
+      insertActionFactory(moduleData, 'insert', storePluginOptions)(
         payload,
         modulePath,
         pluginModuleConfig
@@ -177,7 +177,7 @@ export function getActionFactory (
 export function streamActionFactory (
   moduleData: PlainObject,
   actionName: ActionName | 'revert',
-  storePluginConfig: StorePluginConfig,
+  storePluginOptions: StorePluginOptions,
   makeDataSnapshot?: any,
   restoreDataSnapshot?: any
 ): PluginStreamAction {
@@ -188,16 +188,16 @@ export function streamActionFactory (
     mustExecuteOnRead: MustExecuteOnRead
   ): StreamResponse | DoOnStream | Promise<StreamResponse | DoOnStream> => {
     // this mocks an error during execution
-    throwIfEmulatedError(payload, storePluginConfig)
+    throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
     // this mocks how the result from the next store (the remote store) should update this local store per action type
     // hover over the prop names below to see more info on when they are triggered:
     const doOnStream: DoOnStream = {
       added: (payload, meta) => {
-        insertActionFactory(moduleData, 'insert', storePluginConfig)(payload, modulePath, pluginModuleConfig) // prettier-ignore
+        insertActionFactory(moduleData, 'insert', storePluginOptions)(payload, modulePath, pluginModuleConfig) // prettier-ignore
       },
       modified: (payload, meta) => {
-        insertActionFactory(moduleData, 'insert', storePluginConfig)(payload, modulePath, pluginModuleConfig) // prettier-ignore
+        insertActionFactory(moduleData, 'insert', storePluginOptions)(payload, modulePath, pluginModuleConfig) // prettier-ignore
       },
       removed: (payload, meta) => {
         const isCollection = isCollectionModule(modulePath)
@@ -206,7 +206,7 @@ export function streamActionFactory (
           : isString(payload)
           ? `${modulePath}/${payload}`
           : `${modulePath}/${payload.id}`
-        deleteActionFactory(moduleData, 'delete', storePluginConfig)(
+        deleteActionFactory(moduleData, 'delete', storePluginOptions)(
           undefined,
           pathToDelete,
           pluginModuleConfig
@@ -220,7 +220,7 @@ export function streamActionFactory (
 export function revertActionFactory (
   moduleData: PlainObject,
   actionName: ActionName | 'revert',
-  storePluginConfig: StorePluginConfig,
+  storePluginOptions: StorePluginOptions,
   makeDataSnapshot?: any,
   restoreDataSnapshot?: any
 ): PluginRevertAction {
