@@ -1,4 +1,4 @@
-export type PlainObject = { [key: string]: any }
+export type PlainObject = { [key: string]: any; [key: number]: never }
 
 export type StoreName = string
 

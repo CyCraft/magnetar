@@ -48,14 +48,14 @@ export function handleActionPerStore (
   docFn: DocFn, // actions executed on a "doc" will always return `doc()`
   collectionFn?: CollectionFn // actions executed on a "collection" will return `collection()` or `doc()`
 ):
-  | VueSyncGetAction
-  | VueSyncWriteAction
-  | VueSyncInsertAction
-  | VueSyncDeleteAction
-  | VueSyncDeletePropAction {
+  | VueSyncGetAction<any>
+  | VueSyncWriteAction<any>
+  | VueSyncInsertAction<any>
+  | VueSyncDeleteAction<any>
+  | VueSyncDeletePropAction<any> {
   // returns the action the dev can call with myModule.insert() etc.
   return async function (
-    payload?: void | object | string | string[],
+    payload?: any,
     actionConfig: ActionConfig = {}
   ): Promise<DocInstance | CollectionInstance> {
     // get all the config needed to perform this action
@@ -81,7 +81,7 @@ export function handleActionPerStore (
     throwIfNoFnsToExecute(storesToExecute)
     // update the payload
     for (const modifyFn of modifyPayloadFnsMap[actionName]) {
-      payload = modifyFn(payload as any)
+      payload = modifyFn(payload)
     }
 
     // create the abort mechanism

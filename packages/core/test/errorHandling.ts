@@ -4,9 +4,9 @@ import { pokedex, pokedexEntryDefaults } from './helpers/pokemon'
 
 test('write + onError: stop -- emits fail events & aborts execution by default', async t => {
   const { pokedexModule } = createVueSyncInstance()
-  const insertPayload = { id: 'testid', name: 'this should fail', shouldFail: 'local' }
+  const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'local' })
   try {
-    await pokedexModule.insert(insertPayload, {
+    await pokedexModule.doc('testid').insert(insertPayload, {
       onError: 'stop',
       on: {
         error: ({ payload, storeName }) => {
@@ -27,13 +27,9 @@ test('write + onError: stop -- emits fail events & aborts execution by default',
 
 test('write + onError: stop -- fail in second store plugin does not prevent execution first store plugin', async t => {
   const { pokedexModule } = createVueSyncInstance()
-  const insertPayload = pokedexEntryDefaults({
-    id: 'testid',
-    name: 'this should fail',
-    shouldFail: 'remote',
-  })
+  const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'remote' })
   try {
-    await pokedexModule.insert(insertPayload, {
+    await pokedexModule.doc('testid').insert(insertPayload, {
       onError: 'stop',
       on: {
         error: ({ payload, storeName }) => {
@@ -52,9 +48,9 @@ test('write + onError: stop -- fail in second store plugin does not prevent exec
 
 test('write + onError: continue', async t => {
   const { pokedexModule } = createVueSyncInstance()
-  const insertPayload = { id: 'testid', name: 'this should fail', shouldFail: 'local' }
+  const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'local' })
   try {
-    await pokedexModule.insert(insertPayload, {
+    await pokedexModule.doc('testid').insert(insertPayload, {
       onError: 'continue',
       on: {
         error: ({ payload, storeName }) => {
@@ -78,13 +74,9 @@ test('write + onError: continue', async t => {
 
 test('write + onError: revert', async t => {
   const { pokedexModule } = createVueSyncInstance()
-  const insertPayload = pokedexEntryDefaults({
-    id: 'testid',
-    name: 'this should fail',
-    shouldFail: 'remote',
-  })
+  const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'remote' })
   try {
-    const result = await pokedexModule.insert(insertPayload, {
+    await pokedexModule.doc('testid').insert(insertPayload, {
       onError: 'revert',
       on: {
         revert: ({ payload, result, actionName, storeName }) => {
@@ -112,9 +104,9 @@ test('write + onError: revert', async t => {
 
 test('write + onError: revert - will not go to next store', async t => {
   const { pokedexModule } = createVueSyncInstance()
-  const insertPayload = { id: 'testid', name: 'this should fail', shouldFail: 'local' }
+  const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'local' })
   try {
-    const result = await pokedexModule.insert(insertPayload, {
+    await pokedexModule.doc('testid').insert(insertPayload, {
       onError: 'revert',
       on: {
         error: ({ payload, storeName }) => {
@@ -220,65 +212,4 @@ test('get + onError: continue', async t => {
   // the local store didn't succeed in applying its 'inserted' event, so its local data will be empty:
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.deepEqual(pokedexModule.data.get('136'), undefined)
-})
-
-test('get + onError: revert', async t => {
-  const { pokedexModule } = createVueSyncInstance()
-  const getPayload = { shouldFail: 'remote' }
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-  try {
-    const result = await pokedexModule.get(getPayload, {
-      onError: 'revert',
-      on: {
-        revert: ({ payload, result, actionName, storeName }) => {
-          if (storeName === 'local') {
-            t.is(actionName, 'get')
-          }
-        },
-        before: ({ storeName }) => {
-          if (storeName === 'remote') t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-        },
-        error: ({ payload, storeName }) => {
-          if (storeName === 'local') t.fail()
-          if (storeName === 'remote') {
-            t.deepEqual(payload, getPayload)
-          }
-        },
-      },
-    })
-    t.deepEqual(result.data.get('1'), pokedex(1))
-  } catch (e) {
-    t.fail()
-  }
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-})
-
-test('get + onError: revert - will not go to next store', async t => {
-  const { pokedexModule } = createVueSyncInstance()
-  const getPayload = { shouldFail: 'local' }
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-  try {
-    const result = await pokedexModule.get(getPayload, {
-      onError: 'revert',
-      on: {
-        error: ({ payload, storeName }) => {
-          if (storeName === 'local') {
-            t.deepEqual(payload, getPayload)
-          }
-        },
-        revert: ({ storeName }) => {
-          if (storeName === 'local') t.fail()
-        },
-        before: ({ payload, storeName }) => {
-          if (storeName === 'remote') {
-            t.fail()
-          }
-        },
-      },
-    })
-    t.deepEqual(result.data.get('1'), pokedex(1))
-  } catch (e) {
-    t.fail()
-  }
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
 })

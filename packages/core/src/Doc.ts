@@ -13,10 +13,9 @@ import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
 import { throwIfInvalidId } from './helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from './types/config'
 import { CollectionFn, DocFn } from './VueSync'
-import { CollectionInstance } from './Collection'
 import { executeSetupModulePerStore, getDataFromDataStore } from './helpers/moduleHelpers'
 
-export type DocInstance<DocDataType = { [prop: string]: any }> = {
+export type DocInstance<DocDataType extends object = { [prop: string]: any }> = {
   data: DocDataType
   collection: CollectionFn
   id: string
@@ -34,12 +33,12 @@ export type DocInstance<DocDataType = { [prop: string]: any }> = {
   delete?: VueSyncDeleteAction<DocDataType>
 }
 
-export function createDocWithContext<DocDataType> (
+export function createDocWithContext<DocDataType extends object> (
   idOrPath: string,
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
   docFn: DocFn<DocDataType>,
-  collectionFn: CollectionFn<DocDataType>
+  collectionFn: CollectionFn
 ): DocInstance<DocDataType> {
   throwIfInvalidId(idOrPath, 'doc')
 
@@ -47,11 +46,8 @@ export function createDocWithContext<DocDataType> (
   const path = idOrPath
   const openStreams: { [identifier: string]: () => void } = {}
 
-  function collection<DocDataType> (
-    idOrPath: string,
-    _moduleConfig: ModuleConfig = {}
-  ): CollectionInstance<DocDataType> {
-    return collectionFn<DocDataType>(`${path}/${idOrPath}`, _moduleConfig)
+  const collection: CollectionFn = (idOrPath, _moduleConfig = {}) => {
+    return collectionFn(`${path}/${idOrPath}`, _moduleConfig)
   }
 
   const actions = {

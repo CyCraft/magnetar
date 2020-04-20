@@ -908,9 +908,7 @@ function getDataFromDataStore(modulePath, moduleConfig, globalConfig) {
     var getModuleData = globalConfig.stores[dataStoreName].getModuleData;
     var storeModuleConfig = ((_a = moduleConfig === null || moduleConfig === void 0 ? void 0 : moduleConfig.configPerStore) === null || _a === void 0 ? void 0 : _a[dataStoreName]) || {};
     if (isDocModule(modulePath)) {
-        return (function (_modulePath) {
-            return getModuleData(_modulePath, storeModuleConfig);
-        });
+        return (function (_modulePath) { return getModuleData(_modulePath, storeModuleConfig); });
     }
     var data = getModuleData(modulePath, storeModuleConfig);
     if (!isMap(data)) {
@@ -952,10 +950,10 @@ function createDocWithContext(idOrPath, moduleConfig, globalConfig, docFn, colle
     var id = idOrPath.split('/').slice(-1)[0];
     var path = idOrPath;
     var openStreams = {};
-    function collection(idOrPath, _moduleConfig) {
+    var collection = function (idOrPath, _moduleConfig) {
         if (_moduleConfig === void 0) { _moduleConfig = {}; }
         return collectionFn(path + "/" + idOrPath, _moduleConfig);
-    }
+    };
     var actions = {
         insert: handleActionPerStore(path, moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, docFn),
         merge: handleActionPerStore(path, moduleConfig, globalConfig, 'merge', actionNameTypeMap.merge, docFn),

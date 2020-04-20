@@ -2,7 +2,7 @@ import { O } from 'ts-toolbelt';
 import { VueSyncGetAction, VueSyncStreamAction, VueSyncInsertAction } from './types/actions';
 import { ModuleConfig, GlobalConfig } from './types/config';
 import { DocFn, CollectionFn } from './VueSync';
-export declare type CollectionInstance<DocDataType = {
+export declare type CollectionInstance<DocDataType extends object = {
     [prop: string]: any;
 }> = {
     data: Map<string, DocDataType>;
@@ -16,4 +16,4 @@ export declare type CollectionInstance<DocDataType = {
     stream?: VueSyncStreamAction;
     insert?: VueSyncInsertAction<DocDataType>;
 };
-export declare function createCollectionWithContext<DocDataType>(idOrPath: string, moduleConfig: ModuleConfig, globalConfig: O.Compulsory<GlobalConfig>, docFn: DocFn<DocDataType>, collectionFn: CollectionFn<DocDataType>): CollectionInstance<DocDataType>;
+export declare function createCollectionWithContext<DocDataType extends object>(idOrPath: string, moduleConfig: ModuleConfig, globalConfig: O.Compulsory<GlobalConfig>, docFn: DocFn<DocDataType>, collectionFn: CollectionFn<DocDataType>): CollectionInstance<DocDataType>;

@@ -27,7 +27,7 @@ export type VueSyncStreamAction = (
 ) => Promise<void>
 
 export type VueSyncGetAction<
-  DocDataType = PlainObject,
+  DocDataType extends object = PlainObject,
   calledFrom extends 'collection' | 'doc' = 'collection' | 'doc'
 > = (
   payload?: object | void,
@@ -36,22 +36,22 @@ export type VueSyncGetAction<
   calledFrom extends 'collection' ? CollectionInstance<DocDataType> : DocInstance<DocDataType>
 >
 
-export type VueSyncInsertAction<DocDataType = PlainObject> = (
-  payload: object,
+export type VueSyncInsertAction<DocDataType extends object = PlainObject> = (
+  payload: DocDataType,
   actionConfig?: ActionConfig
 ) => Promise<DocInstance<DocDataType>>
 
-export type VueSyncWriteAction<DocDataType = PlainObject> = (
-  payload: object,
+export type VueSyncWriteAction<DocDataType extends object = PlainObject> = (
+  payload: O.Optional<DocDataType, keyof DocDataType, 'deep'>,
   actionConfig?: ActionConfig
 ) => Promise<DocInstance<DocDataType>>
 
-export type VueSyncDeletePropAction<DocDataType = PlainObject> = (
-  payload: string | string[],
+export type VueSyncDeletePropAction<DocDataType extends object = PlainObject> = (
+  payload: keyof DocDataType | (keyof DocDataType)[],
   actionConfig?: ActionConfig
 ) => Promise<DocInstance<DocDataType>>
 
-export type VueSyncDeleteAction<DocDataType = PlainObject> = (
+export type VueSyncDeleteAction<DocDataType extends object = PlainObject> = (
   actionConfig?: ActionConfig
 ) => Promise<DocInstance<DocDataType>>
 

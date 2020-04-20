@@ -95,11 +95,11 @@ test('delete: (document)', async t => {
 
 test('write: merge (document)', async t => {
   const { pokedexModule } = createVueSyncInstance()
-  const payload = { base: { alt: 'Leaf' } }
+  const payload = { base: { HP: 9000 } }
   const doc = pokedexModule.doc('1')
   t.deepEqual(doc.data, pokedex(1))
   await doc.merge(payload).catch(e => t.fail(e.message)) // prettier-ignore
-  const mergedResult = merge(pokedex(1), { base: { alt: 'Leaf' } })
+  const mergedResult = merge(pokedex(1), { base: { HP: 9000 } })
   t.deepEqual(pokedexModule.data.get('1'), mergedResult)
   t.deepEqual(doc.data, mergedResult)
 })

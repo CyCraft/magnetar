@@ -24,7 +24,7 @@ export function handleStreamPerStore (
   openStreams: { [identifier: string]: () => void }
 ): VueSyncStreamAction {
   // returns the action the dev can call with myModule.insert() etc.
-  return async function (payload?: void | object, actionConfig: ActionConfig = {}): Promise<void> {
+  return async function (payload?: any, actionConfig: ActionConfig = {}): Promise<void> {
     // get all the config needed to perform this action
     const eventNameFnsMap = getEventNameFnsMap(globalConfig.on, moduleConfig.on, actionConfig.on)
     const modifyPayloadFnsMap = getModifyPayloadFnsMap(

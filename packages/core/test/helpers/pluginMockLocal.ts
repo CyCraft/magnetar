@@ -1,15 +1,7 @@
 import { copy } from 'copy-anything'
 import {
-  ActionName,
   PluginInstance,
-  PluginRevertAction,
-  PluginGetAction,
-  PluginWriteAction,
-  PluginStreamAction,
-  PluginDeleteAction,
   VueSyncPlugin,
-  PluginDeletePropAction,
-  PluginInsertAction,
   getCollectionPathDocIdEntry,
   PlainObject,
 } from '../../src/index'
@@ -28,33 +20,15 @@ import { isArray } from 'is-what'
 // - StorePluginOptions
 // - StorePluginModuleConfig
 
-export interface StorePluginOptions {
+export type StorePluginOptions = {
   storeName: string
 }
-export interface StorePluginModuleConfig {
+export type StorePluginModuleConfig = {
   path?: string
   initialData?: PlainObject | [string, PlainObject][]
 }
 
-function actionFactory (
-  moduleData: PlainObject,
-  actionName: ActionName | 'revert',
-  pluginConfig: StorePluginOptions,
-  makeDataSnapshot: any,
-  restoreDataSnapshot: any
-): any {
-  const storeNameActionNameFnMap = {
-    insert: insertActionFactory,
-    merge: writeActionFactory,
-    deleteProp: deletePropActionFactory,
-    delete: deleteActionFactory,
-    get: getActionFactory,
-    stream: streamActionFactory,
-    revert: revertActionFactory,
-  }
-  const f = storeNameActionNameFnMap[actionName]
-  return f(moduleData, actionName, pluginConfig, makeDataSnapshot, restoreDataSnapshot)
-}
+export type MakeRestoreBackup = (collectionPath: string, docId: string) => void
 
 // a Vue Sync plugin is a single function that returns a `PluginInstance`
 // the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
@@ -66,13 +40,29 @@ export const CreatePlugin: VueSyncPlugin<StorePluginOptions> = (
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
   const data: { [collectionPath: string]: Map<string, PlainObject> } = {}
 
-  // this mocks some sort of data snapshot restore functionality of the plugin
-  const dataSnapshots = []
-  const makeDataSnapshot = () => dataSnapshots.push(copy(data))
-  const restoreDataSnapshot = () => {
-    const last = dataSnapshots.pop()
-    Object.keys(data.pokedex).forEach(key => delete data.pokedex[key])
-    Object.keys(last.pokedex).forEach(key => (data.pokedex[key] = last.pokedex[key]))
+  const dataBackups: { [collectionPath: string]: Map<string, PlainObject[]> } = {}
+  const makeBackup: MakeRestoreBackup = (collectionPath, docId) => {
+    // set the backup map for the collection
+    if (!(collectionPath in dataBackups)) dataBackups[collectionPath] = new Map()
+    const backupCollectionMap = dataBackups[collectionPath]
+    // set the backup array for the doc
+    if (!backupCollectionMap.has(docId)) backupCollectionMap.set(docId, [])
+    // make a backup of whatever is found in the data
+    const docBackup = copy(data[collectionPath].get(docId))
+    backupCollectionMap.get(docId).push(docBackup)
+  }
+
+  const restoreBackup: MakeRestoreBackup = (collectionPath, docId) => {
+    // set the backup map for the collection
+    if (!(collectionPath in dataBackups)) return
+    const backupCollectionMap = dataBackups[collectionPath]
+    // set the backup array for the doc
+    if (!backupCollectionMap.has(docId)) return
+    const docBackupArray = backupCollectionMap.get(docId)
+    if (!docBackupArray.length) return
+    // restore the backup of whatever is found and replace with the data
+    const docBackup = docBackupArray.pop()
+    data[collectionPath].set(docId, docBackup)
   }
 
   /**
@@ -93,7 +83,7 @@ export const CreatePlugin: VueSyncPlugin<StorePluginOptions> = (
         data[collectionPath].set(_docId, _docData)
       }
     } else {
-      data[collectionPath].set(docId, initialData)
+      data[collectionPath].set(docId, initialData as PlainObject)
     }
     modulesAlreadySetup.add(modulePath)
   }
@@ -101,28 +91,28 @@ export const CreatePlugin: VueSyncPlugin<StorePluginOptions> = (
   /**
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
    */
-  const getModuleData: PluginInstance['getModuleData'] = <DocDataType>(
+  const getModuleData: PluginInstance['getModuleData'] = (
     modulePath: string,
     moduleConfig: StorePluginModuleConfig = {}
   ) => {
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const collectionDB = data[collectionPath]
     // if it's a collection, just return the collectionDB, which MUST be a map with id as keys and the docs as value
-    if (!docId) return collectionDB as Map<string, DocDataType>
+    if (!docId) return collectionDB as Map<string, PlainObject>
     // if it's a doc, return the specific doc
-    return collectionDB.get(docId) as DocDataType
+    return collectionDB.get(docId) as PlainObject
   }
 
   // the plugin must try to implement logic for every `ActionName`
-  const get: PluginGetAction = actionFactory(data, 'get', storePluginOptions, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const stream: PluginStreamAction = actionFactory(data, 'stream', storePluginOptions, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const insert: PluginInsertAction = actionFactory(data, 'insert', storePluginOptions, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const _merge: PluginWriteAction = actionFactory(data, 'merge', storePluginOptions, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const deleteProp: PluginDeletePropAction = actionFactory(data, 'deleteProp', storePluginOptions, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const _delete: PluginDeleteAction = actionFactory(data, 'delete', storePluginOptions, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  const revert: PluginRevertAction = actionFactory(data, 'revert', storePluginOptions, makeDataSnapshot, restoreDataSnapshot) // prettier-ignore
-  // const assign: PluginWriteAction = actionFactory(data, 'assign', storePluginOptions, makeDataSnapshot, restoreDataSnapshot)
-  // const replace: PluginWriteAction = actionFactory(data, 'replace', storePluginOptions, makeDataSnapshot, restoreDataSnapshot)
+  const _merge = writeActionFactory(data, 'merge', storePluginOptions, makeBackup)
+  // const assign = writeActionFactory(data, 'assign', storePluginOptions, makeBackup)
+  // const replace = writeActionFactory(data, 'replace', storePluginOptions, makeBackup)
+  const get = getActionFactory(data, storePluginOptions, makeBackup)
+  const stream = streamActionFactory(data, storePluginOptions, makeBackup)
+  const insert = insertActionFactory(data, storePluginOptions, makeBackup)
+  const deleteProp = deletePropActionFactory(data, storePluginOptions, makeBackup)
+  const _delete = deleteActionFactory(data, storePluginOptions, makeBackup)
+  const revert = revertActionFactory(data, storePluginOptions, restoreBackup)
 
   // the plugin function must return a `PluginInstance`
   const instance: PluginInstance = {

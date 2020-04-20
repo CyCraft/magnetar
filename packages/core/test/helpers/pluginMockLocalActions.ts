@@ -18,16 +18,15 @@ import {
   ActionName,
   PlainObject,
 } from '../../src/index'
-import { StorePluginModuleConfig, StorePluginOptions } from './pluginMockLocal'
+import { StorePluginModuleConfig, StorePluginOptions, MakeRestoreBackup } from './pluginMockLocal'
 import { throwIfEmulatedError } from './throwFns'
 import { generateRandomId } from './generateRandomId'
 
 export function writeActionFactory (
-  moduleData: PlainObject,
+  data: { [collectionPath: string]: Map<string, PlainObject> },
   actionName: 'merge' | 'assign' | 'replace',
   storePluginOptions: StorePluginOptions,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
+  makeBackup?: MakeRestoreBackup
 ): PluginWriteAction {
   return function (
     payload: PlainObject,
@@ -43,7 +42,7 @@ export function writeActionFactory (
     if (isCollection) throw new Error('An non-existent action was triggered on a collection')
 
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
-    const collectionMap = moduleData[collectionPath]
+    const collectionMap = data[collectionPath]
     if (!collectionMap.get(docId)) collectionMap.set(docId, {})
     const docDataToMutate = collectionMap.get(docId)
     if (actionName === 'merge') {
@@ -55,11 +54,9 @@ export function writeActionFactory (
 }
 
 export function insertActionFactory (
-  moduleData: PlainObject,
-  actionName: 'insert',
+  data: { [collectionPath: string]: Map<string, PlainObject> },
   storePluginOptions: StorePluginOptions,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
+  makeBackup?: MakeRestoreBackup
 ): PluginInsertAction {
   return function (
     payload: PlainObject,
@@ -72,14 +69,16 @@ export function insertActionFactory (
 
     const isCollection = isCollectionModule(modulePath)
     if (isCollection) {
-      const id = String(payload.id) || generateRandomId()
+      const docId = String(payload.id) || generateRandomId()
       const collectionPath = modulePath
-      moduleData[collectionPath].set(id, payload)
-      return id
+      if (makeBackup) makeBackup(collectionPath, docId)
+      data[collectionPath].set(docId, payload)
+      return docId
     }
     // else it's a doc
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
-    const collectionMap = moduleData[collectionPath]
+    if (makeBackup) makeBackup(collectionPath, docId)
+    const collectionMap = data[collectionPath]
     if (!collectionMap.get(docId)) collectionMap.set(docId, {})
     const docDataToMutate = collectionMap.get(docId)
     Object.entries(payload).forEach(([key, value]) => {
@@ -90,11 +89,9 @@ export function insertActionFactory (
 }
 
 export function deletePropActionFactory (
-  moduleData: PlainObject,
-  actionName: 'deleteProp',
+  data: { [collectionPath: string]: Map<string, PlainObject> },
   storePluginOptions: StorePluginOptions,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
+  makeBackup?: MakeRestoreBackup
 ): PluginDeletePropAction {
   return function (
     payload: string | string[],
@@ -110,7 +107,7 @@ export function deletePropActionFactory (
     if (isCollection) throw new Error('An non-existent action was triggered on a collection')
 
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
-    const collectionMap = moduleData[collectionPath]
+    const collectionMap = data[collectionPath]
     const docData = collectionMap.get(docId)
 
     const payloadArray = isArray(payload) ? payload : [payload]
@@ -121,11 +118,9 @@ export function deletePropActionFactory (
 }
 
 export function deleteActionFactory (
-  moduleData: PlainObject,
-  actionName: ActionName | 'revert',
+  data: { [collectionPath: string]: Map<string, PlainObject> },
   storePluginOptions: StorePluginOptions,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
+  makeBackup?: MakeRestoreBackup
 ): PluginDeleteAction {
   return function (
     payload: void,
@@ -141,16 +136,14 @@ export function deleteActionFactory (
     if (isCollection) throw new Error('An non-existent action was triggered on a collection')
 
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
-    moduleData[collectionPath].delete(docId)
+    data[collectionPath].delete(docId)
   }
 }
 
 export function getActionFactory (
-  moduleData: PlainObject,
-  actionName: ActionName | 'revert',
+  data: { [collectionPath: string]: Map<string, PlainObject> },
   storePluginOptions: StorePluginOptions,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
+  makeBackup?: MakeRestoreBackup
 ): PluginGetAction {
   return async (
     payload: void | PlainObject = {},
@@ -158,28 +151,23 @@ export function getActionFactory (
     pluginModuleConfig: StorePluginModuleConfig
   ): Promise<GetResponse | DoOnGet> => {
     // this is custom logic to be implemented by the plugin author
-    makeDataSnapshot()
+    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
+    makeBackup(collectionPath, docId)
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // let's pass a new event that will make sure this plugin's data is kept up to date with the server data
     // this mocks how the result from the next store (the remote store) should be merged into the local stores
     const doOnGetAction: DoOnGet = (payload, meta): void => {
-      insertActionFactory(moduleData, 'insert', storePluginOptions)(
-        payload,
-        modulePath,
-        pluginModuleConfig
-      )
+      insertActionFactory(data, storePluginOptions)(payload, modulePath, pluginModuleConfig)
     }
     return doOnGetAction
   }
 }
 
 export function streamActionFactory (
-  moduleData: PlainObject,
-  actionName: ActionName | 'revert',
+  data: { [collectionPath: string]: Map<string, PlainObject> },
   storePluginOptions: StorePluginOptions,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
+  makeBackup?: MakeRestoreBackup
 ): PluginStreamAction {
   return (
     payload: void | PlainObject = {},
@@ -194,10 +182,10 @@ export function streamActionFactory (
     // hover over the prop names below to see more info on when they are triggered:
     const doOnStream: DoOnStream = {
       added: (payload, meta) => {
-        insertActionFactory(moduleData, 'insert', storePluginOptions)(payload, modulePath, pluginModuleConfig) // prettier-ignore
+        insertActionFactory(data, storePluginOptions)(payload, modulePath, pluginModuleConfig) // prettier-ignore
       },
       modified: (payload, meta) => {
-        insertActionFactory(moduleData, 'insert', storePluginOptions)(payload, modulePath, pluginModuleConfig) // prettier-ignore
+        insertActionFactory(data, storePluginOptions)(payload, modulePath, pluginModuleConfig) // prettier-ignore
       },
       removed: (payload, meta) => {
         const isCollection = isCollectionModule(modulePath)
@@ -206,11 +194,7 @@ export function streamActionFactory (
           : isString(payload)
           ? `${modulePath}/${payload}`
           : `${modulePath}/${payload.id}`
-        deleteActionFactory(moduleData, 'delete', storePluginOptions)(
-          undefined,
-          pathToDelete,
-          pluginModuleConfig
-        )
+        deleteActionFactory(data, storePluginOptions)(undefined, pathToDelete, pluginModuleConfig)
       },
     }
     return doOnStream
@@ -218,11 +202,9 @@ export function streamActionFactory (
 }
 
 export function revertActionFactory (
-  moduleData: PlainObject,
-  actionName: ActionName | 'revert',
-  storePluginOptions: StorePluginOptions,
-  makeDataSnapshot?: any,
-  restoreDataSnapshot?: any
+  data: { [collectionPath: string]: Map<string, PlainObject> },
+  simpleStoreOptions: StorePluginOptions,
+  restoreBackup: MakeRestoreBackup
 ): PluginRevertAction {
   // this is a `PluginRevertAction`:
   return function revert (
@@ -231,29 +213,20 @@ export function revertActionFactory (
     pluginModuleConfig: StorePluginModuleConfig,
     actionName: ActionName
   ): void {
-    // this is custom logic to be implemented by the plugin author
-    if (!payload) return
-    // strings are only possible during deletions
-    // haven't implemented reverting deletions yet
-    if (isString(payload) || (isArray(payload) && isString(payload[0]))) return
-    // this mocks data reverted during a read
-    if (actionName === 'get' || actionName === 'stream') {
-      restoreDataSnapshot()
-      return
-    }
-    // this mocks data reverted during a write
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
-    const collectionMap = moduleData[collectionPath]
-    if (!docId) {
-      // collection
-      throw new Error(
-        `revert not yet implemented for insert on collection - payload: ${JSON.stringify(payload)}`
-      )
-    }
-    if (actionName === 'insert') {
-      collectionMap.delete(docId)
+    // revert all write actions when called on a doc
+    if (
+      docId &&
+      ['insert', 'merge', 'assign', 'replace', 'delete', 'deleteProp'].includes(actionName)
+    ) {
+      restoreBackup(collectionPath, docId)
       return
     }
-    throw new Error('revert not yet implemented for this action')
+    // insert on collection (no id)
+    if (!docId && actionName === 'insert') {
+      throw new Error(`revert not yet implemented for insert on collections`)
+    }
+    // haven't implemented reverting 'get', 'stream' actions yet
+    throw new Error(`revert not yet implemented for ${actionName}`)
   }
 }

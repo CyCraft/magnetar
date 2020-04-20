@@ -49,10 +49,9 @@ export function getDataFromDataStore<calledFrom extends 'collection' | 'doc', Do
   const storeModuleConfig = moduleConfig?.configPerStore?.[dataStoreName] || {}
 
   if (isDocModule(modulePath)) {
-    return ((_modulePath: string) =>
-      getModuleData<DocDataType>(_modulePath, storeModuleConfig)) as any
+    return ((_modulePath: string) => getModuleData(_modulePath, storeModuleConfig)) as any
   }
-  const data = getModuleData<DocDataType>(modulePath, storeModuleConfig)
+  const data = getModuleData(modulePath, storeModuleConfig)
   if (!isMap(data)) {
     logErrorAndThrow('Collections must return a Map')
   }

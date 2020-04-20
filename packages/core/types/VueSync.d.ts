@@ -15,9 +15,9 @@ export interface VueSyncInstance {
 /**
  * This is the type for calling `collection()`
  */
-export declare type CollectionFn<DocDataTypeInherited = PlainObject> = <DocDataType = DocDataTypeInherited>(idOrPath: string, moduleConfig?: ModuleConfig) => CollectionInstance<DocDataType>;
+export declare type CollectionFn<DocDataTypeInherited extends object = PlainObject> = <DocDataType extends object = DocDataTypeInherited>(idOrPath: string, moduleConfig?: ModuleConfig) => CollectionInstance<DocDataType>;
 /**
  * This is the type for calling `doc()`
  */
-export declare type DocFn<DocDataTypeInherited = PlainObject> = <DocDataType = DocDataTypeInherited>(idOrPath: string, moduleConfig?: ModuleConfig) => DocInstance<DocDataType>;
+export declare type DocFn<DocDataTypeInherited extends object = PlainObject> = <DocDataType extends object = DocDataTypeInherited>(idOrPath: string, moduleConfig?: ModuleConfig) => DocInstance<DocDataType>;
 export declare function VueSync(vueSyncConfig: GlobalConfig): VueSyncInstance;

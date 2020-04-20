@@ -8,7 +8,7 @@ import { ModuleConfig, GlobalConfig } from './types/config'
 import { DocFn, CollectionFn } from './VueSync'
 import { executeSetupModulePerStore, getDataFromDataStore } from './helpers/moduleHelpers'
 
-export type CollectionInstance<DocDataType = { [prop: string]: any }> = {
+export type CollectionInstance<DocDataType extends object = { [prop: string]: any }> = {
   data: Map<string, DocDataType>
   doc: DocFn<DocDataType>
   id: string
@@ -21,7 +21,7 @@ export type CollectionInstance<DocDataType = { [prop: string]: any }> = {
   insert?: VueSyncInsertAction<DocDataType>
 }
 
-export function createCollectionWithContext<DocDataType> (
+export function createCollectionWithContext<DocDataType extends object> (
   idOrPath: string,
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,

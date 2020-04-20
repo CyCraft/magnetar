@@ -38,16 +38,16 @@ export interface PluginInstance {
   /**
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
    */
-  getModuleData?: <DocDataType = { [prop: string]: any }>(
+  getModuleData?: (
     modulePath: string,
     moduleConfig: PluginModuleConfig
-  ) => DocDataType | Map<string, DocDataType>
+  ) => PlainObject | Map<string, PlainObject>
 }
 
 /**
  * Extra config a dev might pass when instanciates a module as second param (under `configPerStore`). Eg. `collection('pokedex', { configPerStore: { local: pluginModuleConfig } })`
  */
-export type PluginModuleConfig = PlainObject
+export type PluginModuleConfig = PlainObject | any
 
 // each of the following actions must be implemented by the plugin!
 

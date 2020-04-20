@@ -35,7 +35,9 @@ export interface VueSyncInstance {
 /**
  * This is the type for calling `collection()`
  */
-export type CollectionFn<DocDataTypeInherited = PlainObject> = <DocDataType = DocDataTypeInherited>(
+export type CollectionFn<DocDataTypeInherited extends object = PlainObject> = <
+  DocDataType extends object = DocDataTypeInherited
+>(
   idOrPath: string,
   moduleConfig?: ModuleConfig
 ) => CollectionInstance<DocDataType>
@@ -43,7 +45,9 @@ export type CollectionFn<DocDataTypeInherited = PlainObject> = <DocDataType = Do
 /**
  * This is the type for calling `doc()`
  */
-export type DocFn<DocDataTypeInherited = PlainObject> = <DocDataType = DocDataTypeInherited>(
+export type DocFn<DocDataTypeInherited extends object = PlainObject> = <
+  DocDataType extends object = DocDataTypeInherited
+>(
   idOrPath: string,
   moduleConfig?: ModuleConfig
 ) => DocInstance<DocDataType>
@@ -54,7 +58,7 @@ export function VueSync (vueSyncConfig: GlobalConfig): VueSyncInstance {
 
   const moduleMap = new Map() // apply type upon get/set
 
-  function collection<DocDataType> (
+  function collection<DocDataType extends object> (
     idOrPath: string,
     moduleConfig: ModuleConfig = {}
   ): CollectionInstance<DocDataType> {
@@ -75,7 +79,7 @@ export function VueSync (vueSyncConfig: GlobalConfig): VueSyncInstance {
     return moduleInstance
   }
 
-  function doc<DocDataType> (
+  function doc<DocDataType extends object> (
     idOrPath: string,
     moduleConfig: ModuleConfig = {}
   ): DocInstance<DocDataType> {

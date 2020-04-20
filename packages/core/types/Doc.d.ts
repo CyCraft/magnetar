@@ -2,7 +2,7 @@ import { O } from 'ts-toolbelt';
 import { VueSyncWriteAction, VueSyncGetAction, VueSyncStreamAction, VueSyncDeleteAction, VueSyncDeletePropAction, VueSyncInsertAction } from './types/actions';
 import { ModuleConfig, GlobalConfig } from './types/config';
 import { CollectionFn, DocFn } from './VueSync';
-export declare type DocInstance<DocDataType = {
+export declare type DocInstance<DocDataType extends object = {
     [prop: string]: any;
 }> = {
     data: DocDataType;
@@ -21,4 +21,4 @@ export declare type DocInstance<DocDataType = {
     deleteProp?: VueSyncDeletePropAction<DocDataType>;
     delete?: VueSyncDeleteAction<DocDataType>;
 };
-export declare function createDocWithContext<DocDataType>(idOrPath: string, moduleConfig: ModuleConfig, globalConfig: O.Compulsory<GlobalConfig>, docFn: DocFn<DocDataType>, collectionFn: CollectionFn<DocDataType>): DocInstance<DocDataType>;
+export declare function createDocWithContext<DocDataType extends object>(idOrPath: string, moduleConfig: ModuleConfig, globalConfig: O.Compulsory<GlobalConfig>, docFn: DocFn<DocDataType>, collectionFn: CollectionFn): DocInstance<DocDataType>;
