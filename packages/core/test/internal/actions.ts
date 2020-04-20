@@ -116,11 +116,12 @@ test('read: stream (collection)', async t => {
   const unsubscribe = pokedexModule.openStreams[JSON.stringify(payload)]
   unsubscribe()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-  t.deepEqual(pokedexModule.data.get('136'), pokedex(136))
-  t.deepEqual(pokedexModule.data.size, 2)
+  t.deepEqual(pokedexModule.data.get('2'), pokedex(2))
+  t.deepEqual(pokedexModule.data.get('3'), pokedex(3))
+  t.deepEqual(pokedexModule.data.size, 3)
   await waitMs(1000)
-  t.deepEqual(pokedexModule.data.size, 2)
-  // '4': charmander should come in 3rd, but doesn't because we closed the stream
+  t.deepEqual(pokedexModule.data.size, 3)
+  // '4': charmander should come in next, but doesn't because we closed the stream
 })
 
 test('read: stream (doc)', async t => {
@@ -154,7 +155,7 @@ test('read: get (collection)', async t => {
   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.deepEqual(pokedexModule.data.get('136'), pokedex(136))
-  t.deepEqual(pokedexModule.data.size, 2)
+  t.deepEqual(pokedexModule.data.size, 151)
 })
 
 test('read: get (document)', async t => {

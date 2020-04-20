@@ -18,7 +18,7 @@ import {
 } from '../../src/index'
 import { StorePluginModuleConfig, StorePluginOptions } from './pluginMockRemote'
 import { waitMs } from './wait'
-import { pokedex } from './pokemon'
+import { pokedex, pokedexGetAll } from './pokemon'
 import { throwIfEmulatedError } from './throwFns'
 import { generateRandomId } from './generateRandomId'
 
@@ -97,11 +97,24 @@ export function deleteActionFactory (storePluginOptions: StorePluginOptions): Pl
   }
 }
 
+function mockDataRetrieval (isCollection: boolean, clauses: { where?: any[][] }): PlainObject[] {
+  if (!isCollection) return [{ name: 'Luca', age: 10, dream: 'job' }]
+  let result = pokedexGetAll()
+  const { where } = clauses
+  if (!where) return result
+  for (const wherePhrase of where) {
+    const [prop, comparator, expected] = wherePhrase
+    result = result.filter(p => p[prop] == expected)
+  }
+  return result
+}
+
 export function getActionFactory (storePluginOptions: StorePluginOptions): PluginGetAction {
   return async (
     payload: void | PlainObject = {},
     modulePath: string,
-    pluginModuleConfig: StorePluginModuleConfig
+    pluginModuleConfig: StorePluginModuleConfig,
+    clauses: { where?: any[][] }
   ): Promise<DoOnGet | GetResponse> => {
     // this is custom logic to be implemented by the plugin author
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
@@ -114,9 +127,7 @@ export function getActionFactory (storePluginOptions: StorePluginOptions): Plugi
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         // this mocks an error during execution
-        const dataRetrieved: PlainObject[] = isCollection
-          ? [pokedex(1), pokedex(136)]
-          : [{ name: 'Luca', age: 10, dream: 'job' }]
+        const dataRetrieved = mockDataRetrieval(isCollection, clauses)
         // we must trigger `mustExecuteOnGet.added` for each document that was retrieved and return whatever that returns
         const results = dataRetrieved.map(_data => {
           const _metaData = { data: _data, exists: true, id: _data.id || docId }
@@ -142,8 +153,9 @@ export function streamActionFactory (storePluginOptions: StorePluginOptions): Pl
     // we'll mock opening a stream
 
     const dataRetrieved = isCollection
-      ? [pokedex(1), pokedex(136), pokedex(4)]
+      ? pokedexGetAll()
       : [
+          { name: 'Luca', age: 10 },
           { name: 'Luca', age: 10 },
           { name: 'Luca', age: 10, dream: 'job' },
           { name: 'Luca', age: 10, dream: 'job', colour: 'blue' },
@@ -154,7 +166,7 @@ export function streamActionFactory (storePluginOptions: StorePluginOptions): Pl
     }
     // this mocks actual data coming in at different intervals
     dataRetrieved.forEach((data, i) => {
-      const waitTime = 10 + i * 500
+      const waitTime = 10 + i * 200
       setTimeout(() => {
         // mock when the stream is already stopped
         if (stopStreaming.stopped) return

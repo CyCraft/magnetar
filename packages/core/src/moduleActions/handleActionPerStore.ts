@@ -36,7 +36,8 @@ export function handleActionPerStore<TActionName extends Exclude<ActionName, 'st
   actionName: TActionName,
   actionType: ActionType,
   docFn: DocFn, // actions executed on a "doc" will always return `doc()`
-  collectionFn?: CollectionFn // actions executed on a "collection" will return `collection()` or `doc()`
+  collectionFn?: CollectionFn, // actions executed on a "collection" will return `collection()` or `doc()`
+  clauses?: { where: string[][] }
 ): ActionTernary<TActionName>
 
 export function handleActionPerStore (
@@ -46,7 +47,8 @@ export function handleActionPerStore (
   actionName: Exclude<ActionName, 'stream'>,
   actionType: ActionType,
   docFn: DocFn, // actions executed on a "doc" will always return `doc()`
-  collectionFn?: CollectionFn // actions executed on a "collection" will return `collection()` or `doc()`
+  collectionFn?: CollectionFn, // actions executed on a "collection" will return `collection()` or `doc()`
+  clauses: { where: string[][] } = { where: [] }
 ):
   | VueSyncGetAction<any>
   | VueSyncWriteAction<any>
@@ -124,6 +126,7 @@ export function handleActionPerStore (
             actionName,
             stopExecutionAfterAction,
             storeName,
+            clauses,
           })
       // handle reverting. stopExecution might have been modified by `handleAction`
       if ((stopExecution as any) === 'revert') {

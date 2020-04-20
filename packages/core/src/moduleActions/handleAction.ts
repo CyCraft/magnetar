@@ -27,6 +27,7 @@ export async function handleAction (args: {
   actionName: Exclude<ActionName, 'stream'>
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
   storeName: string
+  clauses: { where: string[][] }
 }): Promise<void | string | GetResponse | OnAddedFn> {
   const {
     modulePath,
@@ -38,6 +39,7 @@ export async function handleAction (args: {
     actionName,
     stopExecutionAfterAction,
     storeName,
+    clauses,
   } = args
   // create abort mechanism for current scope
   let abortExecution = false
@@ -56,7 +58,7 @@ export async function handleAction (args: {
   let result: void | string | GetResponse | OnAddedFn
   try {
     // triggering the action provided by the plugin
-    result = await pluginAction(payload as any, modulePath, pluginModuleConfig)
+    result = await pluginAction(payload as any, modulePath, pluginModuleConfig, clauses)
   } catch (error) {
     if (!isVueSyncError(error)) throw new Error(error)
     // handle and await each eventFn in sequence

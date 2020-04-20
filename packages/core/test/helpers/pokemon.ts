@@ -2022,3 +2022,7 @@ export function pokedex (pokedexNr: number): PokedexEntry {
   const entryIndex = pokedexNr - 1
   return copy(pokedexArray[entryIndex])
 }
+
+export function pokedexGetAll () {
+  return copy(pokedexArray)
+}

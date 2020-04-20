@@ -67,7 +67,8 @@ export type PluginStreamAction = (
 export type PluginGetAction = (
   payload: PlainObject | void,
   modulePath: string,
-  pluginModuleConfig: PluginModuleConfig
+  pluginModuleConfig: PluginModuleConfig,
+  clauses: { where: string[][] }
 ) => GetResponse | DoOnGet | Promise<GetResponse | DoOnGet>
 
 /**
