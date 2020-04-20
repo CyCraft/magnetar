@@ -18,7 +18,7 @@ import {
 } from '../../src/index'
 import { StorePluginModuleConfig, StorePluginOptions } from './pluginMockRemote'
 import { waitMs } from './wait'
-import { bulbasaur, flareon, charmander } from './pokemon'
+import { pokedex } from './pokemon'
 import { throwIfEmulatedError } from './throwFns'
 import { generateRandomId } from './generateRandomId'
 
@@ -115,7 +115,7 @@ export function getActionFactory (storePluginOptions: StorePluginOptions): Plugi
       setTimeout(() => {
         // this mocks an error during execution
         const dataRetrieved: PlainObject[] = isCollection
-          ? [bulbasaur(), flareon()]
+          ? [pokedex(1), pokedex(136)]
           : [{ name: 'Luca', age: 10, dream: 'job' }]
         // we must trigger `mustExecuteOnGet.added` for each document that was retrieved and return whatever that returns
         const results = dataRetrieved.map(_data => {
@@ -142,7 +142,7 @@ export function streamActionFactory (storePluginOptions: StorePluginOptions): Pl
     // we'll mock opening a stream
 
     const dataRetrieved = isCollection
-      ? [bulbasaur(), flareon(), charmander()]
+      ? [pokedex(1), pokedex(136), pokedex(4)]
       : [
           { name: 'Luca', age: 10 },
           { name: 'Luca', age: 10, dream: 'job' },

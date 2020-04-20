@@ -72,7 +72,7 @@ export function insertActionFactory (
 
     const isCollection = isCollectionModule(modulePath)
     if (isCollection) {
-      const id = payload.id || generateRandomId()
+      const id = String(payload.id) || generateRandomId()
       const collectionPath = modulePath
       moduleData[collectionPath].set(id, payload)
       return id

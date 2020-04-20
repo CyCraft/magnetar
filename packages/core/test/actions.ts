@@ -1,25 +1,26 @@
 import test from 'ava'
 import { DocInstance } from '../src/index'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
-import { bulbasaur, squirtle, flareon } from './helpers/pokemon'
+import { pokedex } from './helpers/pokemon'
 import { waitMs } from './helpers/wait'
+import { merge } from 'merge-anything'
 
 test('write: insert (document)', async t => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
-  const payload = squirtle()
-  t.deepEqual(pokedexModule.data.get('007'), undefined)
-  await pokedexModule.doc('007').insert(payload).catch(e => t.fail(e.message)) // prettier-ignore
+  const payload = pokedex(7)
+  t.deepEqual(pokedexModule.data.get('7'), undefined)
+  await pokedexModule.doc('7').insert(payload).catch(e => t.fail(e.message)) // prettier-ignore
   // check data of references executed on
-  t.deepEqual(pokedexModule.data.get('007'), payload)
+  t.deepEqual(pokedexModule.data.get('7'), payload)
   // check data of new references
-  t.deepEqual(pokedexModule.doc('007').data, payload)
-  t.deepEqual(vueSync.doc('pokedex/007').data, payload)
-  t.deepEqual(vueSync.collection('pokedex').doc('007').data, payload)
+  t.deepEqual(pokedexModule.doc('7').data, payload)
+  t.deepEqual(vueSync.doc('pokedex/7').data, payload)
+  t.deepEqual(vueSync.collection('pokedex').doc('7').data, payload)
 })
 
 test('write: insert (collection) → random ID', async t => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
-  const payload = squirtle()
+  const payload = pokedex(7)
 
   let moduleFromResult: DocInstance
   try {
@@ -94,18 +95,18 @@ test('delete: (document)', async t => {
 
 test('write: merge (document)', async t => {
   const { pokedexModule } = createVueSyncInstance()
-  const payload = { id: '001', type: { alt: 'Leaf' } }
-  const doc = pokedexModule.doc('001')
-  t.deepEqual(doc.data, bulbasaur())
+  const payload = { base: { alt: 'Leaf' } }
+  const doc = pokedexModule.doc('1')
+  t.deepEqual(doc.data, pokedex(1))
   await doc.merge(payload).catch(e => t.fail(e.message)) // prettier-ignore
-  const mergedResult = { name: 'Bulbasaur', id: '001', type: { grass: 'Grass', alt: 'Leaf' } }
-  t.deepEqual(pokedexModule.data.get('001'), mergedResult)
+  const mergedResult = merge(pokedex(1), { base: { alt: 'Leaf' } })
+  t.deepEqual(pokedexModule.data.get('1'), mergedResult)
   t.deepEqual(doc.data, mergedResult)
 })
 
 test('read: stream (collection)', async t => {
   const { pokedexModule } = createVueSyncInstance()
-  t.deepEqual(pokedexModule.data.get('001'), bulbasaur())
+  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.deepEqual(pokedexModule.data.size, 1)
   const payload = {}
   // do not await, because it only resolves when the stream is closed
@@ -114,12 +115,12 @@ test('read: stream (collection)', async t => {
   // close the stream:
   const unsubscribe = pokedexModule.openStreams[JSON.stringify(payload)]
   unsubscribe()
-  t.deepEqual(pokedexModule.data.get('001'), bulbasaur())
-  t.deepEqual(pokedexModule.data.get('136'), flareon())
+  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  t.deepEqual(pokedexModule.data.get('136'), pokedex(136))
   t.deepEqual(pokedexModule.data.size, 2)
   await waitMs(1000)
   t.deepEqual(pokedexModule.data.size, 2)
-  // '004': charmander should come in 3rd, but doesn't because we closed the stream
+  // '4': charmander should come in 3rd, but doesn't because we closed the stream
 })
 
 test('read: stream (doc)', async t => {
@@ -141,18 +142,18 @@ test('read: stream (doc)', async t => {
 test('read: get (collection)', async t => {
   // 'get' resolves once all stores have given a response with data
   const { pokedexModule } = createVueSyncInstance()
-  t.deepEqual(pokedexModule.data.get('001'), bulbasaur())
+  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.deepEqual(pokedexModule.data.size, 1)
   try {
     const result = await pokedexModule.get()
-    t.deepEqual(result.data.get('001'), bulbasaur())
-    t.deepEqual(result.data.get('136'), flareon())
+    t.deepEqual(result.data.get('1'), pokedex(1))
+    t.deepEqual(result.data.get('136'), pokedex(136))
   } catch (error) {
     t.fail(error)
   }
   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
-  t.deepEqual(pokedexModule.data.get('001'), bulbasaur())
-  t.deepEqual(pokedexModule.data.get('136'), flareon())
+  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  t.deepEqual(pokedexModule.data.get('136'), pokedex(136))
   t.deepEqual(pokedexModule.data.size, 2)
 })
 

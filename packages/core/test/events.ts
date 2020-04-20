@@ -1,10 +1,10 @@
 import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
-import { squirtle } from './helpers/pokemon'
+import { pokedex } from './helpers/pokemon'
 
 test('insert: emits before & success events', async t => {
   const { pokedexModule } = createVueSyncInstance()
-  const insertPayload = squirtle()
+  const insertPayload = pokedex(7)
   let ranAllEvents = []
   await pokedexModule.insert(insertPayload, {
     on: {
@@ -35,7 +35,7 @@ test('insert: emits before & success events', async t => {
 
 test('insert: can abort in before events', async t => {
   const { pokedexModule } = createVueSyncInstance()
-  const insertPayload = squirtle()
+  const insertPayload = pokedex(7)
   try {
     const result = await pokedexModule.insert(insertPayload, {
       on: {
@@ -61,7 +61,7 @@ test('insert: can abort in before events', async t => {
 
 test('insert: can abort in success events', async t => {
   const { pokedexModule } = createVueSyncInstance()
-  const insertPayload = squirtle()
+  const insertPayload = pokedex(7)
   let ranAllEvents = []
   try {
     const result = await pokedexModule.insert(insertPayload, {
