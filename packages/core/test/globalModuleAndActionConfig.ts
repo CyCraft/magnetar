@@ -1,9 +1,10 @@
 import test from 'ava'
 import { VueSync } from '../src/index'
 import { CreatePlugin } from './helpers/pluginMockLocal'
+import { generateRandomId } from './helpers/generateRandomId'
 
 test('emits global, module and action events', async t => {
-  const local = CreatePlugin({ storeName: 'local' })
+  const local = CreatePlugin({ storeName: 'local', generateRandomId })
   const ranAllEvents: any[] = []
   const vueSync = VueSync({
     dataStoreName: 'local',
@@ -39,7 +40,7 @@ test('emits global, module and action events', async t => {
 })
 
 test('can modify payload in global, module and action settings', async t => {
-  const local = CreatePlugin({ storeName: 'local' })
+  const local = CreatePlugin({ storeName: 'local', generateRandomId })
   const vueSync = VueSync({
     dataStoreName: 'local',
     stores: { local },

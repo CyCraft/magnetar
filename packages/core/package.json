@@ -46,8 +46,12 @@
     "url": "https://github.com/vue-sync/core/issues"
   },
   "ava": {
-    "extensions": ["ts"],
-    "require": ["ts-node/register"],
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
     "timeout": "30s"
   }
 }

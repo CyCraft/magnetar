@@ -1,7 +1,8 @@
-import { CreatePlugin as CreatePluginLocal } from './pluginMockLocal'
+import { CreatePlugin as CreatePluginLocal } from './pluginMockLocal/index'
 import { CreatePlugin as CreatePluginRemote } from './pluginMockRemote'
 import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '../../src/index'
 import { pokedex, PokedexEntry } from './pokemon'
+import { generateRandomId } from './generateRandomId'
 import { O } from 'ts-toolbelt'
 
 const getInitialDataCollection = () => [
@@ -31,7 +32,7 @@ export function createVueSyncInstance (): {
   trainerModule: DocInstance<TrainerModuleData>
   vueSync: VueSyncInstance
 } {
-  const local = CreatePluginLocal({ storeName: 'local' })
+  const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
   const remote = CreatePluginRemote({ storeName: 'remote' })
   const vueSync = VueSync({
     dataStoreName: 'local',
