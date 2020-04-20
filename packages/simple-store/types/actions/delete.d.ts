@@ -1,3 +1,5 @@
 import { PlainObject, PluginDeleteAction } from '@vue-sync/core';
-import { SimpleStoreConfig } from '..';
-export declare function deleteActionFactory(moduleData: PlainObject, simpleStoreConfig: SimpleStoreConfig, makeDataSnapshot?: any): PluginDeleteAction;
+import { SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin';
+export declare function deleteActionFactory(data: {
+    [collectionPath: string]: Map<string, PlainObject>;
+}, simpleStoreOptions: SimpleStoreOptions, makeBackup?: MakeRestoreBackup): PluginDeleteAction;

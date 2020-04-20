@@ -1,26 +1,25 @@
 import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
-import { squirtle } from './helpers/pokemon'
+import { pokedex } from './helpers/pokemon'
 import { DocInstance } from '@vue-sync/core'
-import { isModuleDataEqual } from './helpers/compareModuleData'
 
 test('insert (document)', async t => {
-  const { pokedexModule, vueSync } = createVueSyncInstance()
-  const payload = squirtle()
-  isModuleDataEqual(t, vueSync, 'pokedex/007', undefined)
+  const { pokedexModule } = createVueSyncInstance()
+  const payload = pokedex(7)
+  t.deepEqual(pokedexModule.doc('7').data, undefined)
 
   try {
-    await pokedexModule.doc('007').insert(payload)
+    await pokedexModule.doc('7').insert(payload)
   } catch (error) {
     t.fail(error)
   }
 
-  isModuleDataEqual(t, vueSync, 'pokedex/007', payload)
+  t.deepEqual(pokedexModule.doc('7').data, payload)
 })
 
 test('insert (collection) → random ID', async t => {
-  const { pokedexModule, vueSync } = createVueSyncInstance()
-  const payload = squirtle()
+  const { pokedexModule } = createVueSyncInstance()
+  const payload = pokedex(7)
 
   let moduleFromResult: DocInstance
   try {
@@ -29,26 +28,26 @@ test('insert (collection) → random ID', async t => {
     t.fail(error)
   }
   const newId = moduleFromResult.id
-  isModuleDataEqual(t, vueSync, `pokedex/${newId}`, payload)
+  t.deepEqual(pokedexModule.doc(newId).data, payload)
 })
 
 test('revert: insert (document)', async t => {
-  const { pokedexModule, vueSync } = createVueSyncInstance()
-  const payload = { ...squirtle(), shouldFail: 'remote' }
-  isModuleDataEqual(t, vueSync, 'pokedex/007', undefined)
+  const { pokedexModule } = createVueSyncInstance()
+  const payload = { ...pokedex(7), shouldFail: 'remote' }
+  t.deepEqual(pokedexModule.doc('7').data, undefined)
 
   try {
-    await pokedexModule.doc('007').insert(payload, { onError: 'revert' })
+    await pokedexModule.doc('7').insert(payload, { onError: 'revert' })
   } catch (error) {
     t.fail(error)
   }
 
-  isModuleDataEqual(t, vueSync, 'pokedex/007', undefined)
+  t.deepEqual(pokedexModule.doc('7').data, undefined)
 })
 
 test('revert: insert (collection) → random ID', async t => {
-  const { pokedexModule, vueSync } = createVueSyncInstance()
-  const payload = { ...squirtle(), shouldFail: 'remote' }
+  const { pokedexModule } = createVueSyncInstance()
+  const payload = { ...pokedex(7), shouldFail: 'remote' }
 
   let moduleFromResult: DocInstance
   try {
@@ -57,5 +56,5 @@ test('revert: insert (collection) → random ID', async t => {
     t.fail(error)
   }
   const newId = moduleFromResult.id
-  isModuleDataEqual(t, vueSync, `pokedex/${newId}`, undefined)
+  t.deepEqual(pokedexModule.doc(newId).data, undefined)
 })

@@ -5,8 +5,7 @@ import {
   PluginWriteAction,
   getCollectionPathDocIdEntry,
 } from '@vue-sync/core'
-import { SimpleStoreModuleConfig, SimpleStoreOptions } from '..'
-import { MakeRestoreBackup } from '../CreatePlugin'
+import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function writeActionFactory (
   data: { [collectionPath: string]: Map<string, PlainObject> },

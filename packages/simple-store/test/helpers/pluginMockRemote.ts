@@ -11,12 +11,12 @@ import {
 
 // there are two interfaces to be defined & exported by each plugin
 // - StorePluginOptions
-// - StorePluginModuleConfig
+// - SimpleStoreModuleConfig
 
 export interface StorePluginOptions {
   storeName: string
 }
-export interface StorePluginModuleConfig {
+export interface SimpleStoreModuleConfig {
   path?: string
   initialData?: PlainObject | [string, PlainObject][]
 }

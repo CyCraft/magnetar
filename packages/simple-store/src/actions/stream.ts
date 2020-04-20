@@ -7,7 +7,7 @@ import {
   DoOnStream,
   MustExecuteOnRead,
 } from '@vue-sync/core'
-import { SimpleStoreModuleConfig, SimpleStoreOptions } from '..'
+import { SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 import { deleteActionFactory } from './delete'
 

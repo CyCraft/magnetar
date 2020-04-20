@@ -1,10 +1,11 @@
 import { VueSyncPlugin, PlainObject } from '@vue-sync/core';
-export interface SimpleStoreConfig {
+export interface SimpleStoreOptions {
     storeName: string;
     generateRandomId: () => string;
 }
-export interface StorePluginModuleConfig {
+export interface SimpleStoreModuleConfig {
     path?: string;
     initialData?: PlainObject | [string, PlainObject][];
 }
-export declare const CreatePlugin: VueSyncPlugin<SimpleStoreConfig>;
+export declare type MakeRestoreBackup = (collectionPath: string, docId: string) => void;
+export declare const CreatePlugin: VueSyncPlugin<SimpleStoreOptions>;

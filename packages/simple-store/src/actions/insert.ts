@@ -4,9 +4,8 @@ import {
   PluginInsertAction,
   getCollectionPathDocIdEntry,
 } from '@vue-sync/core'
-import { SimpleStoreModuleConfig, SimpleStoreOptions } from '..'
-import { isFullString } from 'is-what'
-import { MakeRestoreBackup } from '../CreatePlugin'
+import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { isFullString, isNumber } from 'is-what'
 
 export function insertActionFactory (
   data: { [collectionPath: string]: Map<string, PlainObject> },
@@ -22,7 +21,10 @@ export function insertActionFactory (
 
     const isCollection = isCollectionModule(modulePath)
     if (isCollection) {
-      const docId = isFullString(payload.id) ? payload.id : simpleStoreOptions.generateRandomId()
+      const docId =
+        isFullString(payload.id) || isNumber(payload.id)
+          ? String(payload.id)
+          : simpleStoreOptions.generateRandomId()
       const collectionPath = modulePath
 
       if (makeBackup) makeBackup(collectionPath, docId)

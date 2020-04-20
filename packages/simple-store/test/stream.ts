@@ -1,12 +1,11 @@
 import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
-import { bulbasaur, flareon } from './helpers/pokemon'
+import { pokedex } from './helpers/pokemon'
 import { waitMs } from './helpers/wait'
-import { isModuleDataEqual } from './helpers/compareModuleData'
 
 test('stream (collection)', async t => {
-  const { pokedexModule, vueSync } = createVueSyncInstance()
-  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur())
+  const { pokedexModule } = createVueSyncInstance()
+  t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
   t.deepEqual(pokedexModule.data.size, 1)
   const streamPayload = {}
 
@@ -18,17 +17,17 @@ test('stream (collection)', async t => {
   const unsubscribe = pokedexModule.openStreams[JSON.stringify(streamPayload)]
   unsubscribe()
 
-  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur())
-  isModuleDataEqual(t, vueSync, 'pokedex/136', flareon())
+  t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
+  t.deepEqual(pokedexModule.doc('136').data, pokedex(136))
   t.deepEqual(pokedexModule.data.size, 2)
   await waitMs(1000)
   t.deepEqual(pokedexModule.data.size, 2)
-  // '004': charmander should come in 3rd, but doesn't because we closed the stream
+  // '4': charmander should come in 3rd, but doesn't because we closed the stream
 })
 
 test('stream (doc)', async t => {
-  const { trainerModule, vueSync } = createVueSyncInstance()
-  isModuleDataEqual(t, vueSync, 'data/trainer', { name: 'Luca', age: 10 })
+  const { trainerModule } = createVueSyncInstance()
+  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
   const streamPayload = {}
 
   // do not await, because it only resolves when the stream is closed
@@ -39,8 +38,8 @@ test('stream (doc)', async t => {
   const unsubscribe = trainerModule.openStreams[JSON.stringify(streamPayload)]
   unsubscribe()
 
-  isModuleDataEqual(t, vueSync, 'data/trainer', { name: 'Luca', age: 10, dream: 'job' })
+  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
   await waitMs(1000)
-  isModuleDataEqual(t, vueSync, 'data/trainer', { name: 'Luca', age: 10, dream: 'job' })
+  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
   // {colour: 'blue'} should come in 3rd, but doesn't because we closed the stream
 })

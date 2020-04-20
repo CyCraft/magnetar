@@ -6,8 +6,7 @@ import {
   PluginDeletePropAction,
   getCollectionPathDocIdEntry,
 } from '@vue-sync/core'
-import { SimpleStoreModuleConfig, SimpleStoreOptions } from '..'
-import { MakeRestoreBackup } from '../CreatePlugin'
+import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function deletePropActionFactory (
   data: { [collectionPath: string]: Map<string, PlainObject> },

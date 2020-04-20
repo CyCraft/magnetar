@@ -1,24 +1,23 @@
 import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '@vue-sync/core'
 import { CreatePlugin } from '../../src/index'
 import { CreatePlugin as CreatePluginRemote } from './pluginMockRemote'
-import { bulbasaur } from './pokemon'
+import { pokedex, PokedexEntry } from './pokemon'
 import { generateRandomId } from './generateRandomId'
+import { O } from 'ts-toolbelt'
 
 const getInitialDataCollection = () => [
   // doc entries
-  ['001', bulbasaur()],
+  ['1', pokedex(1)],
 ]
 const getInitialDataDocument = () => ({ name: 'Luca', age: 10 })
 
-export interface PokedexModuleData {
-  id?: string
-  name: string
-  type?: {
-    [type: string]: string | undefined | null
+export type PokedexModuleData = O.Merge<
+  PokedexEntry,
+  {
+    seen?: boolean
+    shouldFail?: string
   }
-  seen?: boolean
-  shouldFail?: string
-}
+>
 
 export interface TrainerModuleData {
   name: string

@@ -1,10 +1,9 @@
 import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
-import { isModuleDataEqual } from './helpers/compareModuleData'
 
 test('delete', async t => {
-  const { trainerModule, vueSync } = createVueSyncInstance()
-  isModuleDataEqual(t, vueSync, 'data/trainer', { age: 10, name: 'Luca' })
+  const { trainerModule } = createVueSyncInstance()
+  t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
   try {
     await trainerModule.delete()
@@ -12,12 +11,12 @@ test('delete', async t => {
     t.fail(error)
   }
 
-  isModuleDataEqual(t, vueSync, 'data/trainer', undefined)
+  t.deepEqual(trainerModule.data, undefined)
 })
 
 test('revert: delete', async t => {
-  const { trainerModule, vueSync } = createVueSyncInstance()
-  isModuleDataEqual(t, vueSync, 'data/trainer', { age: 10, name: 'Luca' })
+  const { trainerModule } = createVueSyncInstance()
+  t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
   try {
     // @ts-ignore
@@ -26,5 +25,5 @@ test('revert: delete', async t => {
     t.fail(error)
   }
 
-  isModuleDataEqual(t, vueSync, 'data/trainer', { age: 10, name: 'Luca' })
+  t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 })

@@ -4,8 +4,7 @@ import {
   PluginRevertAction,
   getCollectionPathDocIdEntry,
 } from '@vue-sync/core'
-import { SimpleStoreModuleConfig, SimpleStoreOptions } from '..'
-import { MakeRestoreBackup } from '../CreatePlugin'
+import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function revertActionFactory (
   data: { [collectionPath: string]: Map<string, PlainObject> },

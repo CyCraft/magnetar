@@ -1,13 +1,12 @@
 import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
-import { bulbasaur, flareon } from './helpers/pokemon'
-import { isModuleDataEqual } from './helpers/compareModuleData'
+import { pokedex } from './helpers/pokemon'
 
 test('get (collection)', async t => {
-  // 'get' resolves once all stores have given a response with data
-  const { pokedexModule, vueSync } = createVueSyncInstance()
-  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur())
-  isModuleDataEqual(t, vueSync, 'pokedex/136', undefined)
+  /// 'get' resolves once all stores have given a response with data
+  const { pokedexModule } = createVueSyncInstance()
+  t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
+  t.deepEqual(pokedexModule.doc('136').data, undefined)
   t.deepEqual(pokedexModule.data.size, 1)
 
   try {
@@ -16,15 +15,15 @@ test('get (collection)', async t => {
     t.fail(error)
   }
   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
-  isModuleDataEqual(t, vueSync, 'pokedex/001', bulbasaur())
-  isModuleDataEqual(t, vueSync, 'pokedex/136', flareon())
+  t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
+  t.deepEqual(pokedexModule.doc('136').data, pokedex(136))
   t.deepEqual(pokedexModule.data.size, 2)
 })
 
-test('get (document) - latest version', async t => {
-  // get resolves once all stores have given a response with data
-  const { trainerModule, vueSync } = createVueSyncInstance()
-  isModuleDataEqual(t, vueSync, 'data/trainer', { name: 'Luca', age: 10 })
+test('get (document)', async t => {
+  /// get resolves once all stores have given a response with data
+  const { trainerModule } = createVueSyncInstance()
+  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 
   try {
     await trainerModule.get()
@@ -32,19 +31,159 @@ test('get (document) - latest version', async t => {
     t.fail(error)
   }
   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
-  isModuleDataEqual(t, vueSync, 'data/trainer', { name: 'Luca', age: 10, dream: 'job' })
+  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })
 
-test('get (document) by id', async t => {
-  // get resolves once all stores have given a response with data
-  const { trainerModule, vueSync } = createVueSyncInstance()
-  isModuleDataEqual(t, vueSync, 'data/trainer', { name: 'Luca', age: 10 })
+// test('get (collection) where-filter: ==', async t => {
+//   const { pokedexModule} = createVueSyncInstance()
+//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
 
-  try {
-    await trainerModule.get()
-  } catch (error) {
-    t.fail(error)
-  }
-  // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
-  isModuleDataEqual(t, vueSync, 'data/trainer', { name: 'Luca', age: 10, dream: 'job' })
-})
+//   try {
+//     await pokedexModule.where('', '==', '').get()
+//   } catch (error) {
+//     t.fail(error)
+//   }
+//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
+//   const result = pokedexModule.data.values().filter(p => {})
+//   t.deepEqual(result, [])
+// })
+
+// test('get (collection) where-filter: == nested', async t => {
+//   const { pokedexModule} = createVueSyncInstance()
+//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
+
+//   try {
+//     await pokedexModule.where('', '== nested', '').get()
+//   } catch (error) {
+//     t.fail(error)
+//   }
+//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
+//   const result = pokedexModule.data.values().filter(p => {})
+//   t.deepEqual(result, [])
+// })
+
+// test('get (collection) where-filter: <', async t => {
+//   const { pokedexModule} = createVueSyncInstance()
+//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
+
+//   try {
+//     await pokedexModule.where('', '<', '').get()
+//   } catch (error) {
+//     t.fail(error)
+//   }
+//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
+//   const result = pokedexModule.data.values().filter(p => {})
+//   t.deepEqual(result, [])
+// })
+
+// test('get (collection) where-filter: =<', async t => {
+//   const { pokedexModule} = createVueSyncInstance()
+//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
+
+//   try {
+//     await pokedexModule.where('', '=<', '').get()
+//   } catch (error) {
+//     t.fail(error)
+//   }
+//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
+//   const result = pokedexModule.data.values().filter(p => {})
+//   t.deepEqual(result, [])
+// })
+
+// test('get (collection) where-filter: >', async t => {
+//   const { pokedexModule} = createVueSyncInstance()
+//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
+
+//   try {
+//     await pokedexModule.where('', '>', '').get()
+//   } catch (error) {
+//     t.fail(error)
+//   }
+//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
+//   const result = pokedexModule.data.values().filter(p => {})
+//   t.deepEqual(result, [])
+// })
+
+// test('get (collection) where-filter: >=', async t => {
+//   const { pokedexModule} = createVueSyncInstance()
+//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
+
+//   try {
+//     await pokedexModule.where('', '>=', '').get()
+//   } catch (error) {
+//     t.fail(error)
+//   }
+//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
+//   const result = pokedexModule.data.values().filter(p => {})
+//   t.deepEqual(result, [])
+// })
+
+// test('get (collection) where-filter: array-contains', async t => {
+//   const { pokedexModule} = createVueSyncInstance()
+//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
+
+//   try {
+//     await pokedexModule.where('', 'array-contains', '').get()
+//   } catch (error) {
+//     t.fail(error)
+//   }
+//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
+//   const result = pokedexModule.data.values().filter(p => {})
+//   t.deepEqual(result, [])
+// })
+
+// test('get (collection) where-filter: in', async t => {
+//   const { pokedexModule} = createVueSyncInstance()
+//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
+
+//   try {
+//     await pokedexModule.where('', 'in', '').get()
+//   } catch (error) {
+//     t.fail(error)
+//   }
+//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
+//   const result = pokedexModule.data.values().filter(p => {})
+//   t.deepEqual(result, [])
+// })
+
+// test('get (collection) where-filter: array-contains-any', async t => {
+//   const { pokedexModule} = createVueSyncInstance()
+//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
+
+//   try {
+//     await pokedexModule.where('', 'array-contains-any', '').get()
+//   } catch (error) {
+//     t.fail(error)
+//   }
+//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
+//   const result = pokedexModule.data.values().filter(p => {})
+//   t.deepEqual(result, [])
+// })
+
+// test('get (collection) orderBy', async t => {
+//   const { pokedexModule} = createVueSyncInstance()
+//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
+
+//   try {
+//     await pokedexModule.where('', '', a', '').get()
+//   } catch (error) {
+//     t.fail(error)
+//   }
+//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
+//   const result = pokedexModule.data.values().filter(p => {})
+//   t.deepEqual(result, [])
+// })
+
+// test('get (collection) limit', async t => {
+//   const { pokedexModule} = createVueSyncInstance()
+//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
+
+//   try {
+//     await pokedexModule.where('', '', async t', '').get()
+//   } catch (error) {
+//     t.fail(error)
+//   }
+//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
+//   const result = pokedexModule.data.values().filter(p => {})
+//   t.deepEqual(result, [])
+// })

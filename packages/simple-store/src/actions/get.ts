@@ -1,5 +1,5 @@
 import { PlainObject, PluginGetAction, GetResponse, DoOnGet } from '@vue-sync/core'
-import { SimpleStoreModuleConfig, SimpleStoreOptions } from '..'
+import { SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 
 export function getActionFactory (

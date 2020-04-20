@@ -92,15 +92,17 @@ function __read(o, n) {
     return ar;
 }
 
-function writeActionFactory(moduleData, simpleStoreConfig, makeDataSnapshot, actionName) {
-    return function (payload, modulePath, pluginModuleConfig) {
+function writeActionFactory(data, simpleStoreOptions, actionName, makeBackup) {
+    return function (payload, modulePath, simpleStoreModuleConfig) {
         // this is custom logic to be implemented by the plugin author
         var isCollection = core.isCollectionModule(modulePath);
         // write actions cannot be executed on collections
         if (isCollection)
             throw new Error('An non-existent action was triggered on a collection');
         var _a = __read(core.getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _a[0], docId = _a[1];
-        var collectionMap = moduleData[collectionPath];
+        var collectionMap = data[collectionPath];
+        if (makeBackup)
+            makeBackup(collectionPath, docId);
         // always start from an empty document on 'replace' or when the doc is non existent
         if (actionName === 'replace' || !collectionMap.get(docId))
             collectionMap.set(docId, {});
@@ -120,19 +122,23 @@ function writeActionFactory(moduleData, simpleStoreConfig, makeDataSnapshot, act
     };
 }
 
-function insertActionFactory(moduleData, simpleStoreConfig, makeDataSnapshot) {
-    return function (payload, modulePath, pluginModuleConfig) {
+function insertActionFactory(data, simpleStoreOptions, makeBackup) {
+    return function (payload, modulePath, simpleStoreModuleConfig) {
         // this is custom logic to be implemented by the plugin author
         var isCollection = core.isCollectionModule(modulePath);
         if (isCollection) {
-            var id = isWhat.isFullString(payload.id) ? payload.id : simpleStoreConfig.generateRandomId();
+            var docId_1 = isWhat.isFullString(payload.id) ? payload.id : simpleStoreOptions.generateRandomId();
             var collectionPath_1 = modulePath;
-            moduleData[collectionPath_1].set(id, payload);
-            return id;
+            if (makeBackup)
+                makeBackup(collectionPath_1, docId_1);
+            data[collectionPath_1].set(docId_1, payload);
+            return docId_1;
         }
         // else it's a doc
         var _a = __read(core.getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _a[0], docId = _a[1];
-        var collectionMap = moduleData[collectionPath];
+        var collectionMap = data[collectionPath];
+        if (makeBackup)
+            makeBackup(collectionPath, docId);
         // reset the doc to be able to overwrite
         collectionMap.set(docId, {});
         var docDataToMutate = collectionMap.get(docId);
@@ -144,8 +150,8 @@ function insertActionFactory(moduleData, simpleStoreConfig, makeDataSnapshot) {
     };
 }
 
-function deletePropActionFactory(moduleData, simpleStoreConfig, makeDataSnapshot) {
-    return function (payload, modulePath, pluginModuleConfig) {
+function deletePropActionFactory(data, simpleStoreOptions, makeBackup) {
+    return function (payload, modulePath, simpleStoreModuleConfig) {
         // this is custom logic to be implemented by the plugin author
         var e_1, _a;
         var isCollection = core.isCollectionModule(modulePath);
@@ -153,8 +159,10 @@ function deletePropActionFactory(moduleData, simpleStoreConfig, makeDataSnapshot
         if (isCollection)
             throw new Error('An non-existent action was triggered on a collection');
         var _b = __read(core.getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _b[0], docId = _b[1];
-        var collectionMap = moduleData[collectionPath];
+        var collectionMap = data[collectionPath];
         var docData = collectionMap.get(docId);
+        if (makeBackup)
+            makeBackup(collectionPath, docId);
         var payloadArray = isWhat.isArray(payload) ? payload : [payload];
         try {
             for (var payloadArray_1 = __values(payloadArray), payloadArray_1_1 = payloadArray_1.next(); !payloadArray_1_1.done; payloadArray_1_1 = payloadArray_1.next()) {
@@ -181,52 +189,44 @@ function deletePropActionFactory(moduleData, simpleStoreConfig, makeDataSnapshot
     };
 }
 
-function deleteActionFactory(moduleData, simpleStoreConfig, makeDataSnapshot) {
-    return function (payload, modulePath, pluginModuleConfig) {
+function deleteActionFactory(data, simpleStoreOptions, makeBackup) {
+    return function (payload, modulePath, simpleStoreModuleConfig) {
         // this is custom logic to be implemented by the plugin author
         var isCollection = core.isCollectionModule(modulePath);
         // delete cannot be executed on collections
         if (isCollection)
             throw new Error('An non-existent action was triggered on a collection');
         var _a = __read(core.getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _a[0], docId = _a[1];
-        moduleData[collectionPath]["delete"](docId);
+        if (makeBackup)
+            makeBackup(collectionPath, docId);
+        data[collectionPath]["delete"](docId);
     };
 }
 
-function getActionFactory(moduleData, simpleStoreConfig, makeDataSnapshot) {
+function getActionFactory(data, simpleStoreOptions) {
     var _this = this;
-    return function (payload, modulePath, pluginModuleConfig) {
+    return function (payload, modulePath, simpleStoreModuleConfig) {
         return __awaiter(_this, void 0, void 0, function () {
             var doOnGetAction;
             return __generator(this, function (_a) {
-                // this is custom logic to be implemented by the plugin author
-                makeDataSnapshot();
                 doOnGetAction = function (payload, meta) {
-                    insertActionFactory(moduleData, simpleStoreConfig)(payload, modulePath, pluginModuleConfig);
-                    // return writeActionFactoryThatReturnsPayload(moduleData, 'insert', simpleStoreConfig)(
-                    //   payload,
-                    //   modulePath,
-                    //   pluginModuleConfig
-                    // )
+                    insertActionFactory(data, simpleStoreOptions)(payload, modulePath, simpleStoreModuleConfig);
                 };
-                // in case of a local store that doesn't fetch from anywhere, not even from cach, we could return early here
                 return [2 /*return*/, doOnGetAction];
             });
         });
     };
 }
 
-function streamActionFactory(moduleData, simpleStoreConfig, makeDataSnapshot) {
-    return function (payload, modulePath, pluginModuleConfig, mustExecuteOnRead) {
-        // this is custom logic to be implemented by the plugin author
-        // this mocks how the result from the next store (the remote store) should update this local store per action type
+function streamActionFactory(data, simpleStoreOptions) {
+    return function (payload, modulePath, simpleStoreModuleConfig, mustExecuteOnRead) {
         // hover over the prop names below to see more info on when they are triggered:
         var doOnStream = {
             added: function (payload, meta) {
-                insertActionFactory(moduleData, simpleStoreConfig)(payload, modulePath, pluginModuleConfig); // prettier-ignore
+                insertActionFactory(data, simpleStoreOptions)(payload, modulePath, simpleStoreModuleConfig);
             },
             modified: function (payload, meta) {
-                insertActionFactory(moduleData, simpleStoreConfig)(payload, modulePath, pluginModuleConfig); // prettier-ignore
+                insertActionFactory(data, simpleStoreOptions)(payload, modulePath, simpleStoreModuleConfig);
             },
             removed: function (payload, meta) {
                 var isCollection = core.isCollectionModule(modulePath);
@@ -234,58 +234,67 @@ function streamActionFactory(moduleData, simpleStoreConfig, makeDataSnapshot) {
                     ? modulePath
                     : isWhat.isString(payload)
                         ? modulePath + "/" + payload
-                        : modulePath + "/" + payload.id;
-                deleteActionFactory(moduleData)(undefined, pathToDelete, pluginModuleConfig);
+                        : modulePath + "/" + meta.id;
+                deleteActionFactory(data)(undefined, pathToDelete, simpleStoreModuleConfig);
             },
         };
         return doOnStream;
     };
 }
 
-function revertActionFactory(moduleData, simpleStoreConfig, restoreDataSnapshot) {
+function revertActionFactory(data, simpleStoreOptions, restoreBackup) {
     // this is a `PluginRevertAction`:
-    return function revert(payload, modulePath, pluginModuleConfig, actionName) {
-        // this is custom logic to be implemented by the plugin author
-        if (!payload)
-            return;
-        // strings are only possible during deletions
-        // haven't implemented reverting deletions yet
-        if (isWhat.isString(payload) || (isWhat.isArray(payload) && isWhat.isString(payload[0])))
-            return;
-        // this mocks data reverted during a read
-        if (actionName === 'get' || actionName === 'stream') {
-            restoreDataSnapshot();
-            return;
-        }
-        // this mocks data reverted during a write
+    return function revert(payload, modulePath, simpleStoreModuleConfig, actionName) {
         var _a = __read(core.getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _a[0], docId = _a[1];
-        var collectionMap = moduleData[collectionPath];
-        if (!docId) {
-            // collection
-            throw new Error("revert not yet implemented for insert on collection - payload: " + JSON.stringify(payload));
-        }
-        if (actionName === 'insert') {
-            collectionMap["delete"](docId);
+        // revert all write actions when called on a doc
+        if (docId &&
+            ['insert', 'merge', 'assign', 'replace', 'delete', 'deleteProp'].includes(actionName)) {
+            restoreBackup(collectionPath, docId);
             return;
         }
-        throw new Error('revert not yet implemented for this action');
+        // insert on collection (no id)
+        if (!docId && actionName === 'insert') {
+            throw new Error("revert not yet implemented for insert on collections");
+        }
+        // haven't implemented reverting 'get', 'stream' actions yet
+        throw new Error("revert not yet implemented for " + actionName);
     };
 }
 
 // a Vue Sync plugin is a single function that returns a `PluginInstance`
 // the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
 // each action must have the proper for both collection and doc type modules
-var CreatePlugin = function (simpleStoreConfig) {
+var CreatePlugin = function (simpleStoreOptions) {
     // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
     // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
     var data = {};
-    // this mocks some sort of data snapshot restore functionality of the plugin
-    var dataSnapshots = [];
-    var makeDataSnapshot = function () { dataSnapshots.push(copyAnything.copy(data)); }; // prettier-ignore
-    var restoreDataSnapshot = function () {
-        var last = dataSnapshots.pop();
-        Object.keys(data.pokedex).forEach(function (key) { return delete data.pokedex[key]; });
-        Object.keys(last.pokedex).forEach(function (key) { return (data.pokedex[key] = last.pokedex[key]); });
+    var dataBackups = {};
+    var makeBackup = function (collectionPath, docId) {
+        // set the backup map for the collection
+        if (!(collectionPath in dataBackups))
+            dataBackups[collectionPath] = new Map();
+        var backupCollectionMap = dataBackups[collectionPath];
+        // set the backup array for the doc
+        if (!backupCollectionMap.has(docId))
+            backupCollectionMap.set(docId, []);
+        // make a backup of whatever is found in the data
+        var docBackup = copyAnything.copy(data[collectionPath].get(docId));
+        backupCollectionMap.get(docId).push(docBackup);
+    };
+    var restoreBackup = function (collectionPath, docId) {
+        // set the backup map for the collection
+        if (!(collectionPath in dataBackups))
+            return;
+        var backupCollectionMap = dataBackups[collectionPath];
+        // set the backup array for the doc
+        if (!backupCollectionMap.has(docId))
+            return;
+        var docBackupArray = backupCollectionMap.get(docId);
+        if (!docBackupArray.length)
+            return;
+        // restore the backup of whatever is found and replace with the data
+        var docBackup = docBackupArray.pop();
+        data[collectionPath].set(docId, docBackup);
     };
     /**
      * This must be provided by Store Plugins that have "local" data. It is triggered ONCE when the module (doc or collection) is instantiated. In any case, an empty Map for the collectionPath (to be derived from the modulePath) must be set up.
@@ -338,15 +347,15 @@ var CreatePlugin = function (simpleStoreConfig) {
         return collectionDB.get(docId);
     };
     // the plugin must try to implement logic for every `ActionName`
-    var get = getActionFactory(data, simpleStoreConfig, makeDataSnapshot);
-    var stream = streamActionFactory(data, simpleStoreConfig);
-    var insert = insertActionFactory(data, simpleStoreConfig);
-    var _merge = writeActionFactory(data, simpleStoreConfig, makeDataSnapshot, 'merge');
-    var assign = writeActionFactory(data, simpleStoreConfig, makeDataSnapshot, 'assign');
-    var replace = writeActionFactory(data, simpleStoreConfig, makeDataSnapshot, 'replace');
-    var deleteProp = deletePropActionFactory(data);
-    var _delete = deleteActionFactory(data);
-    var revert = revertActionFactory(data, simpleStoreConfig, restoreDataSnapshot);
+    var get = getActionFactory(data, simpleStoreOptions);
+    var stream = streamActionFactory(data, simpleStoreOptions);
+    var insert = insertActionFactory(data, simpleStoreOptions, makeBackup);
+    var _merge = writeActionFactory(data, simpleStoreOptions, 'merge', makeBackup);
+    var assign = writeActionFactory(data, simpleStoreOptions, 'assign', makeBackup);
+    var replace = writeActionFactory(data, simpleStoreOptions, 'replace', makeBackup);
+    var deleteProp = deletePropActionFactory(data, simpleStoreOptions, makeBackup);
+    var _delete = deleteActionFactory(data, simpleStoreOptions, makeBackup);
+    var revert = revertActionFactory(data, simpleStoreOptions, restoreBackup);
     // the plugin function must return a `PluginInstance`
     var instance = {
         revert: revert,

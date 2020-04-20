@@ -81,7 +81,7 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
         data[collectionPath].set(_docId, _docData)
       }
     } else {
-      data[collectionPath].set(docId, initialData)
+      data[collectionPath].set(docId, initialData as PlainObject)
     }
     modulesAlreadySetup.add(modulePath)
   }

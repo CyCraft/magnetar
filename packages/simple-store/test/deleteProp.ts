@@ -1,11 +1,11 @@
 import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
-import { isModuleDataEqual } from './helpers/compareModuleData'
+import { pokedex } from './helpers/pokemon'
 
 test('deleteProp', async t => {
-  const { trainerModule, vueSync } = createVueSyncInstance()
+  const { trainerModule } = createVueSyncInstance()
   const deletePayload = 'age'
-  isModuleDataEqual(t, vueSync, 'data/trainer', { name: 'Luca', age: 10 })
+  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 
   try {
     await trainerModule.deleteProp(deletePayload)
@@ -13,41 +13,63 @@ test('deleteProp', async t => {
     t.fail(error)
   }
 
-  isModuleDataEqual(t, vueSync, 'data/trainer', { name: 'Luca' })
+  t.deepEqual(trainerModule.data, { name: 'Luca' })
 })
 
 test('deleteProp nested', async t => {
-  const { pokedexModule, vueSync } = createVueSyncInstance()
-  const deletePayload = 'type.grass'
-  isModuleDataEqual(t, vueSync, 'pokedex/001', { name: 'Bulbasaur', id: '001', type: { grass: 'Grass' } }) // prettier-ignore
+  const { pokedexModule } = createVueSyncInstance()
+  const deletePayload = 'base.HP'
+  t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
   try {
-    await pokedexModule.doc('001').deleteProp(deletePayload)
+    await pokedexModule.doc('1').deleteProp(deletePayload)
   } catch (error) {
     t.fail(error)
   }
-
-  isModuleDataEqual(t, vueSync, 'pokedex/001', { name: 'Bulbasaur', id: '001', type: {} })
+  const expected = {
+    id: 1,
+    name: 'Bulbasaur',
+    type: ['Grass', 'Poison'],
+    base: {
+      'Attack': 49,
+      'Defense': 49,
+      'Sp. Attack': 65,
+      'Sp. Defense': 65,
+      'Speed': 45,
+    },
+  }
+  t.deepEqual(pokedexModule.doc('1').data, expected)
 })
 
 test('deleteProp multiple', async t => {
-  const { pokedexModule, vueSync } = createVueSyncInstance()
-  const deletePayload = ['type.grass', 'name']
-  isModuleDataEqual(t, vueSync, 'pokedex/001', { name: 'Bulbasaur', id: '001', type: { grass: 'Grass' } }) // prettier-ignore
+  const { pokedexModule } = createVueSyncInstance()
+  const deletePayload = ['base.HP', 'name']
+  t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
   try {
-    await pokedexModule.doc('001').deleteProp(deletePayload)
+    await pokedexModule.doc('1').deleteProp(deletePayload)
   } catch (error) {
     t.fail(error)
   }
 
-  isModuleDataEqual(t, vueSync, 'pokedex/001', { id: '001', type: {} })
+  const expected = {
+    id: 1,
+    type: ['Grass', 'Poison'],
+    base: {
+      'Attack': 49,
+      'Defense': 49,
+      'Sp. Attack': 65,
+      'Sp. Defense': 65,
+      'Speed': 45,
+    },
+  }
+  t.deepEqual(pokedexModule.doc('1').data, expected)
 })
 
 test('revert: deleteProp', async t => {
-  const { trainerModule, vueSync } = createVueSyncInstance()
+  const { trainerModule } = createVueSyncInstance()
   const deletePayload = ['age', 'remote'] // this triggers an error on the remote store mock
-  isModuleDataEqual(t, vueSync, 'data/trainer', { name: 'Luca', age: 10 })
+  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 
   try {
     await trainerModule.deleteProp(deletePayload, { onError: 'revert' })
@@ -55,19 +77,19 @@ test('revert: deleteProp', async t => {
     t.fail(error)
   }
 
-  isModuleDataEqual(t, vueSync, 'data/trainer', { name: 'Luca', age: 10 })
+  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 })
 
 test('revert: deleteProp nested', async t => {
-  const { pokedexModule, vueSync } = createVueSyncInstance()
-  const deletePayload = ['type.grass', 'remote'] // this triggers an error on the remote store mock
-  isModuleDataEqual(t, vueSync, 'pokedex/001', { name: 'Bulbasaur', id: '001', type: { grass: 'Grass' } }) // prettier-ignore
+  const { pokedexModule } = createVueSyncInstance()
+  const deletePayload = ['base.HP', 'remote'] // this triggers an error on the remote store mock
+  t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
   try {
-    await pokedexModule.doc('001').deleteProp(deletePayload, { onError: 'revert' })
+    await pokedexModule.doc('1').deleteProp(deletePayload, { onError: 'revert' })
   } catch (error) {
     t.fail(error)
   }
 
-  isModuleDataEqual(t, vueSync, 'pokedex/001', { name: 'Bulbasaur', id: '001', type: { grass: 'Grass' } }) // prettier-ignore
+  t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 })

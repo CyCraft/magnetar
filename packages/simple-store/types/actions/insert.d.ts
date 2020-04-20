@@ -1,3 +1,5 @@
 import { PlainObject, PluginInsertAction } from '@vue-sync/core';
-import { SimpleStoreConfig } from '..';
-export declare function insertActionFactory(moduleData: PlainObject, simpleStoreConfig: SimpleStoreConfig, makeDataSnapshot?: any): PluginInsertAction;
+import { SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin';
+export declare function insertActionFactory(data: {
+    [collectionPath: string]: Map<string, PlainObject>;
+}, simpleStoreOptions: SimpleStoreOptions, makeBackup?: MakeRestoreBackup): PluginInsertAction;
