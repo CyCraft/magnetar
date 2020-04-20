@@ -47,7 +47,7 @@ export type VueSyncWriteAction<DocDataType extends object = PlainObject> = (
 ) => Promise<DocInstance<DocDataType>>
 
 export type VueSyncDeletePropAction<DocDataType extends object = PlainObject> = (
-  payload: keyof DocDataType | (keyof DocDataType)[],
+  payload: keyof DocDataType | string | (keyof DocDataType | string)[],
   actionConfig?: ActionConfig
 ) => Promise<DocInstance<DocDataType>>
 
