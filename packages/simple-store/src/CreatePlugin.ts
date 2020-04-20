@@ -12,6 +12,7 @@ import { deleteActionFactory } from './actions/delete'
 import { getActionFactory } from './actions/get'
 import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
+import { isArray } from 'is-what'
 
 // there are two interfaces to be defined & exported by each plugin
 // - SimpleStoreOptions
@@ -76,7 +77,7 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
     // then do anything specific for your plugin, like setting initial data
     const { initialData } = moduleConfig
     if (!initialData) return
-    if (!docId) {
+    if (!docId && isArray(initialData)) {
       for (const [_docId, _docData] of initialData) {
         data[collectionPath].set(_docId, _docData)
       }
