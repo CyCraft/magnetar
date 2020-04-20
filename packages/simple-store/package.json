@@ -1,6 +1,6 @@
 {
   "name": "@vue-sync/simple-store",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "sideEffects": false,
   "description": "A simple local store plugin to use with Vue Sync.",
   "main": "dist/index.cjs.js",
@@ -13,14 +13,12 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "rollup": "rollup -c build.js"
   },
-  "keywords": [
-    "vue-sync"
-  ],
+  "keywords": ["vue-sync"],
   "author": "Luca Ban - Mesqueeb",
   "license": "MIT",
   "homepage": "https://github.com/vue-sync/simple-store#readme",
   "peerDependencies": {
-    "@vue-sync/core": "^0.1.3"
+    "@vue-sync/core": "^0.1.6"
   },
   "dependencies": {
     "copy-anything": "^2.0.1",
@@ -49,12 +47,8 @@
     "url": "https://github.com/vue-sync/simple-store/issues"
   },
   "ava": {
-    "extensions": [
-      "ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
+    "extensions": ["ts"],
+    "require": ["ts-node/register"],
     "timeout": "30s"
   }
 }

@@ -127,7 +127,9 @@ function insertActionFactory(data, simpleStoreOptions, makeBackup) {
         // this is custom logic to be implemented by the plugin author
         var isCollection = core.isCollectionModule(modulePath);
         if (isCollection) {
-            var docId_1 = isWhat.isFullString(payload.id) ? payload.id : simpleStoreOptions.generateRandomId();
+            var docId_1 = isWhat.isFullString(payload.id) || isWhat.isNumber(payload.id)
+                ? String(payload.id)
+                : simpleStoreOptions.generateRandomId();
             var collectionPath_1 = modulePath;
             if (makeBackup)
                 makeBackup(collectionPath_1, docId_1);

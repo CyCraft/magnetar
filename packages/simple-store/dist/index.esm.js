@@ -1,7 +1,7 @@
 import { copy } from 'copy-anything';
 import { isCollectionModule, getCollectionPathDocIdEntry } from '@vue-sync/core';
 import { merge } from 'merge-anything';
-import { isFullString, isArray, isString } from 'is-what';
+import { isFullString, isNumber, isArray, isString } from 'is-what';
 import pathToProp from 'path-to-prop';
 
 /*! *****************************************************************************
@@ -121,7 +121,9 @@ function insertActionFactory(data, simpleStoreOptions, makeBackup) {
         // this is custom logic to be implemented by the plugin author
         var isCollection = isCollectionModule(modulePath);
         if (isCollection) {
-            var docId_1 = isFullString(payload.id) ? payload.id : simpleStoreOptions.generateRandomId();
+            var docId_1 = isFullString(payload.id) || isNumber(payload.id)
+                ? String(payload.id)
+                : simpleStoreOptions.generateRandomId();
             var collectionPath_1 = modulePath;
             if (makeBackup)
                 makeBackup(collectionPath_1, docId_1);
