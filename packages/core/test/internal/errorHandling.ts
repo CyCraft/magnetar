@@ -1,6 +1,6 @@
 import test from 'ava'
-import { createVueSyncInstance } from './helpers/createVueSyncInstance'
-import { pokedex, pokedexEntryDefaults } from './helpers/pokemon'
+import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { pokedex, pokedexEntryDefaults } from '../helpers/pokemon'
 
 test('write + onError: stop -- emits fail events & aborts execution by default', async t => {
   const { pokedexModule } = createVueSyncInstance()

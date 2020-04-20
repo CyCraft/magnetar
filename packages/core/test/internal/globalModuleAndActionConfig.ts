@@ -1,7 +1,7 @@
 import test from 'ava'
-import { VueSync } from '../src/index'
-import { CreatePlugin } from './helpers/pluginMockLocal'
-import { generateRandomId } from './helpers/generateRandomId'
+import { VueSync } from '../../src/index'
+import { CreatePlugin } from '../helpers/pluginMockLocal'
+import { generateRandomId } from '../helpers/generateRandomId'
 
 test('emits global, module and action events', async t => {
   const local = CreatePlugin({ storeName: 'local', generateRandomId })

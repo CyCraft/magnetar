@@ -1,7 +1,7 @@
 import test from 'ava'
-import { createVueSyncInstance } from './helpers/createVueSyncInstance'
-import { pokedex } from './helpers/pokemon'
-import { waitMs } from './helpers/wait'
+import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { pokedex } from '../helpers/pokemon'
+import { waitMs } from '../helpers/wait'
 
 test('get: can mutate payload & read response', async t => {
   function addSeen (payload) {
