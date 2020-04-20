@@ -4,18 +4,18 @@ import {
   PluginDeleteAction,
   getCollectionPathDocIdEntry,
 } from '@vue-sync/core'
-import { StorePluginModuleConfig, SimpleStoreConfig } from '..'
+import { SimpleStoreModuleConfig, SimpleStoreOptions } from '..'
 import { MakeRestoreBackup } from '../CreatePlugin'
 
 export function deleteActionFactory (
-  moduleData: PlainObject,
-  simpleStoreConfig: SimpleStoreConfig,
+  data: { [collectionPath: string]: Map<string, PlainObject> },
+  simpleStoreOptions: SimpleStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeleteAction {
   return function (
     payload: void,
     modulePath: string,
-    pluginModuleConfig: StorePluginModuleConfig
+    simpleStoreModuleConfig: SimpleStoreModuleConfig
   ): void {
     // this is custom logic to be implemented by the plugin author
 
@@ -26,6 +26,6 @@ export function deleteActionFactory (
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     if (makeBackup) makeBackup(collectionPath, docId)
 
-    moduleData[collectionPath].delete(docId)
+    data[collectionPath].delete(docId)
   }
 }

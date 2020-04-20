@@ -5,19 +5,19 @@ import {
   PluginWriteAction,
   getCollectionPathDocIdEntry,
 } from '@vue-sync/core'
-import { StorePluginModuleConfig, SimpleStoreConfig } from '..'
+import { SimpleStoreModuleConfig, SimpleStoreOptions } from '..'
 import { MakeRestoreBackup } from '../CreatePlugin'
 
 export function writeActionFactory (
-  moduleData: PlainObject,
-  simpleStoreConfig: SimpleStoreConfig,
+  data: { [collectionPath: string]: Map<string, PlainObject> },
+  simpleStoreOptions: SimpleStoreOptions,
   actionName: 'merge' | 'assign' | 'replace',
   makeBackup?: MakeRestoreBackup
 ): PluginWriteAction {
   return function (
     payload: PlainObject,
     modulePath: string,
-    pluginModuleConfig: StorePluginModuleConfig
+    simpleStoreModuleConfig: SimpleStoreModuleConfig
   ): void {
     // this is custom logic to be implemented by the plugin author
 
@@ -26,7 +26,7 @@ export function writeActionFactory (
     if (isCollection) throw new Error('An non-existent action was triggered on a collection')
 
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
-    const collectionMap = moduleData[collectionPath]
+    const collectionMap = data[collectionPath]
 
     if (makeBackup) makeBackup(collectionPath, docId)
 

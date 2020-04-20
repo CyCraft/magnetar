@@ -4,35 +4,35 @@ import {
   PluginInsertAction,
   getCollectionPathDocIdEntry,
 } from '@vue-sync/core'
-import { StorePluginModuleConfig, SimpleStoreConfig } from '..'
+import { SimpleStoreModuleConfig, SimpleStoreOptions } from '..'
 import { isFullString } from 'is-what'
 import { MakeRestoreBackup } from '../CreatePlugin'
 
 export function insertActionFactory (
-  moduleData: PlainObject,
-  simpleStoreConfig: SimpleStoreConfig,
+  data: { [collectionPath: string]: Map<string, PlainObject> },
+  simpleStoreOptions: SimpleStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginInsertAction {
   return function (
     payload: PlainObject,
     modulePath: string,
-    pluginModuleConfig: StorePluginModuleConfig
+    simpleStoreModuleConfig: SimpleStoreModuleConfig
   ): string {
     // this is custom logic to be implemented by the plugin author
 
     const isCollection = isCollectionModule(modulePath)
     if (isCollection) {
-      const docId = isFullString(payload.id) ? payload.id : simpleStoreConfig.generateRandomId()
+      const docId = isFullString(payload.id) ? payload.id : simpleStoreOptions.generateRandomId()
       const collectionPath = modulePath
 
       if (makeBackup) makeBackup(collectionPath, docId)
 
-      moduleData[collectionPath].set(docId, payload)
+      data[collectionPath].set(docId, payload)
       return docId
     }
     // else it's a doc
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
-    const collectionMap = moduleData[collectionPath]
+    const collectionMap = data[collectionPath]
 
     if (makeBackup) makeBackup(collectionPath, docId)
 

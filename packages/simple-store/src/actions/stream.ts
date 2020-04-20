@@ -7,28 +7,27 @@ import {
   DoOnStream,
   MustExecuteOnRead,
 } from '@vue-sync/core'
-import { StorePluginModuleConfig, SimpleStoreConfig } from '..'
+import { SimpleStoreModuleConfig, SimpleStoreOptions } from '..'
 import { insertActionFactory } from './insert'
 import { deleteActionFactory } from './delete'
 
 export function streamActionFactory (
-  moduleData: PlainObject,
-  simpleStoreConfig: SimpleStoreConfig,
-  makeDataSnapshot: any
+  data: { [collectionPath: string]: Map<string, PlainObject> },
+  simpleStoreOptions: SimpleStoreOptions
 ): PluginStreamAction {
   return (
     payload: void | PlainObject = {},
     modulePath: string,
-    pluginModuleConfig: StorePluginModuleConfig,
+    simpleStoreModuleConfig: SimpleStoreModuleConfig,
     mustExecuteOnRead: MustExecuteOnRead
   ): StreamResponse | DoOnStream | Promise<StreamResponse | DoOnStream> => {
     // hover over the prop names below to see more info on when they are triggered:
     const doOnStream: DoOnStream = {
       added: (payload, meta) => {
-        insertActionFactory(moduleData, simpleStoreConfig)(payload, modulePath, pluginModuleConfig) // prettier-ignore
+        insertActionFactory(data, simpleStoreOptions)(payload, modulePath, simpleStoreModuleConfig)
       },
       modified: (payload, meta) => {
-        insertActionFactory(moduleData, simpleStoreConfig)(payload, modulePath, pluginModuleConfig) // prettier-ignore
+        insertActionFactory(data, simpleStoreOptions)(payload, modulePath, simpleStoreModuleConfig)
       },
       removed: (payload, meta) => {
         const isCollection = isCollectionModule(modulePath)
@@ -37,10 +36,10 @@ export function streamActionFactory (
           : isString(payload)
           ? `${modulePath}/${payload}`
           : `${modulePath}/${meta.id}`
-        deleteActionFactory(moduleData, simpleStoreConfig)(
+        deleteActionFactory(data, simpleStoreOptions)(
           undefined,
           pathToDelete,
-          pluginModuleConfig
+          simpleStoreModuleConfig
         )
       },
     }

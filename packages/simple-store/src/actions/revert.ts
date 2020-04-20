@@ -1,29 +1,26 @@
-import { isArray, isString } from 'is-what'
 import {
   PlainObject,
   ActionName,
   PluginRevertAction,
   getCollectionPathDocIdEntry,
 } from '@vue-sync/core'
-import { StorePluginModuleConfig, SimpleStoreConfig } from '..'
+import { SimpleStoreModuleConfig, SimpleStoreOptions } from '..'
 import { MakeRestoreBackup } from '../CreatePlugin'
 
 export function revertActionFactory (
-  moduleData: PlainObject,
-  simpleStoreConfig: SimpleStoreConfig,
-  restoreBackup: MakeRestoreBackup,
-  restoreDataSnapshot: any
+  data: { [collectionPath: string]: Map<string, PlainObject> },
+  simpleStoreOptions: SimpleStoreOptions,
+  restoreBackup: MakeRestoreBackup
 ): PluginRevertAction {
   // this is a `PluginRevertAction`:
   return function revert (
     payload: PlainObject | PlainObject[] | string | string[] | void,
     modulePath: string,
-    pluginModuleConfig: StorePluginModuleConfig,
+    simpleStoreModuleConfig: SimpleStoreModuleConfig,
     actionName: ActionName
   ): void {
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
-    const collectionMap = moduleData[collectionPath]
-
+    // revert all write actions when called on a doc
     if (
       docId &&
       ['insert', 'merge', 'assign', 'replace', 'delete', 'deleteProp'].includes(actionName)
@@ -31,25 +28,11 @@ export function revertActionFactory (
       restoreBackup(collectionPath, docId)
       return
     }
-
-    if (!payload) return
-    // strings are only possible during deletions
-    // haven't implemented reverting deletions yet
-    if (isString(payload) || (isArray(payload) && isString(payload[0]))) return
-    if (actionName === 'get' || actionName === 'stream') {
-      restoreDataSnapshot()
-      return
+    // insert on collection (no id)
+    if (!docId && actionName === 'insert') {
+      throw new Error(`revert not yet implemented for insert on collections`)
     }
-    if (!docId) {
-      // collection
-      throw new Error(
-        `revert not yet implemented for insert on collection - payload: ${JSON.stringify(payload)}`
-      )
-    }
-    if (actionName === 'insert') {
-      collectionMap.delete(docId)
-      return
-    }
-    throw new Error('revert not yet implemented for this action')
+    // haven't implemented reverting 'get', 'stream' actions yet
+    throw new Error(`revert not yet implemented for ${actionName}`)
   }
 }

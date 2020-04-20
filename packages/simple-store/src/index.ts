@@ -1,1 +1,1 @@
-export { SimpleStoreConfig, StorePluginModuleConfig, CreatePlugin } from './CreatePlugin'
+export { SimpleStoreOptions, SimpleStoreModuleConfig, CreatePlugin } from './CreatePlugin'

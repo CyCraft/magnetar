@@ -6,18 +6,18 @@ import {
   PluginDeletePropAction,
   getCollectionPathDocIdEntry,
 } from '@vue-sync/core'
-import { StorePluginModuleConfig, SimpleStoreConfig } from '..'
+import { SimpleStoreModuleConfig, SimpleStoreOptions } from '..'
 import { MakeRestoreBackup } from '../CreatePlugin'
 
 export function deletePropActionFactory (
-  moduleData: PlainObject,
-  simpleStoreConfig: SimpleStoreConfig,
+  data: { [collectionPath: string]: Map<string, PlainObject> },
+  simpleStoreOptions: SimpleStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeletePropAction {
   return function (
     payload: string | string[],
     modulePath: string,
-    pluginModuleConfig: StorePluginModuleConfig
+    simpleStoreModuleConfig: SimpleStoreModuleConfig
   ): void {
     // this is custom logic to be implemented by the plugin author
 
@@ -26,7 +26,7 @@ export function deletePropActionFactory (
     if (isCollection) throw new Error('An non-existent action was triggered on a collection')
 
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
-    const collectionMap = moduleData[collectionPath]
+    const collectionMap = data[collectionPath]
     const docData = collectionMap.get(docId)
 
     if (makeBackup) makeBackup(collectionPath, docId)
