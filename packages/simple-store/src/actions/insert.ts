@@ -17,8 +17,6 @@ export function insertActionFactory (
     modulePath: string,
     simpleStoreModuleConfig: SimpleStoreModuleConfig
   ): string {
-    // this is custom logic to be implemented by the plugin author
-
     const isCollection = isCollectionModule(modulePath)
     if (isCollection) {
       const docId =

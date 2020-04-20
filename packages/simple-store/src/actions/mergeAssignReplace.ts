@@ -18,8 +18,6 @@ export function writeActionFactory (
     modulePath: string,
     simpleStoreModuleConfig: SimpleStoreModuleConfig
   ): void {
-    // this is custom logic to be implemented by the plugin author
-
     const isCollection = isCollectionModule(modulePath)
     // write actions cannot be executed on collections
     if (isCollection) throw new Error('An non-existent action was triggered on a collection')

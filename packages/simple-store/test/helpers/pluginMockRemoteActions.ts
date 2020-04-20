@@ -33,7 +33,6 @@ export function writeActionFactory (
   ): Promise<void> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
-    // this is custom logic to be implemented by the plugin author
     await waitMs(1)
 
     const isCollection = isCollectionModule(modulePath)
@@ -50,7 +49,6 @@ export function insertActionFactory (storePluginOptions: StorePluginOptions): Pl
   ): Promise<string> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
-    // this is custom logic to be implemented by the plugin author
     await waitMs(1)
 
     const isCollection = isCollectionModule(modulePath)
@@ -74,7 +72,6 @@ export function deletePropActionFactory (
   ): Promise<void> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
-    // this is custom logic to be implemented by the plugin author
     await waitMs(1)
 
     const isCollection = isCollectionModule(modulePath)
@@ -91,7 +88,6 @@ export function deleteActionFactory (storePluginOptions: StorePluginOptions): Pl
   ): Promise<void> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
-    // this is custom logic to be implemented by the plugin author
     await waitMs(1)
     // this mocks an error during execution
   }
@@ -103,7 +99,6 @@ export function getActionFactory (storePluginOptions: StorePluginOptions): Plugi
     modulePath: string,
     simpleStoreModuleConfig: SimpleStoreModuleConfig
   ): Promise<DoOnGet | GetResponse> => {
-    // this is custom logic to be implemented by the plugin author
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const isCollection = isCollectionModule(modulePath)
     const isDocument = !isCollection
@@ -135,7 +130,6 @@ export function streamActionFactory (storePluginOptions: StorePluginOptions): Pl
     simpleStoreModuleConfig: SimpleStoreModuleConfig,
     mustExecuteOnRead: MustExecuteOnRead
   ): StreamResponse | DoOnStream | Promise<StreamResponse | DoOnStream> => {
-    // this is custom logic to be implemented by the plugin author
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const isCollection = isCollectionModule(modulePath)
     const isDocument = !isCollection
@@ -188,7 +182,6 @@ export function revertActionFactory (storePluginOptions: StorePluginOptions): Pl
     simpleStoreModuleConfig: SimpleStoreModuleConfig,
     actionName: ActionName
   ): Promise<void> {
-    // this is custom logic to be implemented by the plugin author
     await waitMs(1)
   }
 }
