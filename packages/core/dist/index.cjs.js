@@ -431,13 +431,68 @@ function throwIfInvalidId(modulePath, moduleType) {
         logErrorAndThrow(errorMessage);
 }
 
+/**
+ * Extracts the PluginModuleConfig from the ModuleConfig
+ *
+ * @export
+ * @param {ModuleConfig} moduleConfig
+ * @param {string} storeName
+ * @returns {PluginModuleConfig}
+ */
+function getPluginModuleConfig(moduleConfig, storeName) {
+    var where = moduleConfig.where, orderBy = moduleConfig.orderBy, limit = moduleConfig.limit, _a = moduleConfig.configPerStore, configPerStore = _a === void 0 ? {} : _a;
+    var extraStoreConfig = isWhat.isPlainObject(configPerStore[storeName]) ? configPerStore[storeName] : {};
+    return __assign(__assign({}, extraStoreConfig), { where: where, orderBy: orderBy, limit: limit });
+}
+/**
+ * Executes 'setupModule' function per store, when the collection or doc is instantiated.
+ *
+ * @export
+ * @param {GlobalConfig['stores']} globalConfigStores
+ * @param {string} modulePath
+ * @param {ModuleConfig} moduleConfig
+ */
+function executeSetupModulePerStore(globalConfigStores, modulePath, moduleConfig) {
+    for (var storeName in globalConfigStores) {
+        var setupModule = globalConfigStores[storeName].setupModule;
+        if (isWhat.isFunction(setupModule)) {
+            var pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeName);
+            setupModule(modulePath, pluginModuleConfig);
+        }
+    }
+}
+/**
+ * The store specified as 'dataStoreName' should return data
+ *
+ * @export
+ * @template calledFrom
+ * @template DocDataType
+ * @param {string} modulePath
+ * @param {ModuleConfig} moduleConfig
+ * @param {GlobalConfig} globalConfig
+ * @returns {calledFrom extends 'collection' ? Map<string, DocDataType> : <DocDataType>(modulePath: string) => DocDataType}
+ */
+function getDataFromDataStore(modulePath, moduleConfig, globalConfig) {
+    var dataStoreName = moduleConfig.dataStoreName || globalConfig.dataStoreName;
+    throwIfNoDataStoreName(dataStoreName);
+    var getModuleData = globalConfig.stores[dataStoreName].getModuleData;
+    var pluginModuleConfig = getPluginModuleConfig(moduleConfig, dataStoreName);
+    if (isDocModule(modulePath)) {
+        return (function (_modulePath) { return getModuleData(_modulePath, pluginModuleConfig); });
+    }
+    var data = getModuleData(modulePath, pluginModuleConfig);
+    if (!isWhat.isMap(data)) {
+        logErrorAndThrow('Collections must return a Map');
+    }
+    return data;
+}
+
 function handleActionPerStore(modulePath, moduleConfig, globalConfig, actionName, actionType, docFn, // actions executed on a "doc" will always return `doc()`
 collectionFn // actions executed on a "collection" will return `collection()` or `doc()`
 ) {
     // returns the action the dev can call with myModule.insert() etc.
     return function (payload, actionConfig) {
         if (actionConfig === void 0) { actionConfig = {}; }
-        var _a;
         return __awaiter(this, void 0, void 0, function () {
             /**
              * The abort mechanism for the entire store chain. When executed in handleAction() it won't go to the next store in executionOrder.
@@ -446,10 +501,10 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                 if (trueOrRevert === void 0) { trueOrRevert = true; }
                 stopExecution = trueOrRevert;
             }
-            var onError, modifyPayloadFnsMap, modifyReadResponseMap, eventNameFnsMap, storesToExecute, _b, _c, modifyFn, stopExecution, doOnGetFns, _d, collectionPath, docId, isDocModule, isCollectionModule, resultFromPlugin, _e, _f, _g, i, storeName, pluginAction, pluginModuleConfig, _h, storesToRevert, storesToRevert_1, storesToRevert_1_1, storeToRevert, pluginRevertAction, _j, _k, fn, e_1_1, e_2_1, alreadyAddedDocId, _l, _m, docRetrieved, e_3_1;
-            var e_4, _o, e_3, _p, e_2, _q, e_1, _r, e_5, _s;
-            return __generator(this, function (_t) {
-                switch (_t.label) {
+            var onError, modifyPayloadFnsMap, modifyReadResponseMap, eventNameFnsMap, storesToExecute, _a, _b, modifyFn, stopExecution, doOnGetFns, _c, collectionPath, docId, isDocModule, isCollectionModule, resultFromPlugin, _d, _e, _f, i, storeName, pluginAction, pluginModuleConfig, _g, storesToRevert, storesToRevert_1, storesToRevert_1_1, storeToRevert, pluginRevertAction, _h, _j, fn, e_1_1, e_2_1, alreadyAddedDocId, _k, _l, docRetrieved, e_3_1;
+            var e_4, _m, e_3, _o, e_2, _p, e_1, _q, e_5, _r;
+            return __generator(this, function (_s) {
+                switch (_s.label) {
                     case 0:
                         onError = actionConfig.onError || moduleConfig.onError || globalConfig.onError;
                         modifyPayloadFnsMap = getModifyPayloadFnsMap(globalConfig.modifyPayloadOn, moduleConfig.modifyPayloadOn, actionConfig.modifyPayloadOn);
@@ -464,38 +519,38 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                         throwIfNoFnsToExecute(storesToExecute);
                         try {
                             // update the payload
-                            for (_b = __values(modifyPayloadFnsMap[actionName]), _c = _b.next(); !_c.done; _c = _b.next()) {
-                                modifyFn = _c.value;
+                            for (_a = __values(modifyPayloadFnsMap[actionName]), _b = _a.next(); !_b.done; _b = _a.next()) {
+                                modifyFn = _b.value;
                                 payload = modifyFn(payload);
                             }
                         }
                         catch (e_4_1) { e_4 = { error: e_4_1 }; }
                         finally {
                             try {
-                                if (_c && !_c.done && (_o = _b["return"])) _o.call(_b);
+                                if (_b && !_b.done && (_m = _a["return"])) _m.call(_a);
                             }
                             finally { if (e_4) throw e_4.error; }
                         }
                         stopExecution = false;
                         doOnGetFns = modifyReadResponseMap.added;
-                        _d = __read(getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _d[0], docId = _d[1];
+                        _c = __read(getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _c[0], docId = _c[1];
                         isDocModule = !!docId;
                         isCollectionModule = !isDocModule;
-                        _t.label = 1;
+                        _s.label = 1;
                     case 1:
-                        _t.trys.push([1, 23, 24, 25]);
-                        _e = __values(storesToExecute.entries()), _f = _e.next();
-                        _t.label = 2;
+                        _s.trys.push([1, 23, 24, 25]);
+                        _d = __values(storesToExecute.entries()), _e = _d.next();
+                        _s.label = 2;
                     case 2:
-                        if (!!_f.done) return [3 /*break*/, 22];
-                        _g = __read(_f.value, 2), i = _g[0], storeName = _g[1];
+                        if (!!_e.done) return [3 /*break*/, 22];
+                        _f = __read(_e.value, 2), i = _f[0], storeName = _f[1];
                         // a previous iteration stopped the execution:
                         if (stopExecution === 'revert' || stopExecution === true)
                             return [3 /*break*/, 22];
                         pluginAction = globalConfig.stores[storeName].actions[actionName];
-                        pluginModuleConfig = ((_a = moduleConfig === null || moduleConfig === void 0 ? void 0 : moduleConfig.configPerStore) === null || _a === void 0 ? void 0 : _a[storeName]) || {};
+                        pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeName);
                         if (!!pluginAction) return [3 /*break*/, 3];
-                        _h = resultFromPlugin;
+                        _g = resultFromPlugin;
                         return [3 /*break*/, 5];
                     case 3: return [4 /*yield*/, handleAction({
                             modulePath: modulePath,
@@ -511,19 +566,19 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                         // handle reverting. stopExecution might have been modified by `handleAction`
                     ];
                     case 4:
-                        _h = _t.sent();
-                        _t.label = 5;
+                        _g = _s.sent();
+                        _s.label = 5;
                     case 5:
                         // the plugin action
-                        resultFromPlugin = _h;
+                        resultFromPlugin = _g;
                         if (!(stopExecution === 'revert')) return [3 /*break*/, 20];
                         storesToRevert = storesToExecute.slice(0, i);
                         storesToRevert.reverse();
-                        _t.label = 6;
+                        _s.label = 6;
                     case 6:
-                        _t.trys.push([6, 18, 19, 20]);
+                        _s.trys.push([6, 18, 19, 20]);
                         storesToRevert_1 = (e_2 = void 0, __values(storesToRevert)), storesToRevert_1_1 = storesToRevert_1.next();
-                        _t.label = 7;
+                        _s.label = 7;
                     case 7:
                         if (!!storesToRevert_1_1.done) return [3 /*break*/, 17];
                         storeToRevert = storesToRevert_1_1.value;
@@ -532,30 +587,30 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                             // revert eventFns, handle and await each eventFn in sequence
                         ];
                     case 8:
-                        _t.sent();
-                        _t.label = 9;
+                        _s.sent();
+                        _s.label = 9;
                     case 9:
-                        _t.trys.push([9, 14, 15, 16]);
-                        _j = (e_1 = void 0, __values(eventNameFnsMap.revert)), _k = _j.next();
-                        _t.label = 10;
+                        _s.trys.push([9, 14, 15, 16]);
+                        _h = (e_1 = void 0, __values(eventNameFnsMap.revert)), _j = _h.next();
+                        _s.label = 10;
                     case 10:
-                        if (!!_k.done) return [3 /*break*/, 13];
-                        fn = _k.value;
+                        if (!!_j.done) return [3 /*break*/, 13];
+                        fn = _j.value;
                         return [4 /*yield*/, fn({ payload: payload, result: resultFromPlugin, actionName: actionName, storeName: storeName })];
                     case 11:
-                        _t.sent();
-                        _t.label = 12;
+                        _s.sent();
+                        _s.label = 12;
                     case 12:
-                        _k = _j.next();
+                        _j = _h.next();
                         return [3 /*break*/, 10];
                     case 13: return [3 /*break*/, 16];
                     case 14:
-                        e_1_1 = _t.sent();
+                        e_1_1 = _s.sent();
                         e_1 = { error: e_1_1 };
                         return [3 /*break*/, 16];
                     case 15:
                         try {
-                            if (_k && !_k.done && (_r = _j["return"])) _r.call(_j);
+                            if (_j && !_j.done && (_q = _h["return"])) _q.call(_h);
                         }
                         finally { if (e_1) throw e_1.error; }
                         return [7 /*endfinally*/];
@@ -564,12 +619,12 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                         return [3 /*break*/, 7];
                     case 17: return [3 /*break*/, 20];
                     case 18:
-                        e_2_1 = _t.sent();
+                        e_2_1 = _s.sent();
                         e_2 = { error: e_2_1 };
                         return [3 /*break*/, 20];
                     case 19:
                         try {
-                            if (storesToRevert_1_1 && !storesToRevert_1_1.done && (_q = storesToRevert_1["return"])) _q.call(storesToRevert_1);
+                            if (storesToRevert_1_1 && !storesToRevert_1_1.done && (_p = storesToRevert_1["return"])) _p.call(storesToRevert_1);
                         }
                         finally { if (e_2) throw e_2.error; }
                         return [7 /*endfinally*/];
@@ -588,32 +643,32 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                             }
                             if (isGetResponse(resultFromPlugin)) {
                                 try {
-                                    for (_l = (e_5 = void 0, __values(resultFromPlugin.docs)), _m = _l.next(); !_m.done; _m = _l.next()) {
-                                        docRetrieved = _m.value;
+                                    for (_k = (e_5 = void 0, __values(resultFromPlugin.docs)), _l = _k.next(); !_l.done; _l = _k.next()) {
+                                        docRetrieved = _l.value;
                                         executeOnFns(doOnGetFns, docRetrieved.data, [docRetrieved]);
                                     }
                                 }
                                 catch (e_5_1) { e_5 = { error: e_5_1 }; }
                                 finally {
                                     try {
-                                        if (_m && !_m.done && (_s = _l["return"])) _s.call(_l);
+                                        if (_l && !_l.done && (_r = _k["return"])) _r.call(_k);
                                     }
                                     finally { if (e_5) throw e_5.error; }
                                 }
                             }
                         }
-                        _t.label = 21;
+                        _s.label = 21;
                     case 21:
-                        _f = _e.next();
+                        _e = _d.next();
                         return [3 /*break*/, 2];
                     case 22: return [3 /*break*/, 25];
                     case 23:
-                        e_3_1 = _t.sent();
+                        e_3_1 = _s.sent();
                         e_3 = { error: e_3_1 };
                         return [3 /*break*/, 25];
                     case 24:
                         try {
-                            if (_f && !_f.done && (_p = _e["return"])) _p.call(_e);
+                            if (_e && !_e.done && (_o = _d["return"])) _o.call(_d);
                         }
                         finally { if (e_3) throw e_3.error; }
                         return [7 /*endfinally*/];
@@ -799,7 +854,7 @@ function handleStreamPerStore(modulePath, moduleConfig, globalConfig, actionType
                         if (!!storesToExecute_1_1.done) return [3 /*break*/, 5];
                         storeName = storesToExecute_1_1.value;
                         pluginAction = globalConfig.stores[storeName].actions['stream'];
-                        pluginModuleConfig = (moduleConfig === null || moduleConfig === void 0 ? void 0 : moduleConfig.configPerStore[storeName]) || {};
+                        pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeName);
                         if (!pluginAction) return [3 /*break*/, 4];
                         return [4 /*yield*/, handleStream({
                                 modulePath: modulePath,
@@ -876,51 +931,6 @@ function handleStreamPerStore(modulePath, moduleConfig, globalConfig, actionType
     };
 }
 
-/**
- * Executes 'setupModule' function per store, when the collection or doc is instantiated.
- *
- * @export
- * @param {GlobalConfig['stores']} globalConfigStores
- * @param {string} modulePath
- * @param {ModuleConfig} moduleConfig
- */
-function executeSetupModulePerStore(globalConfigStores, modulePath, moduleConfig) {
-    for (var storeName in globalConfigStores) {
-        var setupModule = globalConfigStores[storeName].setupModule;
-        if (isWhat.isFunction(setupModule)) {
-            var moduleConfigPerStore = (moduleConfig === null || moduleConfig === void 0 ? void 0 : moduleConfig.configPerStore) || {};
-            var pluginModuleConfig = moduleConfigPerStore[storeName] || {};
-            setupModule(modulePath, pluginModuleConfig);
-        }
-    }
-}
-/**
- * The store specified as 'dataStoreName' should return data
- *
- * @export
- * @template calledFrom
- * @template DocDataType
- * @param {string} modulePath
- * @param {ModuleConfig} moduleConfig
- * @param {GlobalConfig} globalConfig
- * @returns {calledFrom extends 'collection' ? Map<string, DocDataType> : <DocDataType>(modulePath: string) => DocDataType}
- */
-function getDataFromDataStore(modulePath, moduleConfig, globalConfig) {
-    var _a;
-    var dataStoreName = moduleConfig.dataStoreName || globalConfig.dataStoreName;
-    throwIfNoDataStoreName(dataStoreName);
-    var getModuleData = globalConfig.stores[dataStoreName].getModuleData;
-    var storeModuleConfig = ((_a = moduleConfig === null || moduleConfig === void 0 ? void 0 : moduleConfig.configPerStore) === null || _a === void 0 ? void 0 : _a[dataStoreName]) || {};
-    if (isDocModule(modulePath)) {
-        return (function (_modulePath) { return getModuleData(_modulePath, storeModuleConfig); });
-    }
-    var data = getModuleData(modulePath, storeModuleConfig);
-    if (!isWhat.isMap(data)) {
-        logErrorAndThrow('Collections must return a Map');
-    }
-    return data;
-}
-
 function createCollectionWithContext(idOrPath, moduleConfig, globalConfig, docFn, collectionFn) {
     throwIfInvalidId(idOrPath, 'collection');
     var id = idOrPath.split('/').slice(-1)[0];
@@ -932,20 +942,22 @@ function createCollectionWithContext(idOrPath, moduleConfig, globalConfig, docFn
     };
     var insert = handleActionPerStore(path, moduleConfig, globalConfig, 'insert', actionNameTypeMap.get, docFn, collectionFn); //prettier-ignore
     var get = handleActionPerStore(path, moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn, collectionFn); //prettier-ignore
-    var actions = {
-        stream: handleStreamPerStore(path, moduleConfig, globalConfig, actionNameTypeMap.stream, openStreams),
-        get: get,
-        insert: insert,
-    };
+    var stream = handleStreamPerStore(path, moduleConfig, globalConfig, actionNameTypeMap.stream, openStreams); // prettier-ignore
+    var actions = { stream: stream, get: get, insert: insert };
     // Every store will have its 'setupModule' function executed
     executeSetupModulePerStore(globalConfig.stores, path, moduleConfig);
     // The store specified as 'dataStoreName' should return data
     var data = getDataFromDataStore(path, moduleConfig, globalConfig);
-    var moduleInstance = __assign({ doc: doc,
+    function where(fieldPath, operator, value) {
+        var whereClause = [fieldPath, operator, value];
+        var moduleConfigWithClause = mergeAnything.mergeAndConcat(moduleConfig, { where: [whereClause] });
+        return createCollectionWithContext(idOrPath, moduleConfigWithClause, globalConfig, docFn, collectionFn);
+    }
+    var moduleInstance = __assign(__assign({ doc: doc,
         data: data,
         id: id,
         path: path,
-        openStreams: openStreams }, actions);
+        openStreams: openStreams }, actions), { where: where });
     return moduleInstance;
 }
 
@@ -1005,6 +1017,9 @@ function configWithDefaults(config) {
 function VueSync(vueSyncConfig) {
     // the passed GlobalConfig is merged onto defaults
     var globalConfig = configWithDefaults(vueSyncConfig);
+    /**
+     * takes care of the caching instances of modules. Todo: double check memory leaks for when an instance isn't referenced anymore.
+     */
     var moduleMap = new Map(); // apply type upon get/set
     function collection(idOrPath, moduleConfig) {
         if (moduleConfig === void 0) { moduleConfig = {}; }

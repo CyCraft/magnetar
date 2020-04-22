@@ -2,6 +2,7 @@ import { O } from 'ts-toolbelt';
 import { ActionName } from './actions';
 import { PlainObject, DocMetadata } from './atoms';
 import { OnAddedFn, OnModifiedFn, OnRemovedFn } from './modifyReadResponse';
+import { Clauses } from './clauses';
 /**
  * A Plugin is a single function that returns a plugin instance. The pluginOptions can be anything the plugin might need to instantiate.
  */
@@ -34,9 +35,11 @@ export interface PluginInstance {
     getModuleData?: (modulePath: string, moduleConfig: PluginModuleConfig) => PlainObject | Map<string, PlainObject>;
 }
 /**
- * Extra config a dev might pass when instanciates a module as second param (under `configPerStore`). Eg. `collection('pokedex', { configPerStore: { local: pluginModuleConfig } })`
+ * Where, orderBy, limit clauses or extra config a dev might pass when instanciates a module as second param (under `configPerStore`). Eg. `collection('pokedex', { configPerStore: { local: pluginModuleConfig } })`
  */
-export declare type PluginModuleConfig = PlainObject | any;
+export declare type PluginModuleConfig = O.Merge<Partial<Clauses>, {
+    [key: string]: any;
+}>;
 /**
  * Should handle 'stream' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc). Should return `StreamResponse` when acting as a "remote" Store Plugin, and `DoOnStream` when acting as "local" Store Plugin.
  */

@@ -2,19 +2,14 @@ import { O } from 'ts-toolbelt'
 import { handleStream } from './handleStream'
 import { ActionConfig, VueSyncStreamAction } from '../types/actions'
 import { ActionType } from '../types/actionsInternal'
-import {
-  PluginModuleConfig,
-  StreamResponse,
-  DoOnStreamFns,
-  isDoOnStream,
-  DoOnStream,
-} from '../types/plugins'
+import { StreamResponse, DoOnStreamFns, isDoOnStream, DoOnStream } from '../types/plugins'
 import { getEventNameFnsMap } from '../types/events'
 import { getModifyPayloadFnsMap } from '../types/modifyPayload'
 import { getModifyReadResponseFnsMap } from '../types/modifyReadResponse'
 import { executeOnFns } from '../helpers/executeOnFns'
 import { throwOnIncompleteStreamResponses, throwIfNoFnsToExecute } from '../helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from '../types/config'
+import { getPluginModuleConfig } from '../helpers/moduleHelpers'
 
 export function handleStreamPerStore (
   modulePath: string,
@@ -70,7 +65,7 @@ export function handleStreamPerStore (
     for (const storeName of storesToExecute) {
       // find the action on the plugin
       const pluginAction = globalConfig.stores[storeName].actions['stream']
-      const pluginModuleConfig: PluginModuleConfig = moduleConfig?.configPerStore[storeName] || {}
+      const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeName)
 
       // the plugin action
       if (pluginAction) {

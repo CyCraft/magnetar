@@ -56,6 +56,9 @@ export function VueSync (vueSyncConfig: GlobalConfig): VueSyncInstance {
   // the passed GlobalConfig is merged onto defaults
   const globalConfig = configWithDefaults(vueSyncConfig)
 
+  /**
+   * takes care of the caching instances of modules. Todo: double check memory leaks for when an instance isn't referenced anymore.
+   */
   const moduleMap = new Map() // apply type upon get/set
 
   function collection<DocDataType extends object> (

@@ -12,13 +12,7 @@ import {
   ActionName,
 } from '../types/actions'
 import { ActionType, ActionTernary } from '../types/actionsInternal'
-import {
-  PluginModuleConfig,
-  GetResponse,
-  isDoOnGet,
-  isGetResponse,
-  DoOnGet,
-} from '../types/plugins'
+import { GetResponse, isDoOnGet, isGetResponse, DoOnGet } from '../types/plugins'
 import { getModifyPayloadFnsMap } from '../types/modifyPayload'
 import { OnAddedFn, getModifyReadResponseFnsMap } from '../types/modifyReadResponse'
 import { executeOnFns } from '../helpers/executeOnFns'
@@ -28,6 +22,7 @@ import { CollectionInstance } from '../Collection'
 import { DocInstance } from '../Doc'
 import { getCollectionPathDocIdEntry } from '../helpers/pathHelpers'
 import { CollectionFn, DocFn } from '../VueSync'
+import { getPluginModuleConfig } from '../helpers/moduleHelpers'
 
 export function handleActionPerStore<TActionName extends Exclude<ActionName, 'stream'>> (
   modulePath: string,
@@ -36,8 +31,7 @@ export function handleActionPerStore<TActionName extends Exclude<ActionName, 'st
   actionName: TActionName,
   actionType: ActionType,
   docFn: DocFn, // actions executed on a "doc" will always return `doc()`
-  collectionFn?: CollectionFn, // actions executed on a "collection" will return `collection()` or `doc()`
-  clauses?: { where: string[][] }
+  collectionFn?: CollectionFn // actions executed on a "collection" will return `collection()` or `doc()`
 ): ActionTernary<TActionName>
 
 export function handleActionPerStore (
@@ -47,8 +41,7 @@ export function handleActionPerStore (
   actionName: Exclude<ActionName, 'stream'>,
   actionType: ActionType,
   docFn: DocFn, // actions executed on a "doc" will always return `doc()`
-  collectionFn?: CollectionFn, // actions executed on a "collection" will return `collection()` or `doc()`
-  clauses: { where: string[][] } = { where: [] }
+  collectionFn?: CollectionFn // actions executed on a "collection" will return `collection()` or `doc()`
 ):
   | VueSyncGetAction<any>
   | VueSyncWriteAction<any>
@@ -112,7 +105,7 @@ export function handleActionPerStore (
       if (stopExecution === 'revert' || stopExecution === true) break
       // find the action on the plugin
       const pluginAction = globalConfig.stores[storeName].actions[actionName]
-      const pluginModuleConfig: PluginModuleConfig = moduleConfig?.configPerStore?.[storeName] || {}
+      const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeName)
       // the plugin action
       resultFromPlugin = !pluginAction
         ? resultFromPlugin
@@ -126,7 +119,6 @@ export function handleActionPerStore (
             actionName,
             stopExecutionAfterAction,
             storeName,
-            clauses,
           })
       // handle reverting. stopExecution might have been modified by `handleAction`
       if ((stopExecution as any) === 'revert') {

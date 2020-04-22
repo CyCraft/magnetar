@@ -3,6 +3,7 @@ import { isPlainObject, isFunction, isArray } from 'is-what'
 import { ActionName } from './actions'
 import { PlainObject, DocMetadata } from './atoms'
 import { OnAddedFn, OnModifiedFn, OnRemovedFn } from './modifyReadResponse'
+import { Clauses } from './clauses'
 
 // stores / plugins
 
@@ -45,9 +46,9 @@ export interface PluginInstance {
 }
 
 /**
- * Extra config a dev might pass when instanciates a module as second param (under `configPerStore`). Eg. `collection('pokedex', { configPerStore: { local: pluginModuleConfig } })`
+ * Where, orderBy, limit clauses or extra config a dev might pass when instanciates a module as second param (under `configPerStore`). Eg. `collection('pokedex', { configPerStore: { local: pluginModuleConfig } })`
  */
-export type PluginModuleConfig = PlainObject | any
+export type PluginModuleConfig = O.Merge<Partial<Clauses>, { [key: string]: any }>
 
 // each of the following actions must be implemented by the plugin!
 
@@ -67,8 +68,7 @@ export type PluginStreamAction = (
 export type PluginGetAction = (
   payload: PlainObject | void,
   modulePath: string,
-  pluginModuleConfig: PluginModuleConfig,
-  clauses: { where: string[][] }
+  pluginModuleConfig: PluginModuleConfig
 ) => GetResponse | DoOnGet | Promise<GetResponse | DoOnGet>
 
 /**

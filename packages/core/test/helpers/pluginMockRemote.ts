@@ -1,4 +1,11 @@
-import { PluginInstance, VueSyncPlugin, PlainObject } from '../../src/index'
+import {
+  PluginInstance,
+  VueSyncPlugin,
+  PlainObject,
+  WhereClause,
+  OrderBy,
+  Limit,
+} from '../../src/index'
 import {
   writeActionFactory,
   insertActionFactory,
@@ -19,6 +26,9 @@ export interface StorePluginOptions {
 export interface StorePluginModuleConfig {
   path?: string
   initialData?: PlainObject | [string, PlainObject][]
+  where?: WhereClause[]
+  orderBy?: OrderBy[]
+  limit?: Limit
 }
 
 // a Vue Sync plugin is a single function that returns a `PluginInstance`

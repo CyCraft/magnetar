@@ -152,7 +152,6 @@ test('read: get (collection)', async t => {
   } catch (error) {
     t.fail(error)
   }
-  // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.deepEqual(pokedexModule.data.get('136'), pokedex(136))
   t.deepEqual(pokedexModule.data.size, 151)
@@ -168,6 +167,5 @@ test('read: get (document)', async t => {
   } catch (error) {
     t.fail(error)
   }
-  // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })

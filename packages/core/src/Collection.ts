@@ -7,6 +7,8 @@ import { throwIfInvalidId } from './helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from './types/config'
 import { DocFn, CollectionFn } from './VueSync'
 import { executeSetupModulePerStore, getDataFromDataStore } from './helpers/moduleHelpers'
+import { WhereClause, WhereFilterOp } from './types/clauses'
+import { mergeAndConcat } from 'merge-anything'
 
 export type CollectionInstance<DocDataType extends object = { [prop: string]: any }> = {
   data: Map<string, DocDataType>
@@ -21,7 +23,7 @@ export type CollectionInstance<DocDataType extends object = { [prop: string]: an
   insert?: VueSyncInsertAction<DocDataType>
 
   // filters
-  where: (...args: any[]) => CollectionInstance<DocDataType>
+  where: (fieldPath: string, operator: WhereFilterOp, value: any) => CollectionInstance<DocDataType>
 }
 
 export function createCollectionWithContext<DocDataType extends object> (
@@ -53,27 +55,31 @@ export function createCollectionWithContext<DocDataType extends object> (
   // The store specified as 'dataStoreName' should return data
   const data = getDataFromDataStore<'collection', DocDataType>(path, moduleConfig, globalConfig)
 
-  const moduleInstancePartial: Partial<CollectionInstance<DocDataType>> = {
+  function where (
+    fieldPath: string,
+    operator: WhereFilterOp,
+    value: any
+  ): CollectionInstance<DocDataType> {
+    const whereClause: WhereClause = [fieldPath, operator, value]
+    const moduleConfigWithClause = mergeAndConcat(moduleConfig, { where: [whereClause] })
+    return createCollectionWithContext(
+      idOrPath,
+      moduleConfigWithClause,
+      globalConfig,
+      docFn,
+      collectionFn
+    )
+  }
+
+  const moduleInstance: CollectionInstance<DocDataType> = {
     doc,
     data,
     id,
     path,
     openStreams,
     ...actions,
+    where,
   }
-
-  // @ts-ignore
-  const where: CollectionInstance<DocDataType> = (...args: any[]) => {
-    const clauses = { where: [args] }
-    const get = handleActionPerStore(path, moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn, collectionFn, clauses) as VueSyncGetAction<DocDataType, 'collection'> //prettier-ignore
-    return {
-      ...moduleInstancePartial,
-      get,
-    }
-  }
-
-  // @ts-ignore
-  const moduleInstance: CollectionInstance<DocDataType> = { ...moduleInstancePartial, where }
 
   return moduleInstance
 }

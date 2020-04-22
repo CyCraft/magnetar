@@ -36,8 +36,7 @@ test('get: can mutate payload & read response', async t => {
   } catch (error) {
     t.fail(error)
   }
-  // the local store should have updated its data to the whatever was returned in the remote success event (via the plugin's onNextStoresSuccess handler)
-  // therefore: the local store SHOULD HAVE the applied defaults
+  // the local store SHOULD HAVE the applied defaults
   t.deepEqual(pokedexModule.data.get('1'), { ...pokedex(1), seen: true })
   t.deepEqual(pokedexModule.data.get('136'), { ...pokedex(136), seen: true })
 })
@@ -92,8 +91,7 @@ test('insert: can mutate payload', async t => {
   } catch (error) {
     t.fail(error)
   }
-  // the local store should have updated its data to the whatever was returned in the remote success event (via the plugin's onNextStoresSuccess handler)
-  // therefore: the local store SHOULD HAVE the applied defaults
+  // the local store SHOULD HAVE the applied defaults
   t.deepEqual(pokedexModule.data.get('1'), { ...pokedex(1) })
   t.deepEqual(pokedexModule.data.get('7'), { ...pokedex(7), seen: true })
 })

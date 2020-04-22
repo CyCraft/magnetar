@@ -14,7 +14,6 @@ test('get (collection)', async t => {
   } catch (error) {
     t.fail(error)
   }
-  // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
   t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
   t.deepEqual(pokedexModule.doc('136').data, pokedex(136))
   t.deepEqual(pokedexModule.data.size, 151)
@@ -30,7 +29,6 @@ test('get (document)', async t => {
   } catch (error) {
     t.fail(error)
   }
-  // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })
 
@@ -40,7 +38,6 @@ test('get (collection) where-filter: ==', async t => {
 
   try {
     const result = await pokedexModule.where('name', '==', 'Flareon').get()
-    // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
 
     t.deepEqual([...result.data.values()], [pokedex(1), pokedex(136)])
     t.is(pokedexModule.data.size, 2)
@@ -58,7 +55,6 @@ test('get (collection) where-filter: ==', async t => {
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
 //   const result = pokedexModule.data.values().filter(p => {})
 //   t.deepEqual(result, [])
 // })
@@ -72,7 +68,6 @@ test('get (collection) where-filter: ==', async t => {
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
 //   const result = pokedexModule.data.values().filter(p => {})
 //   t.deepEqual(result, [])
 // })
@@ -86,7 +81,6 @@ test('get (collection) where-filter: ==', async t => {
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
 //   const result = pokedexModule.data.values().filter(p => {})
 //   t.deepEqual(result, [])
 // })
@@ -100,7 +94,6 @@ test('get (collection) where-filter: ==', async t => {
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
 //   const result = pokedexModule.data.values().filter(p => {})
 //   t.deepEqual(result, [])
 // })
@@ -114,7 +107,6 @@ test('get (collection) where-filter: ==', async t => {
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
 //   const result = pokedexModule.data.values().filter(p => {})
 //   t.deepEqual(result, [])
 // })
@@ -128,7 +120,6 @@ test('get (collection) where-filter: ==', async t => {
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
 //   const result = pokedexModule.data.values().filter(p => {})
 //   t.deepEqual(result, [])
 // })
@@ -142,7 +133,6 @@ test('get (collection) where-filter: ==', async t => {
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
 //   const result = pokedexModule.data.values().filter(p => {})
 //   t.deepEqual(result, [])
 // })
@@ -156,7 +146,6 @@ test('get (collection) where-filter: ==', async t => {
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
 //   const result = pokedexModule.data.values().filter(p => {})
 //   t.deepEqual(result, [])
 // })
@@ -170,7 +159,6 @@ test('get (collection) where-filter: ==', async t => {
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
 //   const result = pokedexModule.data.values().filter(p => {})
 //   t.deepEqual(result, [])
 // })
@@ -184,7 +172,6 @@ test('get (collection) where-filter: ==', async t => {
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
 //   const result = pokedexModule.data.values().filter(p => {})
 //   t.deepEqual(result, [])
 // })

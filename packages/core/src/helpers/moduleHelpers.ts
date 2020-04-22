@@ -1,7 +1,25 @@
-import { isFunction, isMap } from 'is-what'
+import { isFunction, isMap, isPlainObject } from 'is-what'
 import { GlobalConfig, ModuleConfig } from '../types/config'
 import { throwIfNoDataStoreName, logErrorAndThrow } from './throwFns'
 import { isDocModule } from './pathHelpers'
+import { PluginModuleConfig } from '../types/plugins'
+
+/**
+ * Extracts the PluginModuleConfig from the ModuleConfig
+ *
+ * @export
+ * @param {ModuleConfig} moduleConfig
+ * @param {string} storeName
+ * @returns {PluginModuleConfig}
+ */
+export function getPluginModuleConfig (
+  moduleConfig: ModuleConfig,
+  storeName: string
+): PluginModuleConfig {
+  const { where, orderBy, limit, configPerStore = {} } = moduleConfig
+  const extraStoreConfig = isPlainObject(configPerStore[storeName]) ? configPerStore[storeName] : {}
+  return { ...extraStoreConfig, where, orderBy, limit }
+}
 
 /**
  * Executes 'setupModule' function per store, when the collection or doc is instantiated.
@@ -19,8 +37,7 @@ export function executeSetupModulePerStore (
   for (const storeName in globalConfigStores) {
     const { setupModule } = globalConfigStores[storeName]
     if (isFunction(setupModule)) {
-      const moduleConfigPerStore = moduleConfig?.configPerStore || {}
-      const pluginModuleConfig = moduleConfigPerStore[storeName] || {}
+      const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeName)
       setupModule(modulePath, pluginModuleConfig)
     }
   }
@@ -46,12 +63,12 @@ export function getDataFromDataStore<calledFrom extends 'collection' | 'doc', Do
   const dataStoreName = moduleConfig.dataStoreName || globalConfig.dataStoreName
   throwIfNoDataStoreName(dataStoreName)
   const { getModuleData } = globalConfig.stores[dataStoreName]
-  const storeModuleConfig = moduleConfig?.configPerStore?.[dataStoreName] || {}
+  const pluginModuleConfig = getPluginModuleConfig(moduleConfig, dataStoreName)
 
   if (isDocModule(modulePath)) {
-    return ((_modulePath: string) => getModuleData(_modulePath, storeModuleConfig)) as any
+    return ((_modulePath: string) => getModuleData(_modulePath, pluginModuleConfig)) as any
   }
-  const data = getModuleData(modulePath, storeModuleConfig)
+  const data = getModuleData(modulePath, pluginModuleConfig)
   if (!isMap(data)) {
     logErrorAndThrow('Collections must return a Map')
   }
