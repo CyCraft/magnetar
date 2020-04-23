@@ -1,7 +1,7 @@
 import test from 'ava'
 import { DocInstance } from '../../src/index'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
-import { pokedex } from '../helpers/pokemon'
+import { pokedex } from '../helpers/pokedex'
 import { waitMs } from '../helpers/wait'
 import { merge } from 'merge-anything'
 

@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
-import { pokedex } from '../helpers/pokemon'
+import { pokedex } from '../helpers/pokedex'
 
 test('get (collection)', async t => {
   /// 'get' resolves once all stores have given a response with data
@@ -35,8 +35,6 @@ test('get (collection) where-filter: ==', async t => {
   const { pokedexModule } = createVueSyncInstance()
   try {
     const queryModuleRef = await pokedexModule.where('name', '==', 'Flareon').get()
-    // await pokedexModule.where('name', '==', 'Flareon').get()
-    // const queryModuleRef = pokedexModule.where('name', '==', 'Flareon')
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(136)]
     t.deepEqual(actual, expected)
@@ -45,38 +43,38 @@ test('get (collection) where-filter: ==', async t => {
   }
 })
 
-// test('get (collection) where-filter: == nested', async t => {
-//   const { pokedexModule } = createVueSyncInstance()
-//   try {
-//     const queryModuleRef = await pokedexModule.where('base.HP', '==', 65).get()
-//     const actual = [...queryModuleRef.data.values()]
-//     const expected = [
-//       pokedex(15),
-//       pokedex(22),
-//       pokedex(53),
-//       pokedex(57),
-//       pokedex(61),
-//       pokedex(70),
-//       pokedex(78),
-//       pokedex(86),
-//       pokedex(110),
-//       pokedex(114),
-//       pokedex(124),
-//       pokedex(125),
-//       pokedex(126),
-//       pokedex(127),
-//       pokedex(135),
-//       pokedex(136),
-//       pokedex(137),
-//     ]
-//     t.deepEqual(actual, expected)
-//   } catch (error) {
-//     t.fail(error)
-//   }
-// })
+test('get (collection) where-filter: == nested', async t => {
+  const { pokedexModule } = createVueSyncInstance()
+  try {
+    const queryModuleRef = await pokedexModule.where('base.HP', '==', 65).get()
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [
+      pokedex(15),
+      pokedex(22),
+      pokedex(53),
+      pokedex(57),
+      pokedex(61),
+      pokedex(70),
+      pokedex(78),
+      pokedex(86),
+      pokedex(110),
+      pokedex(114),
+      pokedex(124),
+      pokedex(125),
+      pokedex(126),
+      pokedex(127),
+      pokedex(135),
+      pokedex(136),
+      pokedex(137),
+    ]
+    t.deepEqual(actual, expected)
+  } catch (error) {
+    t.fail(error)
+  }
+})
 
 // test('get (collection) where-filter: <', async t => {
-//   const { pokedexModule} = createVueSyncInstance()
+//   const { pokedexModule } = createVueSyncInstance()
 //   try {
 //     const queryModuleRef = await pokedexModule.where('', '<', '').get()
 //     const actual = [...queryModuleRef.data.values()]

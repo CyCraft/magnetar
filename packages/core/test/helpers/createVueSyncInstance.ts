@@ -1,7 +1,7 @@
 import { CreatePlugin as CreatePluginLocal } from './pluginMockLocal/index'
 import { CreatePlugin as CreatePluginRemote } from './pluginMockRemote'
 import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '../../src/index'
-import { pokedex, PokedexEntry } from './pokemon'
+import { pokedex, PokedexEntry } from './pokedex'
 import { generateRandomId } from './generateRandomId'
 import { O } from 'ts-toolbelt'
 

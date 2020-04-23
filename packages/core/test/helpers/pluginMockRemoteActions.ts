@@ -19,7 +19,7 @@ import {
 } from '../../src/index'
 import { StorePluginModuleConfig, StorePluginOptions } from './pluginMockRemote'
 import { waitMs } from './wait'
-import { pokedexGetAll, pokedexMap } from './pokemon'
+import { pokedexGetAll, pokedexMap } from './pokedex'
 import { throwIfEmulatedError } from './throwFns'
 import { generateRandomId } from './generateRandomId'
 import { filterDataPerClauses } from './pluginMockLocal/helpers/dataHelpers'
