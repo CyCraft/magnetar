@@ -55,7 +55,7 @@ export function throwIfInvalidId (modulePath: string, moduleType: 'collection' |
     if (!modulePath)
       errorMessage = 'You must provide a document id (or a "path" like so: collection/doc).'
     if (isCollectionModule(modulePath))
-      errorMessage = `Your collection id (or "path") must be of even segments. The expected pattern is: collection/doc/collection/doc ... Yours was ${modulePath}`
+      errorMessage = `Your doc id (or "path") must be of even segments. The expected pattern is: collection/doc/collection/doc ... Yours was ${modulePath}`
   }
   if (errorMessage) logErrorAndThrow(errorMessage)
 }
