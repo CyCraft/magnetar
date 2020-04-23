@@ -169,3 +169,24 @@ test('read: get (document)', async t => {
   }
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })
+
+test('get (collection) where-filter: ==', async t => {
+  const { pokedexModule } = createVueSyncInstance()
+  try {
+    const queryModuleRef = await pokedexModule.where('name', '==', 'Flareon').get()
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [pokedex(136)]
+    t.deepEqual(actual, expected)
+  } catch (error) {
+    t.fail(error)
+  }
+  // try take the query again and see if it's the same result
+  const queryModuleRef = pokedexModule.where('name', '==', 'Flareon')
+  const actual = [...queryModuleRef.data.values()]
+  const expected = [pokedex(136)]
+  t.deepEqual(actual, expected)
+  // see if the main module has also received this data
+  const actual2 = [...pokedexModule.data.values()]
+  const expected2 = [pokedex(1), pokedex(136)]
+  t.deepEqual(actual2, expected2)
+})

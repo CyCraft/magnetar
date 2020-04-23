@@ -48,7 +48,7 @@ export interface PluginInstance {
 /**
  * Where, orderBy, limit clauses or extra config a dev might pass when instanciates a module as second param (under `configPerStore`). Eg. `collection('pokedex', { configPerStore: { local: pluginModuleConfig } })`
  */
-export type PluginModuleConfig = O.Merge<Partial<Clauses>, { [key: string]: any }>
+export type PluginModuleConfig = O.Merge<Clauses, { [key: string]: any }>
 
 // each of the following actions must be implemented by the plugin!
 

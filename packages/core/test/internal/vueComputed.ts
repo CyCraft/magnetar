@@ -2,6 +2,29 @@ import test from 'ava'
 import * as Vue from 'vue/dist/vue.common.js'
 import { flattenObject } from 'flatten-anything'
 import pathToProp from 'path-to-prop'
+import { isPlainObject } from 'is-what'
+
+/**
+ * Creates the params needed to $set a target based on a nested.path
+ *
+ * @param {object} target
+ * @param {string} path
+ * @param {*} value
+ * @returns {[object, string, any]}
+ */
+function getSetParams (target: object, path: string, value: any): [object, string, any] {
+  const pathParts = path.split('.')
+  const prop = pathParts.pop()
+  const pathParent = pathParts.join('.')
+  const targetForNestedProp = pathToProp(target, pathParent)
+  if (!isPlainObject(targetForNestedProp)) {
+    // the target doesn't have an object ready at this level to set the value to
+    // so we need to step down a level and try again
+    return getSetParams(target, pathParent, { [prop]: value })
+  }
+  const valueToSet = value
+  return [targetForNestedProp, prop, valueToSet]
+}
 
 // test if a computed prop is re-run or not based on how the underlying data is overwritten
 test('computed prop lifecycle', t => {
@@ -37,12 +60,9 @@ test('computed prop lifecycle', t => {
         for (const [path, value] of Object.entries(flatPayload)) {
           const targetVal = pathToProp(target, path)
           // do not update anything if the values are the same
-          if (targetVal === value) return
-          const pathParts = path.split('.')
-          const prop = pathParts.pop()
-          const pathParent = pathParts.join('')
-          const targetForNestedProp = pathToProp(target, pathParent)
-          this.$set(targetForNestedProp, prop, value)
+          if (targetVal === value) continue
+          const setParams = getSetParams(target, path, value)
+          this.$set(...setParams)
         }
       },
       updateA () {
@@ -53,31 +73,31 @@ test('computed prop lifecycle', t => {
       },
     },
   })
-  // log twice
-  console.log(vue.always)
-  console.log(vue.always)
+  let a: any
+  a = vue.always
+  a = vue.always
   // should have only ran once
   t.deepEqual(ranFns, ['always'])
   // log onlyB twice
-  console.log(vue.onlyB)
-  console.log(vue.onlyB)
+  a = vue.onlyB
+  a = vue.onlyB
   // should have only ran once
   t.deepEqual(ranFns, ['always', 'onlyB'])
   // update b text
   vue.updateB()
   // log onlyB twice
-  console.log(vue.onlyB)
-  console.log(vue.onlyB)
+  a = vue.onlyB
+  a = vue.onlyB
   // should have only ran once
   t.deepEqual(ranFns, ['always', 'onlyB', 'onlyB'])
   // update A
   vue.updateA()
   // log onlyB again, should have not run in this case
-  console.log(vue.onlyB)
+  a = vue.onlyB
   t.deepEqual(ranFns, ['always', 'onlyB', 'onlyB'])
   // update All
   vue.updateAll()
   // log onlyB again, should have not run in this case
-  console.log(vue.onlyB)
+  a = vue.onlyB
   t.deepEqual(ranFns, ['always', 'onlyB', 'onlyB'])
 })

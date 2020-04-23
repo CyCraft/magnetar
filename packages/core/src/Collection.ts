@@ -52,7 +52,9 @@ export function createCollectionWithContext<DocDataType extends object> (
   // Every store will have its 'setupModule' function executed
   executeSetupModulePerStore(globalConfig.stores, path, moduleConfig)
 
-  // The store specified as 'dataStoreName' should return data
+  /**
+   * The data returned by the store specified as 'dataStoreName'
+   */
   const data = getDataFromDataStore<'collection', DocDataType>(path, moduleConfig, globalConfig)
 
   function where (

@@ -1,3 +1,4 @@
+import { pick } from 'filter-anything'
 import {
   ActionName,
   isCollectionModule,
@@ -18,9 +19,10 @@ import {
 } from '../../src/index'
 import { StorePluginModuleConfig, StorePluginOptions } from './pluginMockRemote'
 import { waitMs } from './wait'
-import { pokedexGetAll } from './pokemon'
+import { pokedexGetAll, pokedexMap } from './pokemon'
 import { throwIfEmulatedError } from './throwFns'
 import { generateRandomId } from './generateRandomId'
+import { filterDataPerClauses } from './pluginMockLocal/helpers/dataHelpers'
 
 export function writeActionFactory (
   storePluginOptions: StorePluginOptions,
@@ -102,14 +104,10 @@ function mockDataRetrieval (
   pluginModuleConfig: StorePluginModuleConfig
 ): PlainObject[] {
   if (!isCollection) return [{ name: 'Luca', age: 10, dream: 'job' }]
-  let result = pokedexGetAll()
-  const { where } = pluginModuleConfig
-  if (!where) return result
-  for (const wherePhrase of where) {
-    const [prop, comparator, expected] = wherePhrase
-    result = result.filter(p => p[prop] == expected)
-  }
-  return result
+  const _pokedexMap = pokedexMap()
+  const clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
+  const filteredMap = filterDataPerClauses(_pokedexMap, clauses)
+  return [...filteredMap.values()]
 }
 
 export function getActionFactory (storePluginOptions: StorePluginOptions): PluginGetAction {

@@ -30,7 +30,7 @@ export type Limit = number
  * Clauses that can filter data in a Collection
  */
 export type Clauses = {
-  where: WhereClause[]
-  orderBy: OrderBy[]
+  where?: WhereClause[]
+  orderBy?: OrderBy[]
   limit?: Limit
 }

@@ -2023,6 +2023,11 @@ export function pokedex (pokedexNr: number): PokedexEntry {
   return copy(pokedexArray[entryIndex])
 }
 
-export function pokedexGetAll () {
+export function pokedexGetAll (): PokedexEntry[] {
   return copy(pokedexArray)
+}
+
+export function pokedexMap (): Map<string, PokedexEntry> {
+  const entries: [string, PokedexEntry][] = copy(pokedexArray).map(p => [String(p.id), p])
+  return new Map(entries)
 }

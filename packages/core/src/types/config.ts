@@ -44,7 +44,7 @@ export type GlobalConfig = O.Merge<
  * Extra options the dev can pass when creating a module with collection() or doc(). These will take precedence over the global config.
  */
 export type ModuleConfig = O.Compact<
-  Partial<Clauses>,
+  Clauses,
   [
     Partial<SharedConfig>,
     {

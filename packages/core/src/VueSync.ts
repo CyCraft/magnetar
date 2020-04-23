@@ -66,8 +66,9 @@ export function VueSync (vueSyncConfig: GlobalConfig): VueSyncInstance {
     moduleConfig: ModuleConfig = {}
   ): CollectionInstance<DocDataType> {
     // retrieved the cached instance
-    const _moduleMap: Map<string, CollectionInstance<DocDataType>> = moduleMap
-    const cachedInstance = _moduleMap.get(idOrPath)
+    type ModuleIdentifier = { idOrPath: string; moduleConfig: ModuleConfig }
+    const _moduleMap: WeakMap<ModuleIdentifier, CollectionInstance<DocDataType>> = moduleMap
+    const cachedInstance = _moduleMap.get({ idOrPath, moduleConfig })
     if (cachedInstance) return cachedInstance
     // else create and cache a new instance
     const moduleInstance = createCollectionWithContext<DocDataType>(
@@ -78,7 +79,7 @@ export function VueSync (vueSyncConfig: GlobalConfig): VueSyncInstance {
       doc,
       collection
     )
-    moduleMap.set(idOrPath, moduleInstance)
+    moduleMap.set({ idOrPath, moduleConfig }, moduleInstance)
     return moduleInstance
   }
 

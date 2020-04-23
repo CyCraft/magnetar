@@ -42,8 +42,9 @@ export function executeSetupModulePerStore (
     }
   }
 }
+
 /**
- * The store specified as 'dataStoreName' should return data
+ * Returns the data form the store specified as 'dataStoreName' but filtered as per the clauses
  *
  * @export
  * @template calledFrom
@@ -65,9 +66,11 @@ export function getDataFromDataStore<calledFrom extends 'collection' | 'doc', Do
   const { getModuleData } = globalConfig.stores[dataStoreName]
   const pluginModuleConfig = getPluginModuleConfig(moduleConfig, dataStoreName)
 
+  // docs
   if (isDocModule(modulePath)) {
     return ((_modulePath: string) => getModuleData(_modulePath, pluginModuleConfig)) as any
   }
+  // collections
   const data = getModuleData(modulePath, pluginModuleConfig)
   if (!isMap(data)) {
     logErrorAndThrow('Collections must return a Map')

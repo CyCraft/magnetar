@@ -23,7 +23,6 @@ test('get (document)', async t => {
   /// get resolves once all stores have given a response with data
   const { trainerModule } = createVueSyncInstance()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
-
   try {
     await trainerModule.get()
   } catch (error) {
@@ -34,144 +33,152 @@ test('get (document)', async t => {
 
 test('get (collection) where-filter: ==', async t => {
   const { pokedexModule } = createVueSyncInstance()
-  // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
-
   try {
-    const result = await pokedexModule.where('name', '==', 'Flareon').get()
-
-    t.deepEqual([...result.data.values()], [pokedex(1), pokedex(136)])
-    t.is(pokedexModule.data.size, 2)
+    const queryModuleRef = await pokedexModule.where('name', '==', 'Flareon').get()
+    // await pokedexModule.where('name', '==', 'Flareon').get()
+    // const queryModuleRef = pokedexModule.where('name', '==', 'Flareon')
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [pokedex(136)]
+    t.deepEqual(actual, expected)
   } catch (error) {
     t.fail(error)
   }
 })
 
 // test('get (collection) where-filter: == nested', async t => {
-//   const { pokedexModule} = createVueSyncInstance()
-//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
-
+//   const { pokedexModule } = createVueSyncInstance()
 //   try {
-//     await pokedexModule.where('', '== nested', '').get()
+//     const queryModuleRef = await pokedexModule.where('base.HP', '==', 65).get()
+//     const actual = [...queryModuleRef.data.values()]
+//     const expected = [
+//       pokedex(15),
+//       pokedex(22),
+//       pokedex(53),
+//       pokedex(57),
+//       pokedex(61),
+//       pokedex(70),
+//       pokedex(78),
+//       pokedex(86),
+//       pokedex(110),
+//       pokedex(114),
+//       pokedex(124),
+//       pokedex(125),
+//       pokedex(126),
+//       pokedex(127),
+//       pokedex(135),
+//       pokedex(136),
+//       pokedex(137),
+//     ]
+//     t.deepEqual(actual, expected)
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   const result = pokedexModule.data.values().filter(p => {})
-//   t.deepEqual(result, [])
 // })
 
 // test('get (collection) where-filter: <', async t => {
 //   const { pokedexModule} = createVueSyncInstance()
-//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
-
 //   try {
-//     await pokedexModule.where('', '<', '').get()
+//     const queryModuleRef = await pokedexModule.where('', '<', '').get()
+//     const actual = [...queryModuleRef.data.values()]
+//     const expected = []
+//     t.deepEqual(actual, expected)
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   const result = pokedexModule.data.values().filter(p => {})
-//   t.deepEqual(result, [])
 // })
 
 // test('get (collection) where-filter: =<', async t => {
 //   const { pokedexModule} = createVueSyncInstance()
-//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
-
 //   try {
-//     await pokedexModule.where('', '=<', '').get()
+//     const queryModuleRef = await pokedexModule.where('', '=<', '').get()
+//     const actual = [...queryModuleRef.data.values()]
+//     const expected = []
+//     t.deepEqual(actual, expected)
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   const result = pokedexModule.data.values().filter(p => {})
-//   t.deepEqual(result, [])
 // })
 
 // test('get (collection) where-filter: >', async t => {
 //   const { pokedexModule} = createVueSyncInstance()
-//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
-
 //   try {
-//     await pokedexModule.where('', '>', '').get()
+//     const queryModuleRef = await pokedexModule.where('', '>', '').get()
+//     const actual = [...queryModuleRef.data.values()]
+//     const expected = []
+//     t.deepEqual(actual, expected)
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   const result = pokedexModule.data.values().filter(p => {})
-//   t.deepEqual(result, [])
 // })
 
 // test('get (collection) where-filter: >=', async t => {
 //   const { pokedexModule} = createVueSyncInstance()
-//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
-
 //   try {
-//     await pokedexModule.where('', '>=', '').get()
+//     const queryModuleRef = await pokedexModule.where('', '>=', '').get()
+//     const actual = [...queryModuleRef.data.values()]
+//     const expected = []
+//     t.deepEqual(actual, expected)
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   const result = pokedexModule.data.values().filter(p => {})
-//   t.deepEqual(result, [])
 // })
 
 // test('get (collection) where-filter: array-contains', async t => {
 //   const { pokedexModule} = createVueSyncInstance()
-//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
-
 //   try {
-//     await pokedexModule.where('', 'array-contains', '').get()
+//     const queryModuleRef = await pokedexModule.where('', 'array-contains', '').get()
+//     const actual = [...queryModuleRef.data.values()]
+//     const expected = []
+//     t.deepEqual(actual, expected)
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   const result = pokedexModule.data.values().filter(p => {})
-//   t.deepEqual(result, [])
 // })
 
 // test('get (collection) where-filter: in', async t => {
 //   const { pokedexModule} = createVueSyncInstance()
-//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
-
 //   try {
-//     await pokedexModule.where('', 'in', '').get()
+//     const queryModuleRef = await pokedexModule.where('', 'in', '').get()
+//     const actual = [...queryModuleRef.data.values()]
+//     const expected = []
+//     t.deepEqual(actual, expected)
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   const result = pokedexModule.data.values().filter(p => {})
-//   t.deepEqual(result, [])
 // })
 
 // test('get (collection) where-filter: array-contains-any', async t => {
 //   const { pokedexModule} = createVueSyncInstance()
-//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
-
 //   try {
-//     await pokedexModule.where('', 'array-contains-any', '').get()
+//     const queryModuleRef = await pokedexModule.where('', 'array-contains-any', '').get()
+//     const actual = [...queryModuleRef.data.values()]
+//     const expected = []
+//     t.deepEqual(actual, expected)
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   const result = pokedexModule.data.values().filter(p => {})
-//   t.deepEqual(result, [])
 // })
 
 // test('get (collection) orderBy', async t => {
 //   const { pokedexModule} = createVueSyncInstance()
-//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
-
 //   try {
-//     await pokedexModule.where('', '', a', '').get()
+//     const queryModuleRef = await pokedexModule.where('', '', a', '').get()
+//     const actual = [...queryModuleRef.data.values()]
+//     const expected = []
+//     t.deepEqual(actual, expected)
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   const result = pokedexModule.data.values().filter(p => {})
-//   t.deepEqual(result, [])
 // })
 
 // test('get (collection) limit', async t => {
 //   const { pokedexModule} = createVueSyncInstance()
-//   // isModuleDataEqual(t, vueSync, 'pokedex/...', ...)
-
 //   try {
-//     await pokedexModule.where('', '', async t', '').get()
+//     const queryModuleRef = await pokedexModule.where('', '', async t', '').get()
+//     const actual = [...queryModuleRef.data.values()]
+//     const expected = []
+//     t.deepEqual(actual, expected)
 //   } catch (error) {
 //     t.fail(error)
 //   }
-//   const result = pokedexModule.data.values().filter(p => {})
-//   t.deepEqual(result, [])
 // })
