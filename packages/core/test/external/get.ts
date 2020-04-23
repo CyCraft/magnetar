@@ -46,116 +46,110 @@ test('get (collection) where-filter: ==', async t => {
 test('get (collection) where-filter: == nested', async t => {
   const { pokedexModule } = createVueSyncInstance()
   try {
-    const queryModuleRef = await pokedexModule.where('base.HP', '==', 65).get()
+    const queryModuleRef = await pokedexModule.where('base.HP', '==', 10).get()
     const actual = [...queryModuleRef.data.values()]
-    const expected = [
-      pokedex(15),
-      pokedex(22),
-      pokedex(53),
-      pokedex(57),
-      pokedex(61),
-      pokedex(70),
-      pokedex(78),
-      pokedex(86),
-      pokedex(110),
-      pokedex(114),
-      pokedex(124),
-      pokedex(125),
-      pokedex(126),
-      pokedex(127),
-      pokedex(135),
-      pokedex(136),
-      pokedex(137),
-    ]
+    const expected = [pokedex(50)]
     t.deepEqual(actual, expected)
   } catch (error) {
     t.fail(error)
   }
 })
 
-// test('get (collection) where-filter: <', async t => {
-//   const { pokedexModule } = createVueSyncInstance()
-//   try {
-//     const queryModuleRef = await pokedexModule.where('', '<', '').get()
-//     const actual = [...queryModuleRef.data.values()]
-//     const expected = []
-//     t.deepEqual(actual, expected)
-//   } catch (error) {
-//     t.fail(error)
-//   }
-// })
+test('get (collection) where-filter: <', async t => {
+  const { pokedexModule } = createVueSyncInstance()
+  try {
+    const queryModuleRef = await pokedexModule.where('base.HP', '<', 11).get()
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [pokedex(50)]
+    t.deepEqual(actual, expected)
+  } catch (error) {
+    t.fail(error)
+  }
+})
 
-// test('get (collection) where-filter: =<', async t => {
-//   const { pokedexModule} = createVueSyncInstance()
-//   try {
-//     const queryModuleRef = await pokedexModule.where('', '=<', '').get()
-//     const actual = [...queryModuleRef.data.values()]
-//     const expected = []
-//     t.deepEqual(actual, expected)
-//   } catch (error) {
-//     t.fail(error)
-//   }
-// })
+test('get (collection) where-filter: <=', async t => {
+  const { pokedexModule } = createVueSyncInstance()
+  try {
+    const queryModuleRef = await pokedexModule.where('base.HP', '<=', 10).get()
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [pokedex(50)]
+    t.deepEqual(actual, expected)
+  } catch (error) {
+    t.fail(error)
+  }
+})
 
-// test('get (collection) where-filter: >', async t => {
-//   const { pokedexModule} = createVueSyncInstance()
-//   try {
-//     const queryModuleRef = await pokedexModule.where('', '>', '').get()
-//     const actual = [...queryModuleRef.data.values()]
-//     const expected = []
-//     t.deepEqual(actual, expected)
-//   } catch (error) {
-//     t.fail(error)
-//   }
-// })
+test('get (collection) where-filter: >', async t => {
+  const { pokedexModule } = createVueSyncInstance()
+  try {
+    const queryModuleRef = await pokedexModule.where('base.HP', '>', 249).get()
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [pokedex(113)]
+    t.deepEqual(actual, expected)
+  } catch (error) {
+    t.fail(error)
+  }
+})
 
-// test('get (collection) where-filter: >=', async t => {
-//   const { pokedexModule} = createVueSyncInstance()
-//   try {
-//     const queryModuleRef = await pokedexModule.where('', '>=', '').get()
-//     const actual = [...queryModuleRef.data.values()]
-//     const expected = []
-//     t.deepEqual(actual, expected)
-//   } catch (error) {
-//     t.fail(error)
-//   }
-// })
+test('get (collection) where-filter: >=', async t => {
+  const { pokedexModule } = createVueSyncInstance()
+  try {
+    const queryModuleRef = await pokedexModule.where('base.HP', '>=', 250).get()
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [pokedex(113)]
+    t.deepEqual(actual, expected)
+  } catch (error) {
+    t.fail(error)
+  }
+})
 
-// test('get (collection) where-filter: array-contains', async t => {
-//   const { pokedexModule} = createVueSyncInstance()
-//   try {
-//     const queryModuleRef = await pokedexModule.where('', 'array-contains', '').get()
-//     const actual = [...queryModuleRef.data.values()]
-//     const expected = []
-//     t.deepEqual(actual, expected)
-//   } catch (error) {
-//     t.fail(error)
-//   }
-// })
+test('get (collection) where-filter: array-contains', async t => {
+  const { pokedexModule } = createVueSyncInstance()
+  try {
+    const queryModuleRef = await pokedexModule.where('type', 'array-contains', 'Steel').get()
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [pokedex(81), pokedex(82)]
+    t.deepEqual(actual, expected)
+  } catch (error) {
+    t.fail(error)
+  }
+})
 
-// test('get (collection) where-filter: in', async t => {
-//   const { pokedexModule} = createVueSyncInstance()
-//   try {
-//     const queryModuleRef = await pokedexModule.where('', 'in', '').get()
-//     const actual = [...queryModuleRef.data.values()]
-//     const expected = []
-//     t.deepEqual(actual, expected)
-//   } catch (error) {
-//     t.fail(error)
-//   }
-// })
+test('get (collection) where-filter: in', async t => {
+  const { pokedexModule } = createVueSyncInstance()
+  try {
+    const queryModuleRef = await pokedexModule
+      .where('name', 'in', ['Vaporeon', 'Jolteon', 'Flareon'])
+      .get()
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [pokedex(134), pokedex(135), pokedex(136)]
+    t.deepEqual(actual, expected)
+  } catch (error) {
+    t.fail(error)
+  }
+})
 
-// test('get (collection) where-filter: array-contains-any', async t => {
-//   const { pokedexModule} = createVueSyncInstance()
-//   try {
-//     const queryModuleRef = await pokedexModule.where('', 'array-contains-any', '').get()
-//     const actual = [...queryModuleRef.data.values()]
-//     const expected = []
-//     t.deepEqual(actual, expected)
-//   } catch (error) {
-//     t.fail(error)
-//   }
-// })
+test('get (collection) where-filter: array-contains-any', async t => {
+  const { pokedexModule } = createVueSyncInstance()
+  try {
+    const queryModuleRef = await pokedexModule
+      .where('type', 'array-contains-any', ['Steel', 'Ice'])
+      .get()
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [
+      pokedex(81),
+      pokedex(82),
+      pokedex(87),
+      pokedex(91),
+      pokedex(124),
+      pokedex(131),
+      pokedex(144),
+    ]
+    t.deepEqual(actual, expected)
+  } catch (error) {
+    t.fail(error)
+  }
+})
 
 // test('get (collection) orderBy', async t => {
 //   const { pokedexModule} = createVueSyncInstance()

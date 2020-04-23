@@ -1,5 +1,5 @@
 import { PlainObject, Clauses } from '../../../../src'
-import { isNumber } from 'is-what'
+import { isNumber, isArray } from 'is-what'
 import pathToProp from 'path-to-prop'
 
 /**
@@ -26,6 +26,29 @@ export function filterDataPerClauses (
       switch (operator) {
         case '==':
           passes = valueAtFieldPath == expectedValue
+          break
+        case '<':
+          passes = valueAtFieldPath < expectedValue
+          break
+        case '<=':
+          passes = valueAtFieldPath <= expectedValue
+          break
+        case '>':
+          passes = valueAtFieldPath > expectedValue
+          break
+        case '>=':
+          passes = valueAtFieldPath >= expectedValue
+          break
+        case 'in':
+          passes = isArray(expectedValue) && expectedValue.includes(valueAtFieldPath)
+          break
+        case 'array-contains':
+          passes = isArray(valueAtFieldPath) && valueAtFieldPath.includes(expectedValue)
+          break
+        case 'array-contains-any':
+          passes =
+            isArray(valueAtFieldPath) &&
+            valueAtFieldPath.some((v: any) => isArray(expectedValue) && expectedValue.includes(v))
           break
         default:
           throw new Error('invalid operator')
