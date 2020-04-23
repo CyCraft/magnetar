@@ -69,7 +69,7 @@ test('stream: can mutate payload & read response', async t => {
   await waitMs(600)
   // the local store SHOULD HAVE the applied defaults
   t.deepEqual(pokedexModule.data.get('1'), { ...pokedex(1), seen: true })
-  t.deepEqual(pokedexModule.data.get('136'), { ...pokedex(136), seen: true })
+  t.deepEqual(pokedexModule.data.get('2'), { ...pokedex(2), seen: true })
 })
 
 test('insert: can mutate payload', async t => {

@@ -169,14 +169,6 @@ test('get (collection) compound queries', async t => {
 
 test('only:get (collection) orderBy', async t => {
   const { pokedexModule } = createVueSyncInstance()
-
-  const te = sort([
-    ['6', pokedex(6)],
-    ['38', pokedex(38)],
-    ['78', pokedex(78)],
-  ]).by({ desc: pe => pe[1]['name'] })
-  console.log(`te → `, te)
-
   try {
     const queryModuleRef = await pokedexModule
       .where('type', 'array-contains', 'Fire')

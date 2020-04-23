@@ -20,7 +20,7 @@ import { throwIfNoFnsToExecute } from '../helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from '../types/config'
 import { CollectionInstance } from '../Collection'
 import { DocInstance } from '../Doc'
-import { getCollectionPathDocIdEntry } from '../helpers/pathHelpers'
+import { getCollectionPathDocIdEntry, isDocModule } from '../helpers/pathHelpers'
 import { CollectionFn, DocFn } from '../VueSync'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers'
 
@@ -95,8 +95,8 @@ export function handleActionPerStore (
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     // check if this action was executed from a "collection" or a "doc"
-    const isDocModule = !!docId
-    const isCollectionModule = !isDocModule
+    const itsADocModule = !!docId
+    const itsACollectionModule = !itsADocModule
 
     // handle and await each action in sequence
     let resultFromPlugin: void | string | GetResponse | OnAddedFn
@@ -138,8 +138,8 @@ export function handleActionPerStore (
       if (actionName === 'insert' && isFullString(resultFromPlugin)) {
         // update the modulePath if a doc with random ID was inserted in a collection
         // if this is the case the result will be a string - the randomly genererated ID
-        const alreadyAddedDocId = getCollectionPathDocIdEntry(modulePath)[1]
-        if (isCollectionModule && !alreadyAddedDocId) {
+        const alreadyAddedDocId = isDocModule(modulePath)
+        if (itsACollectionModule && !alreadyAddedDocId) {
           modulePath = `${modulePath}/${resultFromPlugin}`
         }
       }
@@ -157,11 +157,11 @@ export function handleActionPerStore (
       }
     }
     // anything that's executed from a "doc" module:
-    if (isDocModule) return docFn(modulePath, moduleConfig)
+    if (itsADocModule) return docFn(modulePath, moduleConfig)
 
     // anything that's executed from a "collection" module:
-    if (actionName === 'insert') {
-      // 'insert' always returns a DocInstance, and the ID is now available on the modulePath which was modified
+    // 'insert' always returns a DocInstance, unless the "abort" action was called, then the modulePath might still be a collection:
+    if (actionName === 'insert' && isDocModule(modulePath)) {
       // we do not pass the `moduleConfig`, because it's the moduleConfig of the "collection" in this case
       return docFn(modulePath)
     }

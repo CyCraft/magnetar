@@ -1,6 +1,7 @@
 import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
 import { pokedex, pokedexEntryDefaults } from '../helpers/pokedex'
+import { GetResponse } from '../../src'
 
 test('write + onError: stop -- emits fail events & aborts execution by default', async t => {
   const { pokedexModule } = createVueSyncInstance()
@@ -196,10 +197,7 @@ test('get + onError: continue', async t => {
           if (storeName === 'remote') {
             t.deepEqual(payload, getPayload)
             // even though the local store failed, we got the result of the remote store
-            t.deepEqual(
-              (result as any).docs.map(d => d.id),
-              [1, 136]
-            )
+            t.deepEqual((result as GetResponse).docs.length, 151)
           }
         },
       },

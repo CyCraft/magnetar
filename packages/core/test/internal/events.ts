@@ -45,9 +45,7 @@ test('insert: can abort in before events', async t => {
           }
           if (storeName === 'remote') t.fail()
         },
-        success: ({ storeName, result }) => {
-          t.fail()
-        },
+        success: ({ storeName, result }) => t.fail(),
         error: ({ storeName }) => {
           if (storeName === 'local') t.fail()
         },

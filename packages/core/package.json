@@ -1,6 +1,6 @@
 {
   "name": "@vue-sync/core",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "sideEffects": false,
   "description": "Vue-Sync core library.",
   "main": "dist/index.cjs.js",
@@ -49,12 +49,8 @@
     "url": "https://github.com/vue-sync/core/issues"
   },
   "ava": {
-    "extensions": [
-      "ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
+    "extensions": ["ts"],
+    "require": ["ts-node/register"],
     "timeout": "30s"
   }
 }
