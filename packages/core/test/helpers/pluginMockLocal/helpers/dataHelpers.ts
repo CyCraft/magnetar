@@ -1,6 +1,8 @@
 import { PlainObject, Clauses } from '../../../../src'
 import { isNumber, isArray } from 'is-what'
 import pathToProp from 'path-to-prop'
+import { sort } from 'fast-sort'
+import { ISortByObjectSorter } from 'fast-sort'
 
 /**
  * Filters a Collection module's data map `Map<string, DocData>` based on provided clauses.
@@ -59,10 +61,17 @@ export function filterDataPerClauses (
     entries.push([docId, docData])
   })
   // orderBy
-  const entriesOrdered = entries // todo
+  const by = orderBy.reduce((carry, [path, direction = 'asc']) => {
+    const sorter: ISortByObjectSorter<[string, PlainObject]> = {
+      [direction as 'asc']: (entry: [string, PlainObject]) => pathToProp(entry[1], path),
+    }
+    carry.push(sorter)
+    return carry
+  }, [] as ISortByObjectSorter<[string, PlainObject]>[])
+  const entriesOrdered = orderBy.length ? sort(entries).by(by) : entries
   // limit
   const entriesLimited = isNumber(limit) ? entriesOrdered.slice(0, limit) : entriesOrdered
   // turn back into MAP
-  const filteredDataMap = new Map(entriesLimited)
+  const filteredDataMap: Map<string, PlainObject> = new Map(entriesLimited)
   return filteredDataMap
 }

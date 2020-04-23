@@ -7,7 +7,7 @@ import { throwIfInvalidId } from './helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from './types/config'
 import { DocFn, CollectionFn } from './VueSync'
 import { executeSetupModulePerStore, getDataFromDataStore } from './helpers/moduleHelpers'
-import { WhereClause, WhereFilterOp } from './types/clauses'
+import { WhereClause, WhereFilterOp, OrderBy } from './types/clauses'
 import { mergeAndConcat } from 'merge-anything'
 
 export type CollectionInstance<DocDataType extends object = { [prop: string]: any }> = {
@@ -24,6 +24,8 @@ export type CollectionInstance<DocDataType extends object = { [prop: string]: an
 
   // filters
   where: (fieldPath: string, operator: WhereFilterOp, value: any) => CollectionInstance<DocDataType>
+  orderBy: (fieldPath: string, direction?: 'asc' | 'desc') => CollectionInstance<DocDataType>
+  limit: (limitCount: number) => CollectionInstance<DocDataType>
 }
 
 export function createCollectionWithContext<DocDataType extends object> (
@@ -73,6 +75,33 @@ export function createCollectionWithContext<DocDataType extends object> (
     )
   }
 
+  function orderBy (
+    fieldPath: string,
+    direction: 'asc' | 'desc' = 'asc'
+  ): CollectionInstance<DocDataType> {
+    const orderBy: OrderBy = [fieldPath, direction]
+    const moduleConfigWithClause = mergeAndConcat(moduleConfig, { orderBy: [orderBy] })
+    return createCollectionWithContext(
+      idOrPath,
+      moduleConfigWithClause,
+      globalConfig,
+      docFn,
+      collectionFn
+    )
+  }
+
+  function limit (limitCount: number): CollectionInstance<DocDataType> {
+    return createCollectionWithContext(
+      idOrPath,
+      { ...moduleConfig, limit: limitCount },
+      globalConfig,
+      docFn,
+      collectionFn
+    )
+  }
+
+  const queryFns = { where, orderBy, limit }
+
   const moduleInstance: CollectionInstance<DocDataType> = {
     doc,
     data,
@@ -80,7 +109,7 @@ export function createCollectionWithContext<DocDataType extends object> (
     path,
     openStreams,
     ...actions,
-    where,
+    ...queryFns,
   }
 
   return moduleInstance

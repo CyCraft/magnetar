@@ -1,6 +1,7 @@
 import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
 import { pokedex } from '../helpers/pokedex'
+import { sort } from 'fast-sort'
 
 test('get (collection)', async t => {
   /// 'get' resolves once all stores have given a response with data
@@ -151,26 +152,67 @@ test('get (collection) where-filter: array-contains-any', async t => {
   }
 })
 
-// test('get (collection) orderBy', async t => {
-//   const { pokedexModule} = createVueSyncInstance()
-//   try {
-//     const queryModuleRef = await pokedexModule.where('', '', a', '').get()
-//     const actual = [...queryModuleRef.data.values()]
-//     const expected = []
-//     t.deepEqual(actual, expected)
-//   } catch (error) {
-//     t.fail(error)
-//   }
-// })
+test('get (collection) compound queries', async t => {
+  const { pokedexModule } = createVueSyncInstance()
+  try {
+    const queryModuleRef = await pokedexModule
+      .where('type', 'array-contains', 'Fire')
+      .where('base.Speed', '>=', 100)
+      .get()
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [pokedex(6), pokedex(38), pokedex(78)]
+    t.deepEqual(actual, expected)
+  } catch (error) {
+    t.fail(error)
+  }
+})
 
-// test('get (collection) limit', async t => {
-//   const { pokedexModule} = createVueSyncInstance()
-//   try {
-//     const queryModuleRef = await pokedexModule.where('', '', async t', '').get()
-//     const actual = [...queryModuleRef.data.values()]
-//     const expected = []
-//     t.deepEqual(actual, expected)
-//   } catch (error) {
-//     t.fail(error)
-//   }
-// })
+test('only:get (collection) orderBy', async t => {
+  const { pokedexModule } = createVueSyncInstance()
+
+  const te = sort([
+    ['6', pokedex(6)],
+    ['38', pokedex(38)],
+    ['78', pokedex(78)],
+  ]).by({ desc: pe => pe[1]['name'] })
+  console.log(`te → `, te)
+
+  try {
+    const queryModuleRef = await pokedexModule
+      .where('type', 'array-contains', 'Fire')
+      .where('base.Speed', '>=', 100)
+      .orderBy('name', 'desc')
+      .get()
+    // Rapidash 78
+    // Ninetales 38
+    // Charizard 6
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [pokedex(78), pokedex(38), pokedex(6)]
+    t.deepEqual(actual, expected)
+  } catch (error) {
+    t.fail(error)
+  }
+})
+
+test('get (collection) limit', async t => {
+  const { pokedexModule } = createVueSyncInstance()
+  try {
+    const queryModuleRef = await pokedexModule.limit(10).get()
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [
+      pokedex(1),
+      pokedex(2),
+      pokedex(3),
+      pokedex(4),
+      pokedex(5),
+      pokedex(6),
+      pokedex(7),
+      pokedex(8),
+      pokedex(9),
+      pokedex(10),
+    ]
+    t.deepEqual(actual, expected)
+  } catch (error) {
+    t.fail(error)
+  }
+})

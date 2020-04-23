@@ -2,9 +2,9 @@
  * The operator of a where filter.
  */
 export type WhereFilterOp =
+  | '=='
   | '<'
   | '<='
-  | '=='
   | '>='
   | '>'
   | 'array-contains'
