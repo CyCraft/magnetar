@@ -153,7 +153,7 @@ export function streamActionFactory (storePluginOptions: StorePluginOptions): Pl
     // we'll mock opening a stream
 
     const dataRetrieved = isCollection
-      ? pokedexGetAll()
+      ? mockDataRetrieval(isCollection, pluginModuleConfig)
       : [
           { name: 'Luca', age: 10 },
           { name: 'Luca', age: 10 },

@@ -6,21 +6,21 @@ import {
   VueSyncDeleteAction,
   VueSyncDeletePropAction,
   VueSyncInsertAction,
+  OpenStreams,
 } from './types/actions'
 import { actionNameTypeMap } from './types/actionsInternal'
 import { handleActionPerStore } from './moduleActions/handleActionPerStore'
 import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
-import { throwIfInvalidId } from './helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from './types/config'
 import { CollectionFn, DocFn } from './VueSync'
-import { executeSetupModulePerStore, getDataFromDataStore } from './helpers/moduleHelpers'
+import { executeSetupModulePerStore, getDataProxyHandler } from './helpers/moduleHelpers'
 
 export type DocInstance<DocDataType extends object = { [prop: string]: any }> = {
   data: DocDataType
   collection: CollectionFn
   id: string
   path: string
-  openStreams: { [identifier: string]: () => void }
+  openStreams: OpenStreams
 
   // actions
   get?: VueSyncGetAction<DocDataType, 'doc'>
@@ -38,13 +38,11 @@ export function createDocWithContext<DocDataType extends object> (
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
   docFn: DocFn<DocDataType>,
-  collectionFn: CollectionFn
+  collectionFn: CollectionFn,
+  openStreams: OpenStreams
 ): DocInstance<DocDataType> {
-  throwIfInvalidId(idOrPath, 'doc')
-
   const id = idOrPath.split('/').slice(-1)[0]
   const path = idOrPath
-  const openStreams: { [identifier: string]: () => void } = {}
 
   const collection: CollectionFn = (idOrPath, _moduleConfig = {}) => {
     return collectionFn(`${path}/${idOrPath}`, _moduleConfig)
@@ -70,27 +68,18 @@ export function createDocWithContext<DocDataType extends object> (
   // Every store will have its 'setupModule' function executed
   executeSetupModulePerStore(globalConfig.stores, path, moduleConfig)
 
-  // The store specified as 'dataStoreName' should return data
-  const getModuleData = getDataFromDataStore<'doc', DocDataType>(path, moduleConfig, globalConfig)
-
-  const dataHandler = {
-    get: function (target, key, proxyRef): any {
-      if (key === 'data') return getModuleData<DocDataType>(path)
-      return Reflect.get(target, key, proxyRef)
-    },
-  }
-
-  const moduleInstance = {
+  const moduleInstance: Omit<DocInstance<DocDataType>, 'data'> = {
     collection,
     id,
     path,
     openStreams,
     ...actions,
   }
-  const moduleInstanceWithDataProxy = new Proxy(
-    moduleInstance,
-    dataHandler
-  ) as typeof moduleInstance & { data: DocDataType }
 
-  return moduleInstanceWithDataProxy
+  /**
+   * The data returned by the store specified as 'dataStoreName'
+   */
+  const dataProxyHandler = getDataProxyHandler<'doc', DocDataType>(path, moduleConfig, globalConfig)
+
+  return new Proxy(moduleInstance, dataProxyHandler)
 }

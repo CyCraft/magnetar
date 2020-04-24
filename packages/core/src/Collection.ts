@@ -1,12 +1,16 @@
 import { O } from 'ts-toolbelt'
-import { VueSyncGetAction, VueSyncStreamAction, VueSyncInsertAction } from './types/actions'
+import {
+  VueSyncGetAction,
+  VueSyncStreamAction,
+  VueSyncInsertAction,
+  OpenStreams,
+} from './types/actions'
 import { actionNameTypeMap } from './types/actionsInternal'
 import { handleActionPerStore } from './moduleActions/handleActionPerStore'
 import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
-import { throwIfInvalidId } from './helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from './types/config'
 import { DocFn, CollectionFn } from './VueSync'
-import { executeSetupModulePerStore, getDataFromDataStore } from './helpers/moduleHelpers'
+import { executeSetupModulePerStore, getDataProxyHandler } from './helpers/moduleHelpers'
 import { WhereClause, WhereFilterOp, OrderBy } from './types/clauses'
 import { mergeAndConcat } from 'merge-anything'
 
@@ -15,7 +19,14 @@ export type CollectionInstance<DocDataType extends object = { [prop: string]: an
   doc: DocFn<DocDataType>
   id: string
   path: string
-  openStreams: { [identifier: string]: () => void }
+  /**
+   * A WeakMap of all open streams with the payload passed to `stream(payload)` as key and the `unsubscribe` function as value. In case `stream()` had no payload, use `{}`
+   * @type { WeakMap<object, () => void> }
+   * @example
+   * collection('myDocs').stream()
+   * const unsubscribe = collection('myDocs').openStreams.get({})
+   */
+  openStreams: OpenStreams
 
   // actions
   get?: VueSyncGetAction<DocDataType, 'collection'>
@@ -33,13 +44,11 @@ export function createCollectionWithContext<DocDataType extends object> (
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
   docFn: DocFn<DocDataType>,
-  collectionFn: CollectionFn<DocDataType>
+  collectionFn: CollectionFn<DocDataType>,
+  openStreams: OpenStreams
 ): CollectionInstance<DocDataType> {
-  throwIfInvalidId(idOrPath, 'collection')
-
   const id = idOrPath.split('/').slice(-1)[0]
   const path = idOrPath
-  const openStreams: { [identifier: string]: () => void } = {}
 
   const doc: DocFn<DocDataType> = (idOrPath: string, _moduleConfig: ModuleConfig = {}) => {
     return docFn(`${path}/${idOrPath}`, _moduleConfig)
@@ -54,11 +63,6 @@ export function createCollectionWithContext<DocDataType extends object> (
   // Every store will have its 'setupModule' function executed
   executeSetupModulePerStore(globalConfig.stores, path, moduleConfig)
 
-  /**
-   * The data returned by the store specified as 'dataStoreName'
-   */
-  const data = getDataFromDataStore<'collection', DocDataType>(path, moduleConfig, globalConfig)
-
   function where (
     fieldPath: string,
     operator: WhereFilterOp,
@@ -66,13 +70,7 @@ export function createCollectionWithContext<DocDataType extends object> (
   ): CollectionInstance<DocDataType> {
     const whereClause: WhereClause = [fieldPath, operator, value]
     const moduleConfigWithClause = mergeAndConcat(moduleConfig, { where: [whereClause] })
-    return createCollectionWithContext(
-      idOrPath,
-      moduleConfigWithClause,
-      globalConfig,
-      docFn,
-      collectionFn
-    )
+    return collectionFn(idOrPath, moduleConfigWithClause)
   }
 
   function orderBy (
@@ -81,30 +79,17 @@ export function createCollectionWithContext<DocDataType extends object> (
   ): CollectionInstance<DocDataType> {
     const orderBy: OrderBy = [fieldPath, direction]
     const moduleConfigWithClause = mergeAndConcat(moduleConfig, { orderBy: [orderBy] })
-    return createCollectionWithContext(
-      idOrPath,
-      moduleConfigWithClause,
-      globalConfig,
-      docFn,
-      collectionFn
-    )
+    return collectionFn(idOrPath, moduleConfigWithClause)
   }
 
   function limit (limitCount: number): CollectionInstance<DocDataType> {
-    return createCollectionWithContext(
-      idOrPath,
-      { ...moduleConfig, limit: limitCount },
-      globalConfig,
-      docFn,
-      collectionFn
-    )
+    return collectionFn(idOrPath, { ...moduleConfig, limit: limitCount })
   }
 
   const queryFns = { where, orderBy, limit }
 
-  const moduleInstance: CollectionInstance<DocDataType> = {
+  const moduleInstance: Omit<CollectionInstance<DocDataType>, 'data'> = {
     doc,
-    data,
     id,
     path,
     openStreams,
@@ -112,5 +97,14 @@ export function createCollectionWithContext<DocDataType extends object> (
     ...queryFns,
   }
 
-  return moduleInstance
+  /**
+   * The data returned by the store specified as 'dataStoreName'
+   */
+  const dataProxyHandler = getDataProxyHandler<'collection', DocDataType>(
+    path,
+    moduleConfig,
+    globalConfig
+  )
+
+  return new Proxy(moduleInstance, dataProxyHandler)
 }

@@ -113,7 +113,7 @@ test('read: stream (collection)', async t => {
   pokedexModule.stream(payload).catch(e => t.fail(e.message)) // prettier-ignore
   await waitMs(600)
   // close the stream:
-  const unsubscribe = pokedexModule.openStreams[JSON.stringify(payload)]
+  const unsubscribe = pokedexModule.openStreams.get(payload)
   unsubscribe()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.deepEqual(pokedexModule.data.get('2'), pokedex(2))
@@ -132,7 +132,7 @@ test('read: stream (doc)', async t => {
   trainerModule.stream(payload).catch(e => t.fail(e.message)) // prettier-ignore
   await waitMs(600)
   // close the stream:
-  const unsubscribe = trainerModule.openStreams[JSON.stringify(payload)]
+  const unsubscribe = trainerModule.openStreams.get(payload)
   unsubscribe()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
   await waitMs(1000)
@@ -171,22 +171,47 @@ test('read: get (document)', async t => {
 })
 
 test('get (collection) where-filter: ==', async t => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule, vueSync } = createVueSyncInstance()
+
+  const pokedexModuleWithQuery = pokedexModule.where('name', '==', 'Flareon')
   try {
-    const queryModuleRef = await pokedexModule.where('name', '==', 'Flareon').get()
-    const actual = [...queryModuleRef.data.values()]
-    const expected = [pokedex(136)]
-    t.deepEqual(actual, expected)
+    const queryModuleRef = await pokedexModuleWithQuery.get()
+    t.deepEqual([...queryModuleRef.data.values()], [pokedex(136)])
   } catch (error) {
     t.fail(error)
   }
   // try take the query again and see if it's the same result
   const queryModuleRef = pokedexModule.where('name', '==', 'Flareon')
-  const actual = [...queryModuleRef.data.values()]
-  const expected = [pokedex(136)]
-  t.deepEqual(actual, expected)
+  t.deepEqual([...queryModuleRef.data.values()], [pokedex(136)])
+  // try take the pokedexModuleWithQuery and see if it's the same result
+  t.deepEqual([...pokedexModuleWithQuery.data.values()], [pokedex(136)])
+  // check the invididual doc refs from the pokedexModuleWithQuery
+  t.deepEqual(pokedexModuleWithQuery.doc('136').data, pokedex(136))
+  // check the invididual doc refs from pokedexModule
+  t.deepEqual(pokedexModule.doc('136').data, pokedex(136))
+  // check the invididual doc refs from base
+  t.deepEqual(vueSync.doc('pokedex/136').data, pokedex(136))
   // see if the main module has also received this data
-  const actual2 = [...pokedexModule.data.values()]
-  const expected2 = [pokedex(1), pokedex(136)]
-  t.deepEqual(actual2, expected2)
+  t.deepEqual([...pokedexModule.data.values()], [pokedex(1), pokedex(136)])
 })
+
+// test('stream (collection) opening the same stream twice will pass on the promise of the first stream', async t => {
+//   const { pokedexModule } = createVueSyncInstance()
+//   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+//   t.deepEqual(pokedexModule.data.size, 1)
+//   const payload = {}
+//   // do not await, because it only resolves when the stream is closed
+//   pokedexModule.stream(payload).catch(e => t.fail(e.message)) // prettier-ignore
+//   await waitMs(600)
+//   pokedexModule.stream(payload).catch(e => t.fail(e.message)) // prettier-ignore
+//   // close the stream:
+//   const unsubscribe = pokedexModule.openStreams.get(payload)
+//   unsubscribe()
+//   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+//   t.deepEqual(pokedexModule.data.get('2'), pokedex(2))
+//   t.deepEqual(pokedexModule.data.get('3'), pokedex(3))
+//   t.deepEqual(pokedexModule.data.size, 3)
+//   await waitMs(1000)
+//   t.deepEqual(pokedexModule.data.size, 3)
+//   // '4': charmander should come in next, but doesn't because we closed the stream
+// })

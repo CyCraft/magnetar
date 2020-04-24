@@ -44,36 +44,50 @@ export function executeSetupModulePerStore (
 }
 
 /**
- * Returns the data form the store specified as 'dataStoreName' but filtered as per the clauses
+ * Returns the `getModuleData` function form the store specified as 'dataStoreName'
  *
  * @export
- * @template calledFrom
  * @template DocDataType
- * @param {string} modulePath
  * @param {ModuleConfig} moduleConfig
  * @param {GlobalConfig} globalConfig
- * @returns {calledFrom extends 'collection' ? Map<string, DocDataType> : <DocDataType>(modulePath: string) => DocDataType}
+ * @returns {(modulePath: string) => (Map<string, DocDataType> | DocDataType)}
  */
-export function getDataFromDataStore<calledFrom extends 'collection' | 'doc', DocDataType> (
-  modulePath: string,
+export function getDataFnFromDataStore<DocDataType> (
   moduleConfig: ModuleConfig,
   globalConfig: GlobalConfig
-): calledFrom extends 'collection'
-  ? Map<string, DocDataType>
-  : <DocDataType>(modulePath: string) => DocDataType {
+): (modulePath: string) => Map<string, DocDataType> | DocDataType {
   const dataStoreName = moduleConfig.dataStoreName || globalConfig.dataStoreName
   throwIfNoDataStoreName(dataStoreName)
   const { getModuleData } = globalConfig.stores[dataStoreName]
   const pluginModuleConfig = getPluginModuleConfig(moduleConfig, dataStoreName)
 
-  // docs
-  if (isDocModule(modulePath)) {
-    return ((_modulePath: string) => getModuleData(_modulePath, pluginModuleConfig)) as any
+  return ((_modulePath: string) => getModuleData(_modulePath, pluginModuleConfig)) as any
+}
+
+/**
+ * Returns an object with the `data` prop as proxy which triggers every time the data is accessed
+ *
+ * @export
+ * @template calledFrom {'doc' | 'collection'}
+ * @template DocDataType
+ * @param {string} modulePath
+ * @param {ModuleConfig} moduleConfig
+ * @param {GlobalConfig} globalConfig
+ * @returns {calledFrom extends 'doc' ? { get: (...p: any[]) => DocDataType } : { get: (...p: any[]) => Map<string, DocDataType> }}
+ */
+export function getDataProxyHandler<calledFrom extends 'doc' | 'collection', DocDataType> (
+  modulePath: string,
+  moduleConfig: ModuleConfig,
+  globalConfig: GlobalConfig
+): calledFrom extends 'doc'
+  ? { get: (...p: any[]) => DocDataType }
+  : { get: (...p: any[]) => Map<string, DocDataType> } {
+  const getModuleData = getDataFnFromDataStore<DocDataType>(moduleConfig, globalConfig)
+  const dataHandler = {
+    get: function (target: any, key: any, proxyRef: any): any {
+      if (key === 'data') return getModuleData(modulePath)
+      return Reflect.get(target, key, proxyRef)
+    },
   }
-  // collections
-  const data = getModuleData(modulePath, pluginModuleConfig)
-  if (!isMap(data)) {
-    logErrorAndThrow('Collections must return a Map')
-  }
-  return data as any
+  return dataHandler as any
 }

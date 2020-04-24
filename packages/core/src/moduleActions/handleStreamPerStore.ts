@@ -1,6 +1,6 @@
 import { O } from 'ts-toolbelt'
 import { handleStream } from './handleStream'
-import { ActionConfig, VueSyncStreamAction } from '../types/actions'
+import { ActionConfig, VueSyncStreamAction, OpenStreams } from '../types/actions'
 import { ActionType } from '../types/actionsInternal'
 import { StreamResponse, DoOnStreamFns, isDoOnStream, DoOnStream } from '../types/plugins'
 import { getEventNameFnsMap } from '../types/events'
@@ -16,7 +16,7 @@ export function handleStreamPerStore (
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
   actionType: ActionType,
-  openStreams: { [identifier: string]: () => void }
+  openStreams: OpenStreams
 ): VueSyncStreamAction {
   // returns the action the dev can call with myModule.insert() etc.
   return async function (payload?: any, actionConfig: ActionConfig = {}): Promise<void> {
@@ -94,10 +94,10 @@ export function handleStreamPerStore (
     }
     throwOnIncompleteStreamResponses(streamInfoPerStore, doOnStreamFns)
     const streamPromises = Object.values(streamInfoPerStore).map(({ streaming }) => streaming)
-    // create a function to stop all streams
-    const identifier = JSON.stringify(payload)
-    openStreams[identifier] = (): void =>
-      Object.values(streamInfoPerStore).forEach(({ stop }) => stop())
+    // create a function to unsubscribe from the stream of each store
+    const unsubscribe = (): void => Object.values(streamInfoPerStore).forEach(({ stop }) => stop())
+    const openStreamIdentifier = payload ?? {}
+    openStreams.set(openStreamIdentifier, unsubscribe)
     // return all the stream promises as one promise
     return new Promise((resolve, reject) => {
       Promise.all(streamPromises)
