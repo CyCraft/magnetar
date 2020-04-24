@@ -1,7 +1,6 @@
 import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
 import { pokedex } from '../helpers/pokedex'
-import { sort } from 'fast-sort'
 
 test('get (collection)', async t => {
   /// 'get' resolves once all stores have given a response with data

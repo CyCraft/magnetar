@@ -425,7 +425,7 @@ function throwIfInvalidId(modulePath, moduleType) {
         if (!modulePath)
             errorMessage = 'You must provide a document id (or a "path" like so: collection/doc).';
         if (isCollectionModule(modulePath))
-            errorMessage = "Your collection id (or \"path\") must be of even segments. The expected pattern is: collection/doc/collection/doc ... Yours was " + modulePath;
+            errorMessage = "Your doc id (or \"path\") must be of even segments. The expected pattern is: collection/doc/collection/doc ... Yours was " + modulePath;
     }
     if (errorMessage)
         logErrorAndThrow(errorMessage);
@@ -462,29 +462,42 @@ function executeSetupModulePerStore(globalConfigStores, modulePath, moduleConfig
     }
 }
 /**
- * The store specified as 'dataStoreName' should return data
+ * Returns the `getModuleData` function form the store specified as 'dataStoreName'
  *
  * @export
- * @template calledFrom
  * @template DocDataType
- * @param {string} modulePath
  * @param {ModuleConfig} moduleConfig
  * @param {GlobalConfig} globalConfig
- * @returns {calledFrom extends 'collection' ? Map<string, DocDataType> : <DocDataType>(modulePath: string) => DocDataType}
+ * @returns {(modulePath: string) => (Map<string, DocDataType> | DocDataType)}
  */
-function getDataFromDataStore(modulePath, moduleConfig, globalConfig) {
+function getDataFnFromDataStore(moduleConfig, globalConfig) {
     var dataStoreName = moduleConfig.dataStoreName || globalConfig.dataStoreName;
     throwIfNoDataStoreName(dataStoreName);
     var getModuleData = globalConfig.stores[dataStoreName].getModuleData;
     var pluginModuleConfig = getPluginModuleConfig(moduleConfig, dataStoreName);
-    if (isDocModule(modulePath)) {
-        return (function (_modulePath) { return getModuleData(_modulePath, pluginModuleConfig); });
-    }
-    var data = getModuleData(modulePath, pluginModuleConfig);
-    if (!isWhat.isMap(data)) {
-        logErrorAndThrow('Collections must return a Map');
-    }
-    return data;
+    return (function (_modulePath) { return getModuleData(_modulePath, pluginModuleConfig); });
+}
+/**
+ * Returns an object with the `data` prop as proxy which triggers every time the data is accessed
+ *
+ * @export
+ * @template calledFrom {'doc' | 'collection'}
+ * @template DocDataType
+ * @param {string} modulePath
+ * @param {ModuleConfig} moduleConfig
+ * @param {GlobalConfig} globalConfig
+ * @returns {calledFrom extends 'doc' ? { get: (...p: any[]) => DocDataType } : { get: (...p: any[]) => Map<string, DocDataType> }}
+ */
+function getDataProxyHandler(modulePath, moduleConfig, globalConfig) {
+    var getModuleData = getDataFnFromDataStore(moduleConfig, globalConfig);
+    var dataHandler = {
+        get: function (target, key, proxyRef) {
+            if (key === 'data')
+                return getModuleData(modulePath);
+            return Reflect.get(target, key, proxyRef);
+        },
+    };
+    return dataHandler;
 }
 
 function handleActionPerStore(modulePath, moduleConfig, globalConfig, actionName, actionType, docFn, // actions executed on a "doc" will always return `doc()`
@@ -501,7 +514,7 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                 if (trueOrRevert === void 0) { trueOrRevert = true; }
                 stopExecution = trueOrRevert;
             }
-            var onError, modifyPayloadFnsMap, modifyReadResponseMap, eventNameFnsMap, storesToExecute, _a, _b, modifyFn, stopExecution, doOnGetFns, _c, collectionPath, docId, isDocModule, isCollectionModule, resultFromPlugin, _d, _e, _f, i, storeName, pluginAction, pluginModuleConfig, _g, storesToRevert, storesToRevert_1, storesToRevert_1_1, storeToRevert, pluginRevertAction, _h, _j, fn, e_1_1, e_2_1, alreadyAddedDocId, _k, _l, docRetrieved, e_3_1;
+            var onError, modifyPayloadFnsMap, modifyReadResponseMap, eventNameFnsMap, storesToExecute, _a, _b, modifyFn, stopExecution, doOnGetFns, _c, collectionPath, docId, itsADocModule, itsACollectionModule, resultFromPlugin, _d, _e, _f, i, storeName, pluginAction, pluginModuleConfig, _g, storesToRevert, storesToRevert_1, storesToRevert_1_1, storeToRevert, pluginRevertAction, _h, _j, fn, e_1_1, e_2_1, alreadyAddedDocId, _k, _l, docRetrieved, e_3_1;
             var e_4, _m, e_3, _o, e_2, _p, e_1, _q, e_5, _r;
             return __generator(this, function (_s) {
                 switch (_s.label) {
@@ -534,8 +547,8 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                         stopExecution = false;
                         doOnGetFns = modifyReadResponseMap.added;
                         _c = __read(getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _c[0], docId = _c[1];
-                        isDocModule = !!docId;
-                        isCollectionModule = !isDocModule;
+                        itsADocModule = !!docId;
+                        itsACollectionModule = !itsADocModule;
                         _s.label = 1;
                     case 1:
                         _s.trys.push([1, 23, 24, 25]);
@@ -631,8 +644,8 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                     case 20:
                         // special handling for 'insert' (resultFromPlugin will always be `string`)
                         if (actionName === 'insert' && isWhat.isFullString(resultFromPlugin)) {
-                            alreadyAddedDocId = getCollectionPathDocIdEntry(modulePath)[1];
-                            if (isCollectionModule && !alreadyAddedDocId) {
+                            alreadyAddedDocId = isDocModule(modulePath);
+                            if (itsACollectionModule && !alreadyAddedDocId) {
                                 modulePath = modulePath + "/" + resultFromPlugin;
                             }
                         }
@@ -674,13 +687,14 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                         return [7 /*endfinally*/];
                     case 25:
                         // anything that's executed from a "doc" module:
-                        if (isDocModule)
+                        if (itsADocModule)
                             return [2 /*return*/, docFn(modulePath, moduleConfig)
                                 // anything that's executed from a "collection" module:
+                                // 'insert' always returns a DocInstance, unless the "abort" action was called, then the modulePath might still be a collection:
                             ];
                         // anything that's executed from a "collection" module:
-                        if (actionName === 'insert') {
-                            // 'insert' always returns a DocInstance, and the ID is now available on the modulePath which was modified
+                        // 'insert' always returns a DocInstance, unless the "abort" action was called, then the modulePath might still be a collection:
+                        if (actionName === 'insert' && isDocModule(modulePath)) {
                             // we do not pass the `moduleConfig`, because it's the moduleConfig of the "collection" in this case
                             return [2 /*return*/, docFn(modulePath)];
                         }
@@ -805,7 +819,7 @@ function handleStreamPerStore(modulePath, moduleConfig, globalConfig, actionType
     return function (payload, actionConfig) {
         if (actionConfig === void 0) { actionConfig = {}; }
         return __awaiter(this, void 0, void 0, function () {
-            var eventNameFnsMap, modifyPayloadFnsMap, modifyReadResponseMap, storesToExecute, _a, _b, modifyFn, streamInfoPerStore, doOnStreamFns, mustExecuteOnRead, storesToExecute_1, storesToExecute_1_1, storeName, pluginAction, pluginModuleConfig, result, _c, _d, _e, doOn, doFn, e_1_1, streamPromises, identifier;
+            var eventNameFnsMap, modifyPayloadFnsMap, modifyReadResponseMap, storesToExecute, _a, _b, modifyFn, streamInfoPerStore, doOnStreamFns, mustExecuteOnRead, storesToExecute_1, storesToExecute_1_1, storeName, pluginAction, pluginModuleConfig, result, _c, _d, _e, doOn, doFn, e_1_1, streamPromises, unsubscribe, openStreamIdentifier;
             var e_2, _f, e_1, _g, e_3, _h;
             return __generator(this, function (_j) {
                 switch (_j.label) {
@@ -912,13 +926,12 @@ function handleStreamPerStore(modulePath, moduleConfig, globalConfig, actionType
                             var streaming = _a.streaming;
                             return streaming;
                         });
-                        identifier = JSON.stringify(payload);
-                        openStreams[identifier] = function () {
-                            return Object.values(streamInfoPerStore).forEach(function (_a) {
-                                var stop = _a.stop;
-                                return stop();
-                            });
-                        };
+                        unsubscribe = function () { return Object.values(streamInfoPerStore).forEach(function (_a) {
+                            var stop = _a.stop;
+                            return stop();
+                        }); };
+                        openStreamIdentifier = payload !== null && payload !== void 0 ? payload : {};
+                        openStreams.set(openStreamIdentifier, unsubscribe);
                         // return all the stream promises as one promise
                         return [2 /*return*/, new Promise(function (resolve, reject) {
                                 Promise.all(streamPromises)
@@ -931,11 +944,9 @@ function handleStreamPerStore(modulePath, moduleConfig, globalConfig, actionType
     };
 }
 
-function createCollectionWithContext(idOrPath, moduleConfig, globalConfig, docFn, collectionFn) {
-    throwIfInvalidId(idOrPath, 'collection');
+function createCollectionWithContext(idOrPath, moduleConfig, globalConfig, docFn, collectionFn, openStreams) {
     var id = idOrPath.split('/').slice(-1)[0];
     var path = idOrPath;
-    var openStreams = {};
     var doc = function (idOrPath, _moduleConfig) {
         if (_moduleConfig === void 0) { _moduleConfig = {}; }
         return docFn(path + "/" + idOrPath, _moduleConfig);
@@ -946,26 +957,35 @@ function createCollectionWithContext(idOrPath, moduleConfig, globalConfig, docFn
     var actions = { stream: stream, get: get, insert: insert };
     // Every store will have its 'setupModule' function executed
     executeSetupModulePerStore(globalConfig.stores, path, moduleConfig);
-    // The store specified as 'dataStoreName' should return data
-    var data = getDataFromDataStore(path, moduleConfig, globalConfig);
     function where(fieldPath, operator, value) {
         var whereClause = [fieldPath, operator, value];
         var moduleConfigWithClause = mergeAnything.mergeAndConcat(moduleConfig, { where: [whereClause] });
-        return createCollectionWithContext(idOrPath, moduleConfigWithClause, globalConfig, docFn, collectionFn);
+        return collectionFn(idOrPath, moduleConfigWithClause);
     }
+    function orderBy(fieldPath, direction) {
+        if (direction === void 0) { direction = 'asc'; }
+        var orderBy = [fieldPath, direction];
+        var moduleConfigWithClause = mergeAnything.mergeAndConcat(moduleConfig, { orderBy: [orderBy] });
+        return collectionFn(idOrPath, moduleConfigWithClause);
+    }
+    function limit(limitCount) {
+        return collectionFn(idOrPath, __assign(__assign({}, moduleConfig), { limit: limitCount }));
+    }
+    var queryFns = { where: where, orderBy: orderBy, limit: limit };
     var moduleInstance = __assign(__assign({ doc: doc,
-        data: data,
         id: id,
         path: path,
-        openStreams: openStreams }, actions), { where: where });
-    return moduleInstance;
+        openStreams: openStreams }, actions), queryFns);
+    /**
+     * The data returned by the store specified as 'dataStoreName'
+     */
+    var dataProxyHandler = getDataProxyHandler(path, moduleConfig, globalConfig);
+    return new Proxy(moduleInstance, dataProxyHandler);
 }
 
-function createDocWithContext(idOrPath, moduleConfig, globalConfig, docFn, collectionFn) {
-    throwIfInvalidId(idOrPath, 'doc');
+function createDocWithContext(idOrPath, moduleConfig, globalConfig, docFn, collectionFn, openStreams) {
     var id = idOrPath.split('/').slice(-1)[0];
     var path = idOrPath;
-    var openStreams = {};
     var collection = function (idOrPath, _moduleConfig) {
         if (_moduleConfig === void 0) { _moduleConfig = {}; }
         return collectionFn(path + "/" + idOrPath, _moduleConfig);
@@ -982,21 +1002,15 @@ function createDocWithContext(idOrPath, moduleConfig, globalConfig, docFn, colle
     };
     // Every store will have its 'setupModule' function executed
     executeSetupModulePerStore(globalConfig.stores, path, moduleConfig);
-    // The store specified as 'dataStoreName' should return data
-    var getModuleData = getDataFromDataStore(path, moduleConfig, globalConfig);
-    var dataHandler = {
-        get: function (target, key, proxyRef) {
-            if (key === 'data')
-                return getModuleData(path);
-            return Reflect.get(target, key, proxyRef);
-        },
-    };
     var moduleInstance = __assign({ collection: collection,
         id: id,
         path: path,
         openStreams: openStreams }, actions);
-    var moduleInstanceWithDataProxy = new Proxy(moduleInstance, dataHandler);
-    return moduleInstanceWithDataProxy;
+    /**
+     * The data returned by the store specified as 'dataStoreName'
+     */
+    var dataProxyHandler = getDataProxyHandler(path, moduleConfig, globalConfig);
+    return new Proxy(moduleInstance, dataProxyHandler);
 }
 
 function configWithDefaults(config) {
@@ -1020,32 +1034,41 @@ function VueSync(vueSyncConfig) {
     /**
      * takes care of the caching instances of modules. Todo: double check memory leaks for when an instance isn't referenced anymore.
      */
-    var moduleMap = new Map(); // apply type upon get/set
-    function collection(idOrPath, moduleConfig) {
+    var moduleMap = new WeakMap(); // apply type upon get/set
+    /**
+     * the global storage for subscriptions
+     */
+    var streamSubscribtionMap = new Map(); // apply type upon get/set
+    function getModuleInstance(idOrPath, moduleConfig, moduleType, docFn, collectionFn) {
         if (moduleConfig === void 0) { moduleConfig = {}; }
+        throwIfInvalidId(idOrPath, moduleType);
         // retrieved the cached instance
+        var moduleIdentifier = { idOrPath: idOrPath, moduleConfig: moduleConfig };
         var _moduleMap = moduleMap;
-        var cachedInstance = _moduleMap.get(idOrPath);
+        var cachedInstance = _moduleMap.get(moduleIdentifier);
         if (cachedInstance)
             return cachedInstance;
         // else create and cache a new instance
-        var moduleInstance = createCollectionWithContext(idOrPath, moduleConfig, globalConfig, 
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        doc, collection);
-        moduleMap.set(idOrPath, moduleInstance);
+        // first create the stream subscribtion map for this module
+        if (!streamSubscribtionMap.has(idOrPath)) {
+            streamSubscribtionMap.set(idOrPath, new Map());
+        }
+        var openStreams = streamSubscribtionMap.get(idOrPath);
+        // then create the module instance
+        var createInstanceWithContext = moduleType === 'doc' ? createDocWithContext : createCollectionWithContext;
+        // @ts-ignore
+        var moduleInstance = createInstanceWithContext(idOrPath, moduleConfig, globalConfig, docFn, collectionFn, openStreams);
+        moduleMap.set(moduleIdentifier, moduleInstance);
         return moduleInstance;
+    }
+    function collection(idOrPath, moduleConfig) {
+        if (moduleConfig === void 0) { moduleConfig = {}; }
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        return getModuleInstance(idOrPath, moduleConfig, 'collection', doc, collection); // prettier-ignore
     }
     function doc(idOrPath, moduleConfig) {
         if (moduleConfig === void 0) { moduleConfig = {}; }
-        // retrieved the cached instance
-        var _moduleMap = moduleMap;
-        var cachedInstance = _moduleMap.get(idOrPath);
-        if (idOrPath && cachedInstance)
-            return cachedInstance;
-        // else create and cache a new instance
-        var moduleInstance = createDocWithContext(idOrPath, moduleConfig, globalConfig, doc, collection);
-        moduleMap.set(moduleInstance.id, moduleInstance);
-        return moduleInstance;
+        return getModuleInstance(idOrPath, moduleConfig, 'doc', doc, collection); // prettier-ignore
     }
     var instance = {
         globalConfig: globalConfig,

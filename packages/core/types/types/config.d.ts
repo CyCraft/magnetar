@@ -41,7 +41,7 @@ export declare type GlobalConfig = O.Merge<O.Compulsory<Partial<SharedConfig>, '
 /**
  * Extra options the dev can pass when creating a module with collection() or doc(). These will take precedence over the global config.
  */
-export declare type ModuleConfig = O.Compact<Partial<Clauses>, [Partial<SharedConfig>, {
+export declare type ModuleConfig = O.Compact<Clauses, [Partial<SharedConfig>, {
     /**
      * Custom config the dev can set per Store Plugin. This will be passed to the plugin's action handler.
      */

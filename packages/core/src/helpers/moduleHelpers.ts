@@ -1,7 +1,6 @@
-import { isFunction, isMap, isPlainObject } from 'is-what'
+import { isFunction, isPlainObject } from 'is-what'
 import { GlobalConfig, ModuleConfig } from '../types/config'
-import { throwIfNoDataStoreName, logErrorAndThrow } from './throwFns'
-import { isDocModule } from './pathHelpers'
+import { throwIfNoDataStoreName } from './throwFns'
 import { PluginModuleConfig } from '../types/plugins'
 
 /**

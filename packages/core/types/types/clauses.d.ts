@@ -1,7 +1,7 @@
 /**
  * The operator of a where filter.
  */
-export declare type WhereFilterOp = '<' | '<=' | '==' | '>=' | '>' | 'array-contains' | 'in' | 'array-contains-any';
+export declare type WhereFilterOp = '==' | '<' | '<=' | '>=' | '>' | 'array-contains' | 'in' | 'array-contains-any';
 /**
  * Determines the where-filter to be applied.
  */
@@ -18,7 +18,7 @@ export declare type Limit = number;
  * Clauses that can filter data in a Collection
  */
 export declare type Clauses = {
-    where: WhereClause[];
-    orderBy: OrderBy[];
+    where?: WhereClause[];
+    orderBy?: OrderBy[];
     limit?: Limit;
 };

@@ -26,4 +26,11 @@ export declare type VueSyncError = {
     code?: number;
     errors?: VueSyncError[];
 };
+/**
+ * A WeakMap of all open streams with the payload passed to `stream(payload)` as key and the `unsubscribe` function as value. In case `stream()` had no payload, use `{}`
+ * @example
+ * collection('myDocs').stream()
+ * const unsubscribe = collection('myDocs').openStreams.get({})
+ */
+export declare type OpenStreams = Map<object, () => void>;
 export declare function isVueSyncError(payload: any): payload is VueSyncError;
