@@ -5,10 +5,12 @@ Object.defineProperty(exports, '__esModule', { value: true });
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var copyAnything = require('copy-anything');
+var filterAnything = require('filter-anything');
+var isWhat = require('is-what');
 var core = require('@vue-sync/core');
 var mergeAnything = require('merge-anything');
-var isWhat = require('is-what');
 var pathToProp = _interopDefault(require('path-to-prop'));
+var fastSort = require('fast-sort');
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -94,7 +96,6 @@ function __read(o, n) {
 
 function writeActionFactory(data, simpleStoreOptions, actionName, makeBackup) {
     return function (payload, modulePath, simpleStoreModuleConfig) {
-        // this is custom logic to be implemented by the plugin author
         var isCollection = core.isCollectionModule(modulePath);
         // write actions cannot be executed on collections
         if (isCollection)
@@ -124,7 +125,6 @@ function writeActionFactory(data, simpleStoreOptions, actionName, makeBackup) {
 
 function insertActionFactory(data, simpleStoreOptions, makeBackup) {
     return function (payload, modulePath, simpleStoreModuleConfig) {
-        // this is custom logic to be implemented by the plugin author
         var isCollection = core.isCollectionModule(modulePath);
         if (isCollection) {
             var docId_1 = isWhat.isFullString(payload.id) || isWhat.isNumber(payload.id)
@@ -154,7 +154,6 @@ function insertActionFactory(data, simpleStoreOptions, makeBackup) {
 
 function deletePropActionFactory(data, simpleStoreOptions, makeBackup) {
     return function (payload, modulePath, simpleStoreModuleConfig) {
-        // this is custom logic to be implemented by the plugin author
         var e_1, _a;
         var isCollection = core.isCollectionModule(modulePath);
         // `deleteProp` action cannot be executed on collections
@@ -193,7 +192,6 @@ function deletePropActionFactory(data, simpleStoreOptions, makeBackup) {
 
 function deleteActionFactory(data, simpleStoreOptions, makeBackup) {
     return function (payload, modulePath, simpleStoreModuleConfig) {
-        // this is custom logic to be implemented by the plugin author
         var isCollection = core.isCollectionModule(modulePath);
         // delete cannot be executed on collections
         if (isCollection)
@@ -263,6 +261,79 @@ function revertActionFactory(data, simpleStoreOptions, restoreBackup) {
     };
 }
 
+/**
+ * Filters a Collection module's data map `Map<string, DocData>` based on provided clauses.
+ *
+ * @param {Map<string, PlainObject>} collectionDB
+ * @param {Clauses} clauses
+ * @returns {Map<string, PlainObject>}
+ */
+function filterDataPerClauses(collectionDB, clauses) {
+    var _a = clauses.where, where = _a === void 0 ? [] : _a, _b = clauses.orderBy, orderBy = _b === void 0 ? [] : _b, limit = clauses.limit;
+    // return the same collectionDB to be sure to keep reactivity
+    if (!where.length && !orderBy.length && !isWhat.isNumber(limit))
+        return collectionDB;
+    // all other cases we need to create a new Map() with the results
+    var entries = [];
+    collectionDB.forEach(function (docData, docId) {
+        var passesWhereFilters = where.every(function (whereQuery) {
+            var _a = __read(whereQuery, 3), fieldPath = _a[0], operator = _a[1], expectedValue = _a[2];
+            var valueAtFieldPath = pathToProp(docData, fieldPath);
+            var passes = false;
+            switch (operator) {
+                case '==':
+                    passes = valueAtFieldPath == expectedValue;
+                    break;
+                case '<':
+                    passes = valueAtFieldPath < expectedValue;
+                    break;
+                case '<=':
+                    passes = valueAtFieldPath <= expectedValue;
+                    break;
+                case '>':
+                    passes = valueAtFieldPath > expectedValue;
+                    break;
+                case '>=':
+                    passes = valueAtFieldPath >= expectedValue;
+                    break;
+                case 'in':
+                    passes = isWhat.isArray(expectedValue) && expectedValue.includes(valueAtFieldPath);
+                    break;
+                case 'array-contains':
+                    passes = isWhat.isArray(valueAtFieldPath) && valueAtFieldPath.includes(expectedValue);
+                    break;
+                case 'array-contains-any':
+                    passes =
+                        isWhat.isArray(valueAtFieldPath) &&
+                            valueAtFieldPath.some(function (v) { return isWhat.isArray(expectedValue) && expectedValue.includes(v); });
+                    break;
+                default:
+                    throw new Error('invalid operator');
+            }
+            return passes;
+        });
+        if (!passesWhereFilters)
+            return;
+        entries.push([docId, docData]);
+    });
+    // orderBy
+    var by = orderBy.reduce(function (carry, _a) {
+        var _b;
+        var _c = __read(_a, 2), path = _c[0], _d = _c[1], direction = _d === void 0 ? 'asc' : _d;
+        var sorter = (_b = {},
+            _b[direction] = function (entry) { return pathToProp(entry[1], path); },
+            _b);
+        carry.push(sorter);
+        return carry;
+    }, []);
+    var entriesOrdered = orderBy.length ? fastSort.sort(entries).by(by) : entries;
+    // limit
+    var entriesLimited = isWhat.isNumber(limit) ? entriesOrdered.slice(0, limit) : entriesOrdered;
+    // turn back into MAP
+    var filteredDataMap = new Map(entriesLimited);
+    return filteredDataMap;
+}
+
 // a Vue Sync plugin is a single function that returns a `PluginInstance`
 // the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
 // each action must have the proper for both collection and doc type modules
@@ -316,7 +387,7 @@ var CreatePlugin = function (simpleStoreOptions) {
         var initialData = moduleConfig.initialData;
         if (!initialData)
             return;
-        if (!docId) {
+        if (!docId && isWhat.isArray(initialData)) {
             try {
                 for (var initialData_1 = __values(initialData), initialData_1_1 = initialData_1.next(); !initialData_1_1.done; initialData_1_1 = initialData_1.next()) {
                     var _d = __read(initialData_1_1.value, 2), _docId = _d[0], _docData = _d[1];
@@ -337,16 +408,29 @@ var CreatePlugin = function (simpleStoreOptions) {
         modulesAlreadySetup.add(modulePath);
     };
     /**
+     * Queried local data stored in weakmaps "per query" for the least CPU cycles and preventing memory leaks
+     */
+    var queriedData = new WeakMap();
+    /**
      * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
      */
     var getModuleData = function (modulePath, moduleConfig) {
+        if (moduleConfig === void 0) { moduleConfig = {}; }
         var _a = __read(core.getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _a[0], docId = _a[1];
         var collectionDB = data[collectionPath];
-        // if it's a collection, just return the collectionDB, which MUST be a map with id as keys and the docs as value
-        if (!docId)
-            return collectionDB;
         // if it's a doc, return the specific doc
-        return collectionDB.get(docId);
+        if (docId)
+            return collectionDB.get(docId);
+        // if it's a collection, we must return the collectionDB but with applied query clauses
+        // but remember, the return type MUST be a map with id as keys and the docs as value
+        var clauses = filterAnything.pick(moduleConfig, ['where', 'orderBy', 'limit']);
+        // return from cache
+        if (queriedData.has(clauses))
+            return queriedData.get(clauses);
+        // otherwise create a new filter and return that
+        var filteredMap = filterDataPerClauses(collectionDB, clauses);
+        queriedData.set(clauses, filteredMap);
+        return filteredMap;
     };
     // the plugin must try to implement logic for every `ActionName`
     var get = getActionFactory(data, simpleStoreOptions);

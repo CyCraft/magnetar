@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
-import { pokedex } from './helpers/pokemon'
+import { pokedex } from './helpers/pokedex'
 import { DocInstance } from '@vue-sync/core'
 
 test('insert (document)', async t => {

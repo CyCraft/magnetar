@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createVueSyncInstance } from './helpers/createVueSyncInstance'
-import { pokedex } from './helpers/pokemon'
+import { pokedex } from './helpers/pokedex'
 
 test('deleteProp', async t => {
   const { trainerModule } = createVueSyncInstance()

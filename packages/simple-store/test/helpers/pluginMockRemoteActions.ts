@@ -1,3 +1,4 @@
+import { pick } from 'filter-anything'
 import {
   ActionName,
   isCollectionModule,
@@ -16,11 +17,12 @@ import {
   getCollectionPathDocIdEntry,
   PlainObject,
 } from '@vue-sync/core'
-import { SimpleStoreModuleConfig, StorePluginOptions } from './pluginMockRemote'
+import { StorePluginModuleConfig, StorePluginOptions } from './pluginMockRemote'
 import { waitMs } from './wait'
-import { pokedex } from './pokemon'
+import { pokedexMap } from './pokedex'
 import { throwIfEmulatedError } from './throwFns'
 import { generateRandomId } from './generateRandomId'
+import { filterDataPerClauses } from './pluginMockRemoteHelpers'
 
 export function writeActionFactory (
   storePluginOptions: StorePluginOptions,
@@ -29,10 +31,11 @@ export function writeActionFactory (
   return async function (
     payload: PlainObject,
     modulePath: string,
-    simpleStoreModuleConfig: SimpleStoreModuleConfig
+    pluginModuleConfig: StorePluginModuleConfig
   ): Promise<void> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
+    // this is custom logic to be implemented by the plugin author
     await waitMs(1)
 
     const isCollection = isCollectionModule(modulePath)
@@ -45,10 +48,11 @@ export function insertActionFactory (storePluginOptions: StorePluginOptions): Pl
   return async function (
     payload: PlainObject,
     modulePath: string,
-    simpleStoreModuleConfig: SimpleStoreModuleConfig
+    pluginModuleConfig: StorePluginModuleConfig
   ): Promise<string> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
+    // this is custom logic to be implemented by the plugin author
     await waitMs(1)
 
     const isCollection = isCollectionModule(modulePath)
@@ -68,10 +72,11 @@ export function deletePropActionFactory (
   return async function (
     payload: string | string[],
     modulePath: string,
-    simpleStoreModuleConfig: SimpleStoreModuleConfig
+    pluginModuleConfig: StorePluginModuleConfig
   ): Promise<void> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
+    // this is custom logic to be implemented by the plugin author
     await waitMs(1)
 
     const isCollection = isCollectionModule(modulePath)
@@ -84,21 +89,34 @@ export function deleteActionFactory (storePluginOptions: StorePluginOptions): Pl
   return async function (
     payload: void,
     modulePath: string,
-    simpleStoreModuleConfig: SimpleStoreModuleConfig
+    pluginModuleConfig: StorePluginModuleConfig
   ): Promise<void> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
+    // this is custom logic to be implemented by the plugin author
     await waitMs(1)
     // this mocks an error during execution
   }
+}
+
+function mockDataRetrieval (
+  isCollection: boolean,
+  pluginModuleConfig: StorePluginModuleConfig
+): PlainObject[] {
+  if (!isCollection) return [{ name: 'Luca', age: 10, dream: 'job' }]
+  const _pokedexMap = pokedexMap()
+  const clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
+  const filteredMap = filterDataPerClauses(_pokedexMap, clauses)
+  return [...filteredMap.values()]
 }
 
 export function getActionFactory (storePluginOptions: StorePluginOptions): PluginGetAction {
   return async (
     payload: void | PlainObject = {},
     modulePath: string,
-    simpleStoreModuleConfig: SimpleStoreModuleConfig
+    pluginModuleConfig: StorePluginModuleConfig
   ): Promise<DoOnGet | GetResponse> => {
+    // this is custom logic to be implemented by the plugin author
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const isCollection = isCollectionModule(modulePath)
     const isDocument = !isCollection
@@ -109,12 +127,10 @@ export function getActionFactory (storePluginOptions: StorePluginOptions): Plugi
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         // this mocks an error during execution
-        const dataRetrieved: PlainObject[] = isCollection
-          ? [pokedex(1), pokedex(136)]
-          : [{ name: 'Luca', age: 10, dream: 'job' }]
+        const dataRetrieved = mockDataRetrieval(isCollection, pluginModuleConfig)
         // we must trigger `mustExecuteOnGet.added` for each document that was retrieved and return whatever that returns
         const results = dataRetrieved.map(_data => {
-          const _metaData = { data: _data, id: String(_data.id) || docId, exists: true }
+          const _metaData = { data: _data, exists: true, id: _data.id || docId }
           return _metaData
         })
         resolve({ docs: results })
@@ -127,17 +143,19 @@ export function streamActionFactory (storePluginOptions: StorePluginOptions): Pl
   return (
     payload: void | PlainObject = {},
     modulePath: string,
-    simpleStoreModuleConfig: SimpleStoreModuleConfig,
+    pluginModuleConfig: StorePluginModuleConfig,
     mustExecuteOnRead: MustExecuteOnRead
   ): StreamResponse | DoOnStream | Promise<StreamResponse | DoOnStream> => {
+    // this is custom logic to be implemented by the plugin author
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const isCollection = isCollectionModule(modulePath)
     const isDocument = !isCollection
     // we'll mock opening a stream
 
     const dataRetrieved = isCollection
-      ? [pokedex(1), pokedex(136), pokedex(4)]
+      ? mockDataRetrieval(isCollection, pluginModuleConfig)
       : [
+          { name: 'Luca', age: 10 },
           { name: 'Luca', age: 10 },
           { name: 'Luca', age: 10, dream: 'job' },
           { name: 'Luca', age: 10, dream: 'job', colour: 'blue' },
@@ -147,14 +165,14 @@ export function streamActionFactory (storePluginOptions: StorePluginOptions): Pl
       stop: () => {},
     }
     // this mocks actual data coming in at different intervals
-    dataRetrieved.forEach((_data, i) => {
-      const waitTime = 10 + i * 500
+    dataRetrieved.forEach((data, i) => {
+      const waitTime = 10 + i * 200
       setTimeout(() => {
         // mock when the stream is already stopped
         if (stopStreaming.stopped) return
         // else go ahead and actually trigger the mustExecuteOnRead function
-        const metaData = { data: _data, id: String(_data.id) || docId, exists: true }
-        mustExecuteOnRead.added(_data, metaData)
+        const metaData = { data, id: data.id || docId, exists: true }
+        mustExecuteOnRead.added(data, metaData)
       }, waitTime)
     })
 
@@ -179,9 +197,10 @@ export function revertActionFactory (storePluginOptions: StorePluginOptions): Pl
   return async function revert (
     payload: PlainObject | PlainObject[] | string | string[] | void,
     modulePath: string,
-    simpleStoreModuleConfig: SimpleStoreModuleConfig,
+    pluginModuleConfig: StorePluginModuleConfig,
     actionName: ActionName
   ): Promise<void> {
+    // this is custom logic to be implemented by the plugin author
     await waitMs(1)
   }
 }

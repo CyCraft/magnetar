@@ -1,9 +1,12 @@
 import { copy } from 'copy-anything'
+import { pick } from 'filter-anything'
+import { isArray } from 'is-what'
 import {
   PluginInstance,
   VueSyncPlugin,
   PlainObject,
   getCollectionPathDocIdEntry,
+  Clauses,
 } from '@vue-sync/core'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { insertActionFactory } from './actions/insert'
@@ -12,7 +15,7 @@ import { deleteActionFactory } from './actions/delete'
 import { getActionFactory } from './actions/get'
 import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
-import { isArray } from 'is-what'
+import { filterDataPerClauses } from './helpers/dataHelpers'
 
 // there are two interfaces to be defined & exported by each plugin
 // - SimpleStoreOptions
@@ -88,15 +91,27 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
   }
 
   /**
+   * Queried local data stored in weakmaps "per query" for the least CPU cycles and preventing memory leaks
+   */
+  const queriedData: WeakMap<Clauses, Map<string, PlainObject>> = new WeakMap()
+
+  /**
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
    */
   const getModuleData = (modulePath: string, moduleConfig: SimpleStoreModuleConfig = {}): any => {
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const collectionDB = data[collectionPath]
-    // if it's a collection, just return the collectionDB, which MUST be a map with id as keys and the docs as value
-    if (!docId) return collectionDB
     // if it's a doc, return the specific doc
-    return collectionDB.get(docId)
+    if (docId) return collectionDB.get(docId)
+    // if it's a collection, we must return the collectionDB but with applied query clauses
+    // but remember, the return type MUST be a map with id as keys and the docs as value
+    const clauses = pick(moduleConfig, ['where', 'orderBy', 'limit'])
+    // return from cache
+    if (queriedData.has(clauses)) return queriedData.get(clauses)
+    // otherwise create a new filter and return that
+    const filteredMap = filterDataPerClauses(collectionDB, clauses)
+    queriedData.set(clauses, filteredMap)
+    return filteredMap
   }
 
   // the plugin must try to implement logic for every `ActionName`

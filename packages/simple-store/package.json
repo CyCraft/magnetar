@@ -1,6 +1,6 @@
 {
   "name": "@vue-sync/simple-store",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "sideEffects": false,
   "description": "A simple local store plugin to use with Vue Sync.",
   "main": "dist/index.cjs.js",
@@ -13,7 +13,9 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "rollup": "rollup -c build.js"
   },
-  "keywords": ["vue-sync"],
+  "keywords": [
+    "vue-sync"
+  ],
   "author": "Luca Ban - Mesqueeb",
   "license": "MIT",
   "homepage": "https://github.com/vue-sync/simple-store#readme",
@@ -22,21 +24,23 @@
   },
   "dependencies": {
     "copy-anything": "^2.0.1",
+    "fast-sort": "github:mesqueeb/fast-sort",
+    "filter-anything": "^2.1.2",
     "is-what": "^3.8.0",
     "merge-anything": "^3.0.3",
     "path-to-prop": "0.0.3"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^2.28.0",
-    "@typescript-eslint/parser": "^2.28.0",
-    "@vue-sync/core": "^0.1.6",
-    "ava": "^3.7.0",
+    "@typescript-eslint/eslint-plugin": "^2.29.0",
+    "@typescript-eslint/parser": "^2.29.0",
+    "@vue-sync/core": "^0.2.0",
+    "ava": "^3.7.1",
     "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.10.1",
+    "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-tree-shaking": "^1.8.0",
-    "rollup": "^2.6.1",
+    "rollup": "^2.7.2",
     "rollup-plugin-typescript2": "^0.27.0",
-    "ts-node": "^8.8.2",
+    "ts-node": "^8.9.0",
     "typescript": "^3.8.3"
   },
   "repository": {
@@ -47,8 +51,12 @@
     "url": "https://github.com/vue-sync/simple-store/issues"
   },
   "ava": {
-    "extensions": ["ts"],
-    "require": ["ts-node/register"],
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
     "timeout": "30s"
   }
 }
