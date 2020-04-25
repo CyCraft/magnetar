@@ -1,3 +1,4 @@
+// npm i -D typescript rollup rollup-plugin-typescript2
 /* eslint-disable */
 import typescript from 'rollup-plugin-typescript2'
 
@@ -28,7 +29,7 @@ function defaults (config) {
   // defaults
   const defaults = {
     plugins,
-    external
+    external,
   }
   // defaults.output
   config.output = config.output.map(output => {
@@ -36,7 +37,7 @@ function defaults (config) {
       {
         sourcemap: false,
         name: className,
-        exports: 'named'
+        exports: 'named',
       },
       output
     )
@@ -49,7 +50,7 @@ export default [
     input: 'src/index.ts',
     output: [
       { file: 'dist/index.cjs.js', format: 'cjs' },
-      { file: 'dist/index.esm.js', format: 'esm' }
-    ]
-  })
+      { file: 'dist/index.esm.js', format: 'esm' },
+    ],
+  }),
 ]

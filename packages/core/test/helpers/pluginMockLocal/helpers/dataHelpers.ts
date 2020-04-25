@@ -1,7 +1,7 @@
 import { PlainObject, Clauses } from '../../../../src'
 import { isNumber, isArray } from 'is-what'
 import pathToProp from 'path-to-prop'
-import { sort } from 'fast-sort'
+import sort from 'fast-sort'
 import { ISortByObjectSorter } from 'fast-sort'
 
 /**

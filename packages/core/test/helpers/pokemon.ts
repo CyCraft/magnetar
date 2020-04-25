@@ -1,4 +1,3 @@
-import { copy } from 'copy-anything'
 export type PokemonType =
   | 'Normal'
   | 'Fire'

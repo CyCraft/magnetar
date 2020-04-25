@@ -29,7 +29,7 @@
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-tree-shaking": "^1.8.0",
-    "fast-sort": "github:mesqueeb/fast-sort",
+    "fast-sort": "^2.1.1",
     "filter-anything": "^2.1.2",
     "flatten-anything": "^2.0.1",
     "path-to-prop": "0.0.3",
@@ -40,6 +40,9 @@
     "vue": "^2.6.11",
     "vuex": "^3.2.0"
   },
+  "keywords": [
+    "vue-sync"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vue-sync/core.git"

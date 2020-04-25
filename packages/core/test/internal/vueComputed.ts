@@ -1,5 +1,5 @@
 import test from 'ava'
-import * as Vue from 'vue/dist/vue.common.js'
+import Vue from 'vue/dist/vue.common.js'
 import { flattenObject } from 'flatten-anything'
 import pathToProp from 'path-to-prop'
 import { isPlainObject } from 'is-what'
