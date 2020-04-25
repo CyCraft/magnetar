@@ -7,6 +7,9 @@ import {
   PlainObject,
   getCollectionPathDocIdEntry,
   Clauses,
+  WhereClause,
+  OrderBy,
+  Limit,
 } from '@vue-sync/core'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { insertActionFactory } from './actions/insert'
@@ -28,6 +31,9 @@ export interface SimpleStoreOptions {
 export interface SimpleStoreModuleConfig {
   path?: string
   initialData?: PlainObject | [string, PlainObject][]
+  where?: WhereClause[]
+  orderBy?: OrderBy[]
+  limit?: Limit
 }
 
 export type MakeRestoreBackup = (collectionPath: string, docId: string) => void
