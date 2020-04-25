@@ -13,14 +13,11 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "rollup": "rollup -c build.js"
   },
-  "keywords": [
-    "vue-sync"
-  ],
   "author": "Luca Ban - Mesqueeb",
   "license": "MIT",
   "homepage": "https://github.com/vue-sync/simple-store#readme",
   "peerDependencies": {
-    "@vue-sync/core": "^0.1.6"
+    "@vue-sync/core": "^0.2.0"
   },
   "dependencies": {
     "copy-anything": "^2.0.1",
@@ -41,8 +38,10 @@
     "rollup": "^2.7.2",
     "rollup-plugin-typescript2": "^0.27.0",
     "ts-node": "^8.9.0",
+    "ts-toolbelt": "^6.5.1",
     "typescript": "^3.8.3"
   },
+  "keywords": ["vue-sync"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vue-sync/simple-store.git"
@@ -51,12 +50,8 @@
     "url": "https://github.com/vue-sync/simple-store/issues"
   },
   "ava": {
-    "extensions": [
-      "ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
+    "extensions": ["ts"],
+    "require": ["ts-node/register"],
     "timeout": "30s"
   }
 }
