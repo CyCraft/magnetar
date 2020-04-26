@@ -30,7 +30,7 @@ export function writeActionFactory (
 ): PluginWriteAction {
   return async function (
     payload: PlainObject,
-    modulePath: string,
+    [collectionPath, docId]: [string, string | undefined],
     pluginModuleConfig: StorePluginModuleConfig
   ): Promise<void> {
     // this mocks an error during execution
@@ -38,16 +38,15 @@ export function writeActionFactory (
     // this is custom logic to be implemented by the plugin author
     await waitMs(1)
 
-    const isCollection = isCollectionModule(modulePath)
     // any write action other than `insert` cannot be executed on collections
-    if (isCollection) throw new Error('An non-existent action was triggered on a collection')
+    if (!docId) throw new Error('An non-existent action was triggered on a collection')
   }
 }
 
 export function insertActionFactory (storePluginOptions: StorePluginOptions): PluginInsertAction {
   return async function (
     payload: PlainObject,
-    modulePath: string,
+    [collectionPath, docId]: [string, string | undefined],
     pluginModuleConfig: StorePluginModuleConfig
   ): Promise<string> {
     // this mocks an error during execution
@@ -55,13 +54,10 @@ export function insertActionFactory (storePluginOptions: StorePluginOptions): Pl
     // this is custom logic to be implemented by the plugin author
     await waitMs(1)
 
-    const isCollection = isCollectionModule(modulePath)
-
-    if (isCollection) {
+    if (!docId) {
       const id = generateRandomId()
       return id
     }
-    const docId = modulePath.split('/').slice(-1)[0]
     return docId
   }
 }
@@ -71,7 +67,7 @@ export function deletePropActionFactory (
 ): PluginDeletePropAction {
   return async function (
     payload: string | string[],
-    modulePath: string,
+    [collectionPath, docId]: [string, string | undefined],
     pluginModuleConfig: StorePluginModuleConfig
   ): Promise<void> {
     // this mocks an error during execution
@@ -79,16 +75,15 @@ export function deletePropActionFactory (
     // this is custom logic to be implemented by the plugin author
     await waitMs(1)
 
-    const isCollection = isCollectionModule(modulePath)
     // `deleteProp` action cannot be executed on collections
-    if (isCollection) throw new Error('An non-existent action was triggered on a collection')
+    if (!docId) throw new Error('An non-existent action was triggered on a collection')
   }
 }
 
 export function deleteActionFactory (storePluginOptions: StorePluginOptions): PluginDeleteAction {
   return async function (
     payload: void,
-    modulePath: string,
+    [collectionPath, docId]: [string, string | undefined],
     pluginModuleConfig: StorePluginModuleConfig
   ): Promise<void> {
     // this mocks an error during execution
@@ -100,10 +95,10 @@ export function deleteActionFactory (storePluginOptions: StorePluginOptions): Pl
 }
 
 function mockDataRetrieval (
-  isCollection: boolean,
+  moduleType: 'doc' | 'collection',
   pluginModuleConfig: StorePluginModuleConfig
 ): PlainObject[] {
-  if (!isCollection) return [{ name: 'Luca', age: 10, dream: 'job' }]
+  if (moduleType === 'doc') return [{ name: 'Luca', age: 10, dream: 'job' }]
   const _pokedexMap = pokedexMap()
   const clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
   const filteredMap = filterDataPerClauses(_pokedexMap, clauses)
@@ -113,21 +108,17 @@ function mockDataRetrieval (
 export function getActionFactory (storePluginOptions: StorePluginOptions): PluginGetAction {
   return async (
     payload: void | PlainObject = {},
-    modulePath: string,
+    [collectionPath, docId]: [string, string | undefined],
     pluginModuleConfig: StorePluginModuleConfig
   ): Promise<DoOnGet | GetResponse> => {
     // this is custom logic to be implemented by the plugin author
-    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
-    const isCollection = isCollectionModule(modulePath)
-    const isDocument = !isCollection
-
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // fetch from cache/or from a remote store with logic you implement here
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         // this mocks an error during execution
-        const dataRetrieved = mockDataRetrieval(isCollection, pluginModuleConfig)
+        const dataRetrieved = mockDataRetrieval(docId ? 'doc' : 'collection', pluginModuleConfig)
         // we must trigger `mustExecuteOnGet.added` for each document that was retrieved and return whatever that returns
         const results = dataRetrieved.map(_data => {
           const _metaData = { data: _data, exists: true, id: _data.id || docId }
@@ -142,18 +133,14 @@ export function getActionFactory (storePluginOptions: StorePluginOptions): Plugi
 export function streamActionFactory (storePluginOptions: StorePluginOptions): PluginStreamAction {
   return (
     payload: void | PlainObject = {},
-    modulePath: string,
+    [collectionPath, docId]: [string, string | undefined],
     pluginModuleConfig: StorePluginModuleConfig,
     mustExecuteOnRead: MustExecuteOnRead
   ): StreamResponse | DoOnStream | Promise<StreamResponse | DoOnStream> => {
     // this is custom logic to be implemented by the plugin author
-    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
-    const isCollection = isCollectionModule(modulePath)
-    const isDocument = !isCollection
     // we'll mock opening a stream
-
-    const dataRetrieved = isCollection
-      ? mockDataRetrieval(isCollection, pluginModuleConfig)
+    const dataRetrieved = !docId
+      ? mockDataRetrieval('collection', pluginModuleConfig)
       : [
           { name: 'Luca', age: 10 },
           { name: 'Luca', age: 10 },
@@ -196,7 +183,7 @@ export function revertActionFactory (storePluginOptions: StorePluginOptions): Pl
   // this is a `PluginRevertAction`:
   return async function revert (
     payload: PlainObject | PlainObject[] | string | string[] | void,
-    modulePath: string,
+    [collectionPath, docId]: [string, string | undefined],
     pluginModuleConfig: StorePluginModuleConfig,
     actionName: ActionName
   ): Promise<void> {

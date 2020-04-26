@@ -8,11 +8,15 @@ export function getActionFactory (
 ): PluginGetAction {
   return async (
     payload: void | PlainObject = {},
-    modulePath: string,
+    [collectionPath, docId]: [string, string | undefined],
     simpleStoreModuleConfig: SimpleStoreModuleConfig
   ): Promise<GetResponse | DoOnGet> => {
     const doOnGetAction: DoOnGet = (payload, meta): void => {
-      insertActionFactory(data, simpleStoreOptions)(payload, modulePath, simpleStoreModuleConfig)
+      insertActionFactory(data, simpleStoreOptions)(
+        payload,
+        [collectionPath, docId],
+        simpleStoreModuleConfig
+      )
     }
     return doOnGetAction
   }

@@ -1,10 +1,9 @@
 import { copy } from 'copy-anything';
 import { pick } from 'filter-anything';
 import { isFullString, isNumber, isArray, isString } from 'is-what';
-import { isCollectionModule, getCollectionPathDocIdEntry } from '@vue-sync/core';
 import { merge } from 'merge-anything';
 import pathToProp from 'path-to-prop';
-import { sort } from 'fast-sort';
+import sort from 'fast-sort';
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -89,12 +88,11 @@ function __read(o, n) {
 }
 
 function writeActionFactory(data, simpleStoreOptions, actionName, makeBackup) {
-    return function (payload, modulePath, simpleStoreModuleConfig) {
-        var isCollection = isCollectionModule(modulePath);
+    return function (payload, _a, simpleStoreModuleConfig) {
+        var _b = __read(_a, 2), collectionPath = _b[0], docId = _b[1];
         // write actions cannot be executed on collections
-        if (isCollection)
+        if (!docId)
             throw new Error('An non-existent action was triggered on a collection');
-        var _a = __read(getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _a[0], docId = _a[1];
         var collectionMap = data[collectionPath];
         if (makeBackup)
             makeBackup(collectionPath, docId);
@@ -118,20 +116,18 @@ function writeActionFactory(data, simpleStoreOptions, actionName, makeBackup) {
 }
 
 function insertActionFactory(data, simpleStoreOptions, makeBackup) {
-    return function (payload, modulePath, simpleStoreModuleConfig) {
-        var isCollection = isCollectionModule(modulePath);
-        if (isCollection) {
-            var docId_1 = isFullString(payload.id) || isNumber(payload.id)
+    return function (payload, _a, simpleStoreModuleConfig) {
+        var _b = __read(_a, 2), collectionPath = _b[0], docId = _b[1];
+        if (!docId) {
+            var newDocId = isFullString(payload.id) || isNumber(payload.id)
                 ? String(payload.id)
                 : simpleStoreOptions.generateRandomId();
-            var collectionPath_1 = modulePath;
             if (makeBackup)
-                makeBackup(collectionPath_1, docId_1);
-            data[collectionPath_1].set(docId_1, payload);
-            return docId_1;
+                makeBackup(collectionPath, newDocId);
+            data[collectionPath].set(newDocId, payload);
+            return newDocId;
         }
         // else it's a doc
-        var _a = __read(getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _a[0], docId = _a[1];
         var collectionMap = data[collectionPath];
         if (makeBackup)
             makeBackup(collectionPath, docId);
@@ -147,13 +143,12 @@ function insertActionFactory(data, simpleStoreOptions, makeBackup) {
 }
 
 function deletePropActionFactory(data, simpleStoreOptions, makeBackup) {
-    return function (payload, modulePath, simpleStoreModuleConfig) {
-        var e_1, _a;
-        var isCollection = isCollectionModule(modulePath);
+    return function (payload, _a, simpleStoreModuleConfig) {
+        var e_1, _b;
+        var _c = __read(_a, 2), collectionPath = _c[0], docId = _c[1];
         // `deleteProp` action cannot be executed on collections
-        if (isCollection)
+        if (!docId)
             throw new Error('An non-existent action was triggered on a collection');
-        var _b = __read(getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _b[0], docId = _b[1];
         var collectionMap = data[collectionPath];
         var docData = collectionMap.get(docId);
         if (makeBackup)
@@ -177,7 +172,7 @@ function deletePropActionFactory(data, simpleStoreOptions, makeBackup) {
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
         finally {
             try {
-                if (payloadArray_1_1 && !payloadArray_1_1.done && (_a = payloadArray_1["return"])) _a.call(payloadArray_1);
+                if (payloadArray_1_1 && !payloadArray_1_1.done && (_b = payloadArray_1["return"])) _b.call(payloadArray_1);
             }
             finally { if (e_1) throw e_1.error; }
         }
@@ -185,12 +180,11 @@ function deletePropActionFactory(data, simpleStoreOptions, makeBackup) {
 }
 
 function deleteActionFactory(data, simpleStoreOptions, makeBackup) {
-    return function (payload, modulePath, simpleStoreModuleConfig) {
-        var isCollection = isCollectionModule(modulePath);
+    return function (payload, _a, simpleStoreModuleConfig) {
+        var _b = __read(_a, 2), collectionPath = _b[0], docId = _b[1];
         // delete cannot be executed on collections
-        if (isCollection)
+        if (!docId)
             throw new Error('An non-existent action was triggered on a collection');
-        var _a = __read(getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _a[0], docId = _a[1];
         if (makeBackup)
             makeBackup(collectionPath, docId);
         data[collectionPath]["delete"](docId);
@@ -199,12 +193,13 @@ function deleteActionFactory(data, simpleStoreOptions, makeBackup) {
 
 function getActionFactory(data, simpleStoreOptions) {
     var _this = this;
-    return function (payload, modulePath, simpleStoreModuleConfig) {
+    return function (payload, _a, simpleStoreModuleConfig) {
+        var _b = __read(_a, 2), collectionPath = _b[0], docId = _b[1];
         return __awaiter(_this, void 0, void 0, function () {
             var doOnGetAction;
-            return __generator(this, function (_a) {
+            return __generator(this, function (_c) {
                 doOnGetAction = function (payload, meta) {
-                    insertActionFactory(data, simpleStoreOptions)(payload, modulePath, simpleStoreModuleConfig);
+                    insertActionFactory(data, simpleStoreOptions)(payload, [collectionPath, docId], simpleStoreModuleConfig);
                 };
                 return [2 /*return*/, doOnGetAction];
             });
@@ -213,22 +208,22 @@ function getActionFactory(data, simpleStoreOptions) {
 }
 
 function streamActionFactory(data, simpleStoreOptions) {
-    return function (payload, modulePath, simpleStoreModuleConfig, mustExecuteOnRead) {
+    return function (payload, _a, simpleStoreModuleConfig, mustExecuteOnRead) {
+        var _b = __read(_a, 2), collectionPath = _b[0], docId = _b[1];
         // hover over the prop names below to see more info on when they are triggered:
         var doOnStream = {
             added: function (payload, meta) {
-                insertActionFactory(data, simpleStoreOptions)(payload, modulePath, simpleStoreModuleConfig);
+                insertActionFactory(data, simpleStoreOptions)(payload, [collectionPath, docId], simpleStoreModuleConfig);
             },
             modified: function (payload, meta) {
-                insertActionFactory(data, simpleStoreOptions)(payload, modulePath, simpleStoreModuleConfig);
+                insertActionFactory(data, simpleStoreOptions)(payload, [collectionPath, docId], simpleStoreModuleConfig);
             },
             removed: function (payload, meta) {
-                var isCollection = isCollectionModule(modulePath);
-                var pathToDelete = !isCollection
-                    ? modulePath
+                var pathToDelete = docId
+                    ? [collectionPath, docId]
                     : isString(payload)
-                        ? modulePath + "/" + payload
-                        : modulePath + "/" + meta.id;
+                        ? [collectionPath, payload]
+                        : [collectionPath, meta.id];
                 deleteActionFactory(data)(undefined, pathToDelete, simpleStoreModuleConfig);
             },
         };
@@ -238,8 +233,8 @@ function streamActionFactory(data, simpleStoreOptions) {
 
 function revertActionFactory(data, simpleStoreOptions, restoreBackup) {
     // this is a `PluginRevertAction`:
-    return function revert(payload, modulePath, simpleStoreModuleConfig, actionName) {
-        var _a = __read(getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _a[0], docId = _a[1];
+    return function revert(payload, _a, simpleStoreModuleConfig, actionName) {
+        var _b = __read(_a, 2), collectionPath = _b[0], docId = _b[1];
         // revert all write actions when called on a doc
         if (docId &&
             ['insert', 'merge', 'assign', 'replace', 'delete', 'deleteProp'].includes(actionName)) {
@@ -367,16 +362,17 @@ var CreatePlugin = function (simpleStoreOptions) {
      * This must be provided by Store Plugins that have "local" data. It is triggered ONCE when the module (doc or collection) is instantiated. In any case, an empty Map for the collectionPath (to be derived from the modulePath) must be set up.
      */
     var modulesAlreadySetup = new Set();
-    var setupModule = function (modulePath, moduleConfig) {
-        var e_1, _a;
+    var setupModule = function (_a, moduleConfig) {
+        var e_1, _b;
+        var _c = __read(_a, 2), collectionPath = _c[0], docId = _c[1];
         if (moduleConfig === void 0) { moduleConfig = {}; }
-        var _b;
+        var _d;
+        var modulePath = [collectionPath, docId].filter(Boolean).join('/');
         if (modulesAlreadySetup.has(modulePath))
             return;
-        var _c = __read(getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _c[0], docId = _c[1];
         // always set up a new Map for the collection, but only when it's undefined!
         // the reason for this is that the module can be instantiated multiple times
-        data[collectionPath] = (_b = data[collectionPath]) !== null && _b !== void 0 ? _b : new Map();
+        data[collectionPath] = (_d = data[collectionPath]) !== null && _d !== void 0 ? _d : new Map();
         // then do anything specific for your plugin, like setting initial data
         var initialData = moduleConfig.initialData;
         if (!initialData)
@@ -384,14 +380,14 @@ var CreatePlugin = function (simpleStoreOptions) {
         if (!docId && isArray(initialData)) {
             try {
                 for (var initialData_1 = __values(initialData), initialData_1_1 = initialData_1.next(); !initialData_1_1.done; initialData_1_1 = initialData_1.next()) {
-                    var _d = __read(initialData_1_1.value, 2), _docId = _d[0], _docData = _d[1];
+                    var _e = __read(initialData_1_1.value, 2), _docId = _e[0], _docData = _e[1];
                     data[collectionPath].set(_docId, _docData);
                 }
             }
             catch (e_1_1) { e_1 = { error: e_1_1 }; }
             finally {
                 try {
-                    if (initialData_1_1 && !initialData_1_1.done && (_a = initialData_1["return"])) _a.call(initialData_1);
+                    if (initialData_1_1 && !initialData_1_1.done && (_b = initialData_1["return"])) _b.call(initialData_1);
                 }
                 finally { if (e_1) throw e_1.error; }
             }
@@ -408,9 +404,9 @@ var CreatePlugin = function (simpleStoreOptions) {
     /**
      * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
      */
-    var getModuleData = function (modulePath, moduleConfig) {
+    var getModuleData = function (_a, moduleConfig) {
+        var _b = __read(_a, 2), collectionPath = _b[0], docId = _b[1];
         if (moduleConfig === void 0) { moduleConfig = {}; }
-        var _a = __read(getCollectionPathDocIdEntry(modulePath), 2), collectionPath = _a[0], docId = _a[1];
         var collectionDB = data[collectionPath];
         // if it's a doc, return the specific doc
         if (docId)

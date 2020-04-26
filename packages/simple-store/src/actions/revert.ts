@@ -14,11 +14,10 @@ export function revertActionFactory (
   // this is a `PluginRevertAction`:
   return function revert (
     payload: PlainObject | PlainObject[] | string | string[] | void,
-    modulePath: string,
+    [collectionPath, docId]: [string, string | undefined],
     simpleStoreModuleConfig: SimpleStoreModuleConfig,
     actionName: ActionName
   ): void {
-    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     // revert all write actions when called on a doc
     if (
       docId &&

@@ -13,14 +13,12 @@ export function deleteActionFactory (
 ): PluginDeleteAction {
   return function (
     payload: void,
-    modulePath: string,
+    [collectionPath, docId]: [string, string | undefined],
     simpleStoreModuleConfig: SimpleStoreModuleConfig
   ): void {
-    const isCollection = isCollectionModule(modulePath)
     // delete cannot be executed on collections
-    if (isCollection) throw new Error('An non-existent action was triggered on a collection')
+    if (!docId) throw new Error('An non-existent action was triggered on a collection')
 
-    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     if (makeBackup) makeBackup(collectionPath, docId)
 
     data[collectionPath].delete(docId)

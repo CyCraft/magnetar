@@ -14,24 +14,21 @@ export function insertActionFactory (
 ): PluginInsertAction {
   return function (
     payload: PlainObject,
-    modulePath: string,
+    [collectionPath, docId]: [string, string | undefined],
     simpleStoreModuleConfig: SimpleStoreModuleConfig
   ): string {
-    const isCollection = isCollectionModule(modulePath)
-    if (isCollection) {
-      const docId =
+    if (!docId) {
+      const newDocId =
         isFullString(payload.id) || isNumber(payload.id)
           ? String(payload.id)
           : simpleStoreOptions.generateRandomId()
-      const collectionPath = modulePath
 
-      if (makeBackup) makeBackup(collectionPath, docId)
+      if (makeBackup) makeBackup(collectionPath, newDocId)
 
-      data[collectionPath].set(docId, payload)
-      return docId
+      data[collectionPath].set(newDocId, payload)
+      return newDocId
     }
     // else it's a doc
-    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const collectionMap = data[collectionPath]
 
     if (makeBackup) makeBackup(collectionPath, docId)

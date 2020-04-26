@@ -15,14 +15,12 @@ export function deletePropActionFactory (
 ): PluginDeletePropAction {
   return function (
     payload: string | string[],
-    modulePath: string,
+    [collectionPath, docId]: [string, string | undefined],
     simpleStoreModuleConfig: SimpleStoreModuleConfig
   ): void {
-    const isCollection = isCollectionModule(modulePath)
     // `deleteProp` action cannot be executed on collections
-    if (isCollection) throw new Error('An non-existent action was triggered on a collection')
+    if (!docId) throw new Error('An non-existent action was triggered on a collection')
 
-    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const collectionMap = data[collectionPath]
     const docData = collectionMap.get(docId)
 
