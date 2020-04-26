@@ -4,7 +4,7 @@ import { pokedex } from '../helpers/pokedex'
 import { DocInstance } from '@vue-sync/core'
 
 test('insert (document)', async t => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createVueSyncInstance('insert (document)')
   const payload = pokedex(7)
   t.deepEqual(pokedexModule.doc('7').data, undefined)
 
@@ -18,7 +18,7 @@ test('insert (document)', async t => {
 })
 
 test('insert (collection) → random ID', async t => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createVueSyncInstance('insert (collection) → random ID')
   const payload = pokedex(7)
 
   let moduleFromResult: DocInstance
@@ -31,30 +31,30 @@ test('insert (collection) → random ID', async t => {
   t.deepEqual(pokedexModule.doc(newId).data, payload)
 })
 
-test('revert: insert (document)', async t => {
-  const { pokedexModule } = createVueSyncInstance()
-  const payload = { ...pokedex(7), shouldFail: 'remote' }
-  t.deepEqual(pokedexModule.doc('7').data, undefined)
+// test('revert: insert (document)', async t => {
+//   const { pokedexModule } = createVueSyncInstance('revert: insert (document)')
+//   const payload = { ...pokedex(7), shouldFail: 'remote' }
+//   t.deepEqual(pokedexModule.doc('7').data, undefined)
 
-  try {
-    await pokedexModule.doc('7').insert(payload, { onError: 'revert' })
-  } catch (error) {
-    t.fail(error)
-  }
+//   try {
+//     await pokedexModule.doc('7').insert(payload, { onError: 'revert' })
+//   } catch (error) {
+//     t.fail(error)
+//   }
 
-  t.deepEqual(pokedexModule.doc('7').data, undefined)
-})
+//   t.deepEqual(pokedexModule.doc('7').data, undefined)
+// })
 
-test('revert: insert (collection) → random ID', async t => {
-  const { pokedexModule } = createVueSyncInstance()
-  const payload = { ...pokedex(7), shouldFail: 'remote' }
+// test('revert: insert (collection) → random ID', async t => {
+//   const { pokedexModule } = createVueSyncInstance('revert: insert (collection) → random ID')
+//   const payload = { ...pokedex(7), shouldFail: 'remote' }
 
-  let moduleFromResult: DocInstance
-  try {
-    moduleFromResult = await pokedexModule.insert(payload, { onError: 'revert' })
-  } catch (error) {
-    t.fail(error)
-  }
-  const newId = moduleFromResult.id
-  t.deepEqual(pokedexModule.doc(newId).data, undefined)
-})
+//   let moduleFromResult: DocInstance
+//   try {
+//     moduleFromResult = await pokedexModule.insert(payload, { onError: 'revert' })
+//   } catch (error) {
+//     t.fail(error)
+//   }
+//   const newId = moduleFromResult.id
+//   t.deepEqual(pokedexModule.doc(newId).data, undefined)
+// })
