@@ -18,9 +18,10 @@ import { OnAddedFn } from '../types/modifyReadResponse'
  * in any event/hook it's possible for the dev to modify the result & also abort the execution chain, which prevents calling handleAction on the next store as well
  */
 export async function handleAction (args: {
-  modulePath: string
-  pluginAction: PluginGetAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction // prettier-ignore
+  collectionPath: string
+  docId: string | undefined
   pluginModuleConfig: PluginModuleConfig
+  pluginAction: PluginGetAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction // prettier-ignore
   payload: void | PlainObject | PlainObject[] | string | string[]
   eventNameFnsMap: EventNameFnsMap
   onError: SharedConfig['onError']
@@ -29,9 +30,10 @@ export async function handleAction (args: {
   storeName: string
 }): Promise<void | string | GetResponse | OnAddedFn> {
   const {
-    modulePath,
-    pluginAction,
+    collectionPath,
+    docId,
     pluginModuleConfig,
+    pluginAction,
     payload,
     eventNameFnsMap: on,
     onError,
@@ -56,7 +58,7 @@ export async function handleAction (args: {
   let result: void | string | GetResponse | OnAddedFn
   try {
     // triggering the action provided by the plugin
-    result = await pluginAction(payload as any, modulePath, pluginModuleConfig)
+    result = await pluginAction(payload as any, [collectionPath, docId], pluginModuleConfig)
   } catch (error) {
     if (!isVueSyncError(error)) throw new Error(error)
     // handle and await each eventFn in sequence

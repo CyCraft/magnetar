@@ -9,9 +9,10 @@ import { OnAddedFn } from '../types/modifyReadResponse';
  * in any event/hook it's possible for the dev to modify the result & also abort the execution chain, which prevents calling handleAction on the next store as well
  */
 export declare function handleAction(args: {
-    modulePath: string;
-    pluginAction: PluginGetAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction;
+    collectionPath: string;
+    docId: string | undefined;
     pluginModuleConfig: PluginModuleConfig;
+    pluginAction: PluginGetAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction;
     payload: void | PlainObject | PlainObject[] | string | string[];
     eventNameFnsMap: EventNameFnsMap;
     onError: SharedConfig['onError'];

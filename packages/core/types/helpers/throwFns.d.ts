@@ -6,4 +6,4 @@ export declare function throwOnIncompleteStreamResponses(streamInfoPerStore: {
 }, doOnStreamFns: DoOnStreamFns): void;
 export declare function throwIfNoFnsToExecute(storesToExecute: string[]): void;
 export declare function throwIfNoDataStoreName(dataStoreName: string): void;
-export declare function throwIfInvalidId(modulePath: string, moduleType: 'collection' | 'doc'): void;
+export declare function throwIfInvalidModulePath(modulePath: string, moduleType: 'collection' | 'doc'): void;

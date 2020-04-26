@@ -25,19 +25,19 @@ export function getPluginModuleConfig (
  *
  * @export
  * @param {GlobalConfig['stores']} globalConfigStores
- * @param {string} modulePath
+ * @param {[string, string | undefined]} [collectionPath, docId]
  * @param {ModuleConfig} moduleConfig
  */
 export function executeSetupModulePerStore (
   globalConfigStores: GlobalConfig['stores'],
-  modulePath: string,
+  [collectionPath, docId]: [string, string | undefined],
   moduleConfig: ModuleConfig
 ): void {
   for (const storeName in globalConfigStores) {
     const { setupModule } = globalConfigStores[storeName]
     if (isFunction(setupModule)) {
       const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeName)
-      setupModule(modulePath, pluginModuleConfig)
+      setupModule([collectionPath, docId], pluginModuleConfig)
     }
   }
 }
@@ -49,18 +49,21 @@ export function executeSetupModulePerStore (
  * @template DocDataType
  * @param {ModuleConfig} moduleConfig
  * @param {GlobalConfig} globalConfig
- * @returns {(modulePath: string) => (Map<string, DocDataType> | DocDataType)}
+ * @returns {([collectionPath, docId]: [string, string | undefined]) => (Map<string, DocDataType> | DocDataType)}
  */
 export function getDataFnFromDataStore<DocDataType> (
   moduleConfig: ModuleConfig,
   globalConfig: GlobalConfig
-): (modulePath: string) => Map<string, DocDataType> | DocDataType {
+): ([collectionPath, docId]: [string, string | undefined]) =>
+  | Map<string, DocDataType>
+  | DocDataType {
   const dataStoreName = moduleConfig.dataStoreName || globalConfig.dataStoreName
   throwIfNoDataStoreName(dataStoreName)
   const { getModuleData } = globalConfig.stores[dataStoreName]
   const pluginModuleConfig = getPluginModuleConfig(moduleConfig, dataStoreName)
 
-  return ((_modulePath: string) => getModuleData(_modulePath, pluginModuleConfig)) as any
+  return (([collectionPath, docId]: [string, string | undefined]) =>
+    getModuleData([collectionPath, docId], pluginModuleConfig)) as any
 }
 
 /**
@@ -69,13 +72,13 @@ export function getDataFnFromDataStore<DocDataType> (
  * @export
  * @template calledFrom {'doc' | 'collection'}
  * @template DocDataType
- * @param {string} modulePath
+ * @param {[string, string | undefined]} [collectionPath, docId]
  * @param {ModuleConfig} moduleConfig
  * @param {GlobalConfig} globalConfig
  * @returns {calledFrom extends 'doc' ? { get: (...p: any[]) => DocDataType } : { get: (...p: any[]) => Map<string, DocDataType> }}
  */
 export function getDataProxyHandler<calledFrom extends 'doc' | 'collection', DocDataType> (
-  modulePath: string,
+  [collectionPath, docId]: [string, string | undefined],
   moduleConfig: ModuleConfig,
   globalConfig: GlobalConfig
 ): calledFrom extends 'doc'
@@ -84,7 +87,7 @@ export function getDataProxyHandler<calledFrom extends 'doc' | 'collection', Doc
   const getModuleData = getDataFnFromDataStore<DocDataType>(moduleConfig, globalConfig)
   const dataHandler = {
     get: function (target: any, key: any, proxyRef: any): any {
-      if (key === 'data') return getModuleData(modulePath)
+      if (key === 'data') return getModuleData([collectionPath, docId])
       return Reflect.get(target, key, proxyRef)
     },
   }

@@ -5,7 +5,6 @@ import {
   PluginInstance,
   VueSyncPlugin,
   PlainObject,
-  getCollectionPathDocIdEntry,
   WhereClause,
   OrderBy,
   Limit,
@@ -77,9 +76,11 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
    * This must be provided by Store Plugins that have "local" data. It is triggered ONCE when the module (doc or collection) is instantiated. In any case, an empty Map for the collectionPath (to be derived from the modulePath) must be set up.
    */
   const modulesAlreadySetup = new Set()
-  const setupModule = (modulePath: string, moduleConfig: SimpleStoreModuleConfig = {}): void => {
-    if (modulesAlreadySetup.has(modulePath)) return
-    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
+  const setupModule = (
+    [collectionPath, docId]: [string, string | undefined],
+    moduleConfig: SimpleStoreModuleConfig = {}
+  ): void => {
+    if (modulesAlreadySetup.has([collectionPath, docId].join('/'))) return
     // always set up a new Map for the collection, but only when it's undefined!
     // the reason for this is that the module can be instantiated multiple times
     data[collectionPath] = data[collectionPath] ?? new Map()
@@ -93,7 +94,7 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
     } else {
       data[collectionPath].set(docId, initialData as PlainObject)
     }
-    modulesAlreadySetup.add(modulePath)
+    modulesAlreadySetup.add([collectionPath, docId].join('/'))
   }
 
   /**
@@ -104,8 +105,10 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
   /**
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
    */
-  const getModuleData = (modulePath: string, moduleConfig: SimpleStoreModuleConfig = {}): any => {
-    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
+  const getModuleData = (
+    [collectionPath, docId]: [string, string | undefined],
+    moduleConfig: SimpleStoreModuleConfig = {}
+  ): any => {
     const collectionDB = data[collectionPath]
     // if it's a doc, return the specific doc
     if (docId) return collectionDB.get(docId)

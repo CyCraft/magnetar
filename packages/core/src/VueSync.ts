@@ -5,7 +5,8 @@ import { SharedConfig, GlobalConfig, ModuleConfig } from './types/config'
 import { PlainObject } from './types/atoms'
 import { createDocWithContext, DocInstance } from './Doc'
 import { OpenStreams } from './types/actions'
-import { throwIfInvalidId } from './helpers/throwFns'
+import { throwIfInvalidModulePath } from './helpers/throwFns'
+import { getCollectionPathDocIdEntry } from './helpers/pathHelpers'
 
 export { isDocModule, isCollectionModule } from './helpers/pathHelpers'
 
@@ -58,7 +59,7 @@ export function VueSync (vueSyncConfig: GlobalConfig): VueSyncInstance {
   // the passed GlobalConfig is merged onto defaults
   const globalConfig = configWithDefaults(vueSyncConfig)
 
-  type ModuleIdentifier = { idOrPath: string; moduleConfig: ModuleConfig }
+  type ModuleIdentifier = { modulePath: string; moduleConfig: ModuleConfig }
   /**
    * takes care of the caching instances of modules. Todo: double check memory leaks for when an instance isn't referenced anymore.
    */
@@ -69,30 +70,31 @@ export function VueSync (vueSyncConfig: GlobalConfig): VueSyncInstance {
   const streamSubscribtionMap: Map<string, OpenStreams> = new Map() // apply type upon get/set
 
   function getModuleInstance (
-    idOrPath: string,
+    modulePath: string,
     moduleConfig: ModuleConfig = {},
     moduleType: 'doc' | 'collection',
     docFn: DocFn,
     collectionFn: CollectionFn
   ): CollectionInstance | DocInstance {
-    throwIfInvalidId(idOrPath, moduleType)
+    throwIfInvalidModulePath(modulePath, moduleType)
+    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     // retrieved the cached instance
-    const moduleIdentifier = { idOrPath, moduleConfig }
+    const moduleIdentifier = { modulePath, moduleConfig }
     const _moduleMap: WeakMap<ModuleIdentifier, CollectionInstance | DocInstance> = moduleMap
     const cachedInstance = _moduleMap.get(moduleIdentifier)
     if (cachedInstance) return cachedInstance
     // else create and cache a new instance
     // first create the stream subscribtion map for this module
-    if (!streamSubscribtionMap.has(idOrPath)) {
-      streamSubscribtionMap.set(idOrPath, new Map())
+    if (!streamSubscribtionMap.has(modulePath)) {
+      streamSubscribtionMap.set(modulePath, new Map())
     }
-    const openStreams = streamSubscribtionMap.get(idOrPath)
+    const openStreams = streamSubscribtionMap.get(modulePath)
     // then create the module instance
     const createInstanceWithContext =
       moduleType === 'doc' ? createDocWithContext : createCollectionWithContext
     // @ts-ignore
     const moduleInstance = createInstanceWithContext(
-      idOrPath,
+      [collectionPath, docId],
       moduleConfig,
       globalConfig,
       docFn,
@@ -103,13 +105,13 @@ export function VueSync (vueSyncConfig: GlobalConfig): VueSyncInstance {
     return moduleInstance
   }
 
-  function collection (idOrPath: string, moduleConfig: ModuleConfig = {}): CollectionInstance {
+  function collection (modulePath: string, moduleConfig: ModuleConfig = {}): CollectionInstance {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return getModuleInstance(idOrPath, moduleConfig, 'collection', doc as DocFn, collection as CollectionFn) as CollectionInstance // prettier-ignore
+    return getModuleInstance(modulePath, moduleConfig, 'collection', doc as DocFn, collection as CollectionFn) as CollectionInstance // prettier-ignore
   }
 
-  function doc (idOrPath: string, moduleConfig: ModuleConfig = {}): DocInstance {
-    return getModuleInstance(idOrPath, moduleConfig, 'doc', doc as DocFn, collection as CollectionFn) as DocInstance // prettier-ignore
+  function doc (modulePath: string, moduleConfig: ModuleConfig = {}): DocInstance {
+    return getModuleInstance(modulePath, moduleConfig, 'doc', doc as DocFn, collection as CollectionFn) as DocInstance // prettier-ignore
   }
 
   const instance: VueSyncInstance = {

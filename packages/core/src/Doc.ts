@@ -34,30 +34,30 @@ export type DocInstance<DocDataType extends object = { [prop: string]: any }> = 
 }
 
 export function createDocWithContext<DocDataType extends object> (
-  idOrPath: string,
+  [collectionPath, docId]: [string, string | undefined],
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
   docFn: DocFn<DocDataType>,
   collectionFn: CollectionFn,
   openStreams: OpenStreams
 ): DocInstance<DocDataType> {
-  const id = idOrPath.split('/').slice(-1)[0]
-  const path = idOrPath
+  const id = docId
+  const path = [collectionPath, docId].join('/')
 
-  const collection: CollectionFn = (idOrPath, _moduleConfig = {}) => {
-    return collectionFn(`${path}/${idOrPath}`, _moduleConfig)
+  const collection: CollectionFn = (collectionId, _moduleConfig = {}) => {
+    return collectionFn(`${path}/${collectionId}`, _moduleConfig)
   }
 
   const actions = {
-    insert: (handleActionPerStore(path, moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert,  docFn) as VueSyncInsertAction<DocDataType>), // prettier-ignore
-    merge: (handleActionPerStore(path, moduleConfig, globalConfig, 'merge', actionNameTypeMap.merge, docFn) as VueSyncWriteAction<DocDataType>), // prettier-ignore
-    assign: (handleActionPerStore(path, moduleConfig, globalConfig, 'assign', actionNameTypeMap.assign, docFn) as VueSyncWriteAction<DocDataType>), // prettier-ignore
-    replace: (handleActionPerStore(path, moduleConfig, globalConfig, 'replace', actionNameTypeMap.replace, docFn) as VueSyncWriteAction<DocDataType>), // prettier-ignore
-    deleteProp: (handleActionPerStore(path, moduleConfig, globalConfig, 'deleteProp', actionNameTypeMap.deleteProp, docFn) as VueSyncDeletePropAction<DocDataType>), // prettier-ignore
-    delete: (handleActionPerStore(path, moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn) as VueSyncDeleteAction<DocDataType>), // prettier-ignore
-    get: (handleActionPerStore(path, moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn) as VueSyncGetAction<DocDataType, 'doc'>), // prettier-ignore
+    insert: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert,  docFn) as VueSyncInsertAction<DocDataType>), // prettier-ignore
+    merge: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'merge', actionNameTypeMap.merge, docFn) as VueSyncWriteAction<DocDataType>), // prettier-ignore
+    assign: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'assign', actionNameTypeMap.assign, docFn) as VueSyncWriteAction<DocDataType>), // prettier-ignore
+    replace: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'replace', actionNameTypeMap.replace, docFn) as VueSyncWriteAction<DocDataType>), // prettier-ignore
+    deleteProp: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'deleteProp', actionNameTypeMap.deleteProp, docFn) as VueSyncDeletePropAction<DocDataType>), // prettier-ignore
+    delete: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn) as VueSyncDeleteAction<DocDataType>), // prettier-ignore
+    get: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn) as VueSyncGetAction<DocDataType, 'doc'>), // prettier-ignore
     stream: handleStreamPerStore(
-      path,
+      [collectionPath, docId],
       moduleConfig,
       globalConfig,
       actionNameTypeMap.stream,
@@ -66,7 +66,7 @@ export function createDocWithContext<DocDataType extends object> (
   }
 
   // Every store will have its 'setupModule' function executed
-  executeSetupModulePerStore(globalConfig.stores, path, moduleConfig)
+  executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig)
 
   const moduleInstance: Omit<DocInstance<DocDataType>, 'data'> = {
     collection,
@@ -79,7 +79,11 @@ export function createDocWithContext<DocDataType extends object> (
   /**
    * The data returned by the store specified as 'dataStoreName'
    */
-  const dataProxyHandler = getDataProxyHandler<'doc', DocDataType>(path, moduleConfig, globalConfig)
+  const dataProxyHandler = getDataProxyHandler<'doc', DocDataType>(
+    [collectionPath, docId],
+    moduleConfig,
+    globalConfig
+  )
 
   return new Proxy(moduleInstance, dataProxyHandler)
 }

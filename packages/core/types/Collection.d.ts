@@ -25,4 +25,4 @@ export declare type CollectionInstance<DocDataType extends object = {
     orderBy: (fieldPath: string, direction?: 'asc' | 'desc') => CollectionInstance<DocDataType>;
     limit: (limitCount: number) => CollectionInstance<DocDataType>;
 };
-export declare function createCollectionWithContext<DocDataType extends object>(idOrPath: string, moduleConfig: ModuleConfig, globalConfig: O.Compulsory<GlobalConfig>, docFn: DocFn<DocDataType>, collectionFn: CollectionFn<DocDataType>, openStreams: OpenStreams): CollectionInstance<DocDataType>;
+export declare function createCollectionWithContext<DocDataType extends object>([collectionPath, docId]: [string, string | undefined], moduleConfig: ModuleConfig, globalConfig: O.Compulsory<GlobalConfig>, docFn: DocFn<DocDataType>, collectionFn: CollectionFn<DocDataType>, openStreams: OpenStreams): CollectionInstance<DocDataType>;

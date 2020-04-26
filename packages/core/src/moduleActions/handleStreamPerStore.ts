@@ -12,7 +12,7 @@ import { ModuleConfig, GlobalConfig } from '../types/config'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers'
 
 export function handleStreamPerStore (
-  modulePath: string,
+  [collectionPath, docId]: [string, string | undefined],
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
   actionType: ActionType,
@@ -70,9 +70,10 @@ export function handleStreamPerStore (
       // the plugin action
       if (pluginAction) {
         const result = await handleStream({
-          modulePath,
-          pluginAction,
+          collectionPath,
+          docId,
           pluginModuleConfig,
+          pluginAction,
           payload, // should always use the payload as passed originally for clarity
           eventNameFnsMap,
           actionName: 'stream',

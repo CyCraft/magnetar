@@ -3,7 +3,7 @@ import { isFullString } from 'is-what'
 import { isDocModule, isCollectionModule } from './pathHelpers'
 
 export function logError (errorMessage: string): void {
-  console.error('[vue-sync error]\n', errorMessage)
+  console.error('[@vue-sync error]\n', errorMessage)
 }
 
 export function logErrorAndThrow (errorMessage: string): void {
@@ -42,7 +42,10 @@ export function throwIfNoDataStoreName (dataStoreName: string): void {
   logErrorAndThrow(errorMessage)
 }
 
-export function throwIfInvalidId (modulePath: string, moduleType: 'collection' | 'doc'): void {
+export function throwIfInvalidModulePath (
+  modulePath: string,
+  moduleType: 'collection' | 'doc'
+): void {
   let errorMessage = ''
   if (moduleType === 'collection') {
     if (!modulePath)

@@ -19,4 +19,4 @@ export declare type DocInstance<DocDataType extends object = {
     deleteProp?: VueSyncDeletePropAction<DocDataType>;
     delete?: VueSyncDeleteAction<DocDataType>;
 };
-export declare function createDocWithContext<DocDataType extends object>(idOrPath: string, moduleConfig: ModuleConfig, globalConfig: O.Compulsory<GlobalConfig>, docFn: DocFn<DocDataType>, collectionFn: CollectionFn, openStreams: OpenStreams): DocInstance<DocDataType>;
+export declare function createDocWithContext<DocDataType extends object>([collectionPath, docId]: [string, string | undefined], moduleConfig: ModuleConfig, globalConfig: O.Compulsory<GlobalConfig>, docFn: DocFn<DocDataType>, collectionFn: CollectionFn, openStreams: OpenStreams): DocInstance<DocDataType>;

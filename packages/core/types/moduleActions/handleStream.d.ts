@@ -6,9 +6,10 @@ import { PluginModuleConfig, PluginStreamAction, DoOnStream, StreamResponse } fr
  * handleStream is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success
  */
 export declare function handleStream(args: {
-    modulePath: string;
-    pluginAction: PluginStreamAction;
+    collectionPath: string;
+    docId: string | undefined;
     pluginModuleConfig: PluginModuleConfig;
+    pluginAction: PluginStreamAction;
     payload: PlainObject | void;
     eventNameFnsMap: EventNameFnsMap;
     actionName: 'stream';

@@ -13,9 +13,10 @@ import {
  * handleStream is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success
  */
 export async function handleStream (args: {
-  modulePath: string
-  pluginAction: PluginStreamAction
+  collectionPath: string
+  docId: string | undefined
   pluginModuleConfig: PluginModuleConfig
+  pluginAction: PluginStreamAction
   payload: PlainObject | void
   eventNameFnsMap: EventNameFnsMap
   actionName: 'stream'
@@ -23,9 +24,10 @@ export async function handleStream (args: {
   mustExecuteOnRead: O.Compulsory<DoOnStream>
 }): Promise<StreamResponse | DoOnStream> {
   const {
-    modulePath,
-    pluginAction,
+    collectionPath,
+    docId,
     pluginModuleConfig,
+    pluginAction,
     payload,
     eventNameFnsMap: on,
     actionName,
@@ -45,7 +47,12 @@ export async function handleStream (args: {
   try {
     // triggering the action provided by the plugin
     const pluginStreamAction = pluginAction
-    result = await pluginStreamAction(payload, modulePath, pluginModuleConfig, mustExecuteOnRead)
+    result = await pluginStreamAction(
+      payload,
+      [collectionPath, docId],
+      pluginModuleConfig,
+      mustExecuteOnRead
+    )
   } catch (error) {
     if (!isVueSyncError(error)) throw new Error(error)
     // handle and await each eventFn in sequence

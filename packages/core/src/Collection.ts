@@ -40,28 +40,28 @@ export type CollectionInstance<DocDataType extends object = { [prop: string]: an
 }
 
 export function createCollectionWithContext<DocDataType extends object> (
-  idOrPath: string,
+  [collectionPath, docId]: [string, string | undefined],
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
   docFn: DocFn<DocDataType>,
   collectionFn: CollectionFn<DocDataType>,
   openStreams: OpenStreams
 ): CollectionInstance<DocDataType> {
-  const id = idOrPath.split('/').slice(-1)[0]
-  const path = idOrPath
+  const id = collectionPath.split('/').slice(-1)[0]
+  const path = collectionPath
 
-  const doc: DocFn<DocDataType> = (idOrPath: string, _moduleConfig: ModuleConfig = {}) => {
-    return docFn(`${path}/${idOrPath}`, _moduleConfig)
+  const doc: DocFn<DocDataType> = (docId: string, _moduleConfig: ModuleConfig = {}) => {
+    return docFn(`${path}/${docId}`, _moduleConfig)
   }
 
-  const insert = handleActionPerStore(path, moduleConfig, globalConfig, 'insert', actionNameTypeMap.get, docFn, collectionFn) as VueSyncInsertAction<DocDataType> //prettier-ignore
-  const get = handleActionPerStore(path, moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn, collectionFn) as VueSyncGetAction<DocDataType, 'collection'> //prettier-ignore
-  const stream = handleStreamPerStore(path, moduleConfig, globalConfig, actionNameTypeMap.stream, openStreams) // prettier-ignore
+  const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.get, docFn, collectionFn) as VueSyncInsertAction<DocDataType> //prettier-ignore
+  const get = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn, collectionFn) as VueSyncGetAction<DocDataType, 'collection'> //prettier-ignore
+  const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, openStreams) // prettier-ignore
 
   const actions = { stream, get, insert }
 
   // Every store will have its 'setupModule' function executed
-  executeSetupModulePerStore(globalConfig.stores, path, moduleConfig)
+  executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig)
 
   function where (
     fieldPath: string,
@@ -70,7 +70,7 @@ export function createCollectionWithContext<DocDataType extends object> (
   ): CollectionInstance<DocDataType> {
     const whereClause: WhereClause = [fieldPath, operator, value]
     const moduleConfigWithClause = mergeAndConcat(moduleConfig, { where: [whereClause] })
-    return collectionFn(idOrPath, moduleConfigWithClause)
+    return collectionFn(path, moduleConfigWithClause)
   }
 
   function orderBy (
@@ -79,11 +79,11 @@ export function createCollectionWithContext<DocDataType extends object> (
   ): CollectionInstance<DocDataType> {
     const orderBy: OrderBy = [fieldPath, direction]
     const moduleConfigWithClause = mergeAndConcat(moduleConfig, { orderBy: [orderBy] })
-    return collectionFn(idOrPath, moduleConfigWithClause)
+    return collectionFn(path, moduleConfigWithClause)
   }
 
   function limit (limitCount: number): CollectionInstance<DocDataType> {
-    return collectionFn(idOrPath, { ...moduleConfig, limit: limitCount })
+    return collectionFn(path, { ...moduleConfig, limit: limitCount })
   }
 
   const queryFns = { where, orderBy, limit }
@@ -101,7 +101,7 @@ export function createCollectionWithContext<DocDataType extends object> (
    * The data returned by the store specified as 'dataStoreName'
    */
   const dataProxyHandler = getDataProxyHandler<'collection', DocDataType>(
-    path,
+    [collectionPath, docId],
     moduleConfig,
     globalConfig
   )

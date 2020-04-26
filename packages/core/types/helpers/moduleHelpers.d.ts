@@ -14,10 +14,10 @@ export declare function getPluginModuleConfig(moduleConfig: ModuleConfig, storeN
  *
  * @export
  * @param {GlobalConfig['stores']} globalConfigStores
- * @param {string} modulePath
+ * @param {[string, string | undefined]} [collectionPath, docId]
  * @param {ModuleConfig} moduleConfig
  */
-export declare function executeSetupModulePerStore(globalConfigStores: GlobalConfig['stores'], modulePath: string, moduleConfig: ModuleConfig): void;
+export declare function executeSetupModulePerStore(globalConfigStores: GlobalConfig['stores'], [collectionPath, docId]: [string, string | undefined], moduleConfig: ModuleConfig): void;
 /**
  * Returns the `getModuleData` function form the store specified as 'dataStoreName'
  *
@@ -25,21 +25,21 @@ export declare function executeSetupModulePerStore(globalConfigStores: GlobalCon
  * @template DocDataType
  * @param {ModuleConfig} moduleConfig
  * @param {GlobalConfig} globalConfig
- * @returns {(modulePath: string) => (Map<string, DocDataType> | DocDataType)}
+ * @returns {([collectionPath, docId]: [string, string | undefined]) => (Map<string, DocDataType> | DocDataType)}
  */
-export declare function getDataFnFromDataStore<DocDataType>(moduleConfig: ModuleConfig, globalConfig: GlobalConfig): (modulePath: string) => Map<string, DocDataType> | DocDataType;
+export declare function getDataFnFromDataStore<DocDataType>(moduleConfig: ModuleConfig, globalConfig: GlobalConfig): ([collectionPath, docId]: [string, string | undefined]) => Map<string, DocDataType> | DocDataType;
 /**
  * Returns an object with the `data` prop as proxy which triggers every time the data is accessed
  *
  * @export
  * @template calledFrom {'doc' | 'collection'}
  * @template DocDataType
- * @param {string} modulePath
+ * @param {[string, string | undefined]} [collectionPath, docId]
  * @param {ModuleConfig} moduleConfig
  * @param {GlobalConfig} globalConfig
  * @returns {calledFrom extends 'doc' ? { get: (...p: any[]) => DocDataType } : { get: (...p: any[]) => Map<string, DocDataType> }}
  */
-export declare function getDataProxyHandler<calledFrom extends 'doc' | 'collection', DocDataType>(modulePath: string, moduleConfig: ModuleConfig, globalConfig: GlobalConfig): calledFrom extends 'doc' ? {
+export declare function getDataProxyHandler<calledFrom extends 'doc' | 'collection', DocDataType>([collectionPath, docId]: [string, string | undefined], moduleConfig: ModuleConfig, globalConfig: GlobalConfig): calledFrom extends 'doc' ? {
     get: (...p: any[]) => DocDataType;
 } : {
     get: (...p: any[]) => Map<string, DocDataType>;
