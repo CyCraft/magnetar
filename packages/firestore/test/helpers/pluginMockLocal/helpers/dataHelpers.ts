@@ -1,8 +1,7 @@
 import { PlainObject, Clauses } from '@vue-sync/core'
 import { isNumber, isArray } from 'is-what'
 import pathToProp from 'path-to-prop'
-import { sort } from 'fast-sort'
-import { ISortByObjectSorter } from 'fast-sort'
+import sort, { ISortByObjectSorter } from 'fast-sort'
 
 /**
  * Filters a Collection module's data map `Map<string, DocData>` based on provided clauses.

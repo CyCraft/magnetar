@@ -43,6 +43,7 @@ function countOperations (payload: PlainObject): number {
 
 export type BatchSync = {
   set: (documentPath: string, _payload: PlainObject) => Promise<void>
+  delete: (documentPath: string) => Promise<void>
 }
 
 type SyncStack = {
@@ -122,7 +123,10 @@ export function batchSyncFactory (
   function prepareCountdown (): CountdownInstance {
     if (!state.countdown) {
       state.countdown = Countdown(syncDebounceMs)
-      state.countdown.done.then(executeSync)
+      state.countdown.done.then(() => {
+        executeSync()
+        state.countdown = null
+      })
     }
     return state.countdown
   }
@@ -145,5 +149,18 @@ export function batchSyncFactory (
     return promise
   }
 
-  return { set }
+  function _delete (documentPath: string): Promise<void> {
+    const operationCount = 1
+    const { batch, resolves, rejects } = prepareSyncStack(operationCount)
+    const ref = prepareRef(documentPath)
+    batch.delete(ref)
+    const promise: Promise<void> = new Promise((resolve, reject) => {
+      resolves.push(resolve)
+      rejects.push(reject)
+    })
+    triggerSync()
+    return promise
+  }
+
+  return { set, delete: _delete }
 }

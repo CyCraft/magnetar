@@ -1,6 +1,5 @@
 import { isString } from 'is-what'
 import {
-  isCollectionModule,
   PlainObject,
   PluginStreamAction,
   StreamResponse,
@@ -18,7 +17,7 @@ export function streamActionFactory (
 ): PluginStreamAction {
   return (
     payload: void | PlainObject = {},
-    modulePath: string,
+    [collectionPath, docId]: [string, string | undefined],
     simpleStoreModuleConfig: SimpleStoreModuleConfig,
     mustExecuteOnRead: MustExecuteOnRead
   ): StreamResponse | DoOnStream | Promise<StreamResponse | DoOnStream> => {
@@ -28,21 +27,28 @@ export function streamActionFactory (
     // hover over the prop names below to see more info on when they are triggered:
     const doOnStream: DoOnStream = {
       added: (payload, meta) => {
-        insertActionFactory(data, simpleStoreOptions)(payload, modulePath, simpleStoreModuleConfig)
+        insertActionFactory(data, simpleStoreOptions)(
+          payload,
+          [collectionPath, docId],
+          simpleStoreModuleConfig
+        )
       },
       modified: (payload, meta) => {
-        insertActionFactory(data, simpleStoreOptions)(payload, modulePath, simpleStoreModuleConfig)
+        insertActionFactory(data, simpleStoreOptions)(
+          payload,
+          [collectionPath, docId],
+          simpleStoreModuleConfig
+        )
       },
       removed: (payload, meta) => {
-        const isCollection = isCollectionModule(modulePath)
-        const pathToDelete = !isCollection
-          ? modulePath
+        const collectionPathDocIdToDelete: [string, string] = docId
+          ? [collectionPath, docId]
           : isString(payload)
-          ? `${modulePath}/${payload}`
-          : `${modulePath}/${meta.id}`
+          ? [collectionPath, payload]
+          : [collectionPath, meta.id]
         deleteActionFactory(data, simpleStoreOptions)(
           undefined,
-          pathToDelete,
+          collectionPathDocIdToDelete,
           simpleStoreModuleConfig
         )
       },

@@ -2,59 +2,92 @@ import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
 import { pokedex } from '../helpers/pokedex'
 import { DocInstance } from '@vue-sync/core'
+import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 
-test('insert (document)', async t => {
-  const { pokedexModule } = createVueSyncInstance('insert (document)')
-  const payload = pokedex(7)
-  t.deepEqual(pokedexModule.doc('7').data, undefined)
+{
+  const testName = 'insert (document)'
+  test(testName, async t => {
+    const { pokedexModule } = createVueSyncInstance(testName)
+    const payload = pokedex(7)
+    t.deepEqual(pokedexModule.doc('7').data, undefined)
 
-  try {
-    await pokedexModule.doc('7').insert(payload)
-  } catch (error) {
-    t.fail(error)
-  }
+    // in this case `useModulePathsForFirestore` is `false` in the plugin settings
+    // so when creating a new doc reference we need to pass the `firestorePath`
+    const squirtle = pokedexModule.doc('7', {
+      configPerStore: { remote: { firestorePath: 'vueSyncTests/insert (document)/pokedex/7' } },
+    })
 
-  t.deepEqual(pokedexModule.doc('7').data, payload)
-})
+    try {
+      await squirtle.insert(payload)
+    } catch (error) {
+      t.fail(error)
+    }
 
-test('insert (collection) → random ID', async t => {
-  const { pokedexModule } = createVueSyncInstance('insert (collection) → random ID')
-  const payload = pokedex(7)
+    const expected = payload
+    t.deepEqual(pokedexModule.doc('7').data, expected)
+    await firestoreDeepEqual(t, testName, 'pokedex/7', expected)
+  })
+}
+{
+  const testName = 'insert (collection) → random ID'
+  test(testName, async t => {
+    const { pokedexModule } = createVueSyncInstance(testName)
+    const payload = pokedex(7)
 
-  let moduleFromResult: DocInstance
-  try {
-    moduleFromResult = await pokedexModule.insert(payload)
-  } catch (error) {
-    t.fail(error)
-  }
-  const newId = moduleFromResult.id
-  t.deepEqual(pokedexModule.doc(newId).data, payload)
-})
+    let moduleFromResult: DocInstance
+    try {
+      moduleFromResult = await pokedexModule.insert(payload)
+    } catch (error) {
+      t.fail(error)
+    }
 
-// test('revert: insert (document)', async t => {
-//   const { pokedexModule } = createVueSyncInstance('revert: insert (document)')
-//   const payload = { ...pokedex(7), shouldFail: 'remote' }
-//   t.deepEqual(pokedexModule.doc('7').data, undefined)
+    const newId = moduleFromResult.id
+    const expected = payload
+    t.deepEqual(pokedexModule.doc(newId).data, expected)
+    await firestoreDeepEqual(t, testName, `pokedex/${newId}`, expected)
+  })
+}
+{
+  const testName = 'revert: insert (document)'
+  test(testName, async t => {
+    const { pokedexModule } = createVueSyncInstance(testName)
+    const payload = { ...pokedex(7), shouldFail: undefined }
+    t.deepEqual(pokedexModule.doc('7').data, undefined)
 
-//   try {
-//     await pokedexModule.doc('7').insert(payload, { onError: 'revert' })
-//   } catch (error) {
-//     t.fail(error)
-//   }
+    // in this case `useModulePathsForFirestore` is `false` in the plugin settings
+    // so when creating a new doc reference we need to pass the `firestorePath`
+    const squirtle = pokedexModule.doc('7', {
+      configPerStore: {
+        remote: { firestorePath: `vueSyncTests/${testName}/pokedex/7` },
+      },
+    })
 
-//   t.deepEqual(pokedexModule.doc('7').data, undefined)
-// })
+    try {
+      await squirtle.insert(payload, { onError: 'revert' })
+    } catch (error) {
+      t.truthy(error)
+    }
 
-// test('revert: insert (collection) → random ID', async t => {
-//   const { pokedexModule } = createVueSyncInstance('revert: insert (collection) → random ID')
-//   const payload = { ...pokedex(7), shouldFail: 'remote' }
+    const expected = undefined
+    t.deepEqual(pokedexModule.doc('7').data, expected)
+    await firestoreDeepEqual(t, testName, 'pokedex/7', expected)
+  })
+}
+{
+  const testName = 'revert: insert (collection) → random ID'
+  test(testName, async t => {
+    const { pokedexModule } = createVueSyncInstance(testName)
+    const payload = { ...pokedex(7), shouldFail: undefined }
 
-//   let moduleFromResult: DocInstance
-//   try {
-//     moduleFromResult = await pokedexModule.insert(payload, { onError: 'revert' })
-//   } catch (error) {
-//     t.fail(error)
-//   }
-//   const newId = moduleFromResult.id
-//   t.deepEqual(pokedexModule.doc(newId).data, undefined)
-// })
+    try {
+      await pokedexModule.insert(payload, { onError: 'revert' })
+      t.fail()
+    } catch (error) {
+      t.truthy(error)
+    }
+
+    const expected = undefined
+    t.deepEqual(pokedexModule.doc('7').data, expected)
+    await firestoreDeepEqual(t, testName, 'pokedex/7', expected)
+  })
+}

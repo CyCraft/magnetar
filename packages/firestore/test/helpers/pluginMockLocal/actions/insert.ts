@@ -1,9 +1,4 @@
-import {
-  isCollectionModule,
-  PlainObject,
-  PluginInsertAction,
-  getCollectionPathDocIdEntry,
-} from '@vue-sync/core'
+import { PlainObject, PluginInsertAction } from '@vue-sync/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'
 import { throwIfEmulatedError } from '../../throwFns'
@@ -15,7 +10,7 @@ export function insertActionFactory (
 ): PluginInsertAction {
   return function (
     payload: PlainObject,
-    modulePath: string,
+    [collectionPath, docId]: [string, string | undefined],
     simpleStoreModuleConfig: SimpleStoreModuleConfig
   ): string {
     // this mocks an error during execution
@@ -23,13 +18,11 @@ export function insertActionFactory (
 
     // this is custom logic to be implemented by the plugin author
 
-    const isCollection = isCollectionModule(modulePath)
-    if (isCollection) {
-      const docId =
+    if (!docId) {
+      docId =
         isFullString(payload.id) || isNumber(payload.id)
           ? String(payload.id)
           : simpleStoreOptions.generateRandomId()
-      const collectionPath = modulePath
 
       if (makeBackup) makeBackup(collectionPath, docId)
 
@@ -37,7 +30,6 @@ export function insertActionFactory (
       return docId
     }
     // else it's a doc
-    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const collectionMap = data[collectionPath]
 
     if (makeBackup) makeBackup(collectionPath, docId)

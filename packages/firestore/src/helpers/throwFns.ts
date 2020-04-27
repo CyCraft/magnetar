@@ -30,7 +30,9 @@ export function throwIfInvalidFirestorePath (
   }
   if (moduleType === 'doc') {
     if (!firestorePath)
-      errorMessage = 'You must provide a document id (or a "path" like so: collection/doc).'
+      errorMessage = `Firestore document "path" not found.
+You can enable \`useModulePathsForFirestore\` in the Firestore plugin options to automatically use the same paths in Firestore as your modules.
+Otherwise you have to set the firestorePath like so: \`doc('myCollection/myDoc', { configPerStore: { storePluginName: { firestorePath: 'myFirestorePath/someDoc' } } })\``
     if (isCollectionModule(firestorePath))
       errorMessage = `Your doc id (or "path") must be of even segments. The expected pattern is: collection/doc/collection/doc ... Yours was ${firestorePath}`
   }

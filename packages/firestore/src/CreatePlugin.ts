@@ -3,7 +3,7 @@ import { PluginInstance, VueSyncPlugin, WhereClause, OrderBy, Limit } from '@vue
 import { insertActionFactory } from './actions/insert'
 // import { writeActionFactory } from './actions/mergeAssignReplace'
 // import { deletePropActionFactory } from './actions/deleteProp'
-// import { deleteActionFactory } from './actions/delete'
+import { deleteActionFactory } from './actions/delete'
 // import { getActionFactory } from './actions/get'
 // import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
@@ -55,7 +55,7 @@ export const CreatePlugin: VueSyncPlugin<FirestorePluginOptions> = (
   // const assign = writeActionFactory(batchSync, pluginOptions, 'assign')
   // const replace = writeActionFactory(batchSync, pluginOptions, 'replace')
   // const deleteProp = deletePropActionFactory(batchSync, pluginOptions)
-  // const _delete = deleteActionFactory(batchSync, pluginOptions)
+  const _delete = deleteActionFactory(batchSync, pluginOptions)
 
   const actions = {
     // get,
@@ -65,23 +65,14 @@ export const CreatePlugin: VueSyncPlugin<FirestorePluginOptions> = (
     // assign,
     // replace,
     // deleteProp,
-    // delete: _delete,
+    delete: _delete,
   }
   const revert = revertActionFactory(actions, pluginOptions)
 
   // the plugin function must return a `PluginInstance`
   const instance: PluginInstance = {
     revert,
-    actions: {
-      // get,
-      // stream,
-      insert,
-      // merge: _merge,
-      // assign,
-      // replace,
-      // deleteProp,
-      // delete: _delete,
-    },
+    actions,
   }
   return instance
 }

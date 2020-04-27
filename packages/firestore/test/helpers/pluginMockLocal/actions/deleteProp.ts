@@ -1,11 +1,6 @@
 import { isArray } from 'is-what'
 import pathToProp from 'path-to-prop'
-import {
-  isCollectionModule,
-  PlainObject,
-  PluginDeletePropAction,
-  getCollectionPathDocIdEntry,
-} from '@vue-sync/core'
+import { PlainObject, PluginDeletePropAction } from '@vue-sync/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../throwFns'
 
@@ -16,7 +11,7 @@ export function deletePropActionFactory (
 ): PluginDeletePropAction {
   return function (
     payload: string | string[],
-    modulePath: string,
+    [collectionPath, docId]: [string, string | undefined],
     simpleStoreModuleConfig: SimpleStoreModuleConfig
   ): void {
     // this mocks an error during execution
@@ -24,11 +19,9 @@ export function deletePropActionFactory (
 
     // this is custom logic to be implemented by the plugin author
 
-    const isCollection = isCollectionModule(modulePath)
     // `deleteProp` action cannot be executed on collections
-    if (isCollection) throw new Error('An non-existent action was triggered on a collection')
+    if (!docId) throw new Error('An non-existent action was triggered on a collection')
 
-    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     const collectionMap = data[collectionPath]
     const docData = collectionMap.get(docId)
 

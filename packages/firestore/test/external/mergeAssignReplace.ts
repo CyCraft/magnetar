@@ -1,112 +1,132 @@
 import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
 import { pokedex } from '../helpers/pokedex'
+import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 
-test('merge', async t => {
-  const { pokedexModule } = createVueSyncInstance()
-  const payload = { base: { HP: 9000 } }
-  t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
+{
+  const testName = 'merge'
+  test(testName, async t => {
+    const { pokedexModule } = createVueSyncInstance(testName)
+    const payload = { base: { HP: 9000 } }
+    t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
-  try {
-    await pokedexModule.doc('1').merge(payload)
-  } catch (error) {
-    t.fail(error)
-  }
+    try {
+      await pokedexModule.doc('1').merge(payload)
+    } catch (error) {
+      t.fail(error)
+    }
 
-  const expected = {
-    id: 1,
-    name: 'Bulbasaur',
-    type: ['Grass', 'Poison'],
-    base: {
-      'HP': 9000,
-      'Attack': 49,
-      'Defense': 49,
-      'Sp. Attack': 65,
-      'Sp. Defense': 65,
-      'Speed': 45,
-    },
-  }
-  t.deepEqual(pokedexModule.doc('1').data, expected)
-})
+    const expected = {
+      id: 1,
+      name: 'Bulbasaur',
+      type: ['Grass', 'Poison'],
+      base: {
+        'HP': 9000,
+        'Attack': 49,
+        'Defense': 49,
+        'Sp. Attack': 65,
+        'Sp. Defense': 65,
+        'Speed': 45,
+      },
+    }
+    t.deepEqual(pokedexModule.doc('1').data, expected)
+    await firestoreDeepEqual(t, testName, 'pokedex/1', expected)
+  })
+}
+{
+  const testName = 'assign'
+  test(testName, async t => {
+    const { pokedexModule } = createVueSyncInstance(testName)
+    const payload = { base: { HP: 9000 } }
+    t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
-test('assign', async t => {
-  const { pokedexModule } = createVueSyncInstance()
-  const payload = { base: { HP: 9000 } }
-  t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
+    try {
+      await pokedexModule.doc('1').assign(payload)
+    } catch (error) {
+      t.fail(error)
+    }
 
-  try {
-    await pokedexModule.doc('1').assign(payload)
-  } catch (error) {
-    t.fail(error)
-  }
+    const expected = {
+      id: 1,
+      name: 'Bulbasaur',
+      type: ['Grass', 'Poison'],
+      base: {
+        HP: 9000,
+      },
+    }
+    t.deepEqual(pokedexModule.doc('1').data, expected)
+    await firestoreDeepEqual(t, testName, 'pokedex/1', expected)
+  })
+}
+{
+  const testName = 'replace'
+  test(testName, async t => {
+    const { pokedexModule } = createVueSyncInstance(testName)
+    const payload = { base: { HP: 9000 } }
+    t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
-  const expected = {
-    id: 1,
-    name: 'Bulbasaur',
-    type: ['Grass', 'Poison'],
-    base: {
-      HP: 9000,
-    },
-  }
-  t.deepEqual(pokedexModule.doc('1').data, expected)
-})
+    try {
+      await pokedexModule.doc('1').replace(payload)
+    } catch (error) {
+      t.fail(error)
+    }
 
-test('replace', async t => {
-  const { pokedexModule } = createVueSyncInstance()
-  const payload = { base: { HP: 9000 } }
-  t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
+    const expected = { base: { HP: 9000 } }
+    t.deepEqual(pokedexModule.doc('1').data, expected)
+    await firestoreDeepEqual(t, testName, 'pokedex/1', expected)
+  })
+}
+{
+  const testName = 'revert: merge'
+  test(testName, async t => {
+    const { pokedexModule } = createVueSyncInstance(testName)
+    const payload = { base: { HP: 9000 }, shouldFail: 'remote' }
+    t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
-  try {
-    await pokedexModule.doc('1').replace(payload)
-  } catch (error) {
-    t.fail(error)
-  }
+    try {
+      await pokedexModule.doc('1').merge(payload, { onError: 'revert' })
+    } catch (error) {
+      t.truthy(error)
+    }
 
-  const expected = { base: { HP: 9000 } }
-  t.deepEqual(pokedexModule.doc('1').data, expected)
-})
+    const expected = pokedex(1)
+    t.deepEqual(pokedexModule.doc('1').data, expected)
+    await firestoreDeepEqual(t, testName, 'pokedex/1', expected)
+  })
+}
+{
+  const testName = 'revert: assign'
+  test(testName, async t => {
+    const { pokedexModule } = createVueSyncInstance(testName)
+    const payload = { base: { HP: 9000 }, shouldFail: 'remote' }
+    t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
-test('revert: merge', async t => {
-  const { pokedexModule } = createVueSyncInstance()
-  const payload = { base: { HP: 9000 }, shouldFail: 'remote' }
-  t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
+    try {
+      await pokedexModule.doc('1').assign(payload, { onError: 'revert' })
+    } catch (error) {
+      t.truthy(error)
+    }
 
-  try {
-    await pokedexModule.doc('1').merge(payload, { onError: 'revert' })
-  } catch (error) {
-    t.fail(error)
-  }
+    const expected = pokedex(1)
+    t.deepEqual(pokedexModule.doc('1').data, expected)
+    await firestoreDeepEqual(t, testName, 'pokedex/1', expected)
+  })
+}
+{
+  const testName = 'revert: replace'
+  test(testName, async t => {
+    const { pokedexModule } = createVueSyncInstance(testName)
+    const payload = { base: { HP: 9000 }, shouldFail: 'remote' }
+    t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
-  const expected = pokedex(1)
-  t.deepEqual(pokedexModule.doc('1').data, expected)
-})
+    try {
+      await pokedexModule.doc('1').replace(payload, { onError: 'revert' })
+    } catch (error) {
+      t.truthy(error)
+    }
 
-test('revert: assign', async t => {
-  const { pokedexModule } = createVueSyncInstance()
-  const payload = { base: { HP: 9000 }, shouldFail: 'remote' }
-  t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
-
-  try {
-    await pokedexModule.doc('1').assign(payload, { onError: 'revert' })
-  } catch (error) {
-    t.fail(error)
-  }
-
-  const expected = pokedex(1)
-  t.deepEqual(pokedexModule.doc('1').data, expected)
-})
-
-test('revert: replace', async t => {
-  const { pokedexModule } = createVueSyncInstance()
-  const payload = { base: { HP: 9000 }, shouldFail: 'remote' }
-  t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
-
-  try {
-    await pokedexModule.doc('1').replace(payload, { onError: 'revert' })
-  } catch (error) {
-    t.fail(error)
-  }
-
-  const expected = pokedex(1)
-  t.deepEqual(pokedexModule.doc('1').data, expected)
-})
+    const expected = pokedex(1)
+    t.deepEqual(pokedexModule.doc('1').data, expected)
+    await firestoreDeepEqual(t, testName, 'pokedex/1', expected)
+  })
+}

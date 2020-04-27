@@ -17,7 +17,7 @@
   "license": "MIT",
   "homepage": "https://github.com/vue-sync/firestore#readme",
   "peerDependencies": {
-    "@vue-sync/core": "^0.2.0",
+    "@vue-sync/core": "^0.3.0",
     "firebase": "^7.14.2"
   },
   "dependencies": {
@@ -27,13 +27,13 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.29.0",
     "@typescript-eslint/parser": "^2.29.0",
-    "@vue-sync/core": "^0.2.0",
+    "@vue-sync/core": "^0.4.0",
     "ava": "^3.7.1",
     "copy-anything": "^2.0.1",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-tree-shaking": "^1.8.0",
-    "fast-sort": "github:mesqueeb/fast-sort",
+    "fast-sort": "^2.1.1",
     "firebase": "^7.14.2",
     "is-what": "^3.8.0",
     "path-to-prop": "0.0.3",
@@ -42,7 +42,9 @@
     "ts-node": "^8.9.0",
     "typescript": "^3.8.3"
   },
-  "keywords": ["vue-sync"],
+  "keywords": [
+    "vue-sync"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vue-sync/firestore.git"
@@ -51,8 +53,12 @@
     "url": "https://github.com/vue-sync/firestore/issues"
   },
   "ava": {
-    "extensions": ["ts"],
-    "require": ["ts-node/register"],
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
     "timeout": "30s"
   }
 }

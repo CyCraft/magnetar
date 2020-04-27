@@ -1,9 +1,4 @@
-import {
-  PlainObject,
-  ActionName,
-  PluginRevertAction,
-  getCollectionPathDocIdEntry,
-} from '@vue-sync/core'
+import { PlainObject, ActionName, PluginRevertAction } from '@vue-sync/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../throwFns'
 
@@ -15,14 +10,13 @@ export function revertActionFactory (
   // this is a `PluginRevertAction`:
   return function revert (
     payload: PlainObject | PlainObject[] | string | string[] | void,
-    modulePath: string,
+    [collectionPath, docId]: [string, string | undefined],
     simpleStoreModuleConfig: SimpleStoreModuleConfig,
     actionName: ActionName
   ): void {
     // this mocks an error during execution
     throwIfEmulatedError(payload, simpleStoreOptions)
 
-    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
     // revert all write actions when called on a doc
     if (
       docId &&
