@@ -1,6 +1,6 @@
 import test from 'ava'
-import { createVueSyncInstance } from './helpers/createVueSyncInstance'
-import { pokedex } from './helpers/pokedex'
+import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { pokedex } from '../helpers/pokedex'
 
 test('merge', async t => {
   const { pokedexModule } = createVueSyncInstance()

@@ -1,6 +1,6 @@
 import test from 'ava'
 
-import { createVueSyncInstance } from './helpers/createVueSyncInstance'
+import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
 
 test('get (collectionGroup)', async t => {
   t.pass()

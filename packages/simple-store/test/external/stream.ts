@@ -1,7 +1,7 @@
 import test from 'ava'
-import { createVueSyncInstance } from './helpers/createVueSyncInstance'
-import { pokedex } from './helpers/pokedex'
-import { waitMs } from './helpers/wait'
+import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { pokedex } from '../helpers/pokedex'
+import { waitMs } from '../helpers/wait'
 
 test('stream (collection)', async t => {
   const { pokedexModule } = createVueSyncInstance()

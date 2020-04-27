@@ -1,6 +1,6 @@
 import test from 'ava'
-import { createVueSyncInstance } from './helpers/createVueSyncInstance'
-import { pokedex } from './helpers/pokedex'
+import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { pokedex } from '../helpers/pokedex'
 
 test('get (collection)', async t => {
   /// 'get' resolves once all stores have given a response with data

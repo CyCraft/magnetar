@@ -1,5 +1,5 @@
 import test from 'ava'
-import { createVueSyncInstance } from './helpers/createVueSyncInstance'
+import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
 
 test('delete', async t => {
   const { trainerModule } = createVueSyncInstance()
