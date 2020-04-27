@@ -39,7 +39,7 @@ test('revert: insert (document)', async t => {
   try {
     await pokedexModule.doc('7').insert(payload, { onError: 'revert' })
   } catch (error) {
-    t.fail(error)
+    t.truthy(error)
   }
 
   t.deepEqual(pokedexModule.doc('7').data, undefined)
@@ -49,12 +49,11 @@ test('revert: insert (collection) → random ID', async t => {
   const { pokedexModule } = createVueSyncInstance()
   const payload = { ...pokedex(7), shouldFail: 'remote' }
 
-  let moduleFromResult: DocInstance
   try {
-    moduleFromResult = await pokedexModule.insert(payload, { onError: 'revert' })
+    await pokedexModule.insert(payload, { onError: 'revert' })
+    t.fail()
   } catch (error) {
-    t.fail(error)
+    t.truthy(error)
   }
-  const newId = moduleFromResult.id
-  t.deepEqual(pokedexModule.doc(newId).data, undefined)
+  t.deepEqual(pokedexModule.doc('7').data, undefined)
 })

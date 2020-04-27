@@ -74,7 +74,7 @@ test('revert: merge', async t => {
   try {
     await pokedexModule.doc('1').merge(payload, { onError: 'revert' })
   } catch (error) {
-    t.fail(error)
+    t.truthy(error)
   }
 
   const expected = pokedex(1)
@@ -89,7 +89,7 @@ test('revert: assign', async t => {
   try {
     await pokedexModule.doc('1').assign(payload, { onError: 'revert' })
   } catch (error) {
-    t.fail(error)
+    t.truthy(error)
   }
 
   const expected = pokedex(1)
@@ -104,7 +104,7 @@ test('revert: replace', async t => {
   try {
     await pokedexModule.doc('1').replace(payload, { onError: 'revert' })
   } catch (error) {
-    t.fail(error)
+    t.truthy(error)
   }
 
   const expected = pokedex(1)
