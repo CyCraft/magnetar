@@ -74,7 +74,7 @@ test('revert: deleteProp', async t => {
   try {
     await trainerModule.deleteProp(deletePayload, { onError: 'revert' })
   } catch (error) {
-    t.fail(error)
+    t.truthy(error)
   }
 
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
@@ -88,7 +88,7 @@ test('revert: deleteProp nested', async t => {
   try {
     await pokedexModule.doc('1').deleteProp(deletePayload, { onError: 'revert' })
   } catch (error) {
-    t.fail(error)
+    t.truthy(error)
   }
 
   t.deepEqual(pokedexModule.doc('1').data, pokedex(1))

@@ -1,5 +1,5 @@
 import { mergeAndConcat, merge } from 'merge-anything';
-import { isAnyObject, isPlainObject, isFunction, isArray, isFullString } from 'is-what';
+import { isPlainObject, isFunction, isArray, isFullString, isAnyObject } from 'is-what';
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -111,10 +111,6 @@ var actionNameTypeMap = {
     "delete": 'delete',
 };
 
-function isVueSyncError(payload) {
-    return isAnyObject(payload) && 'payload' in payload && 'message' in payload;
-}
-
 /**
  * handleAction is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success (4) optional: onNextStoresSuccess.
  * in any event/hook it's possible for the dev to modify the result & also abort the execution chain, which prevents calling handleAction on the next store as well
@@ -173,8 +169,6 @@ function handleAction(args) {
                     return [3 /*break*/, 20];
                 case 11:
                     error_1 = _k.sent();
-                    if (!isVueSyncError(error_1))
-                        throw new Error(error_1);
                     _k.label = 12;
                 case 12:
                     _k.trys.push([12, 17, 18, 19]);
@@ -209,7 +203,8 @@ function handleAction(args) {
                     }
                     if (onError === 'revert') {
                         stopExecutionAfterAction('revert');
-                        return [2 /*return*/];
+                        // we need to revert first, then throw the error later
+                        return [2 /*return*/, error_1];
                     }
                     return [3 /*break*/, 20];
                 case 20:
@@ -547,19 +542,18 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                             }
                             finally { if (e_4) throw e_4.error; }
                         }
-                        stopExecution = false;
                         doOnGetFns = modifyReadResponseMap.added;
                         _r.label = 1;
                     case 1:
-                        _r.trys.push([1, 23, 24, 25]);
+                        _r.trys.push([1, 24, 25, 26]);
                         _c = __values(storesToExecute.entries()), _d = _c.next();
                         _r.label = 2;
                     case 2:
-                        if (!!_d.done) return [3 /*break*/, 22];
+                        if (!!_d.done) return [3 /*break*/, 23];
                         _e = __read(_d.value, 2), i = _e[0], storeName = _e[1];
                         // a previous iteration stopped the execution:
-                        if (stopExecution === 'revert' || stopExecution === true)
-                            return [3 /*break*/, 22];
+                        if (stopExecution === true)
+                            return [3 /*break*/, 23];
                         pluginAction = globalConfig.stores[storeName].actions[actionName];
                         pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeName);
                         if (!!pluginAction) return [3 /*break*/, 3];
@@ -585,7 +579,7 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                     case 5:
                         // the plugin action
                         resultFromPlugin = _f;
-                        if (!(stopExecution === 'revert')) return [3 /*break*/, 20];
+                        if (!(stopExecution === 'revert')) return [3 /*break*/, 21];
                         storesToRevert = storesToExecute.slice(0, i);
                         storesToRevert.reverse();
                         _r.label = 6;
@@ -643,7 +637,10 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                         }
                         finally { if (e_2) throw e_2.error; }
                         return [7 /*endfinally*/];
-                    case 20:
+                    case 20: 
+                    // now we must throw the error
+                    throw resultFromPlugin;
+                    case 21:
                         // special handling for 'insert' (resultFromPlugin will always be `string`)
                         if (actionName === 'insert' && isFullString(resultFromPlugin)) {
                             // update the modulePath if a doc with random ID was inserted in a collection
@@ -673,22 +670,22 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                                 }
                             }
                         }
-                        _r.label = 21;
-                    case 21:
+                        _r.label = 22;
+                    case 22:
                         _d = _c.next();
                         return [3 /*break*/, 2];
-                    case 22: return [3 /*break*/, 25];
-                    case 23:
+                    case 23: return [3 /*break*/, 26];
+                    case 24:
                         e_3_1 = _r.sent();
                         e_3 = { error: e_3_1 };
-                        return [3 /*break*/, 25];
-                    case 24:
+                        return [3 /*break*/, 26];
+                    case 25:
                         try {
                             if (_d && !_d.done && (_m = _c["return"])) _m.call(_c);
                         }
                         finally { if (e_3) throw e_3.error; }
                         return [7 /*endfinally*/];
-                    case 25:
+                    case 26:
                         modulePath = [collectionPath, docId].filter(Boolean).join('/');
                         // anything that's executed from a "collection" module:
                         // 'insert' always returns a DocInstance, unless the "abort" action was called, then the modulePath might still be a collection:
@@ -758,8 +755,6 @@ function handleStream(args) {
                     return [3 /*break*/, 19];
                 case 10:
                     error_1 = _k.sent();
-                    if (!isVueSyncError(error_1))
-                        throw new Error(error_1);
                     _k.label = 11;
                 case 11:
                     _k.trys.push([11, 16, 17, 18]);
@@ -786,7 +781,7 @@ function handleStream(args) {
                     }
                     finally { if (e_2) throw e_2.error; }
                     return [7 /*endfinally*/];
-                case 18: return [3 /*break*/, 19];
+                case 18: throw error_1;
                 case 19:
                     _k.trys.push([19, 24, 25, 26]);
                     _e = __values(on.success), _f = _e.next();
@@ -1085,6 +1080,10 @@ function VueSync(vueSyncConfig) {
         doc: doc,
     };
     return instance;
+}
+
+function isVueSyncError(payload) {
+    return isAnyObject(payload) && 'payload' in payload && 'message' in payload;
 }
 
 export { VueSync, getCollectionPathDocIdEntry, isCollectionModule, isDoOnGet, isDoOnStream, isDocModule, isGetResponse, isVueSyncError };

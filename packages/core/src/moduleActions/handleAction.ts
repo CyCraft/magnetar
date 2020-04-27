@@ -1,4 +1,4 @@
-import { isVueSyncError, ActionName } from '../types/actions'
+import { ActionName } from '../types/actions'
 import { SharedConfig } from '../types/config'
 import { PlainObject } from '../types/atoms'
 import { EventNameFnsMap } from '../types/events'
@@ -60,7 +60,6 @@ export async function handleAction (args: {
     // triggering the action provided by the plugin
     result = await pluginAction(payload as any, [collectionPath, docId], pluginModuleConfig)
   } catch (error) {
-    if (!isVueSyncError(error)) throw new Error(error)
     // handle and await each eventFn in sequence
     for (const fn of on.error) {
       await fn({ payload, actionName, storeName, abort, error })
@@ -72,7 +71,8 @@ export async function handleAction (args: {
     }
     if (onError === 'revert') {
       stopExecutionAfterAction('revert')
-      return
+      // we need to revert first, then throw the error later
+      return error
     }
   }
   // handle and await each eventFn in sequence

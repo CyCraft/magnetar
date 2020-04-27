@@ -20,8 +20,8 @@ test('write + onError: stop -- emits fail events & aborts execution by default',
         },
       },
     })
-  } catch (e) {
-    t.deepEqual(e, { message: 'failed', payload: insertPayload })
+  } catch (error) {
+    t.deepEqual(error, { message: 'failed', payload: insertPayload })
   }
   t.is(pokedexModule.data.get('testid'), undefined)
 })
@@ -41,8 +41,8 @@ test('write + onError: stop -- fail in second store plugin does not prevent exec
         },
       },
     })
-  } catch (e) {
-    t.deepEqual(e, { message: 'failed', payload: insertPayload })
+  } catch (error) {
+    t.deepEqual(error, { message: 'failed', payload: insertPayload })
   }
   t.deepEqual(pokedexModule.data.get('testid'), insertPayload)
 })
@@ -67,8 +67,8 @@ test('write + onError: continue', async t => {
         },
       },
     })
-  } catch (e) {
-    t.fail()
+  } catch (error) {
+    t.fail(error)
   }
   t.is(pokedexModule.data.get('testid'), undefined)
 })
@@ -96,9 +96,8 @@ test('write + onError: revert', async t => {
         },
       },
     })
-  } catch (e) {
-    console.error(e)
-    t.fail(e)
+  } catch (error) {
+    t.truthy(error)
   }
   t.is(pokedexModule.data.get('testid'), undefined)
 })
@@ -125,8 +124,8 @@ test('write + onError: revert - will not go to next store', async t => {
         },
       },
     })
-  } catch (e) {
-    t.fail()
+  } catch (error) {
+    t.truthy(error)
   }
   t.is(pokedexModule.data.get('testid'), undefined)
 })
@@ -149,8 +148,8 @@ test('get + onError: stop -- emits fail events & aborts execution by default', a
         },
       },
     })
-  } catch (e) {
-    t.deepEqual(e, { message: 'failed', payload: getPayload })
+  } catch (error) {
+    t.deepEqual(error, { message: 'failed', payload: getPayload })
   }
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
 })
@@ -172,8 +171,8 @@ test('get + onError: stop -- fail in second store plugin does not prevent execut
         },
       },
     })
-  } catch (e) {
-    t.deepEqual(e, { message: 'failed', payload: getPayload })
+  } catch (error) {
+    t.deepEqual(error, { message: 'failed', payload: getPayload })
   }
   t.deepEqual(result, undefined)
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
@@ -204,8 +203,8 @@ test('get + onError: continue', async t => {
     })
     t.deepEqual(result.data.get('1'), pokedex(1))
     t.deepEqual(result.data.get('136'), undefined)
-  } catch (e) {
-    t.fail()
+  } catch (error) {
+    t.fail(error)
   }
   // the local store didn't succeed in applying its 'inserted' event, so its local data will be empty:
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))

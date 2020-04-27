@@ -22,7 +22,7 @@ test('revert: delete', async t => {
     // @ts-ignore
     await trainerModule.delete('remote', { onError: 'revert' }) // mocks error on delete for remote store mock
   } catch (error) {
-    t.fail(error)
+    t.truthy(error)
   }
 
   t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })

@@ -52,8 +52,8 @@ test('insert: can abort in before events', async t => {
       },
     })
     t.is(result.id, pokedexModule.id)
-  } catch (e) {
-    t.fail(e)
+  } catch (error) {
+    t.fail(error)
   }
 })
 
@@ -79,8 +79,8 @@ test('insert: can abort in success events', async t => {
       },
     })
     t.deepEqual(result.data, insertPayload)
-  } catch (e) {
-    t.fail(e)
+  } catch (error) {
+    t.fail(error)
   }
   t.is(ranAllEvents.length, 2)
 })

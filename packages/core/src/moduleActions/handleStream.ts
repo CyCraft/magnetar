@@ -1,5 +1,4 @@
 import { O } from 'ts-toolbelt'
-import { isVueSyncError } from '../types/actions'
 import { PlainObject } from '../types/atoms'
 import { EventNameFnsMap } from '../types/events'
 import {
@@ -54,11 +53,11 @@ export async function handleStream (args: {
       mustExecuteOnRead
     )
   } catch (error) {
-    if (!isVueSyncError(error)) throw new Error(error)
     // handle and await each eventFn in sequence
     for (const fn of on.error) {
       await fn({ payload, actionName, storeName, error, abort })
     }
+    throw error
   }
   // handle and await each eventFn in sequence
   for (const fn of on.success) {

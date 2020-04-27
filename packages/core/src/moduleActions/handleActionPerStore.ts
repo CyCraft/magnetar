@@ -81,7 +81,7 @@ export function handleActionPerStore (
 
     // create the abort mechanism
     type StopExecution = boolean | 'revert'
-    let stopExecution = false as StopExecution
+    let stopExecution: StopExecution
     /**
      * The abort mechanism for the entire store chain. When executed in handleAction() it won't go to the next store in executionOrder.
      */
@@ -98,7 +98,7 @@ export function handleActionPerStore (
     let resultFromPlugin: void | string | GetResponse | OnAddedFn
     for (const [i, storeName] of storesToExecute.entries()) {
       // a previous iteration stopped the execution:
-      if (stopExecution === 'revert' || stopExecution === true) break
+      if (stopExecution === true) break
       // find the action on the plugin
       const pluginAction = globalConfig.stores[storeName].actions[actionName]
       const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeName)
@@ -118,7 +118,7 @@ export function handleActionPerStore (
             storeName,
           })
       // handle reverting. stopExecution might have been modified by `handleAction`
-      if ((stopExecution as any) === 'revert') {
+      if (stopExecution === 'revert') {
         const storesToRevert = storesToExecute.slice(0, i)
         storesToRevert.reverse()
         for (const storeToRevert of storesToRevert) {
@@ -130,6 +130,8 @@ export function handleActionPerStore (
             await fn({ payload, result: resultFromPlugin, actionName, storeName })
           }
         }
+        // now we must throw the error
+        throw resultFromPlugin
       }
 
       // special handling for 'insert' (resultFromPlugin will always be `string`)
