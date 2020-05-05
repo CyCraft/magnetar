@@ -6,7 +6,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'merge'
   test(testName, async t => {
-    const { pokedexModule } = createVueSyncInstance(testName)
+    const { pokedexModule } = await createVueSyncInstance(testName)
     const payload = { base: { HP: 9000 } }
     t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
@@ -36,7 +36,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'assign'
   test(testName, async t => {
-    const { pokedexModule } = createVueSyncInstance(testName)
+    const { pokedexModule } = await createVueSyncInstance(testName)
     const payload = { base: { HP: 9000 } }
     t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
@@ -61,7 +61,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'replace'
   test(testName, async t => {
-    const { pokedexModule } = createVueSyncInstance(testName)
+    const { pokedexModule } = await createVueSyncInstance(testName)
     const payload = { base: { HP: 9000 } }
     t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
@@ -79,7 +79,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'revert: merge'
   test(testName, async t => {
-    const { pokedexModule } = createVueSyncInstance(testName)
+    const { pokedexModule } = await createVueSyncInstance(testName)
     const payload = { base: { HP: 9000 }, shouldFail: 'remote' }
     t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
@@ -97,7 +97,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'revert: assign'
   test(testName, async t => {
-    const { pokedexModule } = createVueSyncInstance(testName)
+    const { pokedexModule } = await createVueSyncInstance(testName)
     const payload = { base: { HP: 9000 }, shouldFail: 'remote' }
     t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
@@ -115,7 +115,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'revert: replace'
   test(testName, async t => {
-    const { pokedexModule } = createVueSyncInstance(testName)
+    const { pokedexModule } = await createVueSyncInstance(testName)
     const payload = { base: { HP: 9000 }, shouldFail: 'remote' }
     t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 

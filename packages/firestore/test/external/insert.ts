@@ -7,7 +7,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'insert (document)'
   test(testName, async t => {
-    const { pokedexModule } = createVueSyncInstance(testName)
+    const { pokedexModule } = await createVueSyncInstance(testName, { deletePaths: ['pokedex/7'] })
     const payload = pokedex(7)
     t.deepEqual(pokedexModule.doc('7').data, undefined)
 
@@ -29,10 +29,30 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
   })
 }
 {
-  const testName = 'insert (collection) → random ID'
+  const testName = 'insert (collection) → id from payload'
   test(testName, async t => {
-    const { pokedexModule } = createVueSyncInstance(testName)
+    const { pokedexModule } = await createVueSyncInstance(testName, { deletePaths: ['pokedex/7'] })
     const payload = pokedex(7)
+
+    let moduleFromResult: DocInstance
+    try {
+      moduleFromResult = await pokedexModule.insert(payload)
+    } catch (error) {
+      t.fail(error)
+    }
+
+    const newId = moduleFromResult.id
+    const expected = payload
+    t.deepEqual(pokedexModule.doc(newId).data, expected)
+    await firestoreDeepEqual(t, testName, `pokedex/${newId}`, expected)
+  })
+}
+{
+  const testName = 'insert (collection) → random id'
+  test(testName, async t => {
+    const { pokedexModule } = await createVueSyncInstance(testName)
+    const payload = pokedex(7)
+    delete payload.id
 
     let moduleFromResult: DocInstance
     try {
@@ -50,7 +70,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'revert: insert (document)'
   test(testName, async t => {
-    const { pokedexModule } = createVueSyncInstance(testName)
+    const { pokedexModule } = await createVueSyncInstance(testName)
     const payload = { ...pokedex(7), shouldFail: undefined }
     t.deepEqual(pokedexModule.doc('7').data, undefined)
 
@@ -76,7 +96,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'revert: insert (collection) → random ID'
   test(testName, async t => {
-    const { pokedexModule } = createVueSyncInstance(testName)
+    const { pokedexModule } = await createVueSyncInstance(testName)
     const payload = { ...pokedex(7), shouldFail: undefined }
 
     try {

@@ -6,7 +6,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'revert: (remote → local) insert (document)'
   test(testName, async t => {
-    const { pokedexModule } = createVueSyncInstance(testName)
+    const { pokedexModule } = await createVueSyncInstance(testName)
     const payload = { ...pokedex(7), shouldFail: 'local' }
     t.deepEqual(pokedexModule.doc('7').data, undefined)
 
@@ -41,7 +41,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'revert: (remote → local) insert (collection) → random ID'
   test(testName, async t => {
-    const { pokedexModule } = createVueSyncInstance(testName)
+    const { pokedexModule } = await createVueSyncInstance(testName)
     const payload = { ...pokedex(7), shouldFail: 'local' }
 
     try {

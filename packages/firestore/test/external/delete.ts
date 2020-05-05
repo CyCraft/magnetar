@@ -5,7 +5,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'delete'
   test(testName, async t => {
-    const { trainerModule } = createVueSyncInstance(testName)
+    const { trainerModule } = await createVueSyncInstance(testName)
     t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
     try {
@@ -22,7 +22,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'revert: delete'
   test(testName, async t => {
-    const { trainerModule } = createVueSyncInstance(testName)
+    const { trainerModule } = await createVueSyncInstance(testName)
     t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
     try {

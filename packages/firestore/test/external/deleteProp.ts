@@ -6,7 +6,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'deleteProp'
   test(testName, async t => {
-    const { trainerModule } = createVueSyncInstance(testName)
+    const { trainerModule } = await createVueSyncInstance(testName)
     const deletePayload = 'age'
     t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 
@@ -24,7 +24,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'deleteProp nested'
   test(testName, async t => {
-    const { pokedexModule } = createVueSyncInstance(testName)
+    const { pokedexModule } = await createVueSyncInstance(testName)
     const deletePayload = 'base.HP'
     t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
@@ -52,7 +52,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'deleteProp multiple'
   test(testName, async t => {
-    const { pokedexModule } = createVueSyncInstance(testName)
+    const { pokedexModule } = await createVueSyncInstance(testName)
     const deletePayload = ['base.HP', 'name']
     t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
@@ -80,7 +80,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'revert: deleteProp'
   test(testName, async t => {
-    const { trainerModule } = createVueSyncInstance(testName)
+    const { trainerModule } = await createVueSyncInstance(testName)
     const deletePayload = ['age', 'remote'] // this triggers an error on the remote store mock
     t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 
@@ -98,7 +98,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'revert: deleteProp nested'
   test(testName, async t => {
-    const { pokedexModule } = createVueSyncInstance(testName)
+    const { pokedexModule } = await createVueSyncInstance(testName)
     const deletePayload = ['base.HP', 'remote'] // this triggers an error on the remote store mock
     t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 

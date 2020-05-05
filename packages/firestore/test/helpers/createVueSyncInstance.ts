@@ -5,6 +5,8 @@ import { pokedex, PokedexEntry } from './pokedex'
 import { generateRandomId } from './generateRandomId'
 import { firestore } from './firestore'
 import { O } from 'ts-toolbelt'
+import { waitMs } from './wait'
+import { deleteAtPath } from './deleteCollection'
 
 const getInitialDataCollection = () => [
   // doc entries
@@ -30,13 +32,14 @@ export type TrainerModuleData = {
 
 const testNamesUsedSoFar: string[] = []
 
-export function createVueSyncInstance (
-  testName: string
-): {
+export async function createVueSyncInstance (
+  testName: string,
+  { insertDocs = [], deletePaths = [] }: { insertDocs?: object[]; deletePaths?: string[] } = {}
+): Promise<{
   pokedexModule: CollectionInstance<PokedexModuleData>
   trainerModule: DocInstance<TrainerModuleData>
   vueSync: VueSyncInstance
-} {
+}> {
   if (testName.includes('/')) throw new Error('no / in test names allowed!')
   if (testNamesUsedSoFar.includes(testName)) {
     throw new Error(`testName: "${testName}" is already used!`)
@@ -61,11 +64,19 @@ export function createVueSyncInstance (
       remote: { firestorePath: `vueSyncTests/${testName}/pokedex` },
     },
   })
+
   const trainerModule = vueSync.doc<TrainerModuleData>('data/trainer', {
     configPerStore: {
       local: { initialData: getInitialDataDocument() },
       remote: { firestorePath: `vueSyncTests/${testName}` },
     },
   })
+  const deletePromises = deletePaths.map(p =>
+    firestore.doc(`vueSyncTests/${testName}/${p}`).delete()
+  )
+  await Promise.all(deletePromises)
+  // await firestore.doc(`vueSyncTests/${testName}`).delete()
+  // await deleteAtPath(`vueSyncTests/${testName}`)
+  // await waitMs(3000)
   return { pokedexModule, trainerModule, vueSync }
 }
