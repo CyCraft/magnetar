@@ -2,6 +2,24 @@ import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
 import { pokedex } from '../helpers/pokedex'
 
+test('delete: emits before & success events', async t => {
+  const { pokedexModule } = createVueSyncInstance()
+  const insertPayload = pokedex(7)
+  await pokedexModule.insert(insertPayload)
+  let ranAllEvents = []
+  await pokedexModule.doc('7').delete(undefined, {
+    on: {
+      before: ({ payload, storeName }) => {
+        ranAllEvents.push(1)
+      },
+      success: ({ payload, storeName }) => {
+        ranAllEvents.push(1)
+      },
+    },
+  })
+  t.is(ranAllEvents.length, 4)
+})
+
 test('insert: emits before & success events', async t => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = pokedex(7)
