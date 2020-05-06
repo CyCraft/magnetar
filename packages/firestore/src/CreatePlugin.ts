@@ -1,10 +1,10 @@
 import * as Firebase from 'firebase'
-import { PluginInstance, VueSyncPlugin, WhereClause, OrderBy, Limit } from '@vue-sync/core'
+import { PluginInstance, VueSyncPlugin, WhereClause, OrderByClause, Limit } from '@vue-sync/core'
 import { insertActionFactory } from './actions/insert'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { deletePropActionFactory } from './actions/deleteProp'
 import { deleteActionFactory } from './actions/delete'
-// import { getActionFactory } from './actions/get'
+import { getActionFactory } from './actions/get'
 // import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
 import { batchSyncFactory } from './helpers/batchSync'
@@ -27,7 +27,7 @@ export interface FirestorePluginOptions {
 export interface FirestoreModuleConfig {
   firestorePath?: string
   where?: WhereClause[]
-  orderBy?: OrderBy[]
+  orderBy?: OrderByClause[]
   limit?: Limit
 }
 
@@ -48,8 +48,8 @@ export const CreatePlugin: VueSyncPlugin<FirestorePluginOptions> = (
   const batchSync = batchSyncFactory(pluginOptions)
 
   // the plugin must try to implement logic for every `ActionName`
-  // const get = getActionFactory(batchSync, pluginOptions)
-  // const stream = streamActionFactory(batchSync, pluginOptions)
+  const get = getActionFactory(pluginOptions)
+  // const stream = streamActionFactory(pluginOptions)
   const insert = insertActionFactory(batchSync, pluginOptions)
   const _merge = writeActionFactory(batchSync, pluginOptions, 'merge')
   const assign = writeActionFactory(batchSync, pluginOptions, 'assign')
@@ -58,7 +58,7 @@ export const CreatePlugin: VueSyncPlugin<FirestorePluginOptions> = (
   const _delete = deleteActionFactory(batchSync, pluginOptions)
 
   const actions = {
-    // get,
+    get,
     // stream,
     insert,
     merge: _merge,

@@ -5,9 +5,8 @@ import {
   PluginInstance,
   VueSyncPlugin,
   PlainObject,
-  getCollectionPathDocIdEntry,
   WhereClause,
-  OrderBy,
+  OrderByClause,
   Limit,
   Clauses,
 } from '@vue-sync/core'
@@ -32,7 +31,7 @@ export interface SimpleStoreModuleConfig {
   path?: string
   initialData?: PlainObject | [string, PlainObject][]
   where?: WhereClause[]
-  orderBy?: OrderBy[]
+  orderBy?: OrderByClause[]
   limit?: Limit
 }
 

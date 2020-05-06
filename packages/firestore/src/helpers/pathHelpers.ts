@@ -24,3 +24,22 @@ export function getFirestoreDocPath (
   throwIfInvalidFirestorePath(documentPath, 'doc')
   return documentPath
 }
+
+export function getFirestoreCollectionPath (
+  _collectionPath: string,
+  firestoreModuleConfig: FirestoreModuleConfig,
+  firestorePluginOptions: FirestorePluginOptions
+): string {
+  let collectionPath: string
+  // if firestorePath is set on the module level, always return this
+  const { firestorePath } = firestoreModuleConfig
+  if (isFullString(firestorePath)) {
+    collectionPath = firestorePath
+  } else {
+    // else, return the modulePath only if this option is enabled in the global firestorePluginOptions
+    const { useModulePathsForFirestore } = firestorePluginOptions
+    collectionPath = useModulePathsForFirestore ? _collectionPath : firestorePath
+  }
+  throwIfInvalidFirestorePath(collectionPath, 'collection')
+  return collectionPath
+}

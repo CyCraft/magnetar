@@ -44,6 +44,10 @@ import { pokedex } from '../helpers/pokedex'
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(136)]
       t.deepEqual(actual, expected)
+      // also check the collection without query
+      const actualDocCountWithoutQuery = pokedexModule.data.size
+      const expectedDocCountWithoutQuery = expected.length + 1
+      t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(error)
     }
@@ -58,6 +62,10 @@ import { pokedex } from '../helpers/pokedex'
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(50)]
       t.deepEqual(actual, expected)
+      // also check the collection without query
+      const actualDocCountWithoutQuery = pokedexModule.data.size
+      const expectedDocCountWithoutQuery = expected.length + 1
+      t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(error)
     }
@@ -72,6 +80,10 @@ import { pokedex } from '../helpers/pokedex'
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(50)]
       t.deepEqual(actual, expected)
+      // also check the collection without query
+      const actualDocCountWithoutQuery = pokedexModule.data.size
+      const expectedDocCountWithoutQuery = expected.length + 1
+      t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(error)
     }
@@ -86,6 +98,10 @@ import { pokedex } from '../helpers/pokedex'
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(50)]
       t.deepEqual(actual, expected)
+      // also check the collection without query
+      const actualDocCountWithoutQuery = pokedexModule.data.size
+      const expectedDocCountWithoutQuery = expected.length + 1
+      t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(error)
     }
@@ -100,6 +116,10 @@ import { pokedex } from '../helpers/pokedex'
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(113)]
       t.deepEqual(actual, expected)
+      // also check the collection without query
+      const actualDocCountWithoutQuery = pokedexModule.data.size
+      const expectedDocCountWithoutQuery = expected.length + 1
+      t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(error)
     }
@@ -114,6 +134,10 @@ import { pokedex } from '../helpers/pokedex'
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(113)]
       t.deepEqual(actual, expected)
+      // also check the collection without query
+      const actualDocCountWithoutQuery = pokedexModule.data.size
+      const expectedDocCountWithoutQuery = expected.length + 1
+      t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(error)
     }
@@ -128,6 +152,10 @@ import { pokedex } from '../helpers/pokedex'
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(81), pokedex(82)]
       t.deepEqual(actual, expected)
+      // also check the collection without query
+      const actualDocCountWithoutQuery = pokedexModule.data.size
+      const expectedDocCountWithoutQuery = expected.length + 1
+      t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(error)
     }
@@ -144,6 +172,10 @@ import { pokedex } from '../helpers/pokedex'
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(134), pokedex(135), pokedex(136)]
       t.deepEqual(actual, expected)
+      // also check the collection without query
+      const actualDocCountWithoutQuery = pokedexModule.data.size
+      const expectedDocCountWithoutQuery = expected.length + 1
+      t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(error)
     }
@@ -156,7 +188,8 @@ import { pokedex } from '../helpers/pokedex'
     try {
       const queryModuleRef = await pokedexModule
         .where('type', 'array-contains-any', ['Steel', 'Ice'])
-        .get()
+        .orderBy('id', 'asc')
+        .get(undefined, { onError: 'stop' })
       const actual = [...queryModuleRef.data.values()]
       const expected = [
         pokedex(81),
@@ -168,6 +201,10 @@ import { pokedex } from '../helpers/pokedex'
         pokedex(144),
       ]
       t.deepEqual(actual, expected)
+      // also check the collection without query
+      const actualDocCountWithoutQuery = pokedexModule.data.size
+      const expectedDocCountWithoutQuery = expected.length + 1
+      t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(error)
     }
@@ -181,56 +218,47 @@ import { pokedex } from '../helpers/pokedex'
       const queryModuleRef = await pokedexModule
         .where('type', 'array-contains', 'Fire')
         .where('base.Speed', '>=', 100)
-        .get()
-      const actual = [...queryModuleRef.data.values()]
-      const expected = [pokedex(6), pokedex(38), pokedex(78)]
+        .orderBy('base.Speed', 'asc')
+        .get(undefined, { onError: 'stop' })
+      const actual = [...queryModuleRef.data.values()].map(p => p.base.Speed)
+      const expected = [pokedex(6), pokedex(38), pokedex(78)].map(p => p.base.Speed)
       t.deepEqual(actual, expected)
+      // also check the collection without query
+      const actualDocCountWithoutQuery = pokedexModule.data.size
+      const expectedDocCountWithoutQuery = expected.length + 1
+      t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(error)
     }
   })
 }
 {
-  const testName = 'get (collection) orderBy'
+  const testName = 'get (collection) orderBy + limit'
   test(testName, async t => {
     const { pokedexModule } = await createVueSyncInstance('read')
     try {
       const queryModuleRef = await pokedexModule
-        .where('type', 'array-contains', 'Fire')
-        .where('base.Speed', '>=', 100)
-        .orderBy('name', 'desc')
-        .get()
-      // Rapidash 78
-      // Ninetales 38
-      // Charizard 6
-      const actual = [...queryModuleRef.data.values()]
-      const expected = [pokedex(78), pokedex(38), pokedex(6)]
-      t.deepEqual(actual, expected)
-    } catch (error) {
-      t.fail(error)
-    }
-  })
-}
-{
-  const testName = 'get (collection) limit'
-  test(testName, async t => {
-    const { pokedexModule } = await createVueSyncInstance('read')
-    try {
-      const queryModuleRef = await pokedexModule.limit(10).get()
-      const actual = [...queryModuleRef.data.values()]
+        .where('id', '<', 10)
+        .orderBy('id', 'desc')
+        .limit(10)
+        .get(undefined, { onError: 'stop' })
+      const actual = [...queryModuleRef.data.values()].map(p => p.id)
       const expected = [
-        pokedex(1),
-        pokedex(2),
-        pokedex(3),
-        pokedex(4),
-        pokedex(5),
-        pokedex(6),
-        pokedex(7),
-        pokedex(8),
         pokedex(9),
-        pokedex(10),
-      ]
+        pokedex(8),
+        pokedex(7),
+        pokedex(6),
+        pokedex(5),
+        pokedex(4),
+        pokedex(3),
+        pokedex(2),
+        pokedex(1),
+      ].map(p => p.id)
       t.deepEqual(actual, expected)
+      // also check the collection without query
+      const actualDocCountWithoutQuery = pokedexModule.data.size
+      const expectedDocCountWithoutQuery = expected.length
+      t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(error)
     }
