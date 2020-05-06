@@ -22,6 +22,13 @@ export function deleteActionFactory (
 
     if (makeBackup) makeBackup(collectionPath, docId)
 
+    // another test to mock deletions
+    const checkDoc = data[collectionPath].get(docId)
+    const { storeName } = simpleStoreOptions
+    if (checkDoc.shouldFailDelete === storeName) {
+      throw new Error(`mocked delete failure in ${storeName} store`)
+    }
+
     data[collectionPath].delete(docId)
   }
 }

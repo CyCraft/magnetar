@@ -8,6 +8,7 @@ import { deleteActionFactory } from './actions/delete'
 // import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
 import { batchSyncFactory } from './helpers/batchSync'
+import { writeActionFactory } from './actions/write'
 
 // there are two interfaces to be defined & exported by each plugin
 // - FirestorePluginOptions
@@ -51,9 +52,9 @@ export const CreatePlugin: VueSyncPlugin<FirestorePluginOptions> = (
   // const get = getActionFactory(batchSync, pluginOptions)
   // const stream = streamActionFactory(batchSync, pluginOptions)
   const insert = insertActionFactory(batchSync, pluginOptions)
-  // const _merge = writeActionFactory(batchSync, pluginOptions, 'merge')
-  // const assign = writeActionFactory(batchSync, pluginOptions, 'assign')
-  // const replace = writeActionFactory(batchSync, pluginOptions, 'replace')
+  const _merge = writeActionFactory(batchSync, pluginOptions, 'merge')
+  const assign = writeActionFactory(batchSync, pluginOptions, 'assign')
+  const replace = writeActionFactory(batchSync, pluginOptions, 'replace')
   // const deleteProp = deletePropActionFactory(batchSync, pluginOptions)
   const _delete = deleteActionFactory(batchSync, pluginOptions)
 
@@ -61,9 +62,9 @@ export const CreatePlugin: VueSyncPlugin<FirestorePluginOptions> = (
     // get,
     // stream,
     insert,
-    // merge: _merge,
-    // assign,
-    // replace,
+    merge: _merge,
+    assign,
+    replace,
     // deleteProp,
     delete: _delete,
   }

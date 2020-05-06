@@ -5,7 +5,9 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'delete'
   test(testName, async t => {
-    const { trainerModule } = await createVueSyncInstance(testName)
+    const { trainerModule } = await createVueSyncInstance(testName, {
+      insertDocs: { '': { age: 10, name: 'Luca' } },
+    })
     t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
     try {
@@ -15,24 +17,6 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     }
 
     const expected = undefined
-    t.deepEqual(trainerModule.data, expected)
-    await firestoreDeepEqual(t, testName, '', expected)
-  })
-}
-{
-  const testName = 'revert: delete'
-  test(testName, async t => {
-    const { trainerModule } = await createVueSyncInstance(testName)
-    t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
-
-    try {
-      // @ts-ignore
-      await trainerModule.delete('remote', { onError: 'revert' }) // mocks error on delete for remote store mock
-    } catch (error) {
-      t.truthy(error)
-    }
-
-    const expected = { age: 10, name: 'Luca' }
     t.deepEqual(trainerModule.data, expected)
     await firestoreDeepEqual(t, testName, '', expected)
   })

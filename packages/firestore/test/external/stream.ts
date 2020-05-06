@@ -6,7 +6,7 @@ import { waitMs } from '../helpers/wait'
 {
   const testName = 'stream (collection)'
   test(testName, async t => {
-    const { pokedexModule } = await createVueSyncInstance(testName)
+    const { pokedexModule } = await createVueSyncInstance('read')
     t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
     t.deepEqual(pokedexModule.data.size, 1)
     const payload = {}
@@ -28,7 +28,7 @@ import { waitMs } from '../helpers/wait'
 {
   const testName = 'stream (doc)'
   test(testName, async t => {
-    const { trainerModule } = await createVueSyncInstance(testName)
+    const { trainerModule } = await createVueSyncInstance('read')
     t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
     const streamPayload = {}
 
@@ -49,7 +49,7 @@ import { waitMs } from '../helpers/wait'
 {
   const testName = 'stream (collection) where-filter'
   test(testName, async t => {
-    const { pokedexModule } = await createVueSyncInstance(testName)
+    const { pokedexModule } = await createVueSyncInstance('read')
     // the original state has 1 pokemon already
     t.deepEqual(pokedexModule.data.size, 1)
     // let's get some more

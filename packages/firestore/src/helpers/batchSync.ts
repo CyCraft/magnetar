@@ -1,6 +1,8 @@
 import { FirestorePluginOptions } from '../CreatePlugin'
 import { PlainObject } from '@vue-sync/core'
 import { Countdown, CountdownInstance } from './Countdown'
+// just for types:
+import { firestore } from 'firebase'
 
 // https://firebase.google.com/docs/firestore/manage-data/transactions#batched-writes
 // A batched write can contain up to 500 operations.
@@ -42,7 +44,11 @@ function countOperations (payload: PlainObject): number {
 }
 
 export type BatchSync = {
-  set: (documentPath: string, _payload: PlainObject) => Promise<void>
+  set: (
+    documentPath: string,
+    _payload: PlainObject,
+    options?: firestore.SetOptions
+  ) => Promise<void>
   delete: (documentPath: string) => Promise<void>
 }
 
@@ -51,7 +57,7 @@ type SyncStack = {
    * Maximum 500! If < 500 additional operations can be added to this same syncStack.
    */
   operationCount: number
-  batch: firebase.firestore.WriteBatch
+  batch: firestore.WriteBatch
   resolves: (() => void)[]
   rejects: ((error: any) => void)[]
 }
@@ -136,11 +142,15 @@ export function batchSyncFactory (
     countdown.restart()
   }
 
-  function set (documentPath: string, _payload: PlainObject): Promise<void> {
+  function set (
+    documentPath: string,
+    _payload: PlainObject,
+    options?: firestore.SetOptions
+  ): Promise<void> {
     const { payload, operationCount } = preparePayload(_payload)
     const { batch, resolves, rejects } = prepareSyncStack(operationCount)
     const ref = prepareRef(documentPath)
-    batch.set(ref, payload)
+    batch.set(ref, payload, options)
     const promise: Promise<void> = new Promise((resolve, reject) => {
       resolves.push(resolve)
       rejects.push(reject)

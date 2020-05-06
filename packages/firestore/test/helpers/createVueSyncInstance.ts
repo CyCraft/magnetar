@@ -19,6 +19,7 @@ export type PokedexModuleData = O.Merge<
   {
     seen?: boolean
     shouldFail?: string
+    shouldFailDelete?: string
   }
 >
 
@@ -34,19 +35,34 @@ const testNamesUsedSoFar: string[] = []
 
 export async function createVueSyncInstance (
   testName: string,
-  { insertDocs = [], deletePaths = [] }: { insertDocs?: object[]; deletePaths?: string[] } = {}
+  {
+    insertDocs = {},
+    deletePaths = [],
+  }: { insertDocs?: { [path: string]: object }; deletePaths?: string[] } = {}
 ): Promise<{
   pokedexModule: CollectionInstance<PokedexModuleData>
   trainerModule: DocInstance<TrainerModuleData>
   vueSync: VueSyncInstance
 }> {
   if (testName.includes('/')) throw new Error('no / in test names allowed!')
-  if (testNamesUsedSoFar.includes(testName)) {
+  if (testName !== 'read' && testNamesUsedSoFar.includes(testName)) {
     throw new Error(`testName: "${testName}" is already used!`)
   } else {
     testNamesUsedSoFar.push(testName)
   }
 
+  // prepare the firestore side
+  const deletePromises = deletePaths.map(path => {
+    const docPath = `vueSyncTests/${testName}${path ? '/' + path : ''}`
+    return firestore.doc(docPath).delete()
+  })
+  const insertPromises = Object.entries(insertDocs).map(([path, data]) => {
+    const docPath = `vueSyncTests/${testName}${path ? '/' + path : ''}`
+    return firestore.doc(docPath).set(data)
+  })
+  await Promise.all(deletePromises.concat(insertPromises))
+
+  // create & prepare the modules
   const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
   const remote = CreatePlugin({ firestoreInstance: firestore })
   const vueSync = VueSync({
@@ -71,12 +87,5 @@ export async function createVueSyncInstance (
       remote: { firestorePath: `vueSyncTests/${testName}` },
     },
   })
-  const deletePromises = deletePaths.map(p =>
-    firestore.doc(`vueSyncTests/${testName}/${p}`).delete()
-  )
-  await Promise.all(deletePromises)
-  // await firestore.doc(`vueSyncTests/${testName}`).delete()
-  // await deleteAtPath(`vueSyncTests/${testName}`)
-  // await waitMs(3000)
   return { pokedexModule, trainerModule, vueSync }
 }
