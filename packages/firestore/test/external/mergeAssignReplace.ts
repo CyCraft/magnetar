@@ -90,6 +90,7 @@ const conf = (testName: string): any => ({
   })
 }
 {
+  // these tests are not really testing reverting the remote store, only the local store:
   const testName = 'revert: merge'
   test(testName, async t => {
     const { pokedexModule } = await createVueSyncInstance(testName, {
@@ -111,6 +112,7 @@ const conf = (testName: string): any => ({
   })
 }
 {
+  // these tests are not really testing reverting the remote store, only the local store:
   const testName = 'revert: assign'
   test(testName, async t => {
     const { pokedexModule } = await createVueSyncInstance(testName, {
@@ -132,6 +134,7 @@ const conf = (testName: string): any => ({
   })
 }
 {
+  // these tests are not really testing reverting the remote store, only the local store:
   const testName = 'revert: replace'
   test(testName, async t => {
     const { pokedexModule } = await createVueSyncInstance(testName, {

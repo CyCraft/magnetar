@@ -44,11 +44,8 @@ function countOperations (payload: PlainObject): number {
 }
 
 export type BatchSync = {
-  set: (
-    documentPath: string,
-    _payload: PlainObject,
-    options?: firestore.SetOptions
-  ) => Promise<void>
+  set: (documentPath: string, payload: PlainObject, options?: firestore.SetOptions) => Promise<void>
+  update: (documentPath: string, payload: PlainObject) => Promise<void>
   delete: (documentPath: string) => Promise<void>
 }
 
@@ -159,6 +156,19 @@ export function batchSyncFactory (
     return promise
   }
 
+  function update (documentPath: string, _payload: PlainObject): Promise<void> {
+    const { payload, operationCount } = preparePayload(_payload)
+    const { batch, resolves, rejects } = prepareSyncStack(operationCount)
+    const ref = prepareRef(documentPath)
+    batch.update(ref, payload)
+    const promise: Promise<void> = new Promise((resolve, reject) => {
+      resolves.push(resolve)
+      rejects.push(reject)
+    })
+    triggerSync()
+    return promise
+  }
+
   function _delete (documentPath: string): Promise<void> {
     const operationCount = 1
     const { batch, resolves, rejects } = prepareSyncStack(operationCount)
@@ -172,5 +182,5 @@ export function batchSyncFactory (
     return promise
   }
 
-  return { set, delete: _delete }
+  return { set, update, delete: _delete }
 }

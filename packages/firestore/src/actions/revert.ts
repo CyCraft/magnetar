@@ -19,15 +19,13 @@ export function revertActionFactory (
         await actions.delete(undefined, [collectionPath, docId], firestoreModuleConfig)
         return
       }
-      if (['merge', 'assign', 'replace'].includes(actionName)) {
-        console.log(`revert payload → `, payload)
-      }
     }
+    // reverting other actions are tricky...
+
     // insert on collection (no id)
     if (!docId && actionName === 'insert') {
       throw new Error(`revert not yet implemented for insert on collections`)
     }
-    // haven't implemented reverting 'get', 'stream' actions yet
     throw new Error(
       `revert not yet implemented for ${actionName}. See https://github.com/vue-sync/core/issues/2`
     )

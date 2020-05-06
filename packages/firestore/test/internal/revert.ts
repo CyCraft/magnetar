@@ -110,6 +110,7 @@ const conf = (testName: string): any => ({
   configPerStore: { remote: { firestorePath: `vueSyncTests/${testName}/pokedex/1` } },
 })
 {
+  // this tests is _not really_ testing reverting the remote store, they test if the local store is reverted and if the remote store stays untouched on an error
   const testName = 'revert: merge (with extra checks)'
   test(testName, async t => {
     const { pokedexModule } = await createVueSyncInstance(testName, {
@@ -152,6 +153,7 @@ const conf = (testName: string): any => ({
   })
 }
 {
+  // this tests is _not really_ testing reverting the remote store, they test if the local store is reverted and if the remote store stays untouched on an error
   const testName = 'revert: assign (with extra checks)'
   test(testName, async t => {
     const { pokedexModule } = await createVueSyncInstance(testName, {
@@ -189,6 +191,7 @@ const conf = (testName: string): any => ({
   })
 }
 {
+  // this tests is _not really_ testing reverting the remote store, they test if the local store is reverted and if the remote store stays untouched on an error
   const testName = 'revert: replace (with extra checks)'
   test(testName, async t => {
     const { pokedexModule } = await createVueSyncInstance(testName, {
