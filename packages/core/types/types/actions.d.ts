@@ -9,17 +9,31 @@ import { CollectionInstance } from '../Collection';
  */
 export declare type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp' | 'delete';
 /**
- * this is what the dev can provide as second param when executing any action in addition to the payload
+ * You can pass options to this action specifically;
+ * This is what the dev can provide as second param when executing any action in addition to the payload.
+ * @example
+ * // first update the server and await that before updating the local store:
+ * { executionOrder: ['remote', 'local'] }
+ * @example
+ * // don't throw errors for this action, wherever it might fail
+ * { onError: 'continue' }
  */
 export declare type ActionConfig = O.Merge<{
     executionOrder?: StoreName[];
-}, Partial<O.Omit<SharedConfig, 'dataStoreName'>>>;
+}, Partial<O.Omit<SharedConfig, 'dataStoreName' | 'executionOrder'>>>;
 export declare type VueSyncStreamAction = (payload?: object | void, actionConfig?: ActionConfig) => Promise<void>;
 export declare type VueSyncGetAction<DocDataType extends object = PlainObject, calledFrom extends 'collection' | 'doc' = 'collection' | 'doc'> = (payload?: object | void, actionConfig?: ActionConfig) => Promise<calledFrom extends 'collection' ? CollectionInstance<DocDataType> : DocInstance<DocDataType>>;
 export declare type VueSyncInsertAction<DocDataType extends object = PlainObject> = (payload: DocDataType, actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
 export declare type VueSyncWriteAction<DocDataType extends object = PlainObject> = (payload: O.Optional<DocDataType, keyof DocDataType, 'deep'>, actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
 export declare type VueSyncDeletePropAction<DocDataType extends object = PlainObject> = (payload: keyof DocDataType | string | (keyof DocDataType | string)[], actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
-export declare type VueSyncDeleteAction<DocDataType extends object = PlainObject> = (actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
+/**
+ * @param {*} [payload] The delete action doesn't need any payload. In some cases, a Store Plugin you use might accept a payload.
+ * @param {ActionConfig} [actionConfig]
+ * @example
+ * // first update the server and await that before updating the local store:
+ * doc(id).delete(undefined, { executionOrder: ['remote', 'local'] })
+ */
+export declare type VueSyncDeleteAction<DocDataType extends object = PlainObject> = (payload?: any, actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
 export declare type VueSyncError = {
     payload: PlainObject | PlainObject[] | string | string[] | void;
     message: string;
