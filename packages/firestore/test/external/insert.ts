@@ -1,6 +1,5 @@
 import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
-import { allPokemonArray } from '../helpers/pokemon'
 import { pokedex } from '../helpers/pokedex'
 import { DocInstance } from '@vue-sync/core'
 import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
