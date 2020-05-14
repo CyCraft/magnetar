@@ -11,7 +11,7 @@ import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
 import { ModuleConfig, GlobalConfig } from './types/config'
 import { DocFn, CollectionFn } from './VueSync'
 import { executeSetupModulePerStore, getDataProxyHandler } from './helpers/moduleHelpers'
-import { WhereClause, WhereFilterOp, OrderBy } from './types/clauses'
+import { WhereClause, WhereFilterOp, OrderByClause } from './types/clauses'
 import { mergeAndConcat } from 'merge-anything'
 
 export type CollectionInstance<DocDataType extends object = { [prop: string]: any }> = {
@@ -77,8 +77,8 @@ export function createCollectionWithContext<DocDataType extends object> (
     fieldPath: string,
     direction: 'asc' | 'desc' = 'asc'
   ): CollectionInstance<DocDataType> {
-    const orderBy: OrderBy = [fieldPath, direction]
-    const moduleConfigWithClause = mergeAndConcat(moduleConfig, { orderBy: [orderBy] })
+    const orderByClause: OrderByClause = [fieldPath, direction]
+    const moduleConfigWithClause = mergeAndConcat(moduleConfig, { orderBy: [orderByClause] })
     return collectionFn(path, moduleConfigWithClause)
   }
 

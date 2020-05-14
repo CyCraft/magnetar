@@ -19,7 +19,7 @@ export type WhereClause = [string, WhereFilterOp, any]
 /**
  * Sort by the specified field, optionally in descending order instead of ascending.
  */
-export type OrderBy = [string, ('asc' | 'desc')?]
+export type OrderByClause = [string, ('asc' | 'desc')?]
 
 /**
  * The maximum number of items to return.
@@ -31,6 +31,6 @@ export type Limit = number
  */
 export type Clauses = {
   where?: WhereClause[]
-  orderBy?: OrderBy[]
+  orderBy?: OrderByClause[]
   limit?: Limit
 }

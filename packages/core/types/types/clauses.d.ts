@@ -9,7 +9,7 @@ export declare type WhereClause = [string, WhereFilterOp, any];
 /**
  * Sort by the specified field, optionally in descending order instead of ascending.
  */
-export declare type OrderBy = [string, ('asc' | 'desc')?];
+export declare type OrderByClause = [string, ('asc' | 'desc')?];
 /**
  * The maximum number of items to return.
  */
@@ -19,6 +19,6 @@ export declare type Limit = number;
  */
 export declare type Clauses = {
     where?: WhereClause[];
-    orderBy?: OrderBy[];
+    orderBy?: OrderByClause[];
     limit?: Limit;
 };

@@ -966,8 +966,8 @@ function createCollectionWithContext(_a, moduleConfig, globalConfig, docFn, coll
     }
     function orderBy(fieldPath, direction) {
         if (direction === void 0) { direction = 'asc'; }
-        var orderBy = [fieldPath, direction];
-        var moduleConfigWithClause = mergeAndConcat(moduleConfig, { orderBy: [orderBy] });
+        var orderByClause = [fieldPath, direction];
+        var moduleConfigWithClause = mergeAndConcat(moduleConfig, { orderBy: [orderByClause] });
         return collectionFn(path, moduleConfigWithClause);
     }
     function limit(limitCount) {

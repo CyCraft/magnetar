@@ -6,7 +6,7 @@ import {
   VueSyncPlugin,
   PlainObject,
   WhereClause,
-  OrderBy,
+  OrderByClause,
   Limit,
   Clauses,
 } from '../../../src'
@@ -31,7 +31,7 @@ export interface SimpleStoreModuleConfig {
   path?: string
   initialData?: PlainObject | [string, PlainObject][]
   where?: WhereClause[]
-  orderBy?: OrderBy[]
+  orderBy?: OrderByClause[]
   limit?: Limit
 }
 

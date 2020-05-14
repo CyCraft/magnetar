@@ -3,7 +3,7 @@ import {
   VueSyncPlugin,
   PlainObject,
   WhereClause,
-  OrderBy,
+  OrderByClause,
   Limit,
 } from '../../src/index'
 import {
@@ -27,7 +27,7 @@ export interface StorePluginModuleConfig {
   path?: string
   initialData?: PlainObject | [string, PlainObject][]
   where?: WhereClause[]
-  orderBy?: OrderBy[]
+  orderBy?: OrderByClause[]
   limit?: Limit
 }
 
