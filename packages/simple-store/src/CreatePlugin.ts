@@ -5,11 +5,11 @@ import {
   PluginInstance,
   VueSyncPlugin,
   PlainObject,
-  getCollectionPathDocIdEntry,
   Clauses,
   WhereClause,
-  OrderBy,
+  OrderByClause,
   Limit,
+  PluginActionPayloadBase,
 } from '@vue-sync/core'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { insertActionFactory } from './actions/insert'
@@ -32,7 +32,7 @@ export interface SimpleStoreModuleConfig {
   path?: string
   initialData?: PlainObject | [string, PlainObject][]
   where?: WhereClause[]
-  orderBy?: OrderBy[]
+  orderBy?: OrderByClause[]
   limit?: Limit
 }
 
@@ -77,17 +77,18 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
    * This must be provided by Store Plugins that have "local" data. It is triggered ONCE when the module (doc or collection) is instantiated. In any case, an empty Map for the collectionPath (to be derived from the modulePath) must be set up.
    */
   const modulesAlreadySetup = new Set()
-  const setupModule = (
-    [collectionPath, docId]: [string, string | undefined],
-    moduleConfig: SimpleStoreModuleConfig = {}
-  ): void => {
+  const setupModule = ({
+    collectionPath,
+    docId,
+    pluginModuleConfig = {},
+  }: PluginActionPayloadBase<SimpleStoreModuleConfig>): void => {
     const modulePath = [collectionPath, docId].filter(Boolean).join('/')
     if (modulesAlreadySetup.has(modulePath)) return
     // always set up a new Map for the collection, but only when it's undefined!
     // the reason for this is that the module can be instantiated multiple times
     data[collectionPath] = data[collectionPath] ?? new Map()
     // then do anything specific for your plugin, like setting initial data
-    const { initialData } = moduleConfig
+    const { initialData } = pluginModuleConfig
     if (!initialData) return
     if (!docId && isArray(initialData)) {
       for (const [_docId, _docData] of initialData) {
@@ -107,16 +108,17 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
   /**
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
    */
-  const getModuleData = (
-    [collectionPath, docId]: [string, string | undefined],
-    moduleConfig: SimpleStoreModuleConfig = {}
-  ): any => {
+  const getModuleData = ({
+    collectionPath,
+    docId,
+    pluginModuleConfig = {},
+  }: PluginActionPayloadBase<SimpleStoreModuleConfig>): any => {
     const collectionDB = data[collectionPath]
     // if it's a doc, return the specific doc
     if (docId) return collectionDB.get(docId)
     // if it's a collection, we must return the collectionDB but with applied query clauses
     // but remember, the return type MUST be a map with id as keys and the docs as value
-    const clauses = pick(moduleConfig, ['where', 'orderBy', 'limit'])
+    const clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
     // return from cache
     if (queriedData.has(clauses)) return queriedData.get(clauses)
     // otherwise create a new filter and return that

@@ -1,4 +1,10 @@
-import { PlainObject, PluginGetAction, GetResponse, DoOnGet } from '@vue-sync/core'
+import {
+  PlainObject,
+  PluginGetAction,
+  GetResponse,
+  DoOnGet,
+  PluginGetActionPayload,
+} from '@vue-sync/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 
@@ -6,17 +12,22 @@ export function getActionFactory (
   data: { [collectionPath: string]: Map<string, PlainObject> },
   simpleStoreOptions: SimpleStoreOptions
 ): PluginGetAction {
-  return async (
-    payload: void | PlainObject = {},
-    [collectionPath, docId]: [string, string | undefined],
-    simpleStoreModuleConfig: SimpleStoreModuleConfig
-  ): Promise<GetResponse | DoOnGet> => {
+  return function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+  }: PluginGetActionPayload<SimpleStoreModuleConfig>): GetResponse | DoOnGet {
     const doOnGetAction: DoOnGet = (payload, meta): void => {
-      insertActionFactory(data, simpleStoreOptions)(
+      insertActionFactory(
+        data,
+        simpleStoreOptions
+      )({
         payload,
-        [collectionPath, docId],
-        simpleStoreModuleConfig
-      )
+        collectionPath,
+        docId,
+        pluginModuleConfig,
+      })
     }
     return doOnGetAction
   }

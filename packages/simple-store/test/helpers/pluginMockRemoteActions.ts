@@ -1,11 +1,8 @@
 import { pick } from 'filter-anything'
 import {
-  ActionName,
-  isCollectionModule,
   PluginWriteAction,
   PluginDeleteAction,
   PluginStreamAction,
-  MustExecuteOnRead,
   StreamResponse,
   DoOnStream,
   PluginGetAction,
@@ -14,10 +11,16 @@ import {
   PluginInsertAction,
   DoOnGet,
   GetResponse,
-  getCollectionPathDocIdEntry,
   PlainObject,
+  PluginStreamActionPayload,
+  PluginRevertActionPayload,
+  PluginGetActionPayload,
+  PluginDeleteActionPayload,
+  PluginDeletePropActionPayload,
+  PluginInsertActionPayload,
+  PluginWriteActionPayload,
 } from '@vue-sync/core'
-import { StorePluginModuleConfig, StorePluginOptions } from './pluginMockRemote'
+import { StorePluginModuleConfig, RemoteStoreOptions } from './pluginMockRemote'
 import { waitMs } from './wait'
 import { pokedexMap } from './pokedex'
 import { throwIfEmulatedError } from './throwFns'
@@ -25,14 +28,15 @@ import { generateRandomId } from './generateRandomId'
 import { filterDataPerClauses } from './pluginMockRemoteHelpers'
 
 export function writeActionFactory (
-  storePluginOptions: StorePluginOptions,
+  storePluginOptions: RemoteStoreOptions,
   actionName: 'merge' | 'assign' | 'replace'
 ): PluginWriteAction {
-  return async function (
-    payload: PlainObject,
-    [collectionPath, docId]: [string, string | undefined],
-    pluginModuleConfig: StorePluginModuleConfig
-  ): Promise<void> {
+  return async function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+  }: PluginWriteActionPayload<StorePluginModuleConfig>): Promise<void> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
@@ -43,12 +47,13 @@ export function writeActionFactory (
   }
 }
 
-export function insertActionFactory (storePluginOptions: StorePluginOptions): PluginInsertAction {
-  return async function (
-    payload: PlainObject,
-    [collectionPath, docId]: [string, string | undefined],
-    pluginModuleConfig: StorePluginModuleConfig
-  ): Promise<string> {
+export function insertActionFactory (storePluginOptions: RemoteStoreOptions): PluginInsertAction {
+  return async function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+  }: PluginInsertActionPayload<StorePluginModuleConfig>): Promise<string> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
@@ -63,13 +68,14 @@ export function insertActionFactory (storePluginOptions: StorePluginOptions): Pl
 }
 
 export function deletePropActionFactory (
-  storePluginOptions: StorePluginOptions
+  storePluginOptions: RemoteStoreOptions
 ): PluginDeletePropAction {
-  return async function (
-    payload: string | string[],
-    [collectionPath, docId]: [string, string | undefined],
-    pluginModuleConfig: StorePluginModuleConfig
-  ): Promise<void> {
+  return async function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+  }: PluginDeletePropActionPayload<StorePluginModuleConfig>): Promise<void> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
@@ -80,12 +86,13 @@ export function deletePropActionFactory (
   }
 }
 
-export function deleteActionFactory (storePluginOptions: StorePluginOptions): PluginDeleteAction {
-  return async function (
-    payload: void,
-    [collectionPath, docId]: [string, string | undefined],
-    pluginModuleConfig: StorePluginModuleConfig
-  ): Promise<void> {
+export function deleteActionFactory (storePluginOptions: RemoteStoreOptions): PluginDeleteAction {
+  return async function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+  }: PluginDeleteActionPayload<StorePluginModuleConfig>): Promise<void> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
@@ -95,7 +102,7 @@ export function deleteActionFactory (storePluginOptions: StorePluginOptions): Pl
 }
 
 function mockDataRetrieval (
-  moduleType: 'doc' | 'collection',
+  moduleType: 'collection' | 'doc',
   pluginModuleConfig: StorePluginModuleConfig
 ): PlainObject[] {
   if (moduleType === 'doc') return [{ name: 'Luca', age: 10, dream: 'job' }]
@@ -105,13 +112,15 @@ function mockDataRetrieval (
   return [...filteredMap.values()]
 }
 
-export function getActionFactory (storePluginOptions: StorePluginOptions): PluginGetAction {
-  return async (
-    payload: void | PlainObject = {},
-    [collectionPath, docId]: [string, string | undefined],
-    pluginModuleConfig: StorePluginModuleConfig
-  ): Promise<DoOnGet | GetResponse> => {
+export function getActionFactory (storePluginOptions: RemoteStoreOptions): PluginGetAction {
+  return async function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+  }: PluginGetActionPayload<StorePluginModuleConfig>): Promise<DoOnGet | GetResponse> {
     // this is custom logic to be implemented by the plugin author
+
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // fetch from cache/or from a remote store with logic you implement here
@@ -130,15 +139,17 @@ export function getActionFactory (storePluginOptions: StorePluginOptions): Plugi
   }
 }
 
-export function streamActionFactory (storePluginOptions: StorePluginOptions): PluginStreamAction {
-  return (
-    payload: void | PlainObject = {},
-    [collectionPath, docId]: [string, string | undefined],
-    pluginModuleConfig: StorePluginModuleConfig,
-    mustExecuteOnRead: MustExecuteOnRead
-  ): StreamResponse | DoOnStream | Promise<StreamResponse | DoOnStream> => {
+export function streamActionFactory (storePluginOptions: RemoteStoreOptions): PluginStreamAction {
+  return async function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+    mustExecuteOnRead,
+  }: PluginStreamActionPayload<StorePluginModuleConfig>): Promise<StreamResponse | DoOnStream> {
     // this is custom logic to be implemented by the plugin author
     // we'll mock opening a stream
+
     const dataRetrieved = !docId
       ? mockDataRetrieval('collection', pluginModuleConfig)
       : [
@@ -179,14 +190,19 @@ export function streamActionFactory (storePluginOptions: StorePluginOptions): Pl
   }
 }
 
-export function revertActionFactory (storePluginOptions: StorePluginOptions): PluginRevertAction {
+export function revertActionFactory (storePluginOptions: RemoteStoreOptions): PluginRevertAction {
   // this is a `PluginRevertAction`:
-  return async function revert (
-    payload: PlainObject | PlainObject[] | string | string[] | void,
-    [collectionPath, docId]: [string, string | undefined],
-    pluginModuleConfig: StorePluginModuleConfig,
-    actionName: ActionName
-  ): Promise<void> {
+  return async function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+    actionName,
+  }: PluginRevertActionPayload<StorePluginModuleConfig>): Promise<void> {
+    // reverting on read actions is not neccesary
+    const isReadAction = ['get', 'stream'].includes(actionName)
+    if (isReadAction) return
+
     // this is custom logic to be implemented by the plugin author
     await waitMs(1)
   }

@@ -1,10 +1,5 @@
 import { merge } from 'merge-anything'
-import {
-  isCollectionModule,
-  PlainObject,
-  PluginWriteAction,
-  getCollectionPathDocIdEntry,
-} from '@vue-sync/core'
+import { PlainObject, PluginWriteAction, PluginWriteActionPayload } from '@vue-sync/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function writeActionFactory (
@@ -13,11 +8,12 @@ export function writeActionFactory (
   actionName: 'merge' | 'assign' | 'replace',
   makeBackup?: MakeRestoreBackup
 ): PluginWriteAction {
-  return function (
-    payload: PlainObject,
-    [collectionPath, docId]: [string, string | undefined],
-    simpleStoreModuleConfig: SimpleStoreModuleConfig
-  ): void {
+  return function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+  }: PluginWriteActionPayload<SimpleStoreModuleConfig>): void {
     // write actions cannot be executed on collections
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 

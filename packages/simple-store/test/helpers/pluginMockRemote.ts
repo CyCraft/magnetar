@@ -3,7 +3,7 @@ import {
   VueSyncPlugin,
   PlainObject,
   WhereClause,
-  OrderBy,
+  OrderByClause,
   Limit,
 } from '@vue-sync/core'
 import {
@@ -17,25 +17,25 @@ import {
 } from './pluginMockRemoteActions'
 
 // there are two interfaces to be defined & exported by each plugin
-// - StorePluginOptions
+// - RemoteStoreOptions
 // - StorePluginModuleConfig
 
-export interface StorePluginOptions {
+export interface RemoteStoreOptions {
   storeName: string
 }
 export interface StorePluginModuleConfig {
   path?: string
   initialData?: PlainObject | [string, PlainObject][]
   where?: WhereClause[]
-  orderBy?: OrderBy[]
+  orderBy?: OrderByClause[]
   limit?: Limit
 }
 
 // a Vue Sync plugin is a single function that returns a `PluginInstance`
 // the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
 // each action must have the proper for both collection and doc type modules
-export const CreatePlugin: VueSyncPlugin<StorePluginOptions> = (
-  storePluginOptions: StorePluginOptions
+export const CreatePlugin: VueSyncPlugin<RemoteStoreOptions> = (
+  storePluginOptions: RemoteStoreOptions
 ): PluginInstance => {
   // the plugin must try to implement logic for every `ActionName`
   const get = getActionFactory(storePluginOptions)

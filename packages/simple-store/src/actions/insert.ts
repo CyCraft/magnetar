@@ -1,9 +1,4 @@
-import {
-  isCollectionModule,
-  PlainObject,
-  PluginInsertAction,
-  getCollectionPathDocIdEntry,
-} from '@vue-sync/core'
+import { PlainObject, PluginInsertAction, PluginInsertActionPayload } from '@vue-sync/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'
 
@@ -12,11 +7,12 @@ export function insertActionFactory (
   simpleStoreOptions: SimpleStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginInsertAction {
-  return function (
-    payload: PlainObject,
-    [collectionPath, docId]: [string, string | undefined],
-    simpleStoreModuleConfig: SimpleStoreModuleConfig
-  ): string {
+  return function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+  }: PluginInsertActionPayload<SimpleStoreModuleConfig>): string {
     if (!docId) {
       const newDocId =
         isFullString(payload.id) || isNumber(payload.id)

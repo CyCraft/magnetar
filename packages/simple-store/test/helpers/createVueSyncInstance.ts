@@ -1,5 +1,5 @@
 import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '@vue-sync/core'
-import { CreatePlugin } from '../../src/index'
+import { CreatePlugin } from '@vue-sync/simple-store'
 import { CreatePlugin as CreatePluginRemote } from './pluginMockRemote'
 import { pokedex, PokedexEntry } from './pokedex'
 import { generateRandomId } from './generateRandomId'
