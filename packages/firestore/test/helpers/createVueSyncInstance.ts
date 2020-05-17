@@ -45,7 +45,7 @@ export async function createVueSyncInstance (
   vueSync: VueSyncInstance
 }> {
   if (testName.includes('/')) throw new Error('no / in test names allowed!')
-  if (testName !== 'read' && testNamesUsedSoFar.includes(testName)) {
+  if (!['read', 'read-no-access'].includes(testName) && testNamesUsedSoFar.includes(testName)) {
     throw new Error(`testName: "${testName}" is already used!`)
   } else {
     testNamesUsedSoFar.push(testName)

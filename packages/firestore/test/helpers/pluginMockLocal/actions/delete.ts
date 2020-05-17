@@ -1,4 +1,4 @@
-import { PlainObject, PluginDeleteAction } from '@vue-sync/core'
+import { PlainObject, PluginDeleteAction, PluginDeleteActionPayload } from '@vue-sync/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../throwFns'
 
@@ -7,11 +7,12 @@ export function deleteActionFactory (
   simpleStoreOptions: SimpleStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeleteAction {
-  return function (
-    payload: void,
-    [collectionPath, docId]: [string, string | undefined],
-    simpleStoreModuleConfig: SimpleStoreModuleConfig
-  ): void {
+  return function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+  }: PluginDeleteActionPayload<SimpleStoreModuleConfig>): void {
     // this mocks an error during execution
     throwIfEmulatedError(payload, simpleStoreOptions)
 
@@ -21,13 +22,6 @@ export function deleteActionFactory (
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 
     if (makeBackup) makeBackup(collectionPath, docId)
-
-    // another test to mock deletions
-    const checkDoc = data[collectionPath].get(docId)
-    const { storeName } = simpleStoreOptions
-    if (checkDoc.shouldFailDelete === storeName) {
-      throw new Error(`mocked delete failure in ${storeName} store`)
-    }
 
     data[collectionPath].delete(docId)
   }

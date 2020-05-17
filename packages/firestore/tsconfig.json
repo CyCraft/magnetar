@@ -6,6 +6,12 @@
     "lib": ["ES2015", "ES2016", "ES2017", "ES2018", "ES2019", "ES2020"],
     "noImplicitReturns": true,
     "esModuleInterop": true,
+    // This must be specified if "paths" is set
+    "baseUrl": ".",
+    // Relative to "baseUrl"
+    "paths": {
+      "@vue-sync/firestore": ["src/index.ts"],
+    }
   },
   "include": [
     "src/**/*"

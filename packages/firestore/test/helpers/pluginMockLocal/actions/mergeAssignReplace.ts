@@ -1,5 +1,5 @@
 import { merge } from 'merge-anything'
-import { PlainObject, PluginWriteAction } from '@vue-sync/core'
+import { PlainObject, PluginWriteAction, PluginWriteActionPayload } from '@vue-sync/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../throwFns'
 
@@ -9,11 +9,12 @@ export function writeActionFactory (
   actionName: 'merge' | 'assign' | 'replace',
   makeBackup?: MakeRestoreBackup
 ): PluginWriteAction {
-  return function (
-    payload: PlainObject,
-    [collectionPath, docId]: [string, string | undefined],
-    simpleStoreModuleConfig: SimpleStoreModuleConfig
-  ): void {
+  return function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+  }: PluginWriteActionPayload<SimpleStoreModuleConfig>): void {
     // this mocks an error during execution
     throwIfEmulatedError(payload, simpleStoreOptions)
 

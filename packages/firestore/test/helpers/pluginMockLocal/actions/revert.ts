@@ -1,4 +1,4 @@
-import { PlainObject, ActionName, PluginRevertAction } from '@vue-sync/core'
+import { PlainObject, PluginRevertAction, PluginRevertActionPayload } from '@vue-sync/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../throwFns'
 
@@ -8,14 +8,19 @@ export function revertActionFactory (
   restoreBackup: MakeRestoreBackup
 ): PluginRevertAction {
   // this is a `PluginRevertAction`:
-  return function revert (
-    payload: PlainObject | PlainObject[] | string | string[] | void,
-    [collectionPath, docId]: [string, string | undefined],
-    simpleStoreModuleConfig: SimpleStoreModuleConfig,
-    actionName: ActionName
-  ): void {
+  return function revert ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+    actionName,
+  }: PluginRevertActionPayload<SimpleStoreModuleConfig>): void {
     // this mocks an error during execution
     throwIfEmulatedError(payload, simpleStoreOptions)
+
+    // reverting on read actions is not neccesary
+    const isReadAction = ['get', 'stream'].includes(actionName)
+    if (isReadAction) return
 
     // revert all write actions when called on a doc
     if (

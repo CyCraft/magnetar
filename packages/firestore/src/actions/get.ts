@@ -1,5 +1,5 @@
 import { firestore } from 'firebase'
-import { PlainObject, PluginGetAction, GetResponse, DocMetadata } from '@vue-sync/core'
+import { PluginGetAction, GetResponse, DocMetadata, PluginGetActionPayload } from '@vue-sync/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { getFirestoreDocPath, getFirestoreCollectionPath } from '../helpers/pathHelpers'
 import { isNumber } from 'is-what'
@@ -7,23 +7,24 @@ import { isNumber } from 'is-what'
 export function getActionFactory (
   firestorePluginOptions: Required<FirestorePluginOptions>
 ): PluginGetAction {
-  return async function (
-    payload: PlainObject,
-    [collectionPath, docId]: [string, string | undefined],
-    firestoreModuleConfig: FirestoreModuleConfig
-  ): Promise<GetResponse> {
+  return async function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+  }: PluginGetActionPayload<FirestoreModuleConfig>): Promise<GetResponse> {
     const { firestoreInstance } = firestorePluginOptions
     // in case of a doc module
     let snapshots: (firestore.DocumentSnapshot | firestore.QueryDocumentSnapshot)[]
     if (docId) {
-      const documentPath = getFirestoreDocPath([collectionPath, docId], firestoreModuleConfig, firestorePluginOptions) // prettier-ignore
+      const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
       const docSnapshot = await firestoreInstance.doc(documentPath).get()
       snapshots = [docSnapshot]
     }
     // in case of a collection module
     else if (!docId) {
-      const _collectionPath = getFirestoreCollectionPath(collectionPath, firestoreModuleConfig, firestorePluginOptions) // prettier-ignore
-      const { where = [], orderBy = [], limit } = firestoreModuleConfig
+      const _collectionPath = getFirestoreCollectionPath(collectionPath, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
+      const { where = [], orderBy = [], limit } = pluginModuleConfig
       let query: firestore.CollectionReference | firestore.Query
       query = firestoreInstance.collection(_collectionPath)
       for (const whereClause of where) {

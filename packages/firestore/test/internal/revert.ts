@@ -1,4 +1,4 @@
-import test, { after } from 'ava'
+import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
 import { pokedex } from '../helpers/pokedex'
 import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'

@@ -1,4 +1,4 @@
-import { PlainObject, PluginWriteAction } from '@vue-sync/core'
+import { PluginWriteAction, PluginWriteActionPayload } from '@vue-sync/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { BatchSync } from '../helpers/batchSync'
 import { getFirestoreDocPath } from '../helpers/pathHelpers'
@@ -8,12 +8,13 @@ export function writeActionFactory (
   firestorePluginOptions: Required<FirestorePluginOptions>,
   actionName: 'merge' | 'assign' | 'replace'
 ): PluginWriteAction {
-  return async function (
-    payload: PlainObject,
-    [collectionPath, docId]: [string, string | undefined],
-    firestoreModuleConfig: FirestoreModuleConfig
-  ): Promise<void> {
-    const documentPath = getFirestoreDocPath([collectionPath, docId], firestoreModuleConfig, firestorePluginOptions) // prettier-ignore
+  return async function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+  }: PluginWriteActionPayload<FirestoreModuleConfig>): Promise<void> {
+    const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
     if (actionName === 'merge') {
       await batchSync.set(documentPath, payload, { merge: true })
     }

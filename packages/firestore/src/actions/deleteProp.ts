@@ -1,6 +1,6 @@
 import { isArray } from 'is-what'
 import { firestore } from 'firebase'
-import { PluginDeletePropAction } from '@vue-sync/core'
+import { PluginDeletePropAction, PluginDeletePropActionPayload } from '@vue-sync/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { BatchSync } from '../helpers/batchSync'
 import { getFirestoreDocPath } from '../helpers/pathHelpers'
@@ -9,12 +9,13 @@ export function deletePropActionFactory (
   batchSync: BatchSync,
   firestorePluginOptions: Required<FirestorePluginOptions>
 ): PluginDeletePropAction {
-  return async function (
-    payload: string | string[],
-    [collectionPath, docId]: [string, string | undefined],
-    firestoreModuleConfig: FirestoreModuleConfig
-  ): Promise<void> {
-    const documentPath = getFirestoreDocPath([collectionPath, docId], firestoreModuleConfig, firestorePluginOptions) // prettier-ignore
+  return async function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+  }: PluginDeletePropActionPayload<FirestoreModuleConfig>): Promise<void> {
+    const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
     const payloadArray = isArray(payload) ? payload : [payload]
     const firestorePayload = payloadArray.reduce(
       (carry, propPath) => ({

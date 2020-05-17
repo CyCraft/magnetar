@@ -4,7 +4,8 @@ import { isCollectionModule } from '@vue-sync/core'
 import { throwIfInvalidFirestorePath } from './throwFns'
 
 export function getFirestoreDocPath (
-  [collectionPath, docId]: [string, string],
+  collectionPath: string,
+  docId: string,
   firestoreModuleConfig: FirestoreModuleConfig,
   firestorePluginOptions: FirestorePluginOptions
 ): string {
