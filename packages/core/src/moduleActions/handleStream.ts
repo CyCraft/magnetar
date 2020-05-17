@@ -46,12 +46,13 @@ export async function handleStream (args: {
   try {
     // triggering the action provided by the plugin
     const pluginStreamAction = pluginAction
-    result = await pluginStreamAction(
+    result = await pluginStreamAction({
       payload,
-      [collectionPath, docId],
+      collectionPath,
+      docId,
       pluginModuleConfig,
-      mustExecuteOnRead
-    )
+      mustExecuteOnRead,
+    })
   } catch (error) {
     // handle and await each eventFn in sequence
     for (const fn of on.error) {

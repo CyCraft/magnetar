@@ -1,5 +1,3 @@
-import { PlainObject } from './atoms'
-import { isAnyObject } from 'is-what'
 import {
   VueSyncStreamAction,
   VueSyncGetAction,
@@ -37,14 +35,3 @@ export type ActionTernary<TActionName extends ActionName> = TActionName extends 
   : TActionName extends 'insert'
   ? VueSyncInsertAction
   : VueSyncWriteAction
-
-export type VueSyncError = {
-  payload: PlainObject | PlainObject[] | string | string[] | void
-  message: string
-  code?: number
-  errors?: VueSyncError[]
-}
-
-export function isVueSyncError (payload: any): payload is VueSyncError {
-  return isAnyObject(payload) && 'payload' in payload && 'message' in payload
-}

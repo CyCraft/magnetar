@@ -34,12 +34,6 @@ export declare type VueSyncDeletePropAction<DocDataType extends object = PlainOb
  * doc(id).delete(undefined, { executionOrder: ['remote', 'local'] })
  */
 export declare type VueSyncDeleteAction<DocDataType extends object = PlainObject> = (payload?: any, actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
-export declare type VueSyncError = {
-    payload: PlainObject | PlainObject[] | string | string[] | void;
-    message: string;
-    code?: number;
-    errors?: VueSyncError[];
-};
 /**
  * A WeakMap of all open streams with the payload passed to `stream(payload)` as key and the `unsubscribe` function as value. In case `stream()` had no payload, use `{}`
  * @example
@@ -47,4 +41,3 @@ export declare type VueSyncError = {
  * const unsubscribe = collection('myDocs').openStreams.get({})
  */
 export declare type OpenStreams = Map<object, () => void>;
-export declare function isVueSyncError(payload: any): payload is VueSyncError;

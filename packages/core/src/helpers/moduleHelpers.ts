@@ -37,7 +37,7 @@ export function executeSetupModulePerStore (
     const { setupModule } = globalConfigStores[storeName]
     if (isFunction(setupModule)) {
       const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeName)
-      setupModule([collectionPath, docId], pluginModuleConfig)
+      setupModule({ collectionPath, docId, pluginModuleConfig })
     }
   }
 }
@@ -49,21 +49,19 @@ export function executeSetupModulePerStore (
  * @template DocDataType
  * @param {ModuleConfig} moduleConfig
  * @param {GlobalConfig} globalConfig
- * @returns {([collectionPath, docId]: [string, string | undefined]) => (Map<string, DocDataType> | DocDataType)}
+ * @returns {(collectionPath: string, docId: string | undefined) => (Map<string, DocDataType> | DocDataType)}
  */
 export function getDataFnFromDataStore<DocDataType> (
   moduleConfig: ModuleConfig,
   globalConfig: GlobalConfig
-): ([collectionPath, docId]: [string, string | undefined]) =>
-  | Map<string, DocDataType>
-  | DocDataType {
+): (collectionPath: string, docId: string | undefined) => Map<string, DocDataType> | DocDataType {
   const dataStoreName = moduleConfig.dataStoreName || globalConfig.dataStoreName
   throwIfNoDataStoreName(dataStoreName)
   const { getModuleData } = globalConfig.stores[dataStoreName]
   const pluginModuleConfig = getPluginModuleConfig(moduleConfig, dataStoreName)
 
-  return (([collectionPath, docId]: [string, string | undefined]) =>
-    getModuleData([collectionPath, docId], pluginModuleConfig)) as any
+  return (collectionPath, docId): Map<string, DocDataType> | DocDataType =>
+    getModuleData({ collectionPath, docId, pluginModuleConfig }) as any
 }
 
 /**
@@ -87,7 +85,7 @@ export function getDataProxyHandler<calledFrom extends 'doc' | 'collection', Doc
   const getModuleData = getDataFnFromDataStore<DocDataType>(moduleConfig, globalConfig)
   const dataHandler = {
     get: function (target: any, key: any, proxyRef: any): any {
-      if (key === 'data') return getModuleData([collectionPath, docId])
+      if (key === 'data') return getModuleData(collectionPath, docId)
       return Reflect.get(target, key, proxyRef)
     },
   }

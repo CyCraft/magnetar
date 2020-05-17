@@ -58,7 +58,7 @@ export async function handleAction (args: {
   let result: void | string | GetResponse | OnAddedFn
   try {
     // triggering the action provided by the plugin
-    result = await pluginAction(payload as any, [collectionPath, docId], pluginModuleConfig)
+    result = await pluginAction({ payload, collectionPath, docId, pluginModuleConfig } as any)
   } catch (error) {
     // handle and await each eventFn in sequence
     for (const fn of on.error) {

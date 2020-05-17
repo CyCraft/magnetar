@@ -25,9 +25,9 @@ export declare function executeSetupModulePerStore(globalConfigStores: GlobalCon
  * @template DocDataType
  * @param {ModuleConfig} moduleConfig
  * @param {GlobalConfig} globalConfig
- * @returns {([collectionPath, docId]: [string, string | undefined]) => (Map<string, DocDataType> | DocDataType)}
+ * @returns {(collectionPath: string, docId: string | undefined) => (Map<string, DocDataType> | DocDataType)}
  */
-export declare function getDataFnFromDataStore<DocDataType>(moduleConfig: ModuleConfig, globalConfig: GlobalConfig): ([collectionPath, docId]: [string, string | undefined]) => Map<string, DocDataType> | DocDataType;
+export declare function getDataFnFromDataStore<DocDataType>(moduleConfig: ModuleConfig, globalConfig: GlobalConfig): (collectionPath: string, docId: string | undefined) => Map<string, DocDataType> | DocDataType;
 /**
  * Returns an object with the `data` prop as proxy which triggers every time the data is accessed
  *

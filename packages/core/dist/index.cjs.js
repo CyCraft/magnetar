@@ -6,18 +6,18 @@ var mergeAnything = require('merge-anything');
 var isWhat = require('is-what');
 
 /*! *****************************************************************************
-Copyright (c) Microsoft Corporation. All rights reserved.
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-this file except in compliance with the License. You may obtain a copy of the
-License at http://www.apache.org/licenses/LICENSE-2.0
+Copyright (c) Microsoft Corporation.
 
-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-MERCHANTABLITY OR NON-INFRINGEMENT.
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
 
-See the Apache Version 2.0 License for specific language governing permissions
-and limitations under the License.
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
 
 var __assign = function() {
@@ -166,7 +166,7 @@ function handleAction(args) {
                     _k.label = 9;
                 case 9:
                     _k.trys.push([9, 11, , 20]);
-                    return [4 /*yield*/, pluginAction(payload, [collectionPath, docId], pluginModuleConfig)];
+                    return [4 /*yield*/, pluginAction({ payload: payload, collectionPath: collectionPath, docId: docId, pluginModuleConfig: pluginModuleConfig })];
                 case 10:
                     // triggering the action provided by the plugin
                     result = _k.sent();
@@ -453,7 +453,7 @@ function executeSetupModulePerStore(globalConfigStores, _a, moduleConfig) {
         var setupModule = globalConfigStores[storeName].setupModule;
         if (isWhat.isFunction(setupModule)) {
             var pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeName);
-            setupModule([collectionPath, docId], pluginModuleConfig);
+            setupModule({ collectionPath: collectionPath, docId: docId, pluginModuleConfig: pluginModuleConfig });
         }
     }
 }
@@ -464,17 +464,16 @@ function executeSetupModulePerStore(globalConfigStores, _a, moduleConfig) {
  * @template DocDataType
  * @param {ModuleConfig} moduleConfig
  * @param {GlobalConfig} globalConfig
- * @returns {([collectionPath, docId]: [string, string | undefined]) => (Map<string, DocDataType> | DocDataType)}
+ * @returns {(collectionPath: string, docId: string | undefined) => (Map<string, DocDataType> | DocDataType)}
  */
 function getDataFnFromDataStore(moduleConfig, globalConfig) {
     var dataStoreName = moduleConfig.dataStoreName || globalConfig.dataStoreName;
     throwIfNoDataStoreName(dataStoreName);
     var getModuleData = globalConfig.stores[dataStoreName].getModuleData;
     var pluginModuleConfig = getPluginModuleConfig(moduleConfig, dataStoreName);
-    return (function (_a) {
-        var _b = __read(_a, 2), collectionPath = _b[0], docId = _b[1];
-        return getModuleData([collectionPath, docId], pluginModuleConfig);
-    });
+    return function (collectionPath, docId) {
+        return getModuleData({ collectionPath: collectionPath, docId: docId, pluginModuleConfig: pluginModuleConfig });
+    };
 }
 /**
  * Returns an object with the `data` prop as proxy which triggers every time the data is accessed
@@ -493,7 +492,7 @@ function getDataProxyHandler(_a, moduleConfig, globalConfig) {
     var dataHandler = {
         get: function (target, key, proxyRef) {
             if (key === 'data')
-                return getModuleData([collectionPath, docId]);
+                return getModuleData(collectionPath, docId);
             return Reflect.get(target, key, proxyRef);
         },
     };
@@ -596,7 +595,14 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                         storeToRevert = storesToRevert_1_1.value;
                         pluginRevertAction = globalConfig.stores[storeToRevert].revert;
                         pluginModuleConfig_1 = getPluginModuleConfig(moduleConfig, storeToRevert);
-                        return [4 /*yield*/, pluginRevertAction(payload, [collectionPath, docId], pluginModuleConfig_1, actionName)
+                        return [4 /*yield*/, pluginRevertAction({
+                                payload: payload,
+                                collectionPath: collectionPath,
+                                docId: docId,
+                                pluginModuleConfig: pluginModuleConfig_1,
+                                actionName: actionName,
+                                error: resultFromPlugin,
+                            })
                             // revert eventFns, handle and await each eventFn in sequence
                         ];
                     case 8:
@@ -753,7 +759,13 @@ function handleStream(args) {
                 case 8:
                     _k.trys.push([8, 10, , 19]);
                     pluginStreamAction = pluginAction;
-                    return [4 /*yield*/, pluginStreamAction(payload, [collectionPath, docId], pluginModuleConfig, mustExecuteOnRead)];
+                    return [4 /*yield*/, pluginStreamAction({
+                            payload: payload,
+                            collectionPath: collectionPath,
+                            docId: docId,
+                            pluginModuleConfig: pluginModuleConfig,
+                            mustExecuteOnRead: mustExecuteOnRead,
+                        })];
                 case 9:
                     result = _k.sent();
                     return [3 /*break*/, 19];
@@ -1086,10 +1098,6 @@ function VueSync(vueSyncConfig) {
     return instance;
 }
 
-function isVueSyncError(payload) {
-    return isWhat.isAnyObject(payload) && 'payload' in payload && 'message' in payload;
-}
-
 exports.VueSync = VueSync;
 exports.getCollectionPathDocIdEntry = getCollectionPathDocIdEntry;
 exports.isCollectionModule = isCollectionModule;
@@ -1097,4 +1105,3 @@ exports.isDoOnGet = isDoOnGet;
 exports.isDoOnStream = isDoOnStream;
 exports.isDocModule = isDocModule;
 exports.isGetResponse = isGetResponse;
-exports.isVueSyncError = isVueSyncError;

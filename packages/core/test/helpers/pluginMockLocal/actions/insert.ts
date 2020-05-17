@@ -1,4 +1,4 @@
-import { PlainObject, PluginInsertAction } from '../../../../src'
+import { PlainObject, PluginInsertAction, PluginInsertActionPayload } from '../../../../src'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'
 import { throwIfEmulatedError } from '../../throwFns'
@@ -8,11 +8,12 @@ export function insertActionFactory (
   simpleStoreOptions: SimpleStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginInsertAction {
-  return function (
-    payload: PlainObject,
-    [collectionPath, docId]: [string, string | undefined],
-    simpleStoreModuleConfig: SimpleStoreModuleConfig
-  ): string {
+  return function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+  }: PluginInsertActionPayload<SimpleStoreModuleConfig>): string {
     // this mocks an error during execution
     throwIfEmulatedError(payload, simpleStoreOptions)
 

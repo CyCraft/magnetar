@@ -1,6 +1,6 @@
 import { isArray } from 'is-what'
 import pathToProp from 'path-to-prop'
-import { PlainObject, PluginDeletePropAction } from '../../../../src'
+import { PlainObject, PluginDeletePropAction, PluginDeletePropActionPayload } from '../../../../src'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../throwFns'
 
@@ -9,11 +9,12 @@ export function deletePropActionFactory (
   simpleStoreOptions: SimpleStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeletePropAction {
-  return function (
-    payload: string | string[],
-    [collectionPath, docId]: [string, string | undefined],
-    simpleStoreModuleConfig: SimpleStoreModuleConfig
-  ): void {
+  return function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+  }: PluginDeletePropActionPayload<SimpleStoreModuleConfig>): void {
     // this mocks an error during execution
     throwIfEmulatedError(payload, simpleStoreOptions)
 

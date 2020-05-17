@@ -1,4 +1,4 @@
-import { PlainObject, PluginDeleteAction } from '../../../../src'
+import { PlainObject, PluginDeleteAction, PluginDeleteActionPayload } from '../../../../src'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../throwFns'
 
@@ -7,11 +7,12 @@ export function deleteActionFactory (
   simpleStoreOptions: SimpleStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeleteAction {
-  return function (
-    payload: void,
-    [collectionPath, docId]: [string, string | undefined],
-    simpleStoreModuleConfig: SimpleStoreModuleConfig
-  ): void {
+  return function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+  }: PluginDeleteActionPayload<SimpleStoreModuleConfig>): void {
     // this mocks an error during execution
     throwIfEmulatedError(payload, simpleStoreOptions)
 

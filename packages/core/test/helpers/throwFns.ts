@@ -1,4 +1,4 @@
-import { PlainObject, VueSyncError } from '../../src'
+import { PlainObject } from '../../src'
 import { isArray, isPlainObject } from 'is-what'
 
 export function throwIfEmulatedError (
@@ -13,7 +13,7 @@ export function throwIfEmulatedError (
     p => p === storeName || (isPlainObject(p) && p.shouldFail === storeName)
   )
   if (!shouldFail) return
-  const errorToThrow: VueSyncError = {
+  const errorToThrow = {
     payload,
     message: 'failed',
   }

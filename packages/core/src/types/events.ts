@@ -1,5 +1,5 @@
 import { O } from 'ts-toolbelt'
-import { ActionName, VueSyncError } from './actions'
+import { ActionName } from './actions'
 import { PlainObject } from './atoms'
 import { GetResponse, StreamResponse, DoOnStream, DoOnGet } from './plugins'
 
@@ -32,9 +32,7 @@ export type EventFnSuccess = (
   args: O.Merge<EventSharedPayload, EventPayloadPropResult>
 ) => void | Promise<void>
 
-export type EventFnError = (
-  args: O.Merge<EventSharedPayload, { error: VueSyncError }>
-) => void | Promise<void>
+export type EventFnError = (args: O.Merge<EventSharedPayload, { error }>) => void | Promise<void>
 
 export type EventFnRevert = (
   args: O.Merge<O.Omit<EventSharedPayload, 'abort'>, EventPayloadPropResult>

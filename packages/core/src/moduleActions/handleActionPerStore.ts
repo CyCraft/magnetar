@@ -95,7 +95,7 @@ export function handleActionPerStore (
     const doOnGetFns: DoOnGet[] = modifyReadResponseMap.added
 
     // handle and await each action in sequence
-    let resultFromPlugin: void | string | GetResponse | OnAddedFn
+    let resultFromPlugin: void | string | GetResponse | OnAddedFn | any
     for (const [i, storeName] of storesToExecute.entries()) {
       // a previous iteration stopped the execution:
       if (stopExecution === true) break
@@ -124,7 +124,14 @@ export function handleActionPerStore (
         for (const storeToRevert of storesToRevert) {
           const pluginRevertAction = globalConfig.stores[storeToRevert].revert
           const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeToRevert)
-          await pluginRevertAction(payload, [collectionPath, docId], pluginModuleConfig, actionName)
+          await pluginRevertAction({
+            payload,
+            collectionPath,
+            docId,
+            pluginModuleConfig,
+            actionName,
+            error: resultFromPlugin, // in this case the result is the error
+          })
           // revert eventFns, handle and await each eventFn in sequence
           for (const fn of eventNameFnsMap.revert) {
             await fn({ payload, result: resultFromPlugin, actionName, storeName })

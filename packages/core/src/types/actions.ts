@@ -1,5 +1,4 @@
 import { O } from 'ts-toolbelt'
-import { isAnyObject } from 'is-what'
 import { SharedConfig } from './config'
 import { PlainObject, StoreName } from './atoms'
 import { DocInstance } from '../Doc'
@@ -70,13 +69,6 @@ export type VueSyncDeleteAction<DocDataType extends object = PlainObject> = (
   actionConfig?: ActionConfig
 ) => Promise<DocInstance<DocDataType>>
 
-export type VueSyncError = {
-  payload: PlainObject | PlainObject[] | string | string[] | void
-  message: string
-  code?: number
-  errors?: VueSyncError[]
-}
-
 /**
  * A WeakMap of all open streams with the payload passed to `stream(payload)` as key and the `unsubscribe` function as value. In case `stream()` had no payload, use `{}`
  * @example
@@ -84,7 +76,3 @@ export type VueSyncError = {
  * const unsubscribe = collection('myDocs').openStreams.get({})
  */
 export type OpenStreams = Map<object, () => void>
-
-export function isVueSyncError (payload: any): payload is VueSyncError {
-  return isAnyObject(payload) && 'payload' in payload && 'message' in payload
-}
