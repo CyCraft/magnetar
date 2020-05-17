@@ -1,4 +1,4 @@
-import { PlainObject, Clauses } from '../../../../src'
+import { PlainObject, Clauses } from '@vue-sync/core'
 import { isNumber, isArray } from 'is-what'
 import pathToProp from 'path-to-prop'
 import sort from 'fast-sort'

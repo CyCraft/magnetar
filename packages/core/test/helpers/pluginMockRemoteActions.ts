@@ -19,7 +19,7 @@ import {
   PluginDeletePropActionPayload,
   PluginInsertActionPayload,
   PluginWriteActionPayload,
-} from '../../src/index'
+} from '@vue-sync/core'
 import { StorePluginModuleConfig, RemoteStoreOptions } from './pluginMockRemote'
 import { waitMs } from './wait'
 import { pokedexMap } from './pokedex'

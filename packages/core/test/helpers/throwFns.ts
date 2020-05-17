@@ -1,4 +1,4 @@
-import { PlainObject } from '../../src'
+import { PlainObject } from '@vue-sync/core'
 import { isArray, isPlainObject } from 'is-what'
 
 export function throwIfEmulatedError (

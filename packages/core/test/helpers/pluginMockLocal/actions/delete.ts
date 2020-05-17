@@ -1,4 +1,4 @@
-import { PlainObject, PluginDeleteAction, PluginDeleteActionPayload } from '../../../../src'
+import { PlainObject, PluginDeleteAction, PluginDeleteActionPayload } from '@vue-sync/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../throwFns'
 

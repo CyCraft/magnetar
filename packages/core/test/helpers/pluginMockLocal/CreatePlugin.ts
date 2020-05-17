@@ -10,7 +10,7 @@ import {
   Limit,
   Clauses,
   PluginActionPayloadBase,
-} from '../../../src'
+} from '@vue-sync/core'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { insertActionFactory } from './actions/insert'
 import { deletePropActionFactory } from './actions/deleteProp'

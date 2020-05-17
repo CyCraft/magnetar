@@ -36,6 +36,7 @@
     "rollup": "^2.10.2",
     "rollup-plugin-typescript2": "^0.27.1",
     "ts-node": "^8.10.1",
+    "tsconfig-paths": "^3.9.0",
     "typescript": "^3.9.2",
     "vue": "^2.6.11",
     "vuex": "^3.4.0"
@@ -55,6 +56,7 @@
       "ts"
     ],
     "require": [
+      "tsconfig-paths/register",
       "ts-node/register"
     ],
     "timeout": "30s"

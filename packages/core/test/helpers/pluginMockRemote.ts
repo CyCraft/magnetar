@@ -5,7 +5,7 @@ import {
   WhereClause,
   OrderByClause,
   Limit,
-} from '../../src/index'
+} from '@vue-sync/core'
 import {
   writeActionFactory,
   insertActionFactory,
