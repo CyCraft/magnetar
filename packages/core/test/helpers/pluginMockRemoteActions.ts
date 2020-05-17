@@ -25,7 +25,7 @@ import { waitMs } from './wait'
 import { pokedexMap } from './pokedex'
 import { throwIfEmulatedError } from './throwFns'
 import { generateRandomId } from './generateRandomId'
-import { filterDataPerClauses } from './pluginMockLocal/helpers/dataHelpers'
+import { filterDataPerClauses } from './pluginMockRemoteHelpers'
 
 export function writeActionFactory (
   storePluginOptions: RemoteStoreOptions,
