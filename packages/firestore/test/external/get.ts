@@ -265,17 +265,15 @@ import { pokedex } from '../helpers/pokedex'
   })
 }
 {
-  const testName = 'only:get: errors are thrown'
+  const testName = 'get: errors are thrown'
   test(testName, async t => {
     const { pokedexModule } = await createVueSyncInstance('read-no-access')
     let error
     try {
       const a = await pokedexModule.get()
-      console.log(`a → `, a)
     } catch (_error) {
       error = _error
     }
-    console.log(`error → `, error)
     t.truthy(error)
   })
 }

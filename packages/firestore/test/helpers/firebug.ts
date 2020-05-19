@@ -1,6 +1,6 @@
 import test from 'ava'
-import { firestore } from './helpers/firestore'
-import { waitMs } from './helpers/wait'
+import { firestore } from '../helpers/firestore'
+import { waitMs } from '../helpers/wait'
 
 test('firebase sdk', async t => {
   const pokemonPath = `vueSyncTests/read/pokedex/136`

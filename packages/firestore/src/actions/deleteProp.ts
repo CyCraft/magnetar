@@ -1,5 +1,5 @@
 import { isArray } from 'is-what'
-import { firestore } from 'firebase'
+import * as Firebase from 'firebase/app'
 import { PluginDeletePropAction, PluginDeletePropActionPayload } from '@vue-sync/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { BatchSync } from '../helpers/batchSync'
@@ -20,7 +20,7 @@ export function deletePropActionFactory (
     const firestorePayload = payloadArray.reduce(
       (carry, propPath) => ({
         ...carry,
-        [propPath]: firestore.FieldValue.delete(),
+        [propPath]: Firebase.firestore.FieldValue.delete(),
       }),
       {} as any
     )

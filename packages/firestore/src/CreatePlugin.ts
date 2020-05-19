@@ -1,11 +1,11 @@
-import * as Firebase from 'firebase'
+import { firestore } from 'firebase'
 import { PluginInstance, VueSyncPlugin, WhereClause, OrderByClause, Limit } from '@vue-sync/core'
 import { insertActionFactory } from './actions/insert'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { deletePropActionFactory } from './actions/deleteProp'
 import { deleteActionFactory } from './actions/delete'
 import { getActionFactory } from './actions/get'
-// import { streamActionFactory } from './actions/stream'
+import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
 import { batchSyncFactory } from './helpers/batchSync'
 
@@ -14,7 +14,7 @@ import { batchSyncFactory } from './helpers/batchSync'
 // - FirestoreModuleConfig
 
 export interface FirestorePluginOptions {
-  firestoreInstance: Firebase.firestore.Firestore
+  firestoreInstance: firestore.Firestore
   /**
    * When this is true, the "modulePath" will be used as firestorePath to sync the data to. Eg. `collection('todos')` will sync data to `todos` on firestore. When this is false (default) the firestorePath must be provided like so: `collection('todos', { firestorePath: 'myTodos' })`
    */
@@ -49,7 +49,7 @@ export const CreatePlugin: VueSyncPlugin<FirestorePluginOptions> = (
 
   // the plugin must try to implement logic for every `ActionName`
   const get = getActionFactory(pluginOptions)
-  // const stream = streamActionFactory(pluginOptions)
+  const stream = streamActionFactory(pluginOptions)
   const insert = insertActionFactory(batchSync, pluginOptions)
   const _merge = writeActionFactory(batchSync, pluginOptions, 'merge')
   const assign = writeActionFactory(batchSync, pluginOptions, 'assign')
@@ -59,7 +59,7 @@ export const CreatePlugin: VueSyncPlugin<FirestorePluginOptions> = (
 
   const actions = {
     get,
-    // stream,
+    stream,
     insert,
     merge: _merge,
     assign,
