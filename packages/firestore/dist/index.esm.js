@@ -415,7 +415,7 @@ function streamActionFactory(firestorePluginOptions) {
 
 function revertActionFactory(actions, firestorePluginOptions) {
     return function (_a) {
-        var payload = _a.payload, collectionPath = _a.collectionPath, docId = _a.docId, pluginModuleConfig = _a.pluginModuleConfig, actionName = _a.actionName;
+        var payload = _a.payload, collectionPath = _a.collectionPath, docId = _a.docId, pluginModuleConfig = _a.pluginModuleConfig, actionName = _a.actionName, error = _a.error;
         return __awaiter(this, void 0, void 0, function () {
             var isReadAction;
             return __generator(this, function (_b) {
@@ -433,10 +433,10 @@ function revertActionFactory(actions, firestorePluginOptions) {
                     case 2:
                         // reverting other actions are tricky...
                         // insert on collection (no id)
-                        if (!docId && actionName === 'insert') {
-                            throw new Error("revert not yet implemented for insert on collections");
-                        }
-                        throw new Error("revert not yet implemented for " + actionName + ". See https://github.com/vue-sync/core/issues/2");
+                        if (!docId && actionName === 'insert')
+                            actionName = 'insert on collections';
+                        console.error("[@vue-sync/firestore] revert not yet implemented for " + actionName + ". See https://github.com/vue-sync/core/issues/2\n\nerror:", error);
+                        return [2 /*return*/];
                 }
             });
         });

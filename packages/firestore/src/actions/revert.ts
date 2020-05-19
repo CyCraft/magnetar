@@ -11,6 +11,7 @@ export function revertActionFactory (
     docId,
     pluginModuleConfig,
     actionName,
+    error,
   }: PluginRevertActionPayload<FirestoreModuleConfig>): Promise<void> {
     // reverting on read actions is not neccesary
     const isReadAction = ['get', 'stream'].includes(actionName)
@@ -24,11 +25,10 @@ export function revertActionFactory (
     }
     // reverting other actions are tricky...
     // insert on collection (no id)
-    if (!docId && actionName === 'insert') {
-      throw new Error(`revert not yet implemented for insert on collections`)
-    }
-    throw new Error(
-      `revert not yet implemented for ${actionName}. See https://github.com/vue-sync/core/issues/2`
+    if (!docId && actionName === 'insert') actionName = 'insert on collections' as any
+    console.error(
+      `[@vue-sync/firestore] revert not yet implemented for ${actionName}. See https://github.com/vue-sync/core/issues/2\n\nerror:`,
+      error
     )
   }
 }
