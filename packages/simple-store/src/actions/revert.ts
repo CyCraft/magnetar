@@ -12,6 +12,7 @@ export function revertActionFactory (
     docId,
     pluginModuleConfig,
     actionName,
+    error,
   }: PluginRevertActionPayload<SimpleStoreModuleConfig>): void {
     // revert all write actions when called on a doc
     if (
@@ -22,10 +23,11 @@ export function revertActionFactory (
       return
     }
     // insert on collection (no id)
-    if (!docId && actionName === 'insert') {
-      throw new Error(`revert not yet implemented for insert on collections`)
-    }
+    if (!docId && actionName === 'insert') actionName = 'insert on collections' as any
     // haven't implemented reverting 'get', 'stream' actions yet
-    throw new Error(`revert not yet implemented for ${actionName}`)
+    console.error(
+      `[@vue-sync/simple-store] revert not yet implemented for ${actionName}\n\nerror:`,
+      error
+    )
   }
 }

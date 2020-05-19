@@ -210,7 +210,7 @@ function streamActionFactory(data, simpleStoreOptions) {
 
 function revertActionFactory(data, simpleStoreOptions, restoreBackup) {
     return function (_a) {
-        var payload = _a.payload, collectionPath = _a.collectionPath, docId = _a.docId, pluginModuleConfig = _a.pluginModuleConfig, actionName = _a.actionName;
+        var payload = _a.payload, collectionPath = _a.collectionPath, docId = _a.docId, pluginModuleConfig = _a.pluginModuleConfig, actionName = _a.actionName, error = _a.error;
         // revert all write actions when called on a doc
         if (docId &&
             ['insert', 'merge', 'assign', 'replace', 'delete', 'deleteProp'].includes(actionName)) {
@@ -218,11 +218,10 @@ function revertActionFactory(data, simpleStoreOptions, restoreBackup) {
             return;
         }
         // insert on collection (no id)
-        if (!docId && actionName === 'insert') {
-            throw new Error("revert not yet implemented for insert on collections");
-        }
+        if (!docId && actionName === 'insert')
+            actionName = 'insert on collections';
         // haven't implemented reverting 'get', 'stream' actions yet
-        throw new Error("revert not yet implemented for " + actionName);
+        console.error("[@vue-sync/simple-store] revert not yet implemented for " + actionName + "\n\nerror:", error);
     };
 }
 
