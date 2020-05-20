@@ -5,23 +5,23 @@ import {
   DoOnGet,
   PluginGetActionPayload,
 } from '@vue-sync/core'
-import { SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin'
+import { ReactiveStoreModuleConfig, ReactiveStoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 
 export function getActionFactory (
   data: { [collectionPath: string]: Map<string, PlainObject> },
-  simpleStoreOptions: SimpleStoreOptions
+  reactiveStoreOptions: ReactiveStoreOptions
 ): PluginGetAction {
   return function ({
     payload,
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginGetActionPayload<SimpleStoreModuleConfig>): GetResponse | DoOnGet {
+  }: PluginGetActionPayload<ReactiveStoreModuleConfig>): GetResponse | DoOnGet {
     const doOnGetAction: DoOnGet = (payload, meta): void => {
       insertActionFactory(
         data,
-        simpleStoreOptions
+        reactiveStoreOptions
       )({
         payload,
         collectionPath,

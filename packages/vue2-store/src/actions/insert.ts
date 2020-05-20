@@ -1,10 +1,10 @@
 import { PlainObject, PluginInsertAction, PluginInsertActionPayload } from '@vue-sync/core'
-import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { ReactiveStoreModuleConfig, ReactiveStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'
 
 export function insertActionFactory (
   data: { [collectionPath: string]: Map<string, PlainObject> },
-  simpleStoreOptions: SimpleStoreOptions,
+  reactiveStoreOptions: ReactiveStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginInsertAction {
   return function ({
@@ -12,12 +12,12 @@ export function insertActionFactory (
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginInsertActionPayload<SimpleStoreModuleConfig>): string {
+  }: PluginInsertActionPayload<ReactiveStoreModuleConfig>): string {
     if (!docId) {
       const newDocId =
         isFullString(payload.id) || isNumber(payload.id)
           ? String(payload.id)
-          : simpleStoreOptions.generateRandomId()
+          : reactiveStoreOptions.generateRandomId()
 
       if (makeBackup) makeBackup(collectionPath, newDocId)
 

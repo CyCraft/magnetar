@@ -1,9 +1,9 @@
 import { VueSyncPlugin, PlainObject, WhereClause, OrderByClause, Limit } from '@vue-sync/core';
-export interface SimpleStoreOptions {
+export interface ReactiveStoreOptions {
     storeName: string;
     generateRandomId: () => string;
 }
-export interface SimpleStoreModuleConfig {
+export interface ReactiveStoreModuleConfig {
     path?: string;
     initialData?: PlainObject | [string, PlainObject][];
     where?: WhereClause[];
@@ -11,4 +11,4 @@ export interface SimpleStoreModuleConfig {
     limit?: Limit;
 }
 export declare type MakeRestoreBackup = (collectionPath: string, docId: string) => void;
-export declare const CreatePlugin: VueSyncPlugin<SimpleStoreOptions>;
+export declare const CreatePlugin: VueSyncPlugin<ReactiveStoreOptions>;

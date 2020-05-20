@@ -49,7 +49,7 @@ function __read(o, n) {
     return ar;
 }
 
-function writeActionFactory(data, simpleStoreOptions, actionName, makeBackup) {
+function writeActionFactory(data, reactiveStoreOptions, actionName, makeBackup) {
     return function (_a) {
         var payload = _a.payload, collectionPath = _a.collectionPath, docId = _a.docId, pluginModuleConfig = _a.pluginModuleConfig;
         // write actions cannot be executed on collections
@@ -77,13 +77,13 @@ function writeActionFactory(data, simpleStoreOptions, actionName, makeBackup) {
     };
 }
 
-function insertActionFactory(data, simpleStoreOptions, makeBackup) {
+function insertActionFactory(data, reactiveStoreOptions, makeBackup) {
     return function (_a) {
         var payload = _a.payload, collectionPath = _a.collectionPath, docId = _a.docId, pluginModuleConfig = _a.pluginModuleConfig;
         if (!docId) {
             var newDocId = isFullString(payload.id) || isNumber(payload.id)
                 ? String(payload.id)
-                : simpleStoreOptions.generateRandomId();
+                : reactiveStoreOptions.generateRandomId();
             if (makeBackup)
                 makeBackup(collectionPath, newDocId);
             data[collectionPath].set(newDocId, payload);
@@ -104,7 +104,7 @@ function insertActionFactory(data, simpleStoreOptions, makeBackup) {
     };
 }
 
-function deletePropActionFactory(data, simpleStoreOptions, makeBackup) {
+function deletePropActionFactory(data, reactiveStoreOptions, makeBackup) {
     return function (_a) {
         var e_1, _b;
         var payload = _a.payload, collectionPath = _a.collectionPath, docId = _a.docId, pluginModuleConfig = _a.pluginModuleConfig;
@@ -141,7 +141,7 @@ function deletePropActionFactory(data, simpleStoreOptions, makeBackup) {
     };
 }
 
-function deleteActionFactory(data, simpleStoreOptions, makeBackup) {
+function deleteActionFactory(data, reactiveStoreOptions, makeBackup) {
     return function (_a) {
         var payload = _a.payload, collectionPath = _a.collectionPath, docId = _a.docId, pluginModuleConfig = _a.pluginModuleConfig;
         // delete cannot be executed on collections
@@ -153,11 +153,11 @@ function deleteActionFactory(data, simpleStoreOptions, makeBackup) {
     };
 }
 
-function getActionFactory(data, simpleStoreOptions) {
+function getActionFactory(data, reactiveStoreOptions) {
     return function (_a) {
         var payload = _a.payload, collectionPath = _a.collectionPath, docId = _a.docId, pluginModuleConfig = _a.pluginModuleConfig;
         var doOnGetAction = function (payload, meta) {
-            insertActionFactory(data, simpleStoreOptions)({
+            insertActionFactory(data, reactiveStoreOptions)({
                 payload: payload,
                 collectionPath: collectionPath,
                 docId: docId,
@@ -168,13 +168,13 @@ function getActionFactory(data, simpleStoreOptions) {
     };
 }
 
-function streamActionFactory(data, simpleStoreOptions) {
+function streamActionFactory(data, reactiveStoreOptions) {
     return function (_a) {
         var payload = _a.payload, collectionPath = _a.collectionPath, docId = _a.docId, pluginModuleConfig = _a.pluginModuleConfig, mustExecuteOnRead = _a.mustExecuteOnRead;
         // hover over the prop names below to see more info on when they are triggered:
         var doOnStream = {
             added: function (payload, meta) {
-                insertActionFactory(data, simpleStoreOptions)({
+                insertActionFactory(data, reactiveStoreOptions)({
                     payload: payload,
                     collectionPath: collectionPath,
                     docId: docId,
@@ -182,7 +182,7 @@ function streamActionFactory(data, simpleStoreOptions) {
                 });
             },
             modified: function (payload, meta) {
-                insertActionFactory(data, simpleStoreOptions)({
+                insertActionFactory(data, reactiveStoreOptions)({
                     payload: payload,
                     collectionPath: collectionPath,
                     docId: docId,
@@ -208,7 +208,7 @@ function streamActionFactory(data, simpleStoreOptions) {
     };
 }
 
-function revertActionFactory(data, simpleStoreOptions, restoreBackup) {
+function revertActionFactory(data, reactiveStoreOptions, restoreBackup) {
     return function (_a) {
         var payload = _a.payload, collectionPath = _a.collectionPath, docId = _a.docId, pluginModuleConfig = _a.pluginModuleConfig, actionName = _a.actionName, error = _a.error;
         // revert all write actions when called on a doc
@@ -301,7 +301,7 @@ function filterDataPerClauses(collectionDB, clauses) {
 // a Vue Sync plugin is a single function that returns a `PluginInstance`
 // the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
 // each action must have the proper for both collection and doc type modules
-var CreatePlugin = function (simpleStoreOptions) {
+var CreatePlugin = function (reactiveStoreOptions) {
     // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
     // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
     var data = {};
@@ -396,15 +396,15 @@ var CreatePlugin = function (simpleStoreOptions) {
         return filteredMap;
     };
     // the plugin must try to implement logic for every `ActionName`
-    var get = getActionFactory(data, simpleStoreOptions);
-    var stream = streamActionFactory(data, simpleStoreOptions);
-    var insert = insertActionFactory(data, simpleStoreOptions, makeBackup);
-    var _merge = writeActionFactory(data, simpleStoreOptions, 'merge', makeBackup);
-    var assign = writeActionFactory(data, simpleStoreOptions, 'assign', makeBackup);
-    var replace = writeActionFactory(data, simpleStoreOptions, 'replace', makeBackup);
-    var deleteProp = deletePropActionFactory(data, simpleStoreOptions, makeBackup);
-    var _delete = deleteActionFactory(data, simpleStoreOptions, makeBackup);
-    var revert = revertActionFactory(data, simpleStoreOptions, restoreBackup);
+    var get = getActionFactory(data, reactiveStoreOptions);
+    var stream = streamActionFactory(data, reactiveStoreOptions);
+    var insert = insertActionFactory(data, reactiveStoreOptions, makeBackup);
+    var _merge = writeActionFactory(data, reactiveStoreOptions, 'merge', makeBackup);
+    var assign = writeActionFactory(data, reactiveStoreOptions, 'assign', makeBackup);
+    var replace = writeActionFactory(data, reactiveStoreOptions, 'replace', makeBackup);
+    var deleteProp = deletePropActionFactory(data, reactiveStoreOptions, makeBackup);
+    var _delete = deleteActionFactory(data, reactiveStoreOptions, makeBackup);
+    var revert = revertActionFactory(data, reactiveStoreOptions, restoreBackup);
     // the plugin function must return a `PluginInstance`
     var instance = {
         revert: revert,

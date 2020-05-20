@@ -6,13 +6,13 @@ import {
   DoOnStream,
   PluginStreamActionPayload,
 } from '@vue-sync/core'
-import { SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin'
+import { ReactiveStoreModuleConfig, ReactiveStoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 import { deleteActionFactory } from './delete'
 
 export function streamActionFactory (
   data: { [collectionPath: string]: Map<string, PlainObject> },
-  simpleStoreOptions: SimpleStoreOptions
+  reactiveStoreOptions: ReactiveStoreOptions
 ): PluginStreamAction {
   return function ({
     payload,
@@ -20,7 +20,7 @@ export function streamActionFactory (
     docId,
     pluginModuleConfig,
     mustExecuteOnRead,
-  }: PluginStreamActionPayload<SimpleStoreModuleConfig>):
+  }: PluginStreamActionPayload<ReactiveStoreModuleConfig>):
     | StreamResponse
     | DoOnStream
     | Promise<StreamResponse | DoOnStream> {
@@ -29,7 +29,7 @@ export function streamActionFactory (
       added: (payload, meta) => {
         insertActionFactory(
           data,
-          simpleStoreOptions
+          reactiveStoreOptions
         )({
           payload,
           collectionPath,
@@ -40,7 +40,7 @@ export function streamActionFactory (
       modified: (payload, meta) => {
         insertActionFactory(
           data,
-          simpleStoreOptions
+          reactiveStoreOptions
         )({
           payload,
           collectionPath,
@@ -57,7 +57,7 @@ export function streamActionFactory (
         const [_cPath, _dId] = collectionPathDocIdToDelete
         deleteActionFactory(
           data,
-          simpleStoreOptions
+          reactiveStoreOptions
         )({
           payload: undefined,
           collectionPath: _cPath,

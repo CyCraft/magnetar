@@ -1,9 +1,9 @@
 import { PlainObject, PluginDeleteAction, PluginDeleteActionPayload } from '@vue-sync/core'
-import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { ReactiveStoreModuleConfig, ReactiveStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function deleteActionFactory (
   data: { [collectionPath: string]: Map<string, PlainObject> },
-  simpleStoreOptions: SimpleStoreOptions,
+  reactiveStoreOptions: ReactiveStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeleteAction {
   return function ({
@@ -11,7 +11,7 @@ export function deleteActionFactory (
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginDeleteActionPayload<SimpleStoreModuleConfig>): void {
+  }: PluginDeleteActionPayload<ReactiveStoreModuleConfig>): void {
     // delete cannot be executed on collections
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 
