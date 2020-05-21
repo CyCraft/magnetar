@@ -18,7 +18,7 @@ test('expected behaviour computed prop lifecycle with update - no reactivity', a
   let a: any
   a = vue.bulbasaurComputed
   a = vue.bulbasaurComputed
-  // should have only ran once each
+  // should have only ran once
   t.deepEqual(ranFns, ['ran'])
 
   allPokemon[0].name = 'Bsaur'
@@ -47,7 +47,7 @@ test('expected behaviour computed prop lifecycle with update - with reactivity',
   let a: any
   a = vue.bulbasaurComputed
   a = vue.bulbasaurComputed
-  // should have only ran once each
+  // should have only ran once
   t.deepEqual(ranFns, ['ran'])
 
   allPokemon[0].name = 'Bsaur'
