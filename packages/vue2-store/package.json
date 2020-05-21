@@ -14,7 +14,7 @@
     "rollup": "rollup -c build.js"
   },
   "author": "Luca Ban - Mesqueeb",
-  "license": "MIT",
+  "license": "TBD",
   "homepage": "https://github.com/vue-sync/reactive-store#readme",
   "peerDependencies": {
     "@vue-sync/core": "^0.5.1"
@@ -40,11 +40,10 @@
     "ts-node": "^8.10.1",
     "ts-toolbelt": "^6.7.7",
     "tsconfig-paths": "^3.9.0",
-    "typescript": "^3.9.2"
+    "typescript": "^3.9.2",
+    "vue": "^2.6.11"
   },
-  "keywords": [
-    "vue-sync"
-  ],
+  "keywords": ["vue-sync"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vue-sync/reactive-store.git"
@@ -53,13 +52,8 @@
     "url": "https://github.com/vue-sync/reactive-store/issues"
   },
   "ava": {
-    "extensions": [
-      "ts"
-    ],
-    "require": [
-      "tsconfig-paths/register",
-      "ts-node/register"
-    ],
+    "extensions": ["ts"],
+    "require": ["tsconfig-paths/register", "ts-node/register"],
     "timeout": "30s"
   }
 }
