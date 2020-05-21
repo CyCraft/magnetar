@@ -14,7 +14,7 @@
     "rollup": "rollup -c build.js"
   },
   "author": "Luca & Louis",
-  "license": "MIT",
+  "license": "TBD",
   "homepage": "https://github.com/vue-sync/core#readme",
   "dependencies": {
     "is-what": "^3.8.0",
