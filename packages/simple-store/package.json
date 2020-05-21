@@ -14,7 +14,7 @@
     "rollup": "rollup -c build.js"
   },
   "author": "Luca Ban - Mesqueeb",
-  "license": "MIT",
+  "license": "TBD",
   "homepage": "https://github.com/vue-sync/simple-store#readme",
   "peerDependencies": {
     "@vue-sync/core": "^0.5.1"
