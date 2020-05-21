@@ -1,5 +1,5 @@
 {
-  "name": "@vue-sync/reactive-store",
+  "name": "@vue-sync/vue2-store",
   "version": "0.0.0",
   "sideEffects": false,
   "description": "A reactive local store plugin to use with Vue Sync.",
@@ -15,7 +15,7 @@
   },
   "author": "Luca Ban - Mesqueeb",
   "license": "TBD",
-  "homepage": "https://github.com/vue-sync/reactive-store#readme",
+  "homepage": "https://github.com/vue-sync/vue2-store#readme",
   "peerDependencies": {
     "@vue-sync/core": "^0.5.1"
   },
@@ -46,10 +46,10 @@
   "keywords": ["vue-sync"],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vue-sync/reactive-store.git"
+    "url": "git+https://github.com/vue-sync/vue2-store.git"
   },
   "bugs": {
-    "url": "https://github.com/vue-sync/reactive-store/issues"
+    "url": "https://github.com/vue-sync/vue2-store/issues"
   },
   "ava": {
     "extensions": ["ts"],
