@@ -1,3 +1,3 @@
-# magnetar
+# magnetar 🌟
 
-An extremely powerful yet modular component framework. ⭐
+A modular component framework for easily prototyping admin tools.
