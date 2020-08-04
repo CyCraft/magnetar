@@ -1,7 +1,7 @@
 {
   "name": "magnetar",
   "version": "0.0.0",
-  "description": "A modular component framework for easily prototyping admin tools 🌟",
+  "description": "A syncing solution that auto-connects any DB/API with your local data store and has optimistic-UI built in 🌟",
   "main": "dist/index.js",
   "scripts": {
     "audit": "lerna-audit",
