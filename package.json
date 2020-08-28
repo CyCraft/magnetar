@@ -16,14 +16,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mesqueeb/magnetar.git"
+    "url": "git+https://github.com/cycraft/magnetar.git"
   },
   "author": "Luca Ban - Mesqueeb",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mesqueeb/magnetar/issues"
+    "url": "https://github.com/cycraft/magnetar/issues"
   },
-  "homepage": "https://github.com/mesqueeb/magnetar#readme",
+  "homepage": "https://github.com/cycraft/magnetar#readme",
   "devDependencies": {
     "@types/node": "^14.0.27",
     "@typescript-eslint/eslint-plugin": "^3.7.1",
