@@ -53,12 +53,12 @@ export function streamActionFactory (
       const _collectionPath = getFirestoreCollectionPath(collectionPath, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
       const queryInstance = getQueryInstance(_collectionPath, pluginModuleConfig, firestoreInstance)
       unsubscribeStream = queryInstance.onSnapshot((querySnapshot: QuerySnapshot) => {
+        // do nothing for local changes
+        const localChanges = querySnapshot.metadata.hasPendingWrites
+        if (localChanges) return
+        // serverChanges only
         querySnapshot.docChanges().forEach((docChange: DocumentChange) => {
           const docSnapshot: QueryDocumentSnapshot = docChange.doc
-          // do nothing for local changes
-          const localChange = docSnapshot.metadata.hasPendingWrites
-          // serverChanges only
-          if (localChange) return
           const docData = docSnapshot.data() as PlainObject
           const docMetadata = docSnapshotToDocMetadata(docSnapshot)
           if (docChange.type === 'added') {
