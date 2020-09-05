@@ -3,7 +3,7 @@ import Vue from 'vue/dist/vue.common.js'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
 import { pokedex } from '../helpers/pokedex'
 
-test('expected behaviour computed prop lifecycle with update - no reactivity', async t => {
+test('expected behaviour computed prop lifecycle - no reactivity', async t => {
   const allPokemon = [{ name: 'bulbasaur' }]
   const ranFns = []
   const vue = new Vue({
@@ -24,12 +24,13 @@ test('expected behaviour computed prop lifecycle with update - no reactivity', a
   allPokemon[0].name = 'Bsaur'
   // should have not yet re-run
   t.deepEqual(ranFns, ['ran'])
-  // check
-  t.is(vue.bulbasaurComputed.name, 'Bsaur!')
-  // still should NOT HAVE re-run because `allPokemon` is not reactive.
-  t.deepEqual(ranFns, ['ran', 'ran'])
+  // should NOT HAVE updated value because `allPokemon` is not reactive.
+  t.is(vue.bulbasaurComputed.name, 'bulbasaur!')
+  // should NOT HAVE re-run because `allPokemon` is not reactive.
+  t.deepEqual(ranFns, ['ran'])
 })
-test('expected behaviour computed prop lifecycle with update - with reactivity', async t => {
+
+test('expected behaviour computed prop lifecycle - with reactivity via data', async t => {
   const allPokemon = [{ name: 'bulbasaur' }]
   const ranFns = []
   const vue = new Vue({
@@ -49,7 +50,34 @@ test('expected behaviour computed prop lifecycle with update - with reactivity',
   a = vue.bulbasaurComputed
   // should have only ran once
   t.deepEqual(ranFns, ['ran'])
+  // update from the outside
+  allPokemon[0].name = 'Bsaur'
+  // should have not yet re-run
+  t.deepEqual(ranFns, ['ran'])
+  // check
+  t.is(vue.bulbasaurComputed.name, 'Bsaur!')
+  // now it should have re-run
+  t.deepEqual(ranFns, ['ran', 'ran'])
+})
 
+test('expected behaviour computed prop lifecycle - with reactivity via vue.observable', async t => {
+  const allPokemon = Vue.observable([{ name: 'bulbasaur' }])
+  const ranFns = []
+  const vue = new Vue({
+    computed: {
+      bulbasaurComputed () {
+        ranFns.push('ran')
+        return { ...allPokemon[0], name: allPokemon[0].name + '!' }
+      },
+    },
+  })
+
+  let a: any
+  a = vue.bulbasaurComputed
+  a = vue.bulbasaurComputed
+  // should have only ran once
+  t.deepEqual(ranFns, ['ran'])
+  // update from the outside
   allPokemon[0].name = 'Bsaur'
   // should have not yet re-run
   t.deepEqual(ranFns, ['ran'])
@@ -100,16 +128,95 @@ test('expected behaviour computed prop lifecycle with update - with reactivity',
 //   t.deepEqual(ranFns, ['bulbasaur', 'bulbasaur'])
 // })
 
-// test('reactivity: document', async t => {
-//   const { trainerModule } = createVueSyncInstance()
-//   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
-//   try {
-//     await trainerModule.get()
-//   } catch (error) {
-//     t.fail(error)
-//   }
-//   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
-// })
+test('reactivity: document - via data', async t => {
+  const { trainerModule } = createVueSyncInstance()
+  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: undefined })
+
+  const ranFns = []
+  const vue = new Vue({
+    data () {
+      return { data: trainerModule.data }
+    },
+    computed: {
+      dataComputed () {
+        ranFns.push('ran')
+        console.log(`this.data.__ob__ → `, this.data.__ob__)
+        return { ...this.data, name: this.data.name + '!' }
+      },
+    },
+  })
+
+  t.is(vue.dataComputed.name, 'Luca!')
+  t.is(vue.dataComputed.name, 'Luca!')
+  // should have only ran once
+  t.deepEqual(ranFns, ['ran'])
+  // update from the outside
+  await trainerModule.merge({ name: 'LUCA' })
+  // should have not yet re-run
+  t.deepEqual(ranFns, ['ran'])
+  // check
+  t.is(vue.dataComputed.name, 'LUCA!')
+  t.is(vue.dataComputed.dream, undefined)
+  // now it should have re-run
+  t.deepEqual(ranFns, ['ran', 'ran'])
+  // get data from server
+  try { await trainerModule.get() } catch (error) { t.fail(error) } // prettier-ignore
+  // the server mock doesn't really update the server data
+  // so a get() call should reset the name back to 'Luca'
+  t.deepEqual(trainerModule.data, { name: 'Luca', dream: 'job' })
+
+  t.is(vue.dataComputed.name, 'Luca!')
+  t.is(vue.dataComputed.dream, 'job')
+  t.is(vue.dataComputed.age, undefined)
+  // now it should have re-run
+  t.deepEqual(ranFns, ['ran', 'ran', 'ran'])
+})
+
+test('only:reactivity: document - directly', async t => {
+  const { trainerModule } = createVueSyncInstance()
+  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: undefined })
+
+  const ranFns = []
+  const vue = new Vue({
+    data () {
+      return {}
+    },
+    computed: {
+      dataComputed () {
+        ranFns.push('ran')
+        const data = trainerModule.data
+        return { ...data, name: data.name + '!' }
+      },
+    },
+  })
+
+  t.is(vue.dataComputed.name, 'Luca!')
+  t.is(vue.dataComputed.name, 'Luca!')
+  // should have only ran once
+  t.deepEqual(ranFns, ['ran'])
+  // update from the outside
+  await trainerModule.merge({ name: 'LUCA' })
+  t.deepEqual(trainerModule.data, { name: 'LUCA', age: 10, dream: undefined })
+  // should have not yet re-run
+  t.deepEqual(ranFns, ['ran'])
+  // check
+  t.is(vue.dataComputed.name, 'LUCA!')
+  t.is(vue.dataComputed.dream, undefined)
+  // // now it should have re-run
+  t.deepEqual(ranFns, ['ran', 'ran'])
+  // // get data from server
+  try { await trainerModule.get() } catch (error) { t.fail(error) } // prettier-ignore
+  // the server mock doesn't really update the server data
+  // so a get() call should reset the name back to 'Luca'
+  t.deepEqual(trainerModule.data, { name: 'Luca', dream: 'job' })
+  t.deepEqual(ranFns, ['ran', 'ran'])
+
+  t.is(vue.dataComputed.name, 'Luca!')
+  t.is(vue.dataComputed.dream, 'job')
+  t.is(vue.dataComputed.age, undefined)
+  // now it should have re-run
+  t.deepEqual(ranFns, ['ran', 'ran', 'ran'])
+})
 
 // test if a computed prop is re-run or not based on how the underlying data is overwritten
 // test('computed prop lifecycle', async t => {

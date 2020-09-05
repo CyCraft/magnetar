@@ -17,7 +17,8 @@
   "license": "TBD",
   "homepage": "https://github.com/vue-sync/vue2-store#readme",
   "peerDependencies": {
-    "@vue-sync/core": "^0.5.1"
+    "@vue-sync/core": "^0.5.1",
+    "vue": "^2.6.11"
   },
   "dependencies": {
     "copy-anything": "^2.0.1",

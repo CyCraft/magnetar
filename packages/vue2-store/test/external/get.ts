@@ -166,7 +166,7 @@ test('get (collection) compound queries', async t => {
   }
 })
 
-test('only:get (collection) orderBy', async t => {
+test('get (collection) orderBy', async t => {
   const { pokedexModule } = createVueSyncInstance()
   try {
     const queryModuleRef = await pokedexModule

@@ -105,7 +105,7 @@ function mockDataRetrieval (
   moduleType: 'collection' | 'doc',
   pluginModuleConfig: StorePluginModuleConfig
 ): PlainObject[] {
-  if (moduleType === 'doc') return [{ name: 'Luca', age: 10, dream: 'job' }]
+  if (moduleType === 'doc') return [{ name: 'Luca', dream: 'job' }]
   const _pokedexMap = pokedexMap()
   const clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
   const filteredMap = filterDataPerClauses(_pokedexMap, clauses)

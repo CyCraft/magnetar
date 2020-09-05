@@ -1,6 +1,7 @@
 import { PlainObject, PluginInsertAction, PluginInsertActionPayload } from '@vue-sync/core'
 import { ReactiveStoreModuleConfig, ReactiveStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'
+import Vue from 'vue'
 
 export function insertActionFactory (
   data: { [collectionPath: string]: Map<string, PlainObject> },
@@ -29,12 +30,18 @@ export function insertActionFactory (
 
     if (makeBackup) makeBackup(collectionPath, docId)
 
-    // reset the doc to be able to overwrite
-    collectionMap.set(docId, {})
     const docDataToMutate = collectionMap.get(docId)
-    Object.entries(payload).forEach(([key, value]) => {
-      docDataToMutate[key] = value
+    // reset the doc to be able to overwrite
+    Object.keys(docDataToMutate).forEach(key => {
+      if (key in payload) return
+      // delete docDataToMutate[key]
+      Vue.delete(docDataToMutate, key)
     })
+    Object.entries(payload).forEach(([key, value]) => {
+      // docDataToMutate[key] = value
+      Vue.set(docDataToMutate, key, value)
+    })
+    // console.log(`docDataToMutate.name → `, docDataToMutate.name)
     return docId
   }
 }

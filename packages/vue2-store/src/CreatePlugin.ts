@@ -1,6 +1,7 @@
 import { copy } from 'copy-anything'
 import { pick } from 'filter-anything'
 import { isArray } from 'is-what'
+// import Vue from 'vue'
 import {
   PluginInstance,
   VueSyncPlugin,
@@ -25,8 +26,10 @@ import { filterDataPerClauses } from './helpers/dataHelpers'
 // - ReactiveStoreModuleConfig
 
 export interface ReactiveStoreOptions {
+  vueInstance: any
   storeName: string
   generateRandomId: () => string
+
 }
 export interface ReactiveStoreModuleConfig {
   path?: string
@@ -92,10 +95,10 @@ export const CreatePlugin: VueSyncPlugin<ReactiveStoreOptions> = (
     if (!initialData) return
     if (!docId && isArray(initialData)) {
       for (const [_docId, _docData] of initialData) {
-        data[collectionPath].set(_docId, _docData)
+        data[collectionPath].set(_docId, reactiveStoreOptions.vueInstance.observable(_docData))
       }
     } else {
-      data[collectionPath].set(docId, initialData as PlainObject)
+      data[collectionPath].set(docId, reactiveStoreOptions.vueInstance.observable(initialData) as PlainObject)
     }
     modulesAlreadySetup.add(modulePath)
   }
@@ -115,6 +118,8 @@ export const CreatePlugin: VueSyncPlugin<ReactiveStoreOptions> = (
   }: PluginActionPayloadBase<ReactiveStoreModuleConfig>): any => {
     const collectionDB = data[collectionPath]
     // if it's a doc, return the specific doc
+    // console.log(`collectionDB.get(docId).__ob__ → `, collectionDB.get(docId).__ob__)
+    // console.log(`collectionDB.get(docId).name → `, collectionDB.get(docId).name)
     if (docId) return collectionDB.get(docId)
     // if it's a collection, we must return the collectionDB but with applied query clauses
     // but remember, the return type MUST be a map with id as keys and the docs as value

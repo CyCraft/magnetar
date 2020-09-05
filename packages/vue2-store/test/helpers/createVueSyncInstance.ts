@@ -4,12 +4,13 @@ import { CreatePlugin as CreatePluginRemote } from './pluginMockRemote'
 import { pokedex, PokedexEntry } from './pokedex'
 import { generateRandomId } from './generateRandomId'
 import { O } from 'ts-toolbelt'
+import Vue from 'vue/dist/vue.common.js'
 
 const getInitialDataCollection = () => [
   // doc entries
   ['1', pokedex(1)],
 ]
-const getInitialDataDocument = () => ({ name: 'Luca', age: 10 })
+const getInitialDataDocument = () => ({ name: 'Luca', age: 10, dream: undefined })
 
 export type PokedexModuleData = O.Merge<
   PokedexEntry,
@@ -27,12 +28,12 @@ export interface TrainerModuleData {
   shouldFail?: string
 }
 
-export function createVueSyncInstance (): {
+export function createVueSyncInstance (vueInstance: any = Vue): {
   pokedexModule: CollectionInstance<PokedexModuleData>
   trainerModule: DocInstance<TrainerModuleData>
   vueSync: VueSyncInstance
 } {
-  const local = CreatePlugin({ storeName: 'local', generateRandomId })
+  const local = CreatePlugin({ storeName: 'local', generateRandomId, vueInstance })
   const remote = CreatePluginRemote({ storeName: 'remote' })
   const vueSync = VueSync({
     dataStoreName: 'local',
