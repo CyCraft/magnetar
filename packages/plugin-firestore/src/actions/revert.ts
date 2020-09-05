@@ -1,4 +1,4 @@
-import { PluginRevertAction, PluginInstance, PluginRevertActionPayload } from '@vue-sync/core'
+import { PluginRevertAction, PluginInstance, PluginRevertActionPayload } from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 
 export function revertActionFactory (
@@ -27,7 +27,7 @@ export function revertActionFactory (
     // insert on collection (no id)
     if (!docId && actionName === 'insert') actionName = 'insert on collections' as any
     console.error(
-      `[@vue-sync/firestore] revert not yet implemented for ${actionName}. See https://github.com/vue-sync/core/issues/2`
+      `[@magnetarjs/plugin-firestore] revert not yet implemented for ${actionName}. See https://github.com/cycraft/core/issues/2`
     )
   }
 }

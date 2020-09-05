@@ -1,6 +1,6 @@
 {
-  "name": "@vue-sync/simple-store",
-  "version": "0.0.6",
+  "name": "@magnetarjs/plugin-simple-store",
+  "version": "0.0.0",
   "sideEffects": false,
   "description": "A simple local store plugin to use with Vue Sync.",
   "main": "dist/index.cjs.js",
@@ -15,9 +15,9 @@
   },
   "author": "Luca Ban - Mesqueeb",
   "license": "TBD",
-  "homepage": "https://github.com/vue-sync/simple-store#readme",
+  "homepage": "https://github.com/cycraft/magnetar#readme",
   "peerDependencies": {
-    "@vue-sync/core": "^0.5.1"
+    "@magnetarjs/core": "^0.0.0"
   },
   "dependencies": {
     "copy-anything": "^2.0.1",
@@ -30,7 +30,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
-    "@vue-sync/core": "^0.5.1",
+    "@magnetarjs/core": "^0.0.0",
     "@vue/test-utils": "^2.0.0-alpha.6",
     "ava": "^3.8.2",
     "browser-env": "^3.3.0",
@@ -52,10 +52,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vue-sync/simple-store.git"
+    "url": "git+https://github.com/cycraft/magnetar.git"
   },
   "bugs": {
-    "url": "https://github.com/vue-sync/simple-store/issues"
+    "url": "https://github.com/cycraft/magnetar/issues"
   },
   "ava": {
     "extensions": [

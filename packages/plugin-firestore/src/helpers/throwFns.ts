@@ -1,8 +1,8 @@
 import { isFullString } from 'is-what'
-import { isDocModule, isCollectionModule } from '@vue-sync/core'
+import { isDocModule, isCollectionModule } from '@magnetarjs/core'
 
 export function logError (errorMessage: string): void {
-  console.error('[@vue-sync/firestore error]\n', errorMessage)
+  console.error('[@magnetarjs/plugin-firestore error]\n', errorMessage)
 }
 
 export function logErrorAndThrow (errorMessage: string): void {

@@ -5,7 +5,7 @@ import {
   StreamResponse,
   DoOnStream,
   PluginStreamActionPayload,
-} from '@vue-sync/core'
+} from '@magnetarjs/core'
 import { ReactiveStoreModuleConfig, ReactiveStoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 import { deleteActionFactory } from './delete'

@@ -66,7 +66,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
   })
 }
 // Todo: currently not possible
-// see: https://github.com/vue-sync/core/issues/2
+// see: https://github.com/cycraft/core/issues/2
 // {
 //   const testName = 'revert: (remote → local) delete (document)'
 //   test(testName, async t => {

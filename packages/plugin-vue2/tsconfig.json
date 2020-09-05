@@ -10,7 +10,7 @@
     "baseUrl": ".",
     // Relative to "baseUrl"
     "paths": {
-      "@vue-sync/reactive-store": ["src/index.ts"],
+      "@magnetarjs/plugin-vue2": ["src/index.ts"],
     }
   },
   "include": [

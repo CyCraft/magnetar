@@ -1,5 +1,5 @@
 import { merge } from 'merge-anything'
-import { PlainObject, PluginWriteAction, PluginWriteActionPayload } from '@vue-sync/core'
+import { PlainObject, PluginWriteAction, PluginWriteActionPayload } from '@magnetarjs/core'
 import { ReactiveStoreModuleConfig, ReactiveStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import Vue from 'vue'
 

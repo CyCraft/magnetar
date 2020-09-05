@@ -1,4 +1,4 @@
-import { VueSyncPlugin, PlainObject, WhereClause, OrderByClause, Limit } from '@vue-sync/core';
+import { VueSyncPlugin, PlainObject, WhereClause, OrderByClause, Limit } from '@magnetarjs/core';
 export interface ReactiveStoreOptions {
     storeName: string;
     generateRandomId: () => string;

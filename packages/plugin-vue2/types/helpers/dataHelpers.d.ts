@@ -1,4 +1,4 @@
-import { PlainObject, Clauses } from '@vue-sync/core';
+import { PlainObject, Clauses } from '@magnetarjs/core';
 /**
  * Filters a Collection module's data map `Map<string, DocData>` based on provided clauses.
  *

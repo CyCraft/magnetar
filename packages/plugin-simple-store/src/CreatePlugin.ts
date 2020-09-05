@@ -10,7 +10,7 @@ import {
   OrderByClause,
   Limit,
   PluginActionPayloadBase,
-} from '@vue-sync/core'
+} from '@magnetarjs/core'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { insertActionFactory } from './actions/insert'
 import { deletePropActionFactory } from './actions/deleteProp'

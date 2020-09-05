@@ -10,7 +10,7 @@
     "baseUrl": ".",
     // Relative to "baseUrl"
     "paths": {
-      "@vue-sync/firestore": ["src/index.ts"],
+      "@magnetarjs/plugin-firestore": ["src/index.ts"],
     }
   },
   "include": [

@@ -1,6 +1,6 @@
 import { isArray } from 'is-what'
 import pathToProp from 'path-to-prop'
-import { PlainObject, PluginDeletePropAction, PluginDeletePropActionPayload } from '@vue-sync/core'
+import { PlainObject, PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetarjs/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../throwFns'
 

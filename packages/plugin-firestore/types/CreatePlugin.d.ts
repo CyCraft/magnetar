@@ -1,5 +1,5 @@
 import { firestore } from 'firebase';
-import { VueSyncPlugin, WhereClause, OrderByClause, Limit } from '@vue-sync/core';
+import { VueSyncPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core';
 export interface FirestorePluginOptions {
     firestoreInstance: firestore.Firestore;
     /**

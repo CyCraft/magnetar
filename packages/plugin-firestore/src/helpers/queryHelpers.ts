@@ -1,7 +1,7 @@
 import { firestore } from 'firebase'
 import { isNumber } from 'is-what'
 import { FirestoreModuleConfig } from 'src/CreatePlugin'
-import { DocMetadata } from '@vue-sync/core'
+import { DocMetadata } from '@magnetarjs/core'
 
 type Firestore = firestore.Firestore
 type Query = firestore.Query

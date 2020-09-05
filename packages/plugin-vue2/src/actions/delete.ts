@@ -1,4 +1,4 @@
-import { PlainObject, PluginDeleteAction, PluginDeleteActionPayload } from '@vue-sync/core'
+import { PlainObject, PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/core'
 import { ReactiveStoreModuleConfig, ReactiveStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function deleteActionFactory (

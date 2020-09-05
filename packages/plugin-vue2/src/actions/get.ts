@@ -4,7 +4,7 @@ import {
   GetResponse,
   DoOnGet,
   PluginGetActionPayload,
-} from '@vue-sync/core'
+} from '@magnetarjs/core'
 import { ReactiveStoreModuleConfig, ReactiveStoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 

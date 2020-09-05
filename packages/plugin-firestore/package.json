@@ -1,6 +1,6 @@
 {
-  "name": "@vue-sync/firestore",
-  "version": "0.0.1",
+  "name": "@magnetarjs/plugin-firestore",
+  "version": "0.0.0",
   "sideEffects": false,
   "description": "",
   "main": "dist/index.cjs.js",
@@ -15,9 +15,9 @@
   },
   "author": "Luca Ban - Mesqueeb",
   "license": "TBD",
-  "homepage": "https://github.com/vue-sync/firestore#readme",
+  "homepage": "https://github.com/cycraft/magnetar#readme",
   "peerDependencies": {
-    "@vue-sync/core": "^0.5.1",
+    "@magnetarjs/core": "^0.0.0",
     "firebase": "^7.14.4"
   },
   "dependencies": {
@@ -28,7 +28,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.34.0",
     "@typescript-eslint/parser": "^2.34.0",
-    "@vue-sync/core": "^0.5.1",
+    "@magnetarjs/core": "^0.0.0",
     "ava": "^3.8.2",
     "copy-anything": "^2.0.1",
     "eslint": "^7.0.0",
@@ -46,10 +46,10 @@
   "keywords": ["vue-sync"],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vue-sync/firestore.git"
+    "url": "git+https://github.com/cycraft/magnetar.git"
   },
   "bugs": {
-    "url": "https://github.com/vue-sync/firestore/issues"
+    "url": "https://github.com/cycraft/magnetar/issues"
   },
   "ava": {
     "extensions": ["ts"],

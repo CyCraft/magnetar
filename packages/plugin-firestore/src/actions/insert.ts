@@ -1,4 +1,4 @@
-import { PluginInsertAction, PluginInsertActionPayload } from '@vue-sync/core'
+import { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'
 import { BatchSync } from '../helpers/batchSync'

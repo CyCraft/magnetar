@@ -1,4 +1,4 @@
-import { PlainObject } from '@vue-sync/core'
+import { PlainObject } from '@magnetarjs/core'
 import { isArray, isPlainObject } from 'is-what'
 
 export function throwIfEmulatedError (

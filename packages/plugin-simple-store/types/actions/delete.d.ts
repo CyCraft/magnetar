@@ -1,4 +1,4 @@
-import { PlainObject, PluginDeleteAction } from '@vue-sync/core';
+import { PlainObject, PluginDeleteAction } from '@magnetarjs/core';
 import { SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin';
 export declare function deleteActionFactory(data: {
     [collectionPath: string]: Map<string, PlainObject>;

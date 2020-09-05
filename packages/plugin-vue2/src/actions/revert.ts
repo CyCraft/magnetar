@@ -1,4 +1,4 @@
-import { PlainObject, PluginRevertAction, PluginRevertActionPayload } from '@vue-sync/core'
+import { PlainObject, PluginRevertAction, PluginRevertActionPayload } from '@magnetarjs/core'
 import { ReactiveStoreModuleConfig, ReactiveStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function revertActionFactory (
@@ -25,6 +25,6 @@ export function revertActionFactory (
     // insert on collection (no id)
     if (!docId && actionName === 'insert') actionName = 'insert on collections' as any
     // haven't implemented reverting 'get', 'stream' actions yet
-    console.error(`[@vue-sync/reactive-store] revert not yet implemented for ${actionName}`)
+    console.error(`[@magnetarjs/reactive-store] revert not yet implemented for ${actionName}`)
   }
 }

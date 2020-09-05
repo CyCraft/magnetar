@@ -1,4 +1,4 @@
-import { PlainObject, Clauses } from '@vue-sync/core'
+import { PlainObject, Clauses } from '@magnetarjs/core'
 import { isNumber, isArray } from 'is-what'
 import pathToProp from 'path-to-prop'
 import sort from 'fast-sort'

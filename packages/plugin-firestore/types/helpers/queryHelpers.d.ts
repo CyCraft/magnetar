@@ -1,6 +1,6 @@
 import { firestore } from 'firebase';
 import { FirestoreModuleConfig } from 'src/CreatePlugin';
-import { DocMetadata } from '@vue-sync/core';
+import { DocMetadata } from '@magnetarjs/core';
 declare type Firestore = firestore.Firestore;
 declare type Query = firestore.Query;
 declare type DocumentSnapshot = firestore.DocumentSnapshot;

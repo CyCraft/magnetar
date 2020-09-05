@@ -1,4 +1,4 @@
-import { PlainObject, PluginRevertAction, PluginRevertActionPayload } from '@vue-sync/core'
+import { PlainObject, PluginRevertAction, PluginRevertActionPayload } from '@magnetarjs/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../throwFns'
 

@@ -1,5 +1,5 @@
 import { FirestorePluginOptions } from '../CreatePlugin';
-import { PlainObject } from '@vue-sync/core';
+import { PlainObject } from '@magnetarjs/core';
 import { firestore } from 'firebase';
 export declare type BatchSync = {
     set: (documentPath: string, payload: PlainObject, options?: firestore.SetOptions) => Promise<void>;

@@ -1,6 +1,6 @@
 {
-  "name": "@vue-sync/core",
-  "version": "0.5.1",
+  "name": "@magnetarjs/core",
+  "version": "0.0.0",
   "sideEffects": false,
   "description": "Vue-Sync core library.",
   "main": "dist/index.cjs.js",
@@ -15,7 +15,7 @@
   },
   "author": "Luca & Louis",
   "license": "TBD",
-  "homepage": "https://github.com/vue-sync/core#readme",
+  "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
     "is-what": "^3.8.0",
     "merge-anything": "^3.0.3",
@@ -44,10 +44,10 @@
   "keywords": ["vue-sync"],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vue-sync/core.git"
+    "url": "git+https://github.com/cycraft/magnetar.git"
   },
   "bugs": {
-    "url": "https://github.com/vue-sync/core/issues"
+    "url": "https://github.com/cycraft/magnetar/issues"
   },
   "ava": {
     "extensions": ["ts"],

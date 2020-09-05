@@ -1,6 +1,6 @@
 import { isFullString } from 'is-what'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
-import { isCollectionModule } from '@vue-sync/core'
+import { isCollectionModule } from '@magnetarjs/core'
 import { throwIfInvalidFirestorePath } from './throwFns'
 
 export function getFirestoreDocPath (

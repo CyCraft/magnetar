@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
-import { DocMetadata } from '@vue-sync/core'
+import { DocMetadata } from '@magnetarjs/core'
 
 {
   const testName = 'get unexisting (document)'

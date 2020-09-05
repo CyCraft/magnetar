@@ -10,7 +10,7 @@
     "baseUrl": ".",
     // Relative to "baseUrl"
     "paths": {
-      "@vue-sync/simple-store": ["src/index.ts"],
+      "@magnetarjs/plugin-simple-store": ["src/index.ts"],
     }
   },
   "include": [

@@ -1,7 +1,7 @@
 import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
 import { pokedex } from '../helpers/pokedex'
-import { DocInstance } from '@vue-sync/core'
+import { DocInstance } from '@magnetarjs/core'
 import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 
 {

@@ -1,4 +1,4 @@
-import { PlainObject, PluginInsertAction } from '@vue-sync/core';
+import { PlainObject, PluginInsertAction } from '@magnetarjs/core';
 import { SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin';
 export declare function insertActionFactory(data: {
     [collectionPath: string]: Map<string, PlainObject>;

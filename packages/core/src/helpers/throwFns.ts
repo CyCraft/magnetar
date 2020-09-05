@@ -3,7 +3,7 @@ import { isFullString } from 'is-what'
 import { isDocModule, isCollectionModule } from './pathHelpers'
 
 export function logError (errorMessage: string): void {
-  console.error('[@vue-sync error]\n', errorMessage)
+  console.error('[@magnetarjs error]\n', errorMessage)
 }
 
 export function logErrorAndThrow (errorMessage: string): void {

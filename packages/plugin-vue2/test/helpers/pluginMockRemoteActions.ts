@@ -19,7 +19,7 @@ import {
   PluginDeletePropActionPayload,
   PluginInsertActionPayload,
   PluginWriteActionPayload,
-} from '@vue-sync/core'
+} from '@magnetarjs/core'
 import { StorePluginModuleConfig, RemoteStoreOptions } from './pluginMockRemote'
 import { waitMs } from './wait'
 import { pokedexMap } from './pokedex'

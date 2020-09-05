@@ -1,5 +1,5 @@
 import { firestore } from 'firebase'
-import { PluginInstance, VueSyncPlugin, WhereClause, OrderByClause, Limit } from '@vue-sync/core'
+import { PluginInstance, VueSyncPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core'
 import { insertActionFactory } from './actions/insert'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { deletePropActionFactory } from './actions/deleteProp'

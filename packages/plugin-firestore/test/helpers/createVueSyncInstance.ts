@@ -1,6 +1,6 @@
 import { CreatePlugin as CreatePluginLocal } from './pluginMockLocal/index'
 import { CreatePlugin } from '../../src'
-import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '@vue-sync/core'
+import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '@magnetarjs/core'
 import { pokedex, PokedexEntry } from './pokedex'
 import { generateRandomId } from './generateRandomId'
 import { firestore } from './firestore'

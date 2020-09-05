@@ -1,6 +1,6 @@
 import { isArray } from 'is-what'
 import * as Firebase from 'firebase/app'
-import { PluginDeletePropAction, PluginDeletePropActionPayload } from '@vue-sync/core'
+import { PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { BatchSync } from '../helpers/batchSync'
 import { getFirestoreDocPath } from '../helpers/pathHelpers'

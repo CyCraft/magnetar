@@ -4,7 +4,7 @@ import {
   PluginStreamAction,
   PluginStreamActionPayload,
   PlainObject,
-} from '@vue-sync/core'
+} from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { getFirestoreDocPath, getFirestoreCollectionPath } from '../helpers/pathHelpers'
 import { getQueryInstance, docSnapshotToDocMetadata } from 'src/helpers/queryHelpers'

@@ -1,5 +1,5 @@
-import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '@vue-sync/core'
-import { CreatePlugin } from '@vue-sync/reactive-store'
+import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '@magnetarjs/core'
+import { CreatePlugin } from '@magnetarjs/reactive-store'
 import { CreatePlugin as CreatePluginRemote } from './pluginMockRemote'
 import { pokedex, PokedexEntry } from './pokedex'
 import { generateRandomId } from './generateRandomId'

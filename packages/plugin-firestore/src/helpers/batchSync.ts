@@ -1,5 +1,5 @@
 import { FirestorePluginOptions } from '../CreatePlugin'
-import { PlainObject } from '@vue-sync/core'
+import { PlainObject } from '@magnetarjs/core'
 import { Countdown, CountdownInstance } from './Countdown'
 // just for types:
 import { firestore } from 'firebase'

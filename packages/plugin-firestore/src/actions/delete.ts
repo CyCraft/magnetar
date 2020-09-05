@@ -1,4 +1,4 @@
-import { PluginDeleteAction, PluginDeleteActionPayload } from '@vue-sync/core'
+import { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { BatchSync } from '../helpers/batchSync'
 import { getFirestoreDocPath } from '../helpers/pathHelpers'

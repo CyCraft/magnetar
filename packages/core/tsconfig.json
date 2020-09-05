@@ -10,7 +10,7 @@
     "baseUrl": ".",
     // Relative to "baseUrl"
     "paths": {
-      "@vue-sync/core": ["src/index.ts"],
+      "@magnetarjs/core": ["src/index.ts"],
     }
   },
   "include": [

@@ -5,7 +5,7 @@ import {
   WhereClause,
   OrderByClause,
   Limit,
-} from '@vue-sync/core'
+} from '@magnetarjs/core'
 import {
   writeActionFactory,
   insertActionFactory,
