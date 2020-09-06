@@ -26,25 +26,16 @@
     "filter-anything": "^2.1.2",
     "is-what": "^3.8.0",
     "merge-anything": "^3.0.3",
-    "path-to-prop": "0.0.3"
+    "path-to-prop": "0.0.3",
+    "ts-toolbelt": "^6.7.7"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^2.33.0",
-    "@typescript-eslint/parser": "^2.33.0",
     "@magnetarjs/core": "^0.0.0",
-    "ava": "^3.8.2",
-    "eslint": "^7.0.0",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-tree-shaking": "^1.8.0",
-    "rollup": "^2.10.2",
-    "rollup-plugin-typescript2": "^0.27.1",
-    "ts-node": "^8.10.1",
-    "ts-toolbelt": "^6.7.7",
-    "tsconfig-paths": "^3.9.0",
-    "typescript": "^3.9.2",
     "vue": "^2.6.11"
   },
-  "keywords": ["vue-sync"],
+  "keywords": [
+    "vue-sync"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cycraft/magnetar.git"
@@ -53,8 +44,12 @@
     "url": "https://github.com/cycraft/magnetar/issues"
   },
   "ava": {
-    "extensions": ["ts"],
-    "require": ["tsconfig-paths/register", "ts-node/register"],
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
     "timeout": "30s"
   }
 }

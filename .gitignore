@@ -5,6 +5,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 dist
+.cache
+.rpt2_cache
 
 # Editor directories and files
 .idea

@@ -26,11 +26,14 @@ import { filterDataPerClauses } from './helpers/dataHelpers'
 // - ReactiveStoreModuleConfig
 
 export interface ReactiveStoreOptions {
+  /**
+   * This is required to make sure there are not two instances of Vue running which can cause issues.
+   */
   vueInstance: any
   storeName: string
   generateRandomId: () => string
-
 }
+
 export interface ReactiveStoreModuleConfig {
   path?: string
   initialData?: PlainObject | [string, PlainObject][]
@@ -98,7 +101,10 @@ export const CreatePlugin: VueSyncPlugin<ReactiveStoreOptions> = (
         data[collectionPath].set(_docId, reactiveStoreOptions.vueInstance.observable(_docData))
       }
     } else {
-      data[collectionPath].set(docId, reactiveStoreOptions.vueInstance.observable(initialData) as PlainObject)
+      data[collectionPath].set(
+        docId,
+        reactiveStoreOptions.vueInstance.observable(initialData) as PlainObject
+      )
     }
     modulesAlreadySetup.add(modulePath)
   }
