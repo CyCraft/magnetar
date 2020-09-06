@@ -18,10 +18,9 @@ import {
   PluginDeletePropActionPayload,
   PluginInsertActionPayload,
   PluginWriteActionPayload,
-} from '@magnetarjs/core'
+} from '../../../core/src'
 import { StorePluginModuleConfig, RemoteStoreOptions } from './index'
-import { waitMs, pokedexMap, generateRandomId } from '../helpers'
-import { throwIfEmulatedError } from './throwFns'
+import { throwIfEmulatedError, waitMs, pokedexMap, generateRandomId } from '../helpers'
 import { filterDataPerClauses } from './helpers'
 
 export function writeActionFactory(
@@ -102,7 +101,7 @@ function mockDataRetrieval(
   moduleType: 'collection' | 'doc',
   pluginModuleConfig: StorePluginModuleConfig
 ): Record<string, any>[] {
-  if (moduleType === 'doc') return [{ name: 'Luca', dream: 'job' }]
+  if (moduleType === 'doc') return [{ name: 'Luca', age: 10, dream: 'job' }]
   const _pokedexMap = pokedexMap()
   const clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
   const filteredMap = filterDataPerClauses(_pokedexMap, clauses)

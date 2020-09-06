@@ -31,8 +31,11 @@ export function insertActionFactory(
 
     const docDataToMutate = collectionMap.get(docId)
 
-    if (!docDataToMutate)
-      throw new Error(`Document data not found for id: ${collectionPath} ${docId}`)
+    if (!docDataToMutate) {
+      // we're setting a new doc with an id that was passed
+      data[collectionPath].set(docId, payload)
+      return docId
+    }
 
     // reset the doc to be able to overwrite
     Object.keys(docDataToMutate).forEach((key) => {

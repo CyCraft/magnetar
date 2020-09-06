@@ -43,7 +43,7 @@ import { pokedex } from 'test-utils'
       const queryModuleRef = await pokedexModule.where('name', '==', 'Flareon').get()
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(136)]
-      t.deepEqual(actual, expected)
+      t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
       const expectedDocCountWithoutQuery = expected.length + 1
@@ -61,7 +61,7 @@ import { pokedex } from 'test-utils'
       const queryModuleRef = await pokedexModule.where('base.HP', '==', 10).get()
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(50)]
-      t.deepEqual(actual, expected)
+      t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
       const expectedDocCountWithoutQuery = expected.length + 1
@@ -79,7 +79,7 @@ import { pokedex } from 'test-utils'
       const queryModuleRef = await pokedexModule.where('base.HP', '<', 11).get()
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(50)]
-      t.deepEqual(actual, expected)
+      t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
       const expectedDocCountWithoutQuery = expected.length + 1
@@ -97,7 +97,7 @@ import { pokedex } from 'test-utils'
       const queryModuleRef = await pokedexModule.where('base.HP', '<=', 10).get()
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(50)]
-      t.deepEqual(actual, expected)
+      t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
       const expectedDocCountWithoutQuery = expected.length + 1
@@ -115,7 +115,7 @@ import { pokedex } from 'test-utils'
       const queryModuleRef = await pokedexModule.where('base.HP', '>', 249).get()
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(113)]
-      t.deepEqual(actual, expected)
+      t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
       const expectedDocCountWithoutQuery = expected.length + 1
@@ -133,7 +133,7 @@ import { pokedex } from 'test-utils'
       const queryModuleRef = await pokedexModule.where('base.HP', '>=', 250).get()
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(113)]
-      t.deepEqual(actual, expected)
+      t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
       const expectedDocCountWithoutQuery = expected.length + 1
@@ -151,7 +151,7 @@ import { pokedex } from 'test-utils'
       const queryModuleRef = await pokedexModule.where('type', 'array-contains', 'Steel').get()
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(81), pokedex(82)]
-      t.deepEqual(actual, expected)
+      t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
       const expectedDocCountWithoutQuery = expected.length + 1
@@ -171,7 +171,7 @@ import { pokedex } from 'test-utils'
         .get()
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(134), pokedex(135), pokedex(136)]
-      t.deepEqual(actual, expected)
+      t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
       const expectedDocCountWithoutQuery = expected.length + 1
@@ -200,7 +200,7 @@ import { pokedex } from 'test-utils'
         pokedex(131),
         pokedex(144),
       ]
-      t.deepEqual(actual, expected)
+      t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
       const expectedDocCountWithoutQuery = expected.length + 1
@@ -222,7 +222,7 @@ import { pokedex } from 'test-utils'
         .get(undefined, { onError: 'stop' })
       const actual = [...queryModuleRef.data.values()].map((p) => p.base.Speed)
       const expected = [pokedex(6), pokedex(38), pokedex(78)].map((p) => p.base.Speed)
-      t.deepEqual(actual, expected)
+      t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
       const expectedDocCountWithoutQuery = expected.length + 1
@@ -254,7 +254,7 @@ import { pokedex } from 'test-utils'
         pokedex(2),
         pokedex(1),
       ].map((p) => p.id)
-      t.deepEqual(actual, expected)
+      t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
       const expectedDocCountWithoutQuery = expected.length

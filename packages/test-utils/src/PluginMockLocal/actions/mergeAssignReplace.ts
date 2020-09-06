@@ -1,10 +1,11 @@
 import { merge } from 'merge-anything'
-import { PluginWriteAction, PluginWriteActionPayload } from '@magnetarjs/core'
-import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { PluginWriteAction, PluginWriteActionPayload } from '../../../../core/src'
+import { StorePluginModuleConfig, StorePluginOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { throwIfEmulatedError } from '../../helpers'
 
 export function writeActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
-  simpleStoreOptions: SimpleStoreOptions,
+  storePluginOptions: StorePluginOptions,
   actionName: 'merge' | 'assign' | 'replace',
   makeBackup?: MakeRestoreBackup
 ): PluginWriteAction {
@@ -13,7 +14,11 @@ export function writeActionFactory(
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginWriteActionPayload<SimpleStoreModuleConfig>): void {
+  }: PluginWriteActionPayload<StorePluginModuleConfig>): void {
+    // this mocks an error during execution
+    throwIfEmulatedError(payload, storePluginOptions)
+    // this is custom logic to be implemented by the plugin author
+
     // write actions cannot be executed on collections
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 

@@ -19,7 +19,7 @@ export type PokemonType =
   | 'Fairy'
 
 export type PokedexEntry = {
-  id: number
+  id?: number
   name: string
   type: PokemonType[]
   base: {

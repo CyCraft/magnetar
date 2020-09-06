@@ -18,15 +18,15 @@ test('merge', async (t) => {
     name: 'Bulbasaur',
     type: ['Grass', 'Poison'],
     base: {
-      HP: 9000,
-      Attack: 49,
-      Defense: 49,
+      'HP': 9000,
+      'Attack': 49,
+      'Defense': 49,
       'Sp. Attack': 65,
       'Sp. Defense': 65,
-      Speed: 45,
+      'Speed': 45,
     },
   }
-  t.deepEqual(pokedexModule.doc('1').data, expected)
+  t.deepEqual(pokedexModule.doc('1').data, expected as any)
 })
 
 test('assign', async (t) => {
@@ -48,7 +48,7 @@ test('assign', async (t) => {
       HP: 9000,
     },
   }
-  t.deepEqual(pokedexModule.doc('1').data, expected)
+  t.deepEqual(pokedexModule.doc('1').data, expected as any)
 })
 
 test('replace', async (t) => {
@@ -63,7 +63,7 @@ test('replace', async (t) => {
   }
 
   const expected = { base: { HP: 9000 } }
-  t.deepEqual(pokedexModule.doc('1').data, expected)
+  t.deepEqual(pokedexModule.doc('1').data, expected as any)
 })
 
 test('revert: merge', async (t) => {
@@ -78,7 +78,7 @@ test('revert: merge', async (t) => {
   }
 
   const expected = pokedex(1)
-  t.deepEqual(pokedexModule.doc('1').data, expected)
+  t.deepEqual(pokedexModule.doc('1').data, expected as any)
 })
 
 test('revert: assign', async (t) => {
@@ -93,7 +93,7 @@ test('revert: assign', async (t) => {
   }
 
   const expected = pokedex(1)
-  t.deepEqual(pokedexModule.doc('1').data, expected)
+  t.deepEqual(pokedexModule.doc('1').data, expected as any)
 })
 
 test('revert: replace', async (t) => {
@@ -108,5 +108,5 @@ test('revert: replace', async (t) => {
   }
 
   const expected = pokedex(1)
-  t.deepEqual(pokedexModule.doc('1').data, expected)
+  t.deepEqual(pokedexModule.doc('1').data, expected as any)
 })

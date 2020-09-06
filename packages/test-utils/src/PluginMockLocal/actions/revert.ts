@@ -1,9 +1,10 @@
-import { PluginRevertAction, PluginRevertActionPayload } from '@magnetarjs/core'
-import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { PluginRevertAction, PluginRevertActionPayload } from '../../../../core/src'
+import { StorePluginModuleConfig, StorePluginOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { throwIfEmulatedError } from '../../helpers'
 
 export function revertActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
-  simpleStoreOptions: SimpleStoreOptions,
+  storePluginOptions: StorePluginOptions,
   restoreBackup: MakeRestoreBackup
 ): PluginRevertAction {
   return function ({
@@ -13,7 +14,11 @@ export function revertActionFactory(
     pluginModuleConfig,
     actionName,
     error,
-  }: PluginRevertActionPayload<SimpleStoreModuleConfig>): void {
+  }: PluginRevertActionPayload<StorePluginModuleConfig>): void {
+    // this mocks an error during execution
+    throwIfEmulatedError(payload, storePluginOptions)
+    // this is custom logic to be implemented by the plugin author
+
     // revert all write actions when called on a doc
     if (
       docId &&
@@ -25,6 +30,6 @@ export function revertActionFactory(
     // insert on collection (no id)
     if (!docId && actionName === 'insert') actionName = 'insert on collections' as any
     // haven't implemented reverting 'get', 'stream' actions yet
-    console.error(`[@magnetarjs/plugin-simple-store] revert not yet implemented for ${actionName}`)
+    console.error(`[@magnetarjs/test-utils] revert not yet implemented for ${actionName}`)
   }
 }

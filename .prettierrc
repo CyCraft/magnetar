@@ -6,5 +6,6 @@
   "semi": false,
   "bracketSpacing": true,
   "arrowParens": "always",
+  "quoteProps": "consistent",
   "vueIndentScriptAndStyle": false
 }

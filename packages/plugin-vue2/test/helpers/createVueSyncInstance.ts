@@ -11,7 +11,7 @@ const getInitialDataCollection = () => [
   // doc entries
   ['1', pokedex(1)],
 ]
-const getInitialDataDocument = () => ({ name: 'Luca', age: 10, dream: undefined })
+const getInitialDataDocument = () => ({ name: 'Luca', age: 10 })
 
 export type PokedexModuleData = O.Merge<
   PokedexEntry,

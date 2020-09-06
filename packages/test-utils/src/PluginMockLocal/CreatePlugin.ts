@@ -9,7 +9,7 @@ import {
   OrderByClause,
   Limit,
   PluginActionPayloadBase,
-} from '@magnetarjs/core'
+} from '../../../core/src'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { insertActionFactory } from './actions/insert'
 import { deletePropActionFactory } from './actions/deleteProp'
@@ -20,14 +20,14 @@ import { revertActionFactory } from './actions/revert'
 import { filterDataPerClauses } from './helpers/dataHelpers'
 
 // there are two interfaces to be defined & exported by each plugin
-// - SimpleStoreOptions
-// - SimpleStoreModuleConfig
+// - StorePluginOptions
+// - StorePluginModuleConfig
 
-export interface SimpleStoreOptions {
+export interface StorePluginOptions {
   storeName: string
   generateRandomId: () => string
 }
-export interface SimpleStoreModuleConfig {
+export interface StorePluginModuleConfig {
   path?: string
   initialData?: Record<string, any> | [string, Record<string, any>][]
   where?: WhereClause[]
@@ -40,8 +40,8 @@ export type MakeRestoreBackup = (collectionPath: string, docId: string) => void
 // a Vue Sync plugin is a single function that returns a `PluginInstance`
 // the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
 // each action must have the proper for both collection and doc type modules
-export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
-  simpleStoreOptions: SimpleStoreOptions
+export const CreatePlugin: VueSyncPlugin<StorePluginOptions> = (
+  storePluginOptions: StorePluginOptions
 ): PluginInstance => {
   // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
@@ -67,10 +67,16 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
     // set the backup array for the doc
     if (!backupCollectionMap.has(docId)) return
     const docBackupArray = backupCollectionMap.get(docId)
-    if (!docBackupArray || !docBackupArray.length) return
+    if (!docBackupArray || !docBackupArray.length) {
+      // the backup was "undefined", so we need to delete it
+      data[collectionPath].delete(docId)
+      return
+    }
     // restore the backup of whatever is found and replace with the data
     const docBackup = docBackupArray.pop()
     if (docBackup) data[collectionPath].set(docId, docBackup)
+    // the backup was "undefined", so we need to delete it
+    if (docBackup === undefined) data[collectionPath].delete(docId)
   }
 
   /**
@@ -81,7 +87,7 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
     collectionPath,
     docId,
     pluginModuleConfig = {},
-  }: PluginActionPayloadBase<SimpleStoreModuleConfig>): void => {
+  }: PluginActionPayloadBase<StorePluginModuleConfig>): void => {
     const modulePath = [collectionPath, docId].filter(Boolean).join('/')
     if (modulesAlreadySetup.has(modulePath)) return
     // always set up a new Map for the collection, but only when it's undefined!
@@ -112,7 +118,7 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
     collectionPath,
     docId,
     pluginModuleConfig = {},
-  }: PluginActionPayloadBase<SimpleStoreModuleConfig>): any => {
+  }: PluginActionPayloadBase<StorePluginModuleConfig>): any => {
     const collectionDB = data[collectionPath]
     // if it's a doc, return the specific doc
     if (docId) return collectionDB.get(docId)
@@ -128,16 +134,16 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
   }
 
   // the plugin must try to implement logic for every `ActionName`
-  const get = getActionFactory(data, simpleStoreOptions)
-  const stream = streamActionFactory(data, simpleStoreOptions)
-  const insert = insertActionFactory(data, simpleStoreOptions, makeBackup)
-  const _merge = writeActionFactory(data, simpleStoreOptions, 'merge', makeBackup)
-  const assign = writeActionFactory(data, simpleStoreOptions, 'assign', makeBackup)
-  const replace = writeActionFactory(data, simpleStoreOptions, 'replace', makeBackup)
-  const deleteProp = deletePropActionFactory(data, simpleStoreOptions, makeBackup)
-  const _delete = deleteActionFactory(data, simpleStoreOptions, makeBackup)
+  const get = getActionFactory(data, storePluginOptions)
+  const stream = streamActionFactory(data, storePluginOptions)
+  const insert = insertActionFactory(data, storePluginOptions, makeBackup)
+  const _merge = writeActionFactory(data, storePluginOptions, 'merge', makeBackup)
+  const assign = writeActionFactory(data, storePluginOptions, 'assign', makeBackup)
+  const replace = writeActionFactory(data, storePluginOptions, 'replace', makeBackup)
+  const deleteProp = deletePropActionFactory(data, storePluginOptions, makeBackup)
+  const _delete = deleteActionFactory(data, storePluginOptions, makeBackup)
 
-  const revert = revertActionFactory(data, simpleStoreOptions, restoreBackup)
+  const revert = revertActionFactory(data, storePluginOptions, restoreBackup)
 
   // the plugin function must return a `PluginInstance`
   const instance: PluginInstance = {

@@ -28,16 +28,16 @@ const conf = (testName: string): any => ({
       name: 'Bulbasaur',
       type: ['Grass', 'Poison'],
       base: {
-        HP: 9000,
-        Attack: 49,
-        Defense: 49,
+        'HP': 9000,
+        'Attack': 49,
+        'Defense': 49,
         'Sp. Attack': 65,
         'Sp. Defense': 65,
-        Speed: 45,
+        'Speed': 45,
       },
     }
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected)
-    await firestoreDeepEqual(t, testName, 'pokedex/1', expected)
+    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected as any)
+    await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
   })
 }
 {
@@ -64,8 +64,8 @@ const conf = (testName: string): any => ({
         HP: 9000,
       },
     }
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected)
-    await firestoreDeepEqual(t, testName, 'pokedex/1', expected)
+    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected as any)
+    await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
   })
 }
 {
@@ -85,8 +85,8 @@ const conf = (testName: string): any => ({
     }
 
     const expected = { base: { HP: 9000 } }
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected)
-    await firestoreDeepEqual(t, testName, 'pokedex/1', expected)
+    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected as any)
+    await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
   })
 }
 {
@@ -107,8 +107,8 @@ const conf = (testName: string): any => ({
     }
 
     const expected = pokedex(1)
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected)
-    await firestoreDeepEqual(t, testName, 'pokedex/1', expected)
+    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected as any)
+    await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
   })
 }
 {
@@ -129,8 +129,8 @@ const conf = (testName: string): any => ({
     }
 
     const expected = pokedex(1)
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected)
-    await firestoreDeepEqual(t, testName, 'pokedex/1', expected)
+    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected as any)
+    await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
   })
 }
 {
@@ -151,7 +151,7 @@ const conf = (testName: string): any => ({
     }
 
     const expected = pokedex(1)
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected)
-    await firestoreDeepEqual(t, testName, 'pokedex/1', expected)
+    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected as any)
+    await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
   })
 }

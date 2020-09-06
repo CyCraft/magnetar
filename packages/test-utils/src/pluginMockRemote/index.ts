@@ -1,4 +1,4 @@
-import { PluginInstance, VueSyncPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core'
+import { PluginInstance, VueSyncPlugin, WhereClause, OrderByClause, Limit } from '../../../core/src'
 import {
   writeActionFactory,
   insertActionFactory,

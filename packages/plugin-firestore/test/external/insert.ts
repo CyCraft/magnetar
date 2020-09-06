@@ -24,8 +24,8 @@ import { DocInstance } from '../../../core/src'
     }
 
     const expected = payload
-    t.deepEqual(pokedexModule.doc('7').data, expected)
-    await firestoreDeepEqual(t, testName, 'pokedex/7', expected)
+    t.deepEqual(pokedexModule.doc('7').data, expected as any)
+    await firestoreDeepEqual(t, testName, 'pokedex/7', expected as any)
   })
 }
 {
@@ -44,8 +44,8 @@ import { DocInstance } from '../../../core/src'
 
     const newId = moduleFromResult.id
     const expected = payload
-    t.deepEqual(pokedexModule.doc(newId).data, expected)
-    await firestoreDeepEqual(t, testName, `pokedex/${newId}`, expected)
+    t.deepEqual(pokedexModule.doc(newId).data, expected as any)
+    await firestoreDeepEqual(t, testName, `pokedex/${newId}`, expected as any)
   })
 }
 {
@@ -65,8 +65,8 @@ import { DocInstance } from '../../../core/src'
 
     const newId = moduleFromResult.id
     const expected = payload
-    t.deepEqual(pokedexModule.doc(newId).data, expected)
-    await firestoreDeepEqual(t, testName, `pokedex/${newId}`, expected)
+    t.deepEqual(pokedexModule.doc(newId).data, expected as any)
+    await firestoreDeepEqual(t, testName, `pokedex/${newId}`, expected as any)
   })
 }
 {
@@ -91,8 +91,8 @@ import { DocInstance } from '../../../core/src'
     }
 
     const expected = undefined
-    t.deepEqual(pokedexModule.doc('7').data, expected)
-    await firestoreDeepEqual(t, testName, 'pokedex/7', expected)
+    t.deepEqual(pokedexModule.doc('7').data, expected as any)
+    await firestoreDeepEqual(t, testName, 'pokedex/7', expected as any)
   })
 }
 {
@@ -109,7 +109,7 @@ import { DocInstance } from '../../../core/src'
     }
 
     const expected = undefined
-    t.deepEqual(pokedexModule.doc('7').data, expected)
-    await firestoreDeepEqual(t, testName, 'pokedex/7', expected)
+    t.deepEqual(pokedexModule.doc('7').data, expected as any)
+    await firestoreDeepEqual(t, testName, 'pokedex/7', expected as any)
   })
 }

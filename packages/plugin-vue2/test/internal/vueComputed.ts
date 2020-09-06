@@ -131,7 +131,7 @@ test('expected behaviour computed prop lifecycle - with reactivity via vue.obser
 
 test('reactivity: document - via data', async (t) => {
   const { trainerModule } = createVueSyncInstance()
-  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: undefined })
+  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 
   const ranFns: any[] = []
   const vue = new Vue({
@@ -164,18 +164,18 @@ test('reactivity: document - via data', async (t) => {
   try { await trainerModule.get() } catch (error) { t.fail(error) } // prettier-ignore
   // the server mock doesn't really update the server data
   // so a get() call should reset the name back to 'Luca'
-  t.deepEqual(trainerModule.data, { name: 'Luca', dream: 'job' })
+  t.deepEqual(trainerModule.data, { name: 'Luca', dream: 'job', age: 10 })
 
   t.is(vue.dataComputed.name, 'Luca!')
   t.is(vue.dataComputed.dream, 'job')
-  t.is(vue.dataComputed.age, undefined)
+  t.is(vue.dataComputed.age, 10)
   // now it should have re-run
   t.deepEqual(ranFns, ['ran', 'ran', 'ran'])
 })
 
-test('only:reactivity: document - directly', async (t) => {
+test('reactivity: document - directly', async (t) => {
   const { trainerModule } = createVueSyncInstance()
-  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: undefined })
+  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 
   const ranFns: any[] = []
   const vue = new Vue({
@@ -197,7 +197,7 @@ test('only:reactivity: document - directly', async (t) => {
   t.deepEqual(ranFns, ['ran'])
   // update from the outside
   await trainerModule.merge({ name: 'LUCA' })
-  t.deepEqual(trainerModule.data, { name: 'LUCA', age: 10, dream: undefined })
+  t.deepEqual(trainerModule.data, { name: 'LUCA', age: 10 })
   // should have not yet re-run
   t.deepEqual(ranFns, ['ran'])
   // check
@@ -209,12 +209,12 @@ test('only:reactivity: document - directly', async (t) => {
   try { await trainerModule.get() } catch (error) { t.fail(error) } // prettier-ignore
   // the server mock doesn't really update the server data
   // so a get() call should reset the name back to 'Luca'
-  t.deepEqual(trainerModule.data, { name: 'Luca', dream: 'job' })
+  t.deepEqual(trainerModule.data, { name: 'Luca', dream: 'job', age: 10 })
   t.deepEqual(ranFns, ['ran', 'ran'])
 
   t.is(vue.dataComputed.name, 'Luca!')
   t.is(vue.dataComputed.dream, 'job')
-  t.is(vue.dataComputed.age, undefined)
+  t.is(vue.dataComputed.age, 10)
   // now it should have re-run
   t.deepEqual(ranFns, ['ran', 'ran', 'ran'])
 })

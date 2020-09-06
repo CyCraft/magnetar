@@ -1,4 +1,4 @@
-import { Clauses } from '@magnetarjs/core'
+import { Clauses } from '../../../../core/src'
 import { isNumber, isArray } from 'is-what'
 import { getProp } from 'path-to-prop'
 import sort from 'fast-sort'

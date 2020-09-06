@@ -4,7 +4,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 
 {
   const testName = 'delete'
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { trainerModule } = await createVueSyncInstance(testName, {
       insertDocs: { '': { age: 10, name: 'Luca' } },
     })
@@ -17,7 +17,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     }
 
     const expected = undefined
-    t.deepEqual(trainerModule.data, expected)
-    await firestoreDeepEqual(t, testName, '', expected)
+    t.deepEqual(trainerModule.data, expected as any)
+    await firestoreDeepEqual(t, testName, '', expected as any)
   })
 }

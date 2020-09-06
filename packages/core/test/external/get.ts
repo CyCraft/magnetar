@@ -37,7 +37,7 @@ test('get (collection) where-filter: ==', async (t) => {
     const queryModuleRef = await pokedexModule.where('name', '==', 'Flareon').get()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(136)]
-    t.deepEqual(actual, expected)
+    t.deepEqual(actual, expected as any)
   } catch (error) {
     t.fail(error)
   }
@@ -49,7 +49,7 @@ test('get (collection) where-filter: == nested', async (t) => {
     const queryModuleRef = await pokedexModule.where('base.HP', '==', 10).get()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(50)]
-    t.deepEqual(actual, expected)
+    t.deepEqual(actual, expected as any)
   } catch (error) {
     t.fail(error)
   }
@@ -61,7 +61,7 @@ test('get (collection) where-filter: <', async (t) => {
     const queryModuleRef = await pokedexModule.where('base.HP', '<', 11).get()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(50)]
-    t.deepEqual(actual, expected)
+    t.deepEqual(actual, expected as any)
   } catch (error) {
     t.fail(error)
   }
@@ -73,7 +73,7 @@ test('get (collection) where-filter: <=', async (t) => {
     const queryModuleRef = await pokedexModule.where('base.HP', '<=', 10).get()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(50)]
-    t.deepEqual(actual, expected)
+    t.deepEqual(actual, expected as any)
   } catch (error) {
     t.fail(error)
   }
@@ -85,7 +85,7 @@ test('get (collection) where-filter: >', async (t) => {
     const queryModuleRef = await pokedexModule.where('base.HP', '>', 249).get()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(113)]
-    t.deepEqual(actual, expected)
+    t.deepEqual(actual, expected as any)
   } catch (error) {
     t.fail(error)
   }
@@ -97,7 +97,7 @@ test('get (collection) where-filter: >=', async (t) => {
     const queryModuleRef = await pokedexModule.where('base.HP', '>=', 250).get()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(113)]
-    t.deepEqual(actual, expected)
+    t.deepEqual(actual, expected as any)
   } catch (error) {
     t.fail(error)
   }
@@ -109,7 +109,7 @@ test('get (collection) where-filter: array-contains', async (t) => {
     const queryModuleRef = await pokedexModule.where('type', 'array-contains', 'Steel').get()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(81), pokedex(82)]
-    t.deepEqual(actual, expected)
+    t.deepEqual(actual, expected as any)
   } catch (error) {
     t.fail(error)
   }
@@ -123,7 +123,7 @@ test('get (collection) where-filter: in', async (t) => {
       .get()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(134), pokedex(135), pokedex(136)]
-    t.deepEqual(actual, expected)
+    t.deepEqual(actual, expected as any)
   } catch (error) {
     t.fail(error)
   }
@@ -145,7 +145,7 @@ test('get (collection) where-filter: array-contains-any', async (t) => {
       pokedex(131),
       pokedex(144),
     ]
-    t.deepEqual(actual, expected)
+    t.deepEqual(actual, expected as any)
   } catch (error) {
     t.fail(error)
   }
@@ -160,7 +160,7 @@ test('get (collection) compound queries', async (t) => {
       .get()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(6), pokedex(38), pokedex(78)]
-    t.deepEqual(actual, expected)
+    t.deepEqual(actual, expected as any)
   } catch (error) {
     t.fail(error)
   }
@@ -179,7 +179,7 @@ test('only:get (collection) orderBy', async (t) => {
     // Charizard 6
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(78), pokedex(38), pokedex(6)]
-    t.deepEqual(actual, expected)
+    t.deepEqual(actual, expected as any)
   } catch (error) {
     t.fail(error)
   }
@@ -202,7 +202,7 @@ test('get (collection) limit', async (t) => {
       pokedex(9),
       pokedex(10),
     ]
-    t.deepEqual(actual, expected)
+    t.deepEqual(actual, expected as any)
   } catch (error) {
     t.fail(error)
   }

@@ -34,7 +34,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     }
 
     const expected = undefined
-    t.deepEqual(pokedexModule.doc('7').data, expected)
+    t.deepEqual(pokedexModule.doc('7').data, expected as any)
     await firestoreDeepEqual(t, testName, 'pokedex/7', expected, 'should be deleted')
   })
 }
@@ -61,7 +61,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     }
 
     const expected = undefined
-    t.deepEqual(pokedexModule.doc('7').data, expected)
+    t.deepEqual(pokedexModule.doc('7').data, expected as any)
     await firestoreDeepEqual(t, testName, 'pokedex/7', expected, 'should be deleted')
   })
 }
@@ -95,7 +95,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 //       t.truthy(error)
 //     }
 //     const expected = payload
-//     t.deepEqual(pokedexModule.doc('7').data, expected)
+//     t.deepEqual(pokedexModule.doc('7').data, expected as any)
 //     await firestoreDeepEqual(
 //       t,
 //       testName,
@@ -131,15 +131,15 @@ const conf = (testName: string): any => ({
               name: 'Bulbasaur',
               type: ['Grass', 'Poison'],
               base: {
-                HP: undefined,
-                Attack: 49,
-                Defense: 49,
+                'HP': undefined,
+                'Attack': 49,
+                'Defense': 49,
                 'Sp. Attack': 65,
                 'Sp. Defense': 65,
-                Speed: 45,
+                'Speed': 45,
               },
             }
-            t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expectedMidway)
+            t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expectedMidway as any)
           },
         },
       })
@@ -148,8 +148,8 @@ const conf = (testName: string): any => ({
     }
 
     const expected = pokedex(1)
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected)
-    await firestoreDeepEqual(t, testName, 'pokedex/1', expected)
+    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected as any)
+    await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
   })
 }
 {
@@ -177,7 +177,7 @@ const conf = (testName: string): any => ({
                 HP: undefined,
               },
             }
-            t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expectedMidway)
+            t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expectedMidway as any)
           },
         },
       })
@@ -186,8 +186,8 @@ const conf = (testName: string): any => ({
     }
 
     const expected = pokedex(1)
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected)
-    await firestoreDeepEqual(t, testName, 'pokedex/1', expected)
+    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected as any)
+    await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
   })
 }
 {
@@ -208,7 +208,7 @@ const conf = (testName: string): any => ({
           success: ({ storeName }) => {
             if (storeName !== 'local') return
             const expectedMidway = { base: { HP: undefined } }
-            t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expectedMidway)
+            t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expectedMidway as any)
           },
         },
       })
@@ -217,7 +217,7 @@ const conf = (testName: string): any => ({
     }
 
     const expected = pokedex(1)
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected)
-    await firestoreDeepEqual(t, testName, 'pokedex/1', expected)
+    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected as any)
+    await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
   })
 }

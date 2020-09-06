@@ -67,10 +67,16 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
     // set the backup array for the doc
     if (!backupCollectionMap.has(docId)) return
     const docBackupArray = backupCollectionMap.get(docId)
-    if (!docBackupArray || !docBackupArray.length) return
+    if (!docBackupArray || !docBackupArray.length) {
+      // the backup was "undefined", so we need to delete it
+      data[collectionPath].delete(docId)
+      return
+    }
     // restore the backup of whatever is found and replace with the data
     const docBackup = docBackupArray.pop()
     if (docBackup) data[collectionPath].set(docId, docBackup)
+    // the backup was "undefined", so we need to delete it
+    if (docBackup === undefined) data[collectionPath].delete(docId)
   }
 
   /**

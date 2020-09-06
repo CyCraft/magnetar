@@ -4,14 +4,15 @@ import {
   StreamResponse,
   DoOnStream,
   PluginStreamActionPayload,
-} from '@magnetarjs/core'
-import { SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin'
+} from '../../../../core/src'
+import { StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 import { deleteActionFactory } from './delete'
+import { throwIfEmulatedError } from '../../helpers'
 
 export function streamActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
-  simpleStoreOptions: SimpleStoreOptions
+  storePluginOptions: StorePluginOptions
 ): PluginStreamAction {
   return function ({
     payload,
@@ -19,16 +20,20 @@ export function streamActionFactory(
     docId,
     pluginModuleConfig,
     mustExecuteOnRead,
-  }: PluginStreamActionPayload<SimpleStoreModuleConfig>):
+  }: PluginStreamActionPayload<StorePluginModuleConfig>):
     | StreamResponse
     | DoOnStream
     | Promise<StreamResponse | DoOnStream> {
+    // this mocks an error during execution
+    throwIfEmulatedError(payload, storePluginOptions)
+    // this is custom logic to be implemented by the plugin author
+
     // hover over the prop names below to see more info on when they are triggered:
     const doOnStream: DoOnStream = {
       added: (payload, meta) => {
         insertActionFactory(
           data,
-          simpleStoreOptions
+          storePluginOptions
         )({
           payload,
           collectionPath,
@@ -39,7 +44,7 @@ export function streamActionFactory(
       modified: (payload, meta) => {
         insertActionFactory(
           data,
-          simpleStoreOptions
+          storePluginOptions
         )({
           payload,
           collectionPath,
@@ -56,7 +61,7 @@ export function streamActionFactory(
         const [_cPath, _dId] = collectionPathDocIdToDelete
         deleteActionFactory(
           data,
-          simpleStoreOptions
+          storePluginOptions
         )({
           payload: undefined,
           collectionPath: _cPath,
