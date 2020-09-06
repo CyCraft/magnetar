@@ -3,13 +3,11 @@ import {
   PluginStreamAction,
   StreamResponse,
   DoOnStream,
-  MustExecuteOnRead,
   PluginStreamActionPayload,
 } from '@magnetarjs/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 import { deleteActionFactory } from './delete'
-import { throwIfEmulatedError } from '../../throwFns'
 
 export function streamActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
@@ -25,9 +23,6 @@ export function streamActionFactory(
     | StreamResponse
     | DoOnStream
     | Promise<StreamResponse | DoOnStream> {
-    // this mocks an error during execution
-    throwIfEmulatedError(payload, simpleStoreOptions)
-
     // hover over the prop names below to see more info on when they are triggered:
     const doOnStream: DoOnStream = {
       added: (payload, meta) => {

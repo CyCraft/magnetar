@@ -1,5 +1,5 @@
 import { firestore } from 'firebase';
-import { FirestoreModuleConfig } from 'src/CreatePlugin';
+import { FirestoreModuleConfig } from '../CreatePlugin';
 import { DocMetadata } from '@magnetarjs/core';
 declare type Firestore = firestore.Firestore;
 declare type Query = firestore.Query;

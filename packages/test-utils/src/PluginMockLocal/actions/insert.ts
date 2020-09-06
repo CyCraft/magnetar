@@ -1,7 +1,6 @@
 import { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'
-import { throwIfEmulatedError } from '../../throwFns'
 
 export function insertActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
@@ -14,21 +13,16 @@ export function insertActionFactory(
     docId,
     pluginModuleConfig,
   }: PluginInsertActionPayload<SimpleStoreModuleConfig>): string {
-    // this mocks an error during execution
-    throwIfEmulatedError(payload, simpleStoreOptions)
-
-    // this is custom logic to be implemented by the plugin author
-
     if (!docId) {
-      docId =
+      const newDocId =
         isFullString(payload.id) || isNumber(payload.id)
           ? String(payload.id)
           : simpleStoreOptions.generateRandomId()
 
-      if (makeBackup) makeBackup(collectionPath, docId)
+      if (makeBackup) makeBackup(collectionPath, newDocId)
 
-      data[collectionPath].set(docId, payload)
-      return docId
+      data[collectionPath].set(newDocId, payload)
+      return newDocId
     }
     // else it's a doc
     const collectionMap = data[collectionPath]

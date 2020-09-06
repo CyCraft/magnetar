@@ -5,6 +5,7 @@
     "dev": "cd packages/dev && npm run dev",
     "dev:docs": "cd packages/docs && npm run dev",
     "test": "lerna run test",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "build": "lerna run build && git add -A && git commit -m \"chore: build\"",
     "publish": "npm run build && lerna publish",
     "deploy:docs": "npm run build && firebase deploy --only hosting && git add -A && git commit -m \"chore: deploy\"",

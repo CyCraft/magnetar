@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
-import { pokedex } from '../helpers/pokedex'
+import { pokedex } from 'test-utils'
 import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 
 const conf = (testName: string): any => ({
@@ -9,7 +9,7 @@ const conf = (testName: string): any => ({
 
 {
   const testName = 'merge'
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
     })
@@ -28,12 +28,12 @@ const conf = (testName: string): any => ({
       name: 'Bulbasaur',
       type: ['Grass', 'Poison'],
       base: {
-        'HP': 9000,
-        'Attack': 49,
-        'Defense': 49,
+        HP: 9000,
+        Attack: 49,
+        Defense: 49,
         'Sp. Attack': 65,
         'Sp. Defense': 65,
-        'Speed': 45,
+        Speed: 45,
       },
     }
     t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected)
@@ -42,7 +42,7 @@ const conf = (testName: string): any => ({
 }
 {
   const testName = 'assign'
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
     })
@@ -70,7 +70,7 @@ const conf = (testName: string): any => ({
 }
 {
   const testName = 'replace'
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
     })
@@ -92,7 +92,7 @@ const conf = (testName: string): any => ({
 {
   // these tests are not really testing reverting the remote store, only the local store:
   const testName = 'revert: merge'
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
     })
@@ -114,7 +114,7 @@ const conf = (testName: string): any => ({
 {
   // these tests are not really testing reverting the remote store, only the local store:
   const testName = 'revert: assign'
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
     })
@@ -136,7 +136,7 @@ const conf = (testName: string): any => ({
 {
   // these tests are not really testing reverting the remote store, only the local store:
   const testName = 'revert: replace'
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
     })

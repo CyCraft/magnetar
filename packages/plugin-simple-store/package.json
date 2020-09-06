@@ -28,7 +28,8 @@
     "ts-toolbelt": "6.12.2"
   },
   "devDependencies": {
-    "@magnetarjs/core": "^0.0.0"
+    "@magnetarjs/core": "^0.0.0",
+    "test-utils": "^0.0.0-beta.0"
   },
   "keywords": [
     "vue-sync"

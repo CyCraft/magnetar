@@ -1,8 +1,8 @@
 import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
-import { pokedex } from '../helpers/pokedex'
+import { pokedex } from 'test-utils'
 
-test('deleteProp', async t => {
+test('deleteProp', async (t) => {
   const { trainerModule } = createVueSyncInstance()
   const deletePayload = 'age'
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
@@ -16,7 +16,7 @@ test('deleteProp', async t => {
   t.deepEqual(trainerModule.data, { name: 'Luca' })
 })
 
-test('deleteProp nested', async t => {
+test('deleteProp nested', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   const deletePayload = 'base.HP'
   t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
@@ -31,17 +31,17 @@ test('deleteProp nested', async t => {
     name: 'Bulbasaur',
     type: ['Grass', 'Poison'],
     base: {
-      'Attack': 49,
-      'Defense': 49,
+      Attack: 49,
+      Defense: 49,
       'Sp. Attack': 65,
       'Sp. Defense': 65,
-      'Speed': 45,
+      Speed: 45,
     },
   }
   t.deepEqual(pokedexModule.doc('1').data, expected)
 })
 
-test('deleteProp multiple', async t => {
+test('deleteProp multiple', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   const deletePayload = ['base.HP', 'name']
   t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
@@ -56,17 +56,17 @@ test('deleteProp multiple', async t => {
     id: 1,
     type: ['Grass', 'Poison'],
     base: {
-      'Attack': 49,
-      'Defense': 49,
+      Attack: 49,
+      Defense: 49,
       'Sp. Attack': 65,
       'Sp. Defense': 65,
-      'Speed': 45,
+      Speed: 45,
     },
   }
   t.deepEqual(pokedexModule.doc('1').data, expected)
 })
 
-test('revert: deleteProp', async t => {
+test('revert: deleteProp', async (t) => {
   const { trainerModule } = createVueSyncInstance()
   const deletePayload = ['age', 'remote'] // this triggers an error on the remote store mock
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
@@ -80,7 +80,7 @@ test('revert: deleteProp', async t => {
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 })
 
-test('revert: deleteProp nested', async t => {
+test('revert: deleteProp nested', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   const deletePayload = ['base.HP', 'remote'] // this triggers an error on the remote store mock
   t.deepEqual(pokedexModule.doc('1').data, pokedex(1))

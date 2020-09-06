@@ -19,7 +19,7 @@ type EventSharedPayload = {
    * stream actions: void // streams cannot be aborted in an event
    * others: () => void
    */
-  abort: (() => void) | void
+  abort: () => void
 }
 
 type EventPayloadPropResult = {

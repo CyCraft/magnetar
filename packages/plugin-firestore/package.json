@@ -26,11 +26,8 @@
   },
   "devDependencies": {
     "@magnetarjs/core": "^0.0.0",
-    "copy-anything": "^2.0.1",
-    "fast-sort": "^2.2.0",
     "firebase": "^7.19.1",
-    "merge-anything": "^3.0.5",
-    "path-to-prop": "1.0.0"
+    "test-utils": "^0.0.0-beta.0"
   },
   "keywords": [
     "vue-sync"

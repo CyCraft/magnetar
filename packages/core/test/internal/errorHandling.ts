@@ -1,9 +1,9 @@
 import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
-import { pokedex, pokedexEntryDefaults } from '../helpers/pokedex'
+import { pokedex, pokedexEntryDefaults } from 'test-utils'
 import { GetResponse } from '../../src'
 
-test('write + onError: stop -- emits fail events & aborts execution by default', async t => {
+test('write + onError: stop -- emits fail events & aborts execution by default', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'local' })
   try {
@@ -26,7 +26,7 @@ test('write + onError: stop -- emits fail events & aborts execution by default',
   t.is(pokedexModule.data.get('testid'), undefined)
 })
 
-test('write + onError: stop -- fail in second store plugin does not prevent execution first store plugin', async t => {
+test('write + onError: stop -- fail in second store plugin does not prevent execution first store plugin', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'remote' })
   try {
@@ -47,7 +47,7 @@ test('write + onError: stop -- fail in second store plugin does not prevent exec
   t.deepEqual(pokedexModule.data.get('testid'), insertPayload)
 })
 
-test('write + onError: continue', async t => {
+test('write + onError: continue', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'local' })
   try {
@@ -73,7 +73,7 @@ test('write + onError: continue', async t => {
   t.is(pokedexModule.data.get('testid'), undefined)
 })
 
-test('write + onError: revert', async t => {
+test('write + onError: revert', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'remote' })
   try {
@@ -102,7 +102,7 @@ test('write + onError: revert', async t => {
   t.is(pokedexModule.data.get('testid'), undefined)
 })
 
-test('write + onError: revert - will not go to next store', async t => {
+test('write + onError: revert - will not go to next store', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'local' })
   try {
@@ -130,7 +130,7 @@ test('write + onError: revert - will not go to next store', async t => {
   t.is(pokedexModule.data.get('testid'), undefined)
 })
 
-test('get + onError: stop -- emits fail events & aborts execution by default', async t => {
+test('get + onError: stop -- emits fail events & aborts execution by default', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   const getPayload = { shouldFail: 'local' }
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
@@ -154,7 +154,7 @@ test('get + onError: stop -- emits fail events & aborts execution by default', a
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
 })
 
-test('get + onError: stop -- fail in second store plugin does not prevent execution first store plugin', async t => {
+test('get + onError: stop -- fail in second store plugin does not prevent execution first store plugin', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   const getPayload = { shouldFail: 'remote' }
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
@@ -178,7 +178,7 @@ test('get + onError: stop -- fail in second store plugin does not prevent execut
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
 })
 
-test('get + onError: continue', async t => {
+test('get + onError: continue', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   const getPayload = { shouldFail: 'local' }
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))

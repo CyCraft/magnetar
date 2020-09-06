@@ -1,5 +1,4 @@
 import { FirestorePluginOptions } from '../CreatePlugin'
-import {} from '@magnetarjs/core'
 import { Countdown, CountdownInstance } from './Countdown'
 // just for types:
 import { firestore } from 'firebase'

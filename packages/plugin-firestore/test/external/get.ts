@@ -1,10 +1,10 @@
 import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
-import { pokedex } from '../helpers/pokedex'
+import { pokedex } from 'test-utils'
 
 {
   const testName = 'get (collection)'
-  test(testName, async t => {
+  test(testName, async (t) => {
     /// 'get' resolves once all stores have given a response with data
     const { pokedexModule } = await createVueSyncInstance('read')
     t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
@@ -23,7 +23,7 @@ import { pokedex } from '../helpers/pokedex'
 }
 {
   const testName = 'get (document)'
-  test(testName, async t => {
+  test(testName, async (t) => {
     /// get resolves once all stores have given a response with data
     const { trainerModule } = await createVueSyncInstance('read')
     t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
@@ -37,7 +37,7 @@ import { pokedex } from '../helpers/pokedex'
 }
 {
   const testName = 'get (collection) where-filter: =='
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance('read')
     try {
       const queryModuleRef = await pokedexModule.where('name', '==', 'Flareon').get()
@@ -55,7 +55,7 @@ import { pokedex } from '../helpers/pokedex'
 }
 {
   const testName = 'get (collection) where-filter: == nested'
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance('read')
     try {
       const queryModuleRef = await pokedexModule.where('base.HP', '==', 10).get()
@@ -73,7 +73,7 @@ import { pokedex } from '../helpers/pokedex'
 }
 {
   const testName = 'get (collection) where-filter: <'
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance('read')
     try {
       const queryModuleRef = await pokedexModule.where('base.HP', '<', 11).get()
@@ -91,7 +91,7 @@ import { pokedex } from '../helpers/pokedex'
 }
 {
   const testName = 'get (collection) where-filter: <='
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance('read')
     try {
       const queryModuleRef = await pokedexModule.where('base.HP', '<=', 10).get()
@@ -109,7 +109,7 @@ import { pokedex } from '../helpers/pokedex'
 }
 {
   const testName = 'get (collection) where-filter: >'
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance('read')
     try {
       const queryModuleRef = await pokedexModule.where('base.HP', '>', 249).get()
@@ -127,7 +127,7 @@ import { pokedex } from '../helpers/pokedex'
 }
 {
   const testName = 'get (collection) where-filter: >='
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance('read')
     try {
       const queryModuleRef = await pokedexModule.where('base.HP', '>=', 250).get()
@@ -145,7 +145,7 @@ import { pokedex } from '../helpers/pokedex'
 }
 {
   const testName = 'get (collection) where-filter: array-contains'
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance('read')
     try {
       const queryModuleRef = await pokedexModule.where('type', 'array-contains', 'Steel').get()
@@ -163,7 +163,7 @@ import { pokedex } from '../helpers/pokedex'
 }
 {
   const testName = 'get (collection) where-filter: in'
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance('read')
     try {
       const queryModuleRef = await pokedexModule
@@ -183,7 +183,7 @@ import { pokedex } from '../helpers/pokedex'
 }
 {
   const testName = 'get (collection) where-filter: array-contains-any'
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance('read')
     try {
       const queryModuleRef = await pokedexModule
@@ -212,7 +212,7 @@ import { pokedex } from '../helpers/pokedex'
 }
 {
   const testName = 'get (collection) compound queries'
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance('read')
     try {
       const queryModuleRef = await pokedexModule
@@ -220,8 +220,8 @@ import { pokedex } from '../helpers/pokedex'
         .where('base.Speed', '>=', 100)
         .orderBy('base.Speed', 'asc')
         .get(undefined, { onError: 'stop' })
-      const actual = [...queryModuleRef.data.values()].map(p => p.base.Speed)
-      const expected = [pokedex(6), pokedex(38), pokedex(78)].map(p => p.base.Speed)
+      const actual = [...queryModuleRef.data.values()].map((p) => p.base.Speed)
+      const expected = [pokedex(6), pokedex(38), pokedex(78)].map((p) => p.base.Speed)
       t.deepEqual(actual, expected)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
@@ -234,7 +234,7 @@ import { pokedex } from '../helpers/pokedex'
 }
 {
   const testName = 'get (collection) orderBy + limit'
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance('read')
     try {
       const queryModuleRef = await pokedexModule
@@ -242,7 +242,7 @@ import { pokedex } from '../helpers/pokedex'
         .orderBy('id', 'desc')
         .limit(10)
         .get(undefined, { onError: 'stop' })
-      const actual = [...queryModuleRef.data.values()].map(p => p.id)
+      const actual = [...queryModuleRef.data.values()].map((p) => p.id)
       const expected = [
         pokedex(9),
         pokedex(8),
@@ -253,7 +253,7 @@ import { pokedex } from '../helpers/pokedex'
         pokedex(3),
         pokedex(2),
         pokedex(1),
-      ].map(p => p.id)
+      ].map((p) => p.id)
       t.deepEqual(actual, expected)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
@@ -266,7 +266,7 @@ import { pokedex } from '../helpers/pokedex'
 }
 {
   const testName = 'get: errors are thrown'
-  test(testName, async t => {
+  test(testName, async (t) => {
     const { pokedexModule } = await createVueSyncInstance('read-no-access')
     let error
     try {

@@ -1,6 +1,5 @@
 import { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
-import { throwIfEmulatedError } from '../../throwFns'
 
 export function deleteActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
@@ -13,11 +12,6 @@ export function deleteActionFactory(
     docId,
     pluginModuleConfig,
   }: PluginDeleteActionPayload<SimpleStoreModuleConfig>): void {
-    // this mocks an error during execution
-    throwIfEmulatedError(payload, simpleStoreOptions)
-
-    // this is custom logic to be implemented by the plugin author
-
     // delete cannot be executed on collections
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 

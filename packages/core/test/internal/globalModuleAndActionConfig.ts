@@ -1,12 +1,12 @@
 import test from 'ava'
 import { VueSync } from '../../src/index'
-import { CreatePlugin } from '../helpers/pluginMockLocal'
-import { generateRandomId } from '../helpers/generateRandomId'
+import { PluginMockLocal, generateRandomId, pokedex } from 'test-utils'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
-import { pokedex } from '../helpers/pokedex'
 
-test('emits global, module and action events', async t => {
-  const local = CreatePlugin({ storeName: 'local', generateRandomId })
+const CreatePluginLocal = PluginMockLocal.CreatePlugin
+
+test('emits global, module and action events', async (t) => {
+  const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
   const ranAllEvents: any[] = []
   const vueSync = VueSync({
     dataStoreName: 'local',
@@ -41,8 +41,8 @@ test('emits global, module and action events', async t => {
   t.deepEqual(ranAllEvents, [insertPayload, insertPayload, insertPayload])
 })
 
-test('can modify payload in global, module and action settings', async t => {
-  const local = CreatePlugin({ storeName: 'local', generateRandomId })
+test('can modify payload in global, module and action settings', async (t) => {
+  const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
   const vueSync = VueSync({
     dataStoreName: 'local',
     stores: { local },
@@ -51,14 +51,14 @@ test('can modify payload in global, module and action settings', async t => {
       write: ['local'],
     },
     modifyPayloadOn: {
-      insert: payload => {
+      insert: (payload) => {
         return { ...payload, addedInGlobal: true }
       },
     },
   })
   const usersModule = vueSync.collection('users', {
     modifyPayloadOn: {
-      insert: payload => {
+      insert: (payload) => {
         return { ...payload, addedInModule: true }
       },
     },
@@ -67,7 +67,7 @@ test('can modify payload in global, module and action settings', async t => {
 
   const result = await usersModule.insert(insertPayload, {
     modifyPayloadOn: {
-      insert: payload => {
+      insert: (payload) => {
         return { ...payload, addedInAction: true }
       },
     },
@@ -80,11 +80,11 @@ test('can modify payload in global, module and action settings', async t => {
   })
 })
 
-test('can overwrite execution order', async t => {
+test('can overwrite execution order', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = pokedex(7)
   await pokedexModule.insert(insertPayload)
-  let ranAllEvents = []
+  let ranAllEvents: string[] = []
   await pokedexModule.doc('7').delete(undefined, {
     executionOrder: ['local', 'remote'],
     on: {

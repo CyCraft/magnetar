@@ -1,8 +1,8 @@
 import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
-import { pokedex } from '../helpers/pokedex'
+import { pokedex } from 'test-utils'
 
-test('get (collection)', async t => {
+test('get (collection)', async (t) => {
   /// 'get' resolves once all stores have given a response with data
   const { pokedexModule } = createVueSyncInstance()
   t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
@@ -19,7 +19,7 @@ test('get (collection)', async t => {
   t.deepEqual(pokedexModule.data.size, 151)
 })
 
-test('get (document)', async t => {
+test('get (document)', async (t) => {
   /// get resolves once all stores have given a response with data
   const { trainerModule } = createVueSyncInstance()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
@@ -31,7 +31,7 @@ test('get (document)', async t => {
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })
 
-test('get (collection) where-filter: ==', async t => {
+test('get (collection) where-filter: ==', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   try {
     const queryModuleRef = await pokedexModule.where('name', '==', 'Flareon').get()
@@ -43,7 +43,7 @@ test('get (collection) where-filter: ==', async t => {
   }
 })
 
-test('get (collection) where-filter: == nested', async t => {
+test('get (collection) where-filter: == nested', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   try {
     const queryModuleRef = await pokedexModule.where('base.HP', '==', 10).get()
@@ -55,7 +55,7 @@ test('get (collection) where-filter: == nested', async t => {
   }
 })
 
-test('get (collection) where-filter: <', async t => {
+test('get (collection) where-filter: <', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   try {
     const queryModuleRef = await pokedexModule.where('base.HP', '<', 11).get()
@@ -67,7 +67,7 @@ test('get (collection) where-filter: <', async t => {
   }
 })
 
-test('get (collection) where-filter: <=', async t => {
+test('get (collection) where-filter: <=', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   try {
     const queryModuleRef = await pokedexModule.where('base.HP', '<=', 10).get()
@@ -79,7 +79,7 @@ test('get (collection) where-filter: <=', async t => {
   }
 })
 
-test('get (collection) where-filter: >', async t => {
+test('get (collection) where-filter: >', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   try {
     const queryModuleRef = await pokedexModule.where('base.HP', '>', 249).get()
@@ -91,7 +91,7 @@ test('get (collection) where-filter: >', async t => {
   }
 })
 
-test('get (collection) where-filter: >=', async t => {
+test('get (collection) where-filter: >=', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   try {
     const queryModuleRef = await pokedexModule.where('base.HP', '>=', 250).get()
@@ -103,7 +103,7 @@ test('get (collection) where-filter: >=', async t => {
   }
 })
 
-test('get (collection) where-filter: array-contains', async t => {
+test('get (collection) where-filter: array-contains', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   try {
     const queryModuleRef = await pokedexModule.where('type', 'array-contains', 'Steel').get()
@@ -115,7 +115,7 @@ test('get (collection) where-filter: array-contains', async t => {
   }
 })
 
-test('get (collection) where-filter: in', async t => {
+test('get (collection) where-filter: in', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   try {
     const queryModuleRef = await pokedexModule
@@ -129,7 +129,7 @@ test('get (collection) where-filter: in', async t => {
   }
 })
 
-test('get (collection) where-filter: array-contains-any', async t => {
+test('get (collection) where-filter: array-contains-any', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   try {
     const queryModuleRef = await pokedexModule
@@ -151,7 +151,7 @@ test('get (collection) where-filter: array-contains-any', async t => {
   }
 })
 
-test('get (collection) compound queries', async t => {
+test('get (collection) compound queries', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   try {
     const queryModuleRef = await pokedexModule
@@ -166,7 +166,7 @@ test('get (collection) compound queries', async t => {
   }
 })
 
-test('only:get (collection) orderBy', async t => {
+test('only:get (collection) orderBy', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   try {
     const queryModuleRef = await pokedexModule
@@ -185,7 +185,7 @@ test('only:get (collection) orderBy', async t => {
   }
 })
 
-test('get (collection) limit', async t => {
+test('get (collection) limit', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   try {
     const queryModuleRef = await pokedexModule.limit(10).get()

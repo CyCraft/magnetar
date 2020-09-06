@@ -1,9 +1,9 @@
-import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '@magnetarjs/core'
-import { CreatePlugin } from '../../src'
-import { CreatePlugin as CreatePluginRemote } from './pluginMockRemote'
-import { pokedex, PokedexEntry } from './pokedex'
-import { generateRandomId } from './generateRandomId'
+import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '../../../core/src'
+import { CreatePlugin as CreatePluginLocal } from '../../src'
+import { pokedex, PokedexEntry, generateRandomId, PluginMockRemote } from 'test-utils'
 import { O } from 'ts-toolbelt'
+
+const CreatePluginRemote = PluginMockRemote.CreatePlugin
 
 const getInitialDataCollection = () => [
   // doc entries
@@ -32,7 +32,7 @@ export function createVueSyncInstance(): {
   trainerModule: DocInstance<TrainerModuleData>
   vueSync: VueSyncInstance
 } {
-  const local = CreatePlugin({ storeName: 'local', generateRandomId })
+  const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
   const remote = CreatePluginRemote({ storeName: 'remote' })
   const vueSync = VueSync({
     dataStoreName: 'local',

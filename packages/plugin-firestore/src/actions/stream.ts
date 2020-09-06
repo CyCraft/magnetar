@@ -2,7 +2,7 @@ import { firestore } from 'firebase'
 import { StreamResponse, PluginStreamAction, PluginStreamActionPayload } from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { getFirestoreDocPath, getFirestoreCollectionPath } from '../helpers/pathHelpers'
-import { getQueryInstance, docSnapshotToDocMetadata } from 'src/helpers/queryHelpers'
+import { getQueryInstance, docSnapshotToDocMetadata } from '../helpers/queryHelpers'
 
 type DocumentSnapshot = firestore.DocumentSnapshot
 type QuerySnapshot = firestore.QuerySnapshot

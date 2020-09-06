@@ -34,7 +34,8 @@ export async function handleStream(args: {
     mustExecuteOnRead,
   } = args
   // no aborting possible in stream actions
-  const abort = undefined
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const abort = () => {}
 
   // handle and await each eventFn in sequence
   for (const fn of on.before) {

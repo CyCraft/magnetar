@@ -2,7 +2,6 @@ import { isArray } from 'is-what'
 import { getProp } from 'path-to-prop'
 import { PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetarjs/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
-import { throwIfEmulatedError } from '../../throwFns'
 
 export function deletePropActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
@@ -15,11 +14,6 @@ export function deletePropActionFactory(
     docId,
     pluginModuleConfig,
   }: PluginDeletePropActionPayload<SimpleStoreModuleConfig>): void {
-    // this mocks an error during execution
-    throwIfEmulatedError(payload, simpleStoreOptions)
-
-    // this is custom logic to be implemented by the plugin author
-
     // `deleteProp` action cannot be executed on collections
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 

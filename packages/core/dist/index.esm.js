@@ -289,7 +289,10 @@ function executeSetupModulePerStore(globalConfigStores, [collectionPath, docId],
 function getDataFnFromDataStore(moduleConfig, globalConfig) {
     const dataStoreName = moduleConfig.dataStoreName || globalConfig.dataStoreName;
     throwIfNoDataStoreName(dataStoreName);
-    const getModuleData = globalConfig.stores[dataStoreName];
+    const getModuleData = globalConfig.stores[dataStoreName].getModuleData;
+    if (!getModuleData) {
+        throw new Error('The data store did not provide a getModuleData function!');
+    }
     const pluginModuleConfig = getPluginModuleConfig(moduleConfig, dataStoreName);
     return (collectionPath, docId) => getModuleData({ collectionPath, docId, pluginModuleConfig });
 }
@@ -443,7 +446,8 @@ function handleStream(args) {
     return __awaiter(this, void 0, void 0, function* () {
         const { collectionPath, docId, pluginModuleConfig, pluginAction, payload, eventNameFnsMap: on, actionName, storeName, mustExecuteOnRead, } = args;
         // no aborting possible in stream actions
-        const abort = undefined;
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        const abort = () => { };
         // handle and await each eventFn in sequence
         for (const fn of on.before) {
             yield fn({ payload, actionName, storeName, abort });

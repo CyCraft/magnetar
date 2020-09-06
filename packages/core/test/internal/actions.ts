@@ -1,15 +1,14 @@
 import test from 'ava'
-import { DocInstance } from '../../src/index'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
-import { pokedex } from '../helpers/pokedex'
-import { waitMs } from '../helpers/wait'
+import { pokedex, waitMs, PokedexEntry } from 'test-utils'
 import { merge } from 'merge-anything'
+import { DocInstance } from '../../src'
 
-test('write: insert (document)', async t => {
+test('write: insert (document)', async (t) => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
   const payload = pokedex(7)
   t.deepEqual(pokedexModule.data.get('7'), undefined)
-  await pokedexModule.doc('7').insert(payload).catch(e => t.fail(e.message)) // prettier-ignore
+  await pokedexModule.doc('7').insert(payload).catch((e: any) => t.fail(e.message)) // prettier-ignore
   // check data of references executed on
   t.deepEqual(pokedexModule.data.get('7'), payload)
   // check data of new references
@@ -18,15 +17,15 @@ test('write: insert (document)', async t => {
   t.deepEqual(vueSync.collection('pokedex').doc('7').data, payload)
 })
 
-test('write: insert (collection) → random ID', async t => {
+test('write: insert (collection) → random ID', async (t) => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
   const payload = pokedex(7)
 
-  let moduleFromResult: DocInstance
+  let moduleFromResult: DocInstance<PokedexEntry>
   try {
     moduleFromResult = await pokedexModule.insert(payload)
   } catch (error) {
-    t.fail(error)
+    return t.fail(error)
   }
   const newId = moduleFromResult.id
   // check data of reference returned
@@ -39,7 +38,7 @@ test('write: insert (collection) → random ID', async t => {
   t.deepEqual(pokedexModule.doc(newId).data, payload)
 })
 
-test('deleteProp: (document)', async t => {
+test('deleteProp: (document)', async (t) => {
   const { trainerModule, vueSync } = createVueSyncInstance()
   const payload = 'age'
   t.deepEqual(trainerModule.data.age, 10)
@@ -59,12 +58,12 @@ test('deleteProp: (document)', async t => {
   // check data of references created on beforehand
   t.deepEqual(vueSyncDoc.data.age, undefined)
   t.deepEqual(vueSyncCollectionDoc.data.age, undefined)
-  t.deepEqual(vueSyncCollectionData.get('trainer').age, undefined)
+  t.deepEqual(vueSyncCollectionData.get('trainer')?.age, undefined)
   // check data of references executed on
   t.deepEqual(trainerModule.data.age, undefined)
 })
 
-test('delete: (document)', async t => {
+test('delete: (document)', async (t) => {
   const { trainerModule, vueSync } = createVueSyncInstance()
   t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
@@ -93,28 +92,28 @@ test('delete: (document)', async t => {
   t.deepEqual(vueSync.collection('data').data.get('trainer'), undefined)
 })
 
-test('write: merge (document)', async t => {
+test('write: merge (document)', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   const payload = { base: { HP: 9000 } }
   const doc = pokedexModule.doc('1')
   t.deepEqual(doc.data, pokedex(1))
-  await doc.merge(payload).catch(e => t.fail(e.message)) // prettier-ignore
+  await doc.merge(payload).catch((e: any) => t.fail(e.message)) // prettier-ignore
   const mergedResult = merge(pokedex(1), { base: { HP: 9000 } })
   t.deepEqual(pokedexModule.data.get('1'), mergedResult)
   t.deepEqual(doc.data, mergedResult)
 })
 
-test('read: stream (collection)', async t => {
+test('read: stream (collection)', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.deepEqual(pokedexModule.data.size, 1)
   const payload = {}
   // do not await, because it only resolves when the stream is closed
-  pokedexModule.stream(payload).catch(e => t.fail(e.message)) // prettier-ignore
+  pokedexModule.stream(payload).catch((e: any) => t.fail(e.message)) // prettier-ignore
   await waitMs(600)
   // close the stream:
   const unsubscribe = pokedexModule.openStreams.get(payload)
-  unsubscribe()
+  if (unsubscribe) unsubscribe()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.deepEqual(pokedexModule.data.get('2'), pokedex(2))
   t.deepEqual(pokedexModule.data.get('3'), pokedex(3))
@@ -124,23 +123,23 @@ test('read: stream (collection)', async t => {
   // '4': charmander should come in next, but doesn't because we closed the stream
 })
 
-test('read: stream (doc)', async t => {
+test('read: stream (doc)', async (t) => {
   const { trainerModule } = createVueSyncInstance()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
   const payload = {}
   // do not await, because it only resolves when the stream is closed
-  trainerModule.stream(payload).catch(e => t.fail(e.message)) // prettier-ignore
+  trainerModule.stream(payload).catch((e: any) => t.fail(e.message)) // prettier-ignore
   await waitMs(600)
   // close the stream:
   const unsubscribe = trainerModule.openStreams.get(payload)
-  unsubscribe()
+  if (unsubscribe) unsubscribe()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
   await waitMs(1000)
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
   // {colour: 'blue'} should come in 3rd, but doesn't because we closed the stream
 })
 
-test('read: get (collection)', async t => {
+test('read: get (collection)', async (t) => {
   // 'get' resolves once all stores have given a response with data
   const { pokedexModule } = createVueSyncInstance()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
@@ -157,7 +156,7 @@ test('read: get (collection)', async t => {
   t.deepEqual(pokedexModule.data.size, 151)
 })
 
-test('read: get (document)', async t => {
+test('read: get (document)', async (t) => {
   // get resolves once all stores have given a response with data
   const { trainerModule } = createVueSyncInstance()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
@@ -170,7 +169,7 @@ test('read: get (document)', async t => {
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })
 
-test('get (collection) where-filter: ==', async t => {
+test('get (collection) where-filter: ==', async (t) => {
   const { pokedexModule, vueSync } = createVueSyncInstance()
 
   const pokedexModuleWithQuery = pokedexModule.where('name', '==', 'Flareon')
@@ -201,12 +200,12 @@ test('get (collection) where-filter: ==', async t => {
 //   t.deepEqual(pokedexModule.data.size, 1)
 //   const payload = {}
 //   // do not await, because it only resolves when the stream is closed
-//   pokedexModule.stream(payload).catch(e => t.fail(e.message)) // prettier-ignore
+//   pokedexModule.stream(payload).catch((e: any) => t.fail(e.message)) // prettier-ignore
 //   await waitMs(600)
-//   pokedexModule.stream(payload).catch(e => t.fail(e.message)) // prettier-ignore
+//   pokedexModule.stream(payload).catch((e: any) => t.fail(e.message)) // prettier-ignore
 //   // close the stream:
 //   const unsubscribe = pokedexModule.openStreams.get(payload)
-//   unsubscribe()
+//   if (unsubscribe) unsubscribe()
 //   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
 //   t.deepEqual(pokedexModule.data.get('2'), pokedex(2))
 //   t.deepEqual(pokedexModule.data.get('3'), pokedex(3))

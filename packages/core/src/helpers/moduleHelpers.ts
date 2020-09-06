@@ -57,7 +57,10 @@ export function getDataFnFromDataStore<DocDataType>(
 ): (collectionPath: string, docId: string | undefined) => Map<string, DocDataType> | DocDataType {
   const dataStoreName = moduleConfig.dataStoreName || globalConfig.dataStoreName
   throwIfNoDataStoreName(dataStoreName)
-  const getModuleData = globalConfig.stores[dataStoreName] as any
+  const getModuleData = globalConfig.stores[dataStoreName].getModuleData
+  if (!getModuleData) {
+    throw new Error('The data store did not provide a getModuleData function!')
+  }
   const pluginModuleConfig = getPluginModuleConfig(moduleConfig, dataStoreName)
 
   return (collectionPath, docId): Map<string, DocDataType> | DocDataType =>

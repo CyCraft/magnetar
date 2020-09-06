@@ -20,10 +20,8 @@ import {
   PluginWriteActionPayload,
 } from '@magnetarjs/core'
 import { StorePluginModuleConfig, RemoteStoreOptions } from './index'
-import { waitMs } from './wait'
-import { pokedexMap } from '../helpers/pokedex'
+import { waitMs, pokedexMap, generateRandomId } from '../helpers'
 import { throwIfEmulatedError } from './throwFns'
-import { generateRandomId } from './generateRandomId'
 import { filterDataPerClauses } from './helpers'
 
 export function writeActionFactory(

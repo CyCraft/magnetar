@@ -1,8 +1,7 @@
 import test from 'ava'
-
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
 
-test('get (collectionGroup)', async t => {
+test('get (collectionGroup)', async (t) => {
   t.pass()
   //   // get resolves once all stores have given a response with data
   //   const { trainerModule} = createVueSyncInstance()

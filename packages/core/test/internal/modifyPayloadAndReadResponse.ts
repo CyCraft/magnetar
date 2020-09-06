@@ -1,13 +1,12 @@
 import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
-import { pokedex } from '../helpers/pokedex'
-import { waitMs } from '../helpers/wait'
+import { pokedex, waitMs } from 'test-utils'
 
-test('get: can mutate payload & read response', async t => {
-  function addSeen (payload) {
+test('get: can mutate payload & read response', async (t) => {
+  function addSeen(payload: any) {
     return { ...payload, seen: true }
   }
-  function addToken (payload) {
+  function addToken(payload: any) {
     return { ...payload, auth: 'Bearer 123123' }
   }
   // get resolves once all stores have given a response with data
@@ -41,11 +40,11 @@ test('get: can mutate payload & read response', async t => {
   t.deepEqual(pokedexModule.data.get('136'), { ...pokedex(136), seen: true })
 })
 
-test('stream: can mutate payload & read response', async t => {
-  function addSeen (payload) {
+test('stream: can mutate payload & read response', async (t) => {
+  function addSeen(payload: any) {
     return { ...payload, seen: true }
   }
-  function addToken (payload) {
+  function addToken(payload: any) {
     return { ...payload, auth: 'Bearer 123123' }
   }
   const { pokedexModule } = createVueSyncInstance()
@@ -72,8 +71,8 @@ test('stream: can mutate payload & read response', async t => {
   t.deepEqual(pokedexModule.data.get('2'), { ...pokedex(2), seen: true })
 })
 
-test('insert: can mutate payload', async t => {
-  function addSeen (payload) {
+test('insert: can mutate payload', async (t) => {
+  function addSeen(payload: any) {
     if (!('seen' in payload)) return { ...payload, seen: true }
   }
   // get resolves once all stores have given a response with data

@@ -1,6 +1,6 @@
 import { firestore } from 'firebase'
 import { isNumber } from 'is-what'
-import { FirestoreModuleConfig } from 'src/CreatePlugin'
+import { FirestoreModuleConfig } from '../CreatePlugin'
 import { DocMetadata } from '@magnetarjs/core'
 
 type Firestore = firestore.Firestore
@@ -9,7 +9,7 @@ type CollectionReference = firestore.CollectionReference
 type DocumentSnapshot = firestore.DocumentSnapshot
 type QueryDocumentSnapshot = firestore.QueryDocumentSnapshot
 
-export function getQueryInstance (
+export function getQueryInstance(
   collectionPath: string,
   pluginModuleConfig: FirestoreModuleConfig,
   firestoreInstance: Firestore
@@ -29,7 +29,7 @@ export function getQueryInstance (
   return query
 }
 
-export function docSnapshotToDocMetadata (
+export function docSnapshotToDocMetadata(
   docSnapshot: DocumentSnapshot | QueryDocumentSnapshot
 ): DocMetadata {
   const docMetaData: DocMetadata = {

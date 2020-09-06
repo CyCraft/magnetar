@@ -1,14 +1,15 @@
 import test from 'ava'
-import Vue from 'vue/dist/vue.common.js'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
-import { pokedex } from '../helpers/pokedex'
+import { pokedex } from 'test-utils'
+// @ts-ignore
+import Vue from 'vue/dist/vue.common.js'
 
-test('expected behaviour computed prop lifecycle - no reactivity', async t => {
+test('expected behaviour computed prop lifecycle - no reactivity', async (t) => {
   const allPokemon = [{ name: 'bulbasaur' }]
-  const ranFns = []
+  const ranFns: any[] = []
   const vue = new Vue({
     computed: {
-      bulbasaurComputed () {
+      bulbasaurComputed() {
         ranFns.push('ran')
         return { ...allPokemon[0], name: allPokemon[0].name + '!' }
       },
@@ -30,17 +31,17 @@ test('expected behaviour computed prop lifecycle - no reactivity', async t => {
   t.deepEqual(ranFns, ['ran'])
 })
 
-test('expected behaviour computed prop lifecycle - with reactivity via data', async t => {
+test('expected behaviour computed prop lifecycle - with reactivity via data', async (t) => {
   const allPokemon = [{ name: 'bulbasaur' }]
-  const ranFns = []
+  const ranFns: any[] = []
   const vue = new Vue({
-    data () {
+    data() {
       return { allPokemon }
     },
     computed: {
-      bulbasaurComputed () {
+      bulbasaurComputed(): any {
         ranFns.push('ran')
-        return { ...this.allPokemon[0], name: this.allPokemon[0].name + '!' }
+        return { ...(this as any).allPokemon[0], name: (this as any).allPokemon[0].name + '!' }
       },
     },
   })
@@ -60,12 +61,12 @@ test('expected behaviour computed prop lifecycle - with reactivity via data', as
   t.deepEqual(ranFns, ['ran', 'ran'])
 })
 
-test('expected behaviour computed prop lifecycle - with reactivity via vue.observable', async t => {
+test('expected behaviour computed prop lifecycle - with reactivity via vue.observable', async (t) => {
   const allPokemon = Vue.observable([{ name: 'bulbasaur' }])
-  const ranFns = []
+  const ranFns: any[] = []
   const vue = new Vue({
     computed: {
-      bulbasaurComputed () {
+      bulbasaurComputed() {
         ranFns.push('ran')
         return { ...allPokemon[0], name: allPokemon[0].name + '!' }
       },
@@ -90,7 +91,7 @@ test('expected behaviour computed prop lifecycle - with reactivity via vue.obser
 // test('reactivity: collection - updating', async t => {
 //   const { pokedexModule } = createVueSyncInstance()
 //   const bulbasaurModule = pokedexModule.doc('1')
-//   const ranFns = []
+//   const ranFns: any[] = []
 //   const vue = new Vue({
 //     computed: {
 //       allPokemon () {
@@ -128,20 +129,20 @@ test('expected behaviour computed prop lifecycle - with reactivity via vue.obser
 //   t.deepEqual(ranFns, ['bulbasaur', 'bulbasaur'])
 // })
 
-test('reactivity: document - via data', async t => {
+test('reactivity: document - via data', async (t) => {
   const { trainerModule } = createVueSyncInstance()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: undefined })
 
-  const ranFns = []
+  const ranFns: any[] = []
   const vue = new Vue({
-    data () {
+    data() {
       return { data: trainerModule.data }
     },
     computed: {
-      dataComputed () {
+      dataComputed(): any {
         ranFns.push('ran')
-        console.log(`this.data.__ob__ → `, this.data.__ob__)
-        return { ...this.data, name: this.data.name + '!' }
+        console.log(`this.data.__ob__ → `, (this as any).data.__ob__)
+        return { ...(this as any).data, name: (this as any).data.name + '!' }
       },
     },
   })
@@ -172,17 +173,17 @@ test('reactivity: document - via data', async t => {
   t.deepEqual(ranFns, ['ran', 'ran', 'ran'])
 })
 
-test('only:reactivity: document - directly', async t => {
+test('only:reactivity: document - directly', async (t) => {
   const { trainerModule } = createVueSyncInstance()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: undefined })
 
-  const ranFns = []
+  const ranFns: any[] = []
   const vue = new Vue({
-    data () {
+    data() {
       return {}
     },
     computed: {
-      dataComputed () {
+      dataComputed() {
         ranFns.push('ran')
         const data = trainerModule.data
         return { ...data, name: data.name + '!' }
@@ -223,7 +224,7 @@ test('only:reactivity: document - directly', async t => {
 //   const { pokedexModule } = createVueSyncInstance()
 //   try { await pokedexModule.get() } catch (error) { t.fail(error) } // prettier-ignore
 
-//   const ranFns = []
+//   const ranFns: any[] = []
 //   const vue = new Vue({
 //     computed: {
 //       allPokemon () {

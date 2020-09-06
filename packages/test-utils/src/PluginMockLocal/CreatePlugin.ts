@@ -4,10 +4,10 @@ import { isArray } from 'is-what'
 import {
   PluginInstance,
   VueSyncPlugin,
+  Clauses,
   WhereClause,
   OrderByClause,
   Limit,
-  Clauses,
   PluginActionPayloadBase,
 } from '@magnetarjs/core'
 import { writeActionFactory } from './actions/mergeAssignReplace'
@@ -56,7 +56,8 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
     if (!backupCollectionMap.has(docId)) backupCollectionMap.set(docId, [])
     // make a backup of whatever is found in the data
     const docBackup = copy(data[collectionPath].get(docId))
-    backupCollectionMap.get(docId).push(docBackup)
+    const arr = backupCollectionMap.get(docId)
+    if (docBackup && arr) arr.push(docBackup)
   }
 
   const restoreBackup: MakeRestoreBackup = (collectionPath, docId) => {
@@ -66,10 +67,10 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
     // set the backup array for the doc
     if (!backupCollectionMap.has(docId)) return
     const docBackupArray = backupCollectionMap.get(docId)
-    if (!docBackupArray.length) return
+    if (!docBackupArray || !docBackupArray.length) return
     // restore the backup of whatever is found and replace with the data
     const docBackup = docBackupArray.pop()
-    data[collectionPath].set(docId, docBackup)
+    if (docBackup) data[collectionPath].set(docId, docBackup)
   }
 
   /**
@@ -79,9 +80,10 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
   const setupModule = ({
     collectionPath,
     docId,
-    pluginModuleConfig,
+    pluginModuleConfig = {},
   }: PluginActionPayloadBase<SimpleStoreModuleConfig>): void => {
-    if (modulesAlreadySetup.has([collectionPath, docId].join('/'))) return
+    const modulePath = [collectionPath, docId].filter(Boolean).join('/')
+    if (modulesAlreadySetup.has(modulePath)) return
     // always set up a new Map for the collection, but only when it's undefined!
     // the reason for this is that the module can be instantiated multiple times
     data[collectionPath] = data[collectionPath] ?? new Map()
@@ -92,10 +94,10 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
       for (const [_docId, _docData] of initialData) {
         data[collectionPath].set(_docId, _docData)
       }
-    } else {
+    } else if (docId) {
       data[collectionPath].set(docId, initialData as Record<string, any>)
     }
-    modulesAlreadySetup.add([collectionPath, docId].join('/'))
+    modulesAlreadySetup.add(modulePath)
   }
 
   /**
@@ -109,7 +111,7 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
   const getModuleData = ({
     collectionPath,
     docId,
-    pluginModuleConfig,
+    pluginModuleConfig = {},
   }: PluginActionPayloadBase<SimpleStoreModuleConfig>): any => {
     const collectionDB = data[collectionPath]
     // if it's a doc, return the specific doc

@@ -21,11 +21,7 @@
     "ts-toolbelt": "6.12.2"
   },
   "devDependencies": {
-    "copy-anything": "^2.0.1",
-    "fast-sort": "^2.2.0",
-    "filter-anything": "^2.1.4",
-    "flatten-anything": "^2.0.2",
-    "path-to-prop": "1.0.0"
+    "test-utils": "^0.0.0-beta.0"
   },
   "keywords": [
     "vue-sync"

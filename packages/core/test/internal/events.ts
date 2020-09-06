@@ -1,12 +1,12 @@
 import test from 'ava'
 import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
-import { pokedex } from '../helpers/pokedex'
+import { pokedex } from 'test-utils'
 
-test('delete: emits before & success events', async t => {
+test('delete: emits before & success events', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = pokedex(7)
   await pokedexModule.insert(insertPayload)
-  let ranAllEvents = []
+  const ranAllEvents: any[] = []
   await pokedexModule.doc('7').delete(undefined, {
     on: {
       before: ({ payload, storeName }) => {
@@ -20,10 +20,10 @@ test('delete: emits before & success events', async t => {
   t.is(ranAllEvents.length, 4)
 })
 
-test('insert: emits before & success events', async t => {
+test('insert: emits before & success events', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = pokedex(7)
-  let ranAllEvents = []
+  const ranAllEvents: any[] = []
   await pokedexModule.insert(insertPayload, {
     on: {
       before: ({ payload, storeName }) => {
@@ -51,7 +51,7 @@ test('insert: emits before & success events', async t => {
   t.is(ranAllEvents.length, 4)
 })
 
-test('insert: can abort in before events', async t => {
+test('insert: can abort in before events', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = pokedex(7)
   try {
@@ -75,10 +75,10 @@ test('insert: can abort in before events', async t => {
   }
 })
 
-test('insert: can abort in success events', async t => {
+test('insert: can abort in success events', async (t) => {
   const { pokedexModule } = createVueSyncInstance()
   const insertPayload = pokedex(7)
-  let ranAllEvents = []
+  const ranAllEvents: any[] = []
   try {
     const result = await pokedexModule.insert(insertPayload, {
       on: {

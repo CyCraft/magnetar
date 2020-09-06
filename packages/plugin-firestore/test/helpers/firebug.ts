@@ -1,13 +1,13 @@
 import test from 'ava'
 import { firestore } from '../helpers/firestore'
-import { waitMs } from '../helpers/wait'
+import { waitMs } from 'test-utils'
 
-test('firebase sdk', async t => {
+test('firebase sdk', async (t) => {
   const pokemonPath = `vueSyncTests/read/pokedex/136`
   console.log(`1)`)
   await firestore
     .doc(pokemonPath)
-    .onSnapshot({ includeMetadataChanges: false }, async querySnapshot => {
+    .onSnapshot({ includeMetadataChanges: false }, async (querySnapshot) => {
       console.log(
         `doc(${pokemonPath}).onSnapshot
   querySnapshot.metadata.fromCache → `,
@@ -24,7 +24,7 @@ test('firebase sdk', async t => {
   console.log(`\n2)`)
   await firestore
     .collection(pokedexPath)
-    .onSnapshot({ includeMetadataChanges: false }, async querySnapshot => {
+    .onSnapshot({ includeMetadataChanges: false }, async (querySnapshot) => {
       // this always gets executed twice.
       // expected: once from cache, once from the server
       console.log(

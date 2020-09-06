@@ -15,7 +15,7 @@ declare type EventSharedPayload = {
      * stream actions: void // streams cannot be aborted in an event
      * others: () => void
      */
-    abort: (() => void) | void;
+    abort: () => void;
 };
 declare type EventPayloadPropResult = {
     result: void | string | GetResponse | DoOnGet | StreamResponse | DoOnStream;
