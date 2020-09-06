@@ -1,1 +1,1 @@
-export { CreatePlugin } from './CreatePlugin';
+export { FirestorePluginOptions, FirestoreModuleConfig, CreatePlugin } from './CreatePlugin';

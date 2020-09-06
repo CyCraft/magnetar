@@ -1,7 +1,7 @@
 import { O } from 'ts-toolbelt'
 import { isPlainObject, isFunction, isArray } from 'is-what'
 import { ActionName } from './actions'
-import { PlainObject, DocMetadata } from './atoms'
+import { DocMetadata } from './atoms'
 import { OnAddedFn, OnModifiedFn, OnRemovedFn } from './modifyReadResponse'
 import { Clauses } from './clauses'
 
@@ -41,7 +41,7 @@ export interface PluginInstance {
    */
   getModuleData?: (
     pluginActionPayload: PluginActionPayloadBase
-  ) => PlainObject | Map<string, PlainObject>
+  ) => Record<string, any> | Map<string, Record<string, any>>
 }
 
 /**
@@ -72,7 +72,7 @@ export type PluginStreamActionPayload<SpecificPluginModuleConfig = PluginModuleC
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: PlainObject | void
+    payload: Record<string, any> | void
     /**
      * MustExecuteOnRead:
      * The functions for 'added', 'modified' and 'removed' **must** be executed by the plugin whenever the stream sees any of these changes. These are the functions that will pass the data to the other "local" Store Plugins.
@@ -94,7 +94,7 @@ export type PluginGetActionPayload<SpecificPluginModuleConfig = PluginModuleConf
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: PlainObject | void
+    payload: Record<string, any> | void
   }
 >
 /**
@@ -110,7 +110,7 @@ export type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleCo
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: PlainObject
+    payload: Record<string, any>
   }
 >
 /**
@@ -124,7 +124,7 @@ export type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleC
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: PlainObject
+    payload: Record<string, any>
   }
 >
 /**
@@ -141,6 +141,10 @@ export type PluginDeletePropActionPayload<
      * Whatever payload was passed to the action that was triggered
      */
     payload: string | string[]
+    /**
+     * docId must be provided
+     */
+    docId: string
   }
 >
 /**
@@ -170,7 +174,7 @@ export type PluginRevertActionPayload<SpecificPluginModuleConfig = PluginModuleC
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: PlainObject | PlainObject[] | void | string | string[]
+    payload: Record<string, any> | Record<string, any>[] | void | string | string[]
     /**
      * Whatever action was originally triggered when an error was thrown. This is the action that will need to be reverted by this function.
      */
@@ -241,7 +245,7 @@ export type MustExecuteOnRead = O.Compulsory<DoOnStream>
 /**
  * DoOnStream type guard
  */
-export function isDoOnStream (payload: any): payload is DoOnStream {
+export function isDoOnStream(payload: any): payload is DoOnStream {
   const isNotDoOnStream =
     !isPlainObject(payload) ||
     payload.streaming ||
@@ -267,13 +271,13 @@ export type DoOnGet = OnAddedFn
 /**
  * DoOnGet type guard
  */
-export function isDoOnGet (payload: any): payload is DoOnGet {
+export function isDoOnGet(payload: any): payload is DoOnGet {
   return isFunction(payload)
 }
 
 /**
  * GetResponse type guard
  */
-export function isGetResponse (payload: any): payload is GetResponse {
+export function isGetResponse(payload: any): payload is GetResponse {
   return isPlainObject(payload) && isArray(payload.docs)
 }

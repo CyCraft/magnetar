@@ -1,10 +1,9 @@
-import { PlainObject, PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/core'
+import { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/core'
 import { ReactiveStoreModuleConfig, ReactiveStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'
-import Vue from 'vue'
 
-export function insertActionFactory (
-  data: { [collectionPath: string]: Map<string, PlainObject> },
+export function insertActionFactory(
+  data: { [collectionPath: string]: Map<string, Record<string, any>> },
   reactiveStoreOptions: ReactiveStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginInsertAction {
@@ -31,15 +30,19 @@ export function insertActionFactory (
     if (makeBackup) makeBackup(collectionPath, docId)
 
     const docDataToMutate = collectionMap.get(docId)
+
+    if (!docDataToMutate)
+      throw new Error(`Document data not found for id: ${collectionPath} ${docId}`)
+
     // reset the doc to be able to overwrite
-    Object.keys(docDataToMutate).forEach(key => {
+    Object.keys(docDataToMutate).forEach((key) => {
       if (key in payload) return
       // delete docDataToMutate[key]
-      Vue.delete(docDataToMutate, key)
+      reactiveStoreOptions.vueInstance.delete(docDataToMutate, key)
     })
     Object.entries(payload).forEach(([key, value]) => {
       // docDataToMutate[key] = value
-      Vue.set(docDataToMutate, key, value)
+      reactiveStoreOptions.vueInstance.set(docDataToMutate, key, value)
     })
     // console.log(`docDataToMutate.name → `, docDataToMutate.name)
     return docId

@@ -1,9 +1,9 @@
-import { PlainObject, PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/core'
+import { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../throwFns'
 
-export function deleteActionFactory (
-  data: { [collectionPath: string]: Map<string, PlainObject> },
+export function deleteActionFactory(
+  data: { [collectionPath: string]: Map<string, Record<string, any>> },
   simpleStoreOptions: SimpleStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeleteAction {

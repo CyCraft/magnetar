@@ -1,9 +1,10 @@
 import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '@magnetarjs/core'
-import { CreatePlugin } from '@magnetarjs/reactive-store'
+import { CreatePlugin } from '../../src'
 import { CreatePlugin as CreatePluginRemote } from './pluginMockRemote'
 import { pokedex, PokedexEntry } from './pokedex'
 import { generateRandomId } from './generateRandomId'
 import { O } from 'ts-toolbelt'
+// @ts-ignore
 import Vue from 'vue/dist/vue.common.js'
 
 const getInitialDataCollection = () => [
@@ -20,7 +21,7 @@ export type PokedexModuleData = O.Merge<
   }
 >
 
-export interface TrainerModuleData {
+export type TrainerModuleData = {
   name: string
   age?: number
   nickName?: string
@@ -28,7 +29,9 @@ export interface TrainerModuleData {
   shouldFail?: string
 }
 
-export function createVueSyncInstance (vueInstance: any = Vue): {
+export function createVueSyncInstance(
+  vueInstance: any = Vue
+): {
   pokedexModule: CollectionInstance<PokedexModuleData>
   trainerModule: DocInstance<TrainerModuleData>
   vueSync: VueSyncInstance

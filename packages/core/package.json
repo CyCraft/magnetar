@@ -7,26 +7,25 @@
   "module": "dist/index.esm.js",
   "typings": "types/index.d.ts",
   "scripts": {
-    "build": "npm run lint && npm run test && npm run rollup",
+    "build": "npm run test && npm run rollup",
     "test": "ava --verbose",
     "test--only": "ava --verbose --match='*only:*'",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "rollup": "rollup -c build.js"
+    "rollup": "rimraf dist && rimraf types && rollup -c build.js"
   },
   "author": "Luca & Louis",
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
-    "is-what": "^3.8.0",
-    "merge-anything": "^3.0.3",
-    "ts-toolbelt": "^6.7.7"
+    "is-what": "^3.11.2",
+    "merge-anything": "^3.0.5",
+    "ts-toolbelt": "6.12.2"
   },
   "devDependencies": {
     "copy-anything": "^2.0.1",
     "fast-sort": "^2.2.0",
-    "filter-anything": "^2.1.2",
-    "flatten-anything": "^2.0.1",
-    "path-to-prop": "0.0.3"
+    "filter-anything": "^2.1.4",
+    "flatten-anything": "^2.0.2",
+    "path-to-prop": "1.0.0"
   },
   "keywords": [
     "vue-sync"

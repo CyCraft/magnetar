@@ -33,6 +33,8 @@
     "rimraf": "^3.0.2",
     "rollup": "^2.26.10",
     "rollup-plugin-typescript2": "^0.27.2",
+    "ts-node": "^9.0.0",
+    "tsconfig-paths": "^3.9.0",
     "typescript": "^4.0.2"
   },
   "author": "Luca Ban - Mesqueeb",
@@ -43,14 +45,5 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cycraft/magnetar.git"
-  },
-  "ava": {
-    "extensions": [
-      "ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
-    "timeout": "30s"
   }
 }

@@ -1,6 +1,5 @@
 import { isString } from 'is-what'
 import {
-  PlainObject,
   PluginStreamAction,
   StreamResponse,
   DoOnStream,
@@ -12,8 +11,8 @@ import { insertActionFactory } from './insert'
 import { deleteActionFactory } from './delete'
 import { throwIfEmulatedError } from '../../throwFns'
 
-export function streamActionFactory (
-  data: { [collectionPath: string]: Map<string, PlainObject> },
+export function streamActionFactory(
+  data: { [collectionPath: string]: Map<string, Record<string, any>> },
   simpleStoreOptions: SimpleStoreOptions
 ): PluginStreamAction {
   return function ({

@@ -1,12 +1,10 @@
+import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '@magnetarjs/core'
 import { CreatePlugin as CreatePluginLocal } from './pluginMockLocal/index'
 import { CreatePlugin } from '../../src'
-import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '@magnetarjs/core'
 import { pokedex, PokedexEntry } from './pokedex'
 import { generateRandomId } from './generateRandomId'
-import { firestore } from './firestore'
 import { O } from 'ts-toolbelt'
-import { waitMs } from './wait'
-import { deleteAtPath } from './deleteCollection'
+import { firestore } from './firestore'
 
 const getInitialDataCollection = () => [
   // doc entries
@@ -33,12 +31,12 @@ export type TrainerModuleData = {
 
 const testNamesUsedSoFar: string[] = []
 
-export async function createVueSyncInstance (
+export async function createVueSyncInstance(
   testName: string,
   {
     insertDocs = {},
     deletePaths = [],
-  }: { insertDocs?: { [path: string]: object }; deletePaths?: string[] } = {}
+  }: { insertDocs?: { [path: string]: Record<string, any> }; deletePaths?: string[] } = {}
 ): Promise<{
   pokedexModule: CollectionInstance<PokedexModuleData>
   trainerModule: DocInstance<TrainerModuleData>
@@ -52,7 +50,7 @@ export async function createVueSyncInstance (
   }
 
   // prepare the firestore side
-  const deletePromises = deletePaths.map(path => {
+  const deletePromises = deletePaths.map((path) => {
     const docPath = `vueSyncTests/${testName}${path ? '/' + path : ''}`
     return firestore.doc(docPath).delete()
   })

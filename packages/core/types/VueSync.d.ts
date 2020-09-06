@@ -1,7 +1,6 @@
 import { O } from 'ts-toolbelt';
 import { CollectionInstance } from './Collection';
 import { GlobalConfig, ModuleConfig } from './types/config';
-import { PlainObject } from './types/atoms';
 import { DocInstance } from './Doc';
 export { isDocModule, isCollectionModule } from './helpers/pathHelpers';
 /**
@@ -15,9 +14,9 @@ export interface VueSyncInstance {
 /**
  * This is the type for calling `collection()`
  */
-export declare type CollectionFn<DocDataTypeInherited extends object = PlainObject> = <DocDataType extends object = DocDataTypeInherited>(idOrPath: string, moduleConfig?: ModuleConfig) => CollectionInstance<DocDataType>;
+export declare type CollectionFn<DocDataTypeInherited extends Record<string, any> = Record<string, any>> = <DocDataType extends Record<string, any> = DocDataTypeInherited>(idOrPath: string, moduleConfig?: ModuleConfig) => CollectionInstance<DocDataType>;
 /**
  * This is the type for calling `doc()`
  */
-export declare type DocFn<DocDataTypeInherited extends object = PlainObject> = <DocDataType extends object = DocDataTypeInherited>(idOrPath: string, moduleConfig?: ModuleConfig) => DocInstance<DocDataType>;
+export declare type DocFn<DocDataTypeInherited extends Record<string, any> = Record<string, any>> = <DocDataType extends Record<string, any> = DocDataTypeInherited>(idOrPath: string, moduleConfig?: ModuleConfig) => DocInstance<DocDataType>;
 export declare function VueSync(vueSyncConfig: GlobalConfig): VueSyncInstance;

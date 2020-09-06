@@ -1,6 +1,6 @@
 import { O } from 'ts-toolbelt';
 import { ActionName } from './actions';
-import { PlainObject, DocMetadata } from './atoms';
+import { DocMetadata } from './atoms';
 import { OnAddedFn, OnModifiedFn, OnRemovedFn } from './modifyReadResponse';
 import { Clauses } from './clauses';
 /**
@@ -32,7 +32,7 @@ export interface PluginInstance {
     /**
      * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
      */
-    getModuleData?: (pluginActionPayload: PluginActionPayloadBase) => PlainObject | Map<string, PlainObject>;
+    getModuleData?: (pluginActionPayload: PluginActionPayloadBase) => Record<string, any> | Map<string, Record<string, any>>;
 }
 /**
  * Where, orderBy, limit clauses or extra config a dev might pass when instanciates a module as second param (under `configPerStore`). Eg. `collection('pokedex', { configPerStore: { local: pluginModuleConfig } })`
@@ -58,7 +58,7 @@ export declare type PluginStreamActionPayload<SpecificPluginModuleConfig = Plugi
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: PlainObject | void;
+    payload: Record<string, any> | void;
     /**
      * MustExecuteOnRead:
      * The functions for 'added', 'modified' and 'removed' **must** be executed by the plugin whenever the stream sees any of these changes. These are the functions that will pass the data to the other "local" Store Plugins.
@@ -73,7 +73,7 @@ export declare type PluginGetActionPayload<SpecificPluginModuleConfig = PluginMo
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: PlainObject | void;
+    payload: Record<string, any> | void;
 }>;
 /**
  * Should handle 'get' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc). Should return `GetResponse` when acting as a "remote" Store Plugin, and `DoOnGet` when acting as "local" Store Plugin.
@@ -83,7 +83,7 @@ export declare type PluginWriteActionPayload<SpecificPluginModuleConfig = Plugin
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: PlainObject;
+    payload: Record<string, any>;
 }>;
 /**
  * Should handle 'merge' 'assign' 'replace' for docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
@@ -93,7 +93,7 @@ export declare type PluginInsertActionPayload<SpecificPluginModuleConfig = Plugi
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: PlainObject;
+    payload: Record<string, any>;
 }>;
 /**
  * Should handle 'insert' for collections & docs. Must return the new document's ID! When executed on a collection, the plugin must provide a newly generated ID. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc)
@@ -104,6 +104,10 @@ export declare type PluginDeletePropActionPayload<SpecificPluginModuleConfig = P
      * Whatever payload was passed to the action that was triggered
      */
     payload: string | string[];
+    /**
+     * docId must be provided
+     */
+    docId: string;
 }>;
 /**
  * Should handle 'deleteProp' for docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
@@ -123,7 +127,7 @@ export declare type PluginRevertActionPayload<SpecificPluginModuleConfig = Plugi
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: PlainObject | PlainObject[] | void | string | string[];
+    payload: Record<string, any> | Record<string, any>[] | void | string | string[];
     /**
      * Whatever action was originally triggered when an error was thrown. This is the action that will need to be reverted by this function.
      */

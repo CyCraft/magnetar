@@ -1,10 +1,5 @@
 import { firestore } from 'firebase'
-import {
-  StreamResponse,
-  PluginStreamAction,
-  PluginStreamActionPayload,
-  PlainObject,
-} from '@magnetarjs/core'
+import { StreamResponse, PluginStreamAction, PluginStreamActionPayload } from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { getFirestoreDocPath, getFirestoreCollectionPath } from '../helpers/pathHelpers'
 import { getQueryInstance, docSnapshotToDocMetadata } from 'src/helpers/queryHelpers'
@@ -14,7 +9,7 @@ type QuerySnapshot = firestore.QuerySnapshot
 type DocumentChange = firestore.DocumentChange
 type QueryDocumentSnapshot = firestore.QueryDocumentSnapshot
 
-export function streamActionFactory (
+export function streamActionFactory(
   firestorePluginOptions: Required<FirestorePluginOptions>
 ): PluginStreamAction {
   return function ({
@@ -32,7 +27,7 @@ export function streamActionFactory (
       resolveStream = resolve
       rejectStream = reject
     })
-    let unsubscribeStream
+    let unsubscribeStream: any
     // in case of a doc module
     if (docId) {
       const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
@@ -43,9 +38,10 @@ export function streamActionFactory (
           // do nothing for local changes
           if (localChange) return
           // serverChanges only
-          const docData = docSnapshot.data() as PlainObject
+          const docData = docSnapshot.data() as Record<string, any>
           const docMetadata = docSnapshotToDocMetadata(docSnapshot)
           added(docData, docMetadata)
+          // @ts-ignore
         }, rejectStream)
     }
     // in case of a collection module
@@ -59,7 +55,7 @@ export function streamActionFactory (
         // serverChanges only
         querySnapshot.docChanges().forEach((docChange: DocumentChange) => {
           const docSnapshot: QueryDocumentSnapshot = docChange.doc
-          const docData = docSnapshot.data() as PlainObject
+          const docData = docSnapshot.data() as Record<string, any>
           const docMetadata = docSnapshotToDocMetadata(docSnapshot)
           if (docChange.type === 'added') {
             added(docData, docMetadata)
@@ -71,9 +67,10 @@ export function streamActionFactory (
             removed(docData, docMetadata)
           }
         })
+        // @ts-ignore
       }, rejectStream)
     }
-    function stop (): void {
+    function stop(): void {
       resolveStream()
       unsubscribeStream()
     }

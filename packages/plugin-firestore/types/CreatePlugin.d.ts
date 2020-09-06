@@ -1,6 +1,9 @@
 import { firestore } from 'firebase';
 import { VueSyncPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core';
 export interface FirestorePluginOptions {
+    /**
+     * This is required to make sure there are not two instances of Firestore running which can cause issues.
+     */
     firestoreInstance: firestore.Firestore;
     /**
      * When this is true, the "modulePath" will be used as firestorePath to sync the data to. Eg. `collection('todos')` will sync data to `todos` on firestore. When this is false (default) the firestorePath must be provided like so: `collection('todos', { firestorePath: 'myTodos' })`

@@ -1,8 +1,7 @@
 import { O } from 'ts-toolbelt';
-import { PlainObject } from './atoms';
-export declare type ModifyWritePayload = (payload: PlainObject) => PlainObject;
+export declare type ModifyWritePayload = (payload: Record<string, any>) => Record<string, any>;
 export declare type ModifyDeletePropPayload = (payload: string | string[]) => string | string[];
-export declare type ModifyReadPayload = (payload: PlainObject | void) => PlainObject | void;
+export declare type ModifyReadPayload = (payload: Record<string, any> | void) => Record<string, any> | void;
 export declare type ModifyPayloadFnMap = {
     insert?: ModifyWritePayload;
     merge?: ModifyWritePayload;

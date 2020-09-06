@@ -1,7 +1,7 @@
 import { PluginRevertAction, PluginInstance, PluginRevertActionPayload } from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 
-export function revertActionFactory (
+export function revertActionFactory(
   actions: PluginInstance['actions'],
   firestorePluginOptions: Required<FirestorePluginOptions>
 ): PluginRevertAction {
@@ -19,7 +19,8 @@ export function revertActionFactory (
     // revert all write actions when called on a doc
     if (docId) {
       if (actionName === 'insert') {
-        await actions.delete({ payload: undefined, collectionPath, docId, pluginModuleConfig })
+        if (actions.delete)
+          await actions.delete({ payload: undefined, collectionPath, docId, pluginModuleConfig })
         return
       }
     }

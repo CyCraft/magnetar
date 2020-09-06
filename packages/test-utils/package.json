@@ -1,0 +1,24 @@
+{
+  "name": "test-utils",
+  "private": true,
+  "version": "0.0.0-beta.0",
+  "description": "magnetar test utils",
+  "module": "src/index.ts",
+  "main": "src/index.ts",
+  "author": "Luca Ban - Mesqueeb",
+  "dependencies": {
+    "@magnetarjs/core": "^0.0.0",
+    "copy-anything": "^2.0.1",
+    "fast-sort": "^2.2.0",
+    "filter-anything": "^2.1.4",
+    "is-what": "^3.11.2",
+    "merge-anything": "^3.0.5",
+    "path-to-prop": "^1.0.0"
+  },
+  "homepage": "https://github.com/cycraft/magnetar#readme",
+  "bugs": "https://github.com/cycraft/magnetar/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cycraft/magnetar.git"
+  }
+}

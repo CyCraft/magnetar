@@ -11,7 +11,7 @@ import { PluginModuleConfig } from '../types/plugins'
  * @param {string} storeName
  * @returns {PluginModuleConfig}
  */
-export function getPluginModuleConfig (
+export function getPluginModuleConfig(
   moduleConfig: ModuleConfig,
   storeName: string
 ): PluginModuleConfig {
@@ -28,7 +28,7 @@ export function getPluginModuleConfig (
  * @param {[string, string | undefined]} [collectionPath, docId]
  * @param {ModuleConfig} moduleConfig
  */
-export function executeSetupModulePerStore (
+export function executeSetupModulePerStore(
   globalConfigStores: GlobalConfig['stores'],
   [collectionPath, docId]: [string, string | undefined],
   moduleConfig: ModuleConfig
@@ -51,13 +51,13 @@ export function executeSetupModulePerStore (
  * @param {GlobalConfig} globalConfig
  * @returns {(collectionPath: string, docId: string | undefined) => (Map<string, DocDataType> | DocDataType)}
  */
-export function getDataFnFromDataStore<DocDataType> (
+export function getDataFnFromDataStore<DocDataType>(
   moduleConfig: ModuleConfig,
   globalConfig: GlobalConfig
 ): (collectionPath: string, docId: string | undefined) => Map<string, DocDataType> | DocDataType {
   const dataStoreName = moduleConfig.dataStoreName || globalConfig.dataStoreName
   throwIfNoDataStoreName(dataStoreName)
-  const { getModuleData } = globalConfig.stores[dataStoreName]
+  const getModuleData = globalConfig.stores[dataStoreName] as any
   const pluginModuleConfig = getPluginModuleConfig(moduleConfig, dataStoreName)
 
   return (collectionPath, docId): Map<string, DocDataType> | DocDataType =>
@@ -75,7 +75,7 @@ export function getDataFnFromDataStore<DocDataType> (
  * @param {GlobalConfig} globalConfig
  * @returns {calledFrom extends 'doc' ? { get: (...p: any[]) => DocDataType } : { get: (...p: any[]) => Map<string, DocDataType> }}
  */
-export function getDataProxyHandler<calledFrom extends 'doc' | 'collection', DocDataType> (
+export function getDataProxyHandler<calledFrom extends 'doc' | 'collection', DocDataType>(
   [collectionPath, docId]: [string, string | undefined],
   moduleConfig: ModuleConfig,
   globalConfig: GlobalConfig

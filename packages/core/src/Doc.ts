@@ -15,7 +15,7 @@ import { ModuleConfig, GlobalConfig } from './types/config'
 import { CollectionFn, DocFn } from './VueSync'
 import { executeSetupModulePerStore, getDataProxyHandler } from './helpers/moduleHelpers'
 
-export type DocInstance<DocDataType extends object = { [prop: string]: any }> = {
+export type DocInstance<DocDataType extends Record<string, any> = Record<string, any>> = {
   data: DocDataType
   collection: CollectionFn
   id: string
@@ -23,13 +23,13 @@ export type DocInstance<DocDataType extends object = { [prop: string]: any }> = 
   openStreams: OpenStreams
 
   // actions
-  get?: VueSyncGetAction<DocDataType, 'doc'>
-  stream?: VueSyncStreamAction
-  insert?: VueSyncInsertAction<DocDataType>
-  merge?: VueSyncWriteAction<DocDataType>
-  assign?: VueSyncWriteAction<DocDataType>
-  replace?: VueSyncWriteAction<DocDataType>
-  deleteProp?: VueSyncDeletePropAction<DocDataType>
+  get: VueSyncGetAction<DocDataType, 'doc'>
+  stream: VueSyncStreamAction
+  insert: VueSyncInsertAction<DocDataType>
+  merge: VueSyncWriteAction<DocDataType>
+  assign: VueSyncWriteAction<DocDataType>
+  replace: VueSyncWriteAction<DocDataType>
+  deleteProp: VueSyncDeletePropAction<DocDataType>
   /**
    * @type {VueSyncDeleteAction} Documentation copied from `VueSyncDeleteAction`
    * @param {*} [payload] The delete action doesn't need any payload. In some cases, a Store Plugin you use might accept a payload.
@@ -38,10 +38,10 @@ export type DocInstance<DocDataType extends object = { [prop: string]: any }> = 
    * // first update the server and await that before updating the local store:
    * doc(id).delete(undefined, { executionOrder: ['remote', 'local'] })
    */
-  delete?: VueSyncDeleteAction<DocDataType>
+  delete: VueSyncDeleteAction<DocDataType>
 }
 
-export function createDocWithContext<DocDataType extends object> (
+export function createDocWithContext<DocDataType extends Record<string, any>>(
   [collectionPath, docId]: [string, string | undefined],
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
@@ -78,7 +78,7 @@ export function createDocWithContext<DocDataType extends object> (
 
   const moduleInstance: Omit<DocInstance<DocDataType>, 'data'> = {
     collection,
-    id,
+    id: id as string,
     path,
     openStreams,
     ...actions,

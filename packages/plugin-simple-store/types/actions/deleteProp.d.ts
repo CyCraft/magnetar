@@ -1,5 +1,5 @@
-import { PlainObject, PluginDeletePropAction } from '@magnetarjs/core';
+import { PluginDeletePropAction } from '@magnetarjs/core';
 import { SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin';
 export declare function deletePropActionFactory(data: {
-    [collectionPath: string]: Map<string, PlainObject>;
+    [collectionPath: string]: Map<string, Record<string, any>>;
 }, simpleStoreOptions: SimpleStoreOptions, makeBackup?: MakeRestoreBackup): PluginDeletePropAction;

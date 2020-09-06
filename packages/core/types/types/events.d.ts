@@ -1,27 +1,26 @@
 import { O } from 'ts-toolbelt';
 import { ActionName } from './actions';
-import { PlainObject } from './atoms';
 import { GetResponse, StreamResponse, DoOnStream, DoOnGet } from './plugins';
 export declare type EventName = 'before' | 'success' | 'error' | 'revert';
 declare type EventSharedPayload = {
     /**
-     * write actions: PlainObject | PlainObject[]
-     * delete actions: PlainObject | PlainObject[] | string | string[]
-     * read actions: PlainObject | void
+     * write actions: Record<string, any> | Record<string, any>[]
+     * delete actions: Record<string, any> | Record<string, any>[] | string | string[]
+     * read actions: Record<string, any> | void
      */
-    payload: PlainObject | PlainObject[] | void | string | string[];
+    payload: Record<string, any> | Record<string, any>[] | void | string | string[];
     actionName: ActionName;
     storeName: string;
     /**
      * stream actions: void // streams cannot be aborted in an event
      * others: () => void
      */
-    abort: () => void | void;
+    abort: (() => void) | void;
 };
 declare type EventPayloadPropResult = {
     result: void | string | GetResponse | DoOnGet | StreamResponse | DoOnStream;
 };
-export declare type EventFnBefore = (args: O.Merge<EventSharedPayload, {}>) => void | Promise<void>;
+export declare type EventFnBefore = (args: EventSharedPayload) => void | Promise<void>;
 export declare type EventFnSuccess = (args: O.Merge<EventSharedPayload, EventPayloadPropResult>) => void | Promise<void>;
 export declare type EventFnError = (args: O.Merge<EventSharedPayload, {
     error: any;

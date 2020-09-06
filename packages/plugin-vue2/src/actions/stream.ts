@@ -1,6 +1,5 @@
 import { isString } from 'is-what'
 import {
-  PlainObject,
   PluginStreamAction,
   StreamResponse,
   DoOnStream,
@@ -10,8 +9,8 @@ import { ReactiveStoreModuleConfig, ReactiveStoreOptions } from '../CreatePlugin
 import { insertActionFactory } from './insert'
 import { deleteActionFactory } from './delete'
 
-export function streamActionFactory (
-  data: { [collectionPath: string]: Map<string, PlainObject> },
+export function streamActionFactory(
+  data: { [collectionPath: string]: Map<string, Record<string, any>> },
   reactiveStoreOptions: ReactiveStoreOptions
 ): PluginStreamAction {
   return function ({

@@ -3,7 +3,7 @@ import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { isCollectionModule } from '@magnetarjs/core'
 import { throwIfInvalidFirestorePath } from './throwFns'
 
-export function getFirestoreDocPath (
+export function getFirestoreDocPath(
   collectionPath: string,
   docId: string,
   firestoreModuleConfig: FirestoreModuleConfig,
@@ -20,13 +20,13 @@ export function getFirestoreDocPath (
     // else, return the modulePath only if this option is enabled in the global firestorePluginOptions
     const { useModulePathsForFirestore } = firestorePluginOptions
     const modulePath = [collectionPath, docId].join('/')
-    documentPath = useModulePathsForFirestore ? modulePath : firestorePath
+    documentPath = (useModulePathsForFirestore ? modulePath : firestorePath) as string
   }
   throwIfInvalidFirestorePath(documentPath, 'doc')
   return documentPath
 }
 
-export function getFirestoreCollectionPath (
+export function getFirestoreCollectionPath(
   _collectionPath: string,
   firestoreModuleConfig: FirestoreModuleConfig,
   firestorePluginOptions: FirestorePluginOptions
@@ -39,7 +39,7 @@ export function getFirestoreCollectionPath (
   } else {
     // else, return the modulePath only if this option is enabled in the global firestorePluginOptions
     const { useModulePathsForFirestore } = firestorePluginOptions
-    collectionPath = useModulePathsForFirestore ? _collectionPath : firestorePath
+    collectionPath = (useModulePathsForFirestore ? _collectionPath : firestorePath) as string
   }
   throwIfInvalidFirestorePath(collectionPath, 'collection')
   return collectionPath

@@ -3,7 +3,7 @@ import { ModifyPayloadFnMap } from './modifyPayload';
 import { ModifyReadResponseFnMap } from './modifyReadResponse';
 import { EventNameFnMap } from './events';
 import { PluginInstance } from './plugins';
-import { StoreName, PlainObject } from './atoms';
+import { StoreName } from './atoms';
 import { Clauses } from './clauses';
 /**
  * Shared config can be set globally < or per module < or per action.
@@ -41,11 +41,14 @@ export declare type GlobalConfig = O.Merge<O.Compulsory<Partial<SharedConfig>, '
 /**
  * Extra options the dev can pass when creating a module with collection() or doc(). These will take precedence over the global config.
  */
-export declare type ModuleConfig = O.Compact<Clauses, [Partial<SharedConfig>, {
-    /**
-     * Custom config the dev can set per Store Plugin. This will be passed to the plugin's action handler.
-     */
-    configPerStore?: {
-        [storeName: string]: PlainObject;
-    };
-}]>;
+export declare type ModuleConfig = O.Compact<Clauses, [
+    Partial<SharedConfig>,
+    {
+        /**
+         * Custom config the dev can set per Store Plugin. This will be passed to the plugin's action handler.
+         */
+        configPerStore?: {
+            [storeName: string]: Record<string, any>;
+        };
+    }
+]>;

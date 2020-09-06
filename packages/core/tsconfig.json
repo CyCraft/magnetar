@@ -4,7 +4,11 @@
     "declaration": true,
     "declarationDir": "./types/",
     // This must be specified if "paths" is set
-    "baseUrl": "."
+    "baseUrl": ".",
+    // Relative to "baseUrl"
+    "paths": {
+      "@magnetarjs/core": ["src/index.ts"]
+    }
   },
   "include": ["src/**/*", "test/**/*"]
 }

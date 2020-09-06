@@ -1,11 +1,11 @@
-import { VueSyncPlugin, PlainObject, WhereClause, OrderByClause, Limit } from '@magnetarjs/core';
+import { VueSyncPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core';
 export interface SimpleStoreOptions {
     storeName: string;
     generateRandomId: () => string;
 }
 export interface SimpleStoreModuleConfig {
     path?: string;
-    initialData?: PlainObject | [string, PlainObject][];
+    initialData?: Record<string, any> | [string, Record<string, any>][];
     where?: WhereClause[];
     orderBy?: OrderByClause[];
     limit?: Limit;

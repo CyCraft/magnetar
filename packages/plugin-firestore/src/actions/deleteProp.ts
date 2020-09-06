@@ -5,7 +5,7 @@ import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { BatchSync } from '../helpers/batchSync'
 import { getFirestoreDocPath } from '../helpers/pathHelpers'
 
-export function deletePropActionFactory (
+export function deletePropActionFactory(
   batchSync: BatchSync,
   firestorePluginOptions: Required<FirestorePluginOptions>
 ): PluginDeletePropAction {
@@ -15,6 +15,8 @@ export function deletePropActionFactory (
     docId,
     pluginModuleConfig,
   }: PluginDeletePropActionPayload<FirestoreModuleConfig>): Promise<void> {
+    if (!docId) throw new Error('An non-existent action was triggered on a collection')
+
     const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
     const payloadArray = isArray(payload) ? payload : [payload]
     const firestorePayload = payloadArray.reduce(

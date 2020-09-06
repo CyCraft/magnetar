@@ -1,5 +1,4 @@
 import { O } from 'ts-toolbelt';
-import { PlainObject } from '../types/atoms';
 import { EventNameFnsMap } from '../types/events';
 import { PluginModuleConfig, PluginStreamAction, DoOnStream, StreamResponse } from '../types/plugins';
 /**
@@ -10,7 +9,7 @@ export declare function handleStream(args: {
     docId: string | undefined;
     pluginModuleConfig: PluginModuleConfig;
     pluginAction: PluginStreamAction;
-    payload: PlainObject | void;
+    payload: Record<string, any> | void;
     eventNameFnsMap: EventNameFnsMap;
     actionName: 'stream';
     storeName: string;

@@ -1,14 +1,14 @@
-import { PlainObject, PluginRevertAction, PluginRevertActionPayload } from '@magnetarjs/core'
+import { PluginRevertAction, PluginRevertActionPayload } from '@magnetarjs/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../throwFns'
 
-export function revertActionFactory (
-  data: { [collectionPath: string]: Map<string, PlainObject> },
+export function revertActionFactory(
+  data: { [collectionPath: string]: Map<string, Record<string, any>> },
   simpleStoreOptions: SimpleStoreOptions,
   restoreBackup: MakeRestoreBackup
 ): PluginRevertAction {
   // this is a `PluginRevertAction`:
-  return function revert ({
+  return function revert({
     payload,
     collectionPath,
     docId,

@@ -1,6 +1,6 @@
 import { ActionName } from '../types/actions'
 import { SharedConfig } from '../types/config'
-import { PlainObject } from '../types/atoms'
+
 import { EventNameFnsMap } from '../types/events'
 import {
   PluginModuleConfig,
@@ -17,12 +17,12 @@ import { OnAddedFn } from '../types/modifyReadResponse'
  * handleAction is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success (4) optional: onNextStoresSuccess.
  * in any event/hook it's possible for the dev to modify the result & also abort the execution chain, which prevents calling handleAction on the next store as well
  */
-export async function handleAction (args: {
+export async function handleAction(args: {
   collectionPath: string
   docId: string | undefined
   pluginModuleConfig: PluginModuleConfig
   pluginAction: PluginGetAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction // prettier-ignore
-  payload: void | PlainObject | PlainObject[] | string | string[]
+  payload: void | Record<string, any> | Record<string, any>[] | string | string[]
   eventNameFnsMap: EventNameFnsMap
   onError: SharedConfig['onError']
   actionName: Exclude<ActionName, 'stream'>

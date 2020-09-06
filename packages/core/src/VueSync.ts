@@ -2,7 +2,7 @@ import { O } from 'ts-toolbelt'
 import { merge } from 'merge-anything'
 import { createCollectionWithContext, CollectionInstance } from './Collection'
 import { SharedConfig, GlobalConfig, ModuleConfig } from './types/config'
-import { PlainObject } from './types/atoms'
+import {} from './types/atoms'
 import { createDocWithContext, DocInstance } from './Doc'
 import { OpenStreams } from './types/actions'
 import { throwIfInvalidModulePath } from './helpers/throwFns'
@@ -10,7 +10,7 @@ import { getCollectionPathDocIdEntry } from './helpers/pathHelpers'
 
 export { isDocModule, isCollectionModule } from './helpers/pathHelpers'
 
-function configWithDefaults (config: GlobalConfig): O.Compulsory<GlobalConfig> {
+function configWithDefaults(config: GlobalConfig): O.Compulsory<GlobalConfig> {
   const defaults: SharedConfig = {
     executionOrder: {
       read: [],
@@ -38,8 +38,8 @@ export interface VueSyncInstance {
 /**
  * This is the type for calling `collection()`
  */
-export type CollectionFn<DocDataTypeInherited extends object = PlainObject> = <
-  DocDataType extends object = DocDataTypeInherited
+export type CollectionFn<DocDataTypeInherited extends Record<string, any> = Record<string, any>> = <
+  DocDataType extends Record<string, any> = DocDataTypeInherited
 >(
   idOrPath: string,
   moduleConfig?: ModuleConfig
@@ -48,14 +48,14 @@ export type CollectionFn<DocDataTypeInherited extends object = PlainObject> = <
 /**
  * This is the type for calling `doc()`
  */
-export type DocFn<DocDataTypeInherited extends object = PlainObject> = <
-  DocDataType extends object = DocDataTypeInherited
+export type DocFn<DocDataTypeInherited extends Record<string, any> = Record<string, any>> = <
+  DocDataType extends Record<string, any> = DocDataTypeInherited
 >(
   idOrPath: string,
   moduleConfig?: ModuleConfig
 ) => DocInstance<DocDataType>
 
-export function VueSync (vueSyncConfig: GlobalConfig): VueSyncInstance {
+export function VueSync(vueSyncConfig: GlobalConfig): VueSyncInstance {
   // the passed GlobalConfig is merged onto defaults
   const globalConfig = configWithDefaults(vueSyncConfig)
 
@@ -69,7 +69,7 @@ export function VueSync (vueSyncConfig: GlobalConfig): VueSyncInstance {
    */
   const streamSubscribtionMap: Map<string, OpenStreams> = new Map() // apply type upon get/set
 
-  function getModuleInstance (
+  function getModuleInstance(
     modulePath: string,
     moduleConfig: ModuleConfig = {},
     moduleType: 'doc' | 'collection',
@@ -105,12 +105,12 @@ export function VueSync (vueSyncConfig: GlobalConfig): VueSyncInstance {
     return moduleInstance
   }
 
-  function collection (modulePath: string, moduleConfig: ModuleConfig = {}): CollectionInstance {
+  function collection(modulePath: string, moduleConfig: ModuleConfig = {}): CollectionInstance {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return getModuleInstance(modulePath, moduleConfig, 'collection', doc as DocFn, collection as CollectionFn) as CollectionInstance // prettier-ignore
   }
 
-  function doc (modulePath: string, moduleConfig: ModuleConfig = {}): DocInstance {
+  function doc(modulePath: string, moduleConfig: ModuleConfig = {}): DocInstance {
     return getModuleInstance(modulePath, moduleConfig, 'doc', doc as DocFn, collection as CollectionFn) as DocInstance // prettier-ignore
   }
 

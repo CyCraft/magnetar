@@ -1,11 +1,4 @@
-import {
-  PluginInstance,
-  VueSyncPlugin,
-  PlainObject,
-  WhereClause,
-  OrderByClause,
-  Limit,
-} from '@magnetarjs/core'
+import { PluginInstance, VueSyncPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core'
 import {
   writeActionFactory,
   insertActionFactory,
@@ -25,7 +18,7 @@ export interface RemoteStoreOptions {
 }
 export interface StorePluginModuleConfig {
   path?: string
-  initialData?: PlainObject | [string, PlainObject][]
+  initialData?: Record<string, any> | [string, Record<string, any>][]
   where?: WhereClause[]
   orderBy?: OrderByClause[]
   limit?: Limit

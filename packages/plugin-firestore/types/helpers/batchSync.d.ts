@@ -1,9 +1,8 @@
 import { FirestorePluginOptions } from '../CreatePlugin';
-import { PlainObject } from '@magnetarjs/core';
 import { firestore } from 'firebase';
 export declare type BatchSync = {
-    set: (documentPath: string, payload: PlainObject, options?: firestore.SetOptions) => Promise<void>;
-    update: (documentPath: string, payload: PlainObject) => Promise<void>;
+    set: (documentPath: string, payload: Record<string, any>, options?: firestore.SetOptions) => Promise<void>;
+    update: (documentPath: string, payload: Record<string, any>) => Promise<void>;
     delete: (documentPath: string) => Promise<void>;
 };
 /**

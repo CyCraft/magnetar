@@ -1,11 +1,9 @@
 import { copy } from 'copy-anything'
 import { pick } from 'filter-anything'
 import { isArray } from 'is-what'
-// import Vue from 'vue'
 import {
   PluginInstance,
   VueSyncPlugin,
-  PlainObject,
   Clauses,
   WhereClause,
   OrderByClause,
@@ -36,7 +34,7 @@ export interface ReactiveStoreOptions {
 
 export interface ReactiveStoreModuleConfig {
   path?: string
-  initialData?: PlainObject | [string, PlainObject][]
+  initialData?: Record<string, any> | [string, Record<string, any>][]
   where?: WhereClause[]
   orderBy?: OrderByClause[]
   limit?: Limit
@@ -52,9 +50,9 @@ export const CreatePlugin: VueSyncPlugin<ReactiveStoreOptions> = (
 ): PluginInstance => {
   // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
-  const data: { [collectionPath: string]: Map<string, PlainObject> } = {}
+  const data: { [collectionPath: string]: Map<string, Record<string, any>> } = {}
 
-  const dataBackups: { [collectionPath: string]: Map<string, PlainObject[]> } = {}
+  const dataBackups: { [collectionPath: string]: Map<string, Record<string, any>[]> } = {}
   const makeBackup: MakeRestoreBackup = (collectionPath, docId) => {
     // set the backup map for the collection
     if (!(collectionPath in dataBackups)) dataBackups[collectionPath] = new Map()
@@ -63,7 +61,8 @@ export const CreatePlugin: VueSyncPlugin<ReactiveStoreOptions> = (
     if (!backupCollectionMap.has(docId)) backupCollectionMap.set(docId, [])
     // make a backup of whatever is found in the data
     const docBackup = copy(data[collectionPath].get(docId))
-    backupCollectionMap.get(docId).push(docBackup)
+    const arr = backupCollectionMap.get(docId)
+    if (docBackup && arr) arr.push(docBackup)
   }
 
   const restoreBackup: MakeRestoreBackup = (collectionPath, docId) => {
@@ -73,10 +72,10 @@ export const CreatePlugin: VueSyncPlugin<ReactiveStoreOptions> = (
     // set the backup array for the doc
     if (!backupCollectionMap.has(docId)) return
     const docBackupArray = backupCollectionMap.get(docId)
-    if (!docBackupArray.length) return
+    if (!docBackupArray || !docBackupArray.length) return
     // restore the backup of whatever is found and replace with the data
     const docBackup = docBackupArray.pop()
-    data[collectionPath].set(docId, docBackup)
+    if (docBackup) data[collectionPath].set(docId, docBackup)
   }
 
   /**
@@ -100,10 +99,10 @@ export const CreatePlugin: VueSyncPlugin<ReactiveStoreOptions> = (
       for (const [_docId, _docData] of initialData) {
         data[collectionPath].set(_docId, reactiveStoreOptions.vueInstance.observable(_docData))
       }
-    } else {
+    } else if (docId) {
       data[collectionPath].set(
         docId,
-        reactiveStoreOptions.vueInstance.observable(initialData) as PlainObject
+        reactiveStoreOptions.vueInstance.observable(initialData) as Record<string, any>
       )
     }
     modulesAlreadySetup.add(modulePath)
@@ -112,7 +111,7 @@ export const CreatePlugin: VueSyncPlugin<ReactiveStoreOptions> = (
   /**
    * Queried local data stored in weakmaps "per query" for the least CPU cycles and preventing memory leaks
    */
-  const queriedData: WeakMap<Clauses, Map<string, PlainObject>> = new WeakMap()
+  const queriedData: WeakMap<Clauses, Map<string, Record<string, any>>> = new WeakMap()
 
   /**
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.

@@ -1,6 +1,6 @@
+import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '@magnetarjs/core'
 import { CreatePlugin as CreatePluginLocal } from './pluginMockLocal/index'
 import { CreatePlugin as CreatePluginRemote } from './pluginMockRemote'
-import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '@magnetarjs/core'
 import { pokedex, PokedexEntry } from './pokedex'
 import { generateRandomId } from './generateRandomId'
 import { O } from 'ts-toolbelt'
@@ -27,7 +27,7 @@ export type TrainerModuleData = {
   shouldFail?: string
 }
 
-export function createVueSyncInstance (): {
+export function createVueSyncInstance(): {
   pokedexModule: CollectionInstance<PokedexModuleData>
   trainerModule: DocInstance<TrainerModuleData>
   vueSync: VueSyncInstance

@@ -3,7 +3,7 @@ import { ModifyPayloadFnMap } from './modifyPayload'
 import { ModifyReadResponseFnMap } from './modifyReadResponse'
 import { EventNameFnMap } from './events'
 import { PluginInstance } from './plugins'
-import { StoreName, PlainObject } from './atoms'
+import { StoreName } from './atoms'
 import { Clauses } from './clauses'
 
 /**
@@ -52,7 +52,7 @@ export type ModuleConfig = O.Compact<
        * Custom config the dev can set per Store Plugin. This will be passed to the plugin's action handler.
        */
       configPerStore?: {
-        [storeName: string]: PlainObject
+        [storeName: string]: Record<string, any>
       }
     }
   ]

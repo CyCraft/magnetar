@@ -1,5 +1,5 @@
 import { FirestorePluginOptions } from '../CreatePlugin'
-import { PlainObject } from '@magnetarjs/core'
+import {} from '@magnetarjs/core'
 import { Countdown, CountdownInstance } from './Countdown'
 // just for types:
 import { firestore } from 'firebase'
@@ -34,18 +34,22 @@ import { firestore } from 'firebase'
  * Within a write operation, field transforms like serverTimestamp,
  * arrayUnion, and increment each count as an additional operation.
  *
- * @param {PlainObject} payload
+ * @param {Record<string, any>} payload
  * @returns {number}
  */
-function countOperations (payload: PlainObject): number {
+function countOperations(payload: Record<string, any>): number {
   const count = 1
   // todo: when actions like serverTimestamp, arrayUnion and increment are supported, count them here
   return count
 }
 
 export type BatchSync = {
-  set: (documentPath: string, payload: PlainObject, options?: firestore.SetOptions) => Promise<void>
-  update: (documentPath: string, payload: PlainObject) => Promise<void>
+  set: (
+    documentPath: string,
+    payload: Record<string, any>,
+    options?: firestore.SetOptions
+  ) => Promise<void>
+  update: (documentPath: string, payload: Record<string, any>) => Promise<void>
   delete: (documentPath: string) => Promise<void>
 }
 
@@ -61,7 +65,7 @@ type SyncStack = {
 
 type State = {
   queue: SyncStack[]
-  countdown: CountdownInstance
+  countdown: CountdownInstance | null
 }
 
 /**
@@ -70,7 +74,7 @@ type State = {
  * @export
  * @returns {BatchSync}
  */
-export function batchSyncFactory (
+export function batchSyncFactory(
   firestorePluginOptions: Required<FirestorePluginOptions>
 ): BatchSync {
   const { firestoreInstance, syncDebounceMs } = firestorePluginOptions
@@ -87,20 +91,20 @@ export function batchSyncFactory (
     rejects: [],
   })
 
-  function prepareSyncStack (operationCount: number): SyncStack {
+  function prepareSyncStack(operationCount: number): SyncStack {
     if (!state.queue.length) state.queue.push(newSyncStack())
     const [syncStack] = state.queue
     syncStack.operationCount += operationCount
     return syncStack
   }
 
-  function prepareRef (documentPath: string): firebase.firestore.DocumentReference {
+  function prepareRef(documentPath: string): firebase.firestore.DocumentReference {
     return firestoreInstance.doc(documentPath)
   }
 
-  function preparePayload (
-    _payload: PlainObject
-  ): { payload: PlainObject; operationCount: number } {
+  function preparePayload(
+    _payload: Record<string, any>
+  ): { payload: Record<string, any>; operationCount: number } {
     // todo: properly handle any serverTimestamp, arrayUnion and increment in here
     const payload = _payload
     const operationCount = countOperations(_payload)
@@ -110,12 +114,15 @@ export function batchSyncFactory (
   /**
    * Removes one `syncStack` entry from the `queue` & executes batch.commit() and makes sure to reject or resolve all actions when this promise is resolved
    */
-  function executeSync (): void {
+  function executeSync(): void {
     const syncStack = state.queue.shift()
+    if (!syncStack || !syncStack.batch) {
+      throw new Error('executeSync executed before it was instantiated')
+    }
     syncStack.batch
       .commit()
-      .then(() => syncStack.resolves.forEach(r => r()))
-      .catch(error => syncStack.rejects.forEach(r => r(error)))
+      .then(() => syncStack.resolves.forEach((r) => r()))
+      .catch((error) => syncStack.rejects.forEach((r) => r(error)))
   }
 
   /**
@@ -123,7 +130,7 @@ export function batchSyncFactory (
    *
    * @returns {CountdownInstance}
    */
-  function prepareCountdown (): CountdownInstance {
+  function prepareCountdown(): CountdownInstance {
     if (!state.countdown) {
       state.countdown = Countdown(syncDebounceMs)
       state.countdown.done.then(() => {
@@ -134,20 +141,20 @@ export function batchSyncFactory (
     return state.countdown
   }
 
-  function triggerSync (): void {
+  function triggerSync(): void {
     const countdown = prepareCountdown()
     countdown.restart()
   }
 
-  function set (
+  function set(
     documentPath: string,
-    _payload: PlainObject,
+    _payload: Record<string, any>,
     options?: firestore.SetOptions
   ): Promise<void> {
     const { payload, operationCount } = preparePayload(_payload)
     const { batch, resolves, rejects } = prepareSyncStack(operationCount)
     const ref = prepareRef(documentPath)
-    batch.set(ref, payload, options)
+    batch.set(ref, payload, options || {})
     const promise: Promise<void> = new Promise((resolve, reject) => {
       resolves.push(resolve)
       rejects.push(reject)
@@ -156,7 +163,7 @@ export function batchSyncFactory (
     return promise
   }
 
-  function update (documentPath: string, _payload: PlainObject): Promise<void> {
+  function update(documentPath: string, _payload: Record<string, any>): Promise<void> {
     const { payload, operationCount } = preparePayload(_payload)
     const { batch, resolves, rejects } = prepareSyncStack(operationCount)
     const ref = prepareRef(documentPath)
@@ -169,7 +176,7 @@ export function batchSyncFactory (
     return promise
   }
 
-  function _delete (documentPath: string): Promise<void> {
+  function _delete(documentPath: string): Promise<void> {
     const operationCount = 1
     const { batch, resolves, rejects } = prepareSyncStack(operationCount)
     const ref = prepareRef(documentPath)

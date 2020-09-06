@@ -1,5 +1,5 @@
 import { O } from 'ts-toolbelt'
-import { PlainObject } from '../types/atoms'
+
 import { EventNameFnsMap } from '../types/events'
 import {
   PluginModuleConfig,
@@ -11,12 +11,12 @@ import {
 /**
  * handleStream is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success
  */
-export async function handleStream (args: {
+export async function handleStream(args: {
   collectionPath: string
   docId: string | undefined
   pluginModuleConfig: PluginModuleConfig
   pluginAction: PluginStreamAction
-  payload: PlainObject | void
+  payload: Record<string, any> | void
   eventNameFnsMap: EventNameFnsMap
   actionName: 'stream'
   storeName: string

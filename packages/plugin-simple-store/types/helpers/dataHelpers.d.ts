@@ -1,9 +1,9 @@
-import { PlainObject, Clauses } from '@magnetarjs/core';
+import { Clauses } from '@magnetarjs/core';
 /**
  * Filters a Collection module's data map `Map<string, DocData>` based on provided clauses.
  *
- * @param {Map<string, PlainObject>} collectionDB
+ * @param {Map<string, Record<string, any>>} collectionDB
  * @param {Clauses} clauses
- * @returns {Map<string, PlainObject>}
+ * @returns {Map<string, Record<string, any>>}
  */
-export declare function filterDataPerClauses(collectionDB: Map<string, PlainObject>, clauses: Clauses): Map<string, PlainObject>;
+export declare function filterDataPerClauses(collectionDB: Map<string, Record<string, any>>, clauses: Clauses): Map<string, Record<string, any>>;

@@ -1,6 +1,5 @@
 import { ActionName } from '../types/actions';
 import { SharedConfig } from '../types/config';
-import { PlainObject } from '../types/atoms';
 import { EventNameFnsMap } from '../types/events';
 import { PluginModuleConfig, PluginGetAction, PluginWriteAction, PluginDeleteAction, PluginDeletePropAction, PluginInsertAction, GetResponse } from '../types/plugins';
 import { OnAddedFn } from '../types/modifyReadResponse';
@@ -13,7 +12,7 @@ export declare function handleAction(args: {
     docId: string | undefined;
     pluginModuleConfig: PluginModuleConfig;
     pluginAction: PluginGetAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction;
-    payload: void | PlainObject | PlainObject[] | string | string[];
+    payload: void | Record<string, any> | Record<string, any>[] | string | string[];
     eventNameFnsMap: EventNameFnsMap;
     onError: SharedConfig['onError'];
     actionName: Exclude<ActionName, 'stream'>;

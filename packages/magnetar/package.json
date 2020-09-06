@@ -5,7 +5,12 @@
   "module": "index.js",
   "main": "index.js",
   "author": "Luca Ban - Mesqueeb",
-  "dependencies": {},
+  "dependencies": {
+    "@magnetarjs/core": "^0.0.0",
+    "@magnetarjs/plugin-firestore": "^0.0.0",
+    "@magnetarjs/plugin-simple-store": "^0.0.0",
+    "@magnetarjs/plugin-vue2": "^0.0.0"
+  },
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "keywords": [
     "state-management",

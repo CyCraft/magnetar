@@ -1,16 +1,10 @@
-import {
-  PlainObject,
-  PluginGetAction,
-  GetResponse,
-  DoOnGet,
-  PluginGetActionPayload,
-} from '@magnetarjs/core'
+import { PluginGetAction, GetResponse, DoOnGet, PluginGetActionPayload } from '@magnetarjs/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 import { throwIfEmulatedError } from '../../throwFns'
 
-export function getActionFactory (
-  data: { [collectionPath: string]: Map<string, PlainObject> },
+export function getActionFactory(
+  data: { [collectionPath: string]: Map<string, Record<string, any>> },
   simpleStoreOptions: SimpleStoreOptions
 ): PluginGetAction {
   return function ({

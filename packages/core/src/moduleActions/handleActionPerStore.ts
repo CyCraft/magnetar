@@ -23,7 +23,7 @@ import { DocInstance } from '../Doc'
 import { CollectionFn, DocFn } from '../VueSync'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers'
 
-export function handleActionPerStore<TActionName extends Exclude<ActionName, 'stream'>> (
+export function handleActionPerStore<TActionName extends Exclude<ActionName, 'stream'>>(
   [collectionPath, _docId]: [string, string | undefined],
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
@@ -33,7 +33,7 @@ export function handleActionPerStore<TActionName extends Exclude<ActionName, 'st
   collectionFn?: CollectionFn // actions executed on a "collection" will return `collection()` or `doc()`
 ): ActionTernary<TActionName>
 
-export function handleActionPerStore (
+export function handleActionPerStore(
   [collectionPath, _docId]: [string, string | undefined],
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
@@ -85,7 +85,7 @@ export function handleActionPerStore (
     /**
      * The abort mechanism for the entire store chain. When executed in handleAction() it won't go to the next store in executionOrder.
      */
-    function stopExecutionAfterAction (trueOrRevert: StopExecution = true): void {
+    function stopExecutionAfterAction(trueOrRevert: StopExecution = true): void {
       stopExecution = trueOrRevert
     }
 
@@ -98,6 +98,7 @@ export function handleActionPerStore (
     let resultFromPlugin: void | string | GetResponse | OnAddedFn | any
     for (const [i, storeName] of storesToExecute.entries()) {
       // a previous iteration stopped the execution:
+      // @ts-ignore
       if (stopExecution === true) break
       // find the action on the plugin
       const pluginAction = globalConfig.stores[storeName].actions[actionName]
@@ -118,6 +119,7 @@ export function handleActionPerStore (
             storeName,
           })
       // handle reverting. stopExecution might have been modified by `handleAction`
+      // @ts-ignore
       if (stopExecution === 'revert') {
         const storesToRevert = storesToExecute.slice(0, i)
         storesToRevert.reverse()
@@ -173,7 +175,7 @@ export function handleActionPerStore (
     }
 
     // anything that's executed from a "doc" module:
-    if (docId) return docFn(modulePath, moduleConfig)
+    if (docId || !collectionFn) return docFn(modulePath, moduleConfig)
 
     // all other actions triggered on collections ('get' is the only possibility left)
     // should return the collection:

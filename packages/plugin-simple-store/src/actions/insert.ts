@@ -1,9 +1,9 @@
-import { PlainObject, PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/core'
+import { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'
 
-export function insertActionFactory (
-  data: { [collectionPath: string]: Map<string, PlainObject> },
+export function insertActionFactory(
+  data: { [collectionPath: string]: Map<string, Record<string, any>> },
   simpleStoreOptions: SimpleStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginInsertAction {
@@ -32,6 +32,10 @@ export function insertActionFactory (
     // reset the doc to be able to overwrite
     collectionMap.set(docId, {})
     const docDataToMutate = collectionMap.get(docId)
+
+    if (!docDataToMutate)
+      throw new Error(`Document data not found for id: ${collectionPath} ${docId}`)
+
     Object.entries(payload).forEach(([key, value]) => {
       docDataToMutate[key] = value
     })

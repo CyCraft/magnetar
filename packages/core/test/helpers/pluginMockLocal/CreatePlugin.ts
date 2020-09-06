@@ -4,7 +4,6 @@ import { isArray } from 'is-what'
 import {
   PluginInstance,
   VueSyncPlugin,
-  PlainObject,
   WhereClause,
   OrderByClause,
   Limit,
@@ -30,7 +29,7 @@ export interface SimpleStoreOptions {
 }
 export interface SimpleStoreModuleConfig {
   path?: string
-  initialData?: PlainObject | [string, PlainObject][]
+  initialData?: Record<string, any> | [string, Record<string, any>][]
   where?: WhereClause[]
   orderBy?: OrderByClause[]
   limit?: Limit
@@ -46,9 +45,9 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
 ): PluginInstance => {
   // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
-  const data: { [collectionPath: string]: Map<string, PlainObject> } = {}
+  const data: { [collectionPath: string]: Map<string, Record<string, any>> } = {}
 
-  const dataBackups: { [collectionPath: string]: Map<string, PlainObject[]> } = {}
+  const dataBackups: { [collectionPath: string]: Map<string, Record<string, any>[]> } = {}
   const makeBackup: MakeRestoreBackup = (collectionPath, docId) => {
     // set the backup map for the collection
     if (!(collectionPath in dataBackups)) dataBackups[collectionPath] = new Map()
@@ -94,7 +93,7 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
         data[collectionPath].set(_docId, _docData)
       }
     } else {
-      data[collectionPath].set(docId, initialData as PlainObject)
+      data[collectionPath].set(docId, initialData as Record<string, any>)
     }
     modulesAlreadySetup.add([collectionPath, docId].join('/'))
   }
@@ -102,7 +101,7 @@ export const CreatePlugin: VueSyncPlugin<SimpleStoreOptions> = (
   /**
    * Queried local data stored in weakmaps "per query" for the least CPU cycles and preventing memory leaks
    */
-  const queriedData: WeakMap<Clauses, Map<string, PlainObject>> = new WeakMap()
+  const queriedData: WeakMap<Clauses, Map<string, Record<string, any>>> = new WeakMap()
 
   /**
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.

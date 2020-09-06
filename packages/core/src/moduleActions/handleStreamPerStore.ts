@@ -11,7 +11,7 @@ import { throwOnIncompleteStreamResponses, throwIfNoFnsToExecute } from '../help
 import { ModuleConfig, GlobalConfig } from '../types/config'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers'
 
-export function handleStreamPerStore (
+export function handleStreamPerStore(
   [collectionPath, docId]: [string, string | undefined],
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
@@ -84,7 +84,7 @@ export function handleStreamPerStore (
         if (isDoOnStream(result)) {
           // register the functions we received: result
           for (const [doOn, doFn] of Object.entries(result)) {
-            doOnStreamFns[doOn].push(doFn)
+            if (doFn) doOnStreamFns[doOn as 'added' | 'modified' | 'removed'].push(doFn as any)
           }
         }
         // if the plugin action for stream returns a "stream response" result

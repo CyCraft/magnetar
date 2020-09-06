@@ -7,11 +7,10 @@
   "module": "dist/index.esm.js",
   "typings": "types/index.d.ts",
   "scripts": {
-    "build": "npm run lint && npm run test && npm run rollup",
+    "build": "npm run test && npm run rollup",
     "test": "ava --verbose",
     "test--only": "ava --verbose --match='*only:*'",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "rollup": "rollup -c build.js"
+    "rollup": "rimraf dist && rimraf types && rollup -c build.js"
   },
   "author": "Luca Ban - Mesqueeb",
   "license": "TBD",
@@ -22,11 +21,11 @@
   "dependencies": {
     "copy-anything": "^2.0.1",
     "fast-sort": "^2.2.0",
-    "filter-anything": "^2.1.2",
-    "is-what": "^3.8.0",
-    "merge-anything": "^3.0.3",
-    "path-to-prop": "0.0.3",
-    "ts-toolbelt": "^6.7.7"
+    "filter-anything": "^2.1.4",
+    "is-what": "^3.11.2",
+    "merge-anything": "^3.0.5",
+    "path-to-prop": "1.0.0",
+    "ts-toolbelt": "6.12.2"
   },
   "devDependencies": {
     "@magnetarjs/core": "^0.0.0"

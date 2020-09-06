@@ -1,16 +1,15 @@
-import { PlainObject } from '@magnetarjs/core'
 import { isArray, isPlainObject } from 'is-what'
 
-export function throwIfEmulatedError (
-  payload: PlainObject | PlainObject[] | string | string[] | void,
-  storePluginConfig: any
+export function throwIfEmulatedError(
+  payload: Record<string, any> | Record<string, any>[] | string | string[] | void,
+  storePluginConfig: Record<string, any>
 ): void {
   const { storeName } = storePluginConfig
   if (!payload) return
   if (isArray(payload) && !payload.length) return
   const payloadArray = !isArray(payload) ? [payload] : payload
   const shouldFail = payloadArray.some(
-    p => p === storeName || (isPlainObject(p) && p.shouldFail === storeName)
+    (p) => p === storeName || (isPlainObject(p) && p.shouldFail === storeName)
   )
   if (!shouldFail) return
   const errorToThrow = {

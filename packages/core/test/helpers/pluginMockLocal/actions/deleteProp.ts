@@ -1,11 +1,11 @@
 import { isArray } from 'is-what'
-import pathToProp from 'path-to-prop'
-import { PlainObject, PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetarjs/core'
+import { getProp } from 'path-to-prop'
+import { PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetarjs/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../throwFns'
 
-export function deletePropActionFactory (
-  data: { [collectionPath: string]: Map<string, PlainObject> },
+export function deletePropActionFactory(
+  data: { [collectionPath: string]: Map<string, Record<string, any>> },
   simpleStoreOptions: SimpleStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeletePropAction {
@@ -26,6 +26,8 @@ export function deletePropActionFactory (
     const collectionMap = data[collectionPath]
     const docData = collectionMap.get(docId)
 
+    if (!docData) throw new Error(`Document data not found for id: ${collectionPath} ${docId}`)
+
     if (makeBackup) makeBackup(collectionPath, docId)
 
     const payloadArray = isArray(payload) ? payload : [payload]
@@ -34,8 +36,8 @@ export function deletePropActionFactory (
       if (isNestedPropPath) {
         const parts = propToDelete.split(/[./]/)
         const lastPart = parts.pop()
-        const parentRef = pathToProp(docData, parts.join('.'))
-        delete parentRef[lastPart]
+        const parentRef = getProp(docData, parts.join('.')) as Record<string, any>
+        delete parentRef[lastPart || '']
       } else {
         delete docData[propToDelete]
       }

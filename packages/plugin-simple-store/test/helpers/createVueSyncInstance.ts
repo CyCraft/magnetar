@@ -1,5 +1,5 @@
 import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '@magnetarjs/core'
-import { CreatePlugin } from '@magnetarjs/plugin-simple-store'
+import { CreatePlugin } from '../../src'
 import { CreatePlugin as CreatePluginRemote } from './pluginMockRemote'
 import { pokedex, PokedexEntry } from './pokedex'
 import { generateRandomId } from './generateRandomId'
@@ -19,7 +19,7 @@ export type PokedexModuleData = O.Merge<
   }
 >
 
-export interface TrainerModuleData {
+export type TrainerModuleData = {
   name: string
   age?: number
   nickName?: string
@@ -27,7 +27,7 @@ export interface TrainerModuleData {
   shouldFail?: string
 }
 
-export function createVueSyncInstance (): {
+export function createVueSyncInstance(): {
   pokedexModule: CollectionInstance<PokedexModuleData>
   trainerModule: DocInstance<TrainerModuleData>
   vueSync: VueSyncInstance

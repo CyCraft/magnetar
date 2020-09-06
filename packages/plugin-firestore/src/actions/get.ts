@@ -7,7 +7,7 @@ import { getQueryInstance, docSnapshotToDocMetadata } from 'src/helpers/queryHel
 type DocumentSnapshot = firestore.DocumentSnapshot
 type QueryDocumentSnapshot = firestore.QueryDocumentSnapshot
 
-export function getActionFactory (
+export function getActionFactory(
   firestorePluginOptions: Required<FirestorePluginOptions>
 ): PluginGetAction {
   return async function ({
@@ -18,7 +18,7 @@ export function getActionFactory (
   }: PluginGetActionPayload<FirestoreModuleConfig>): Promise<GetResponse> {
     const { firestoreInstance } = firestorePluginOptions
     // in case of a doc module
-    let snapshots: (DocumentSnapshot | QueryDocumentSnapshot)[]
+    let snapshots: (DocumentSnapshot | QueryDocumentSnapshot)[] | undefined
     if (docId) {
       const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
       const docSnapshot = await firestoreInstance.doc(documentPath).get()
@@ -31,6 +31,7 @@ export function getActionFactory (
       const querySnapshot = await queryInstance.get()
       snapshots = querySnapshot.docs
     }
+    if (!snapshots) return { docs: [] }
     // map snapshots to DocMetadata type
     const docs: DocMetadata[] = snapshots.map(docSnapshotToDocMetadata)
     return { docs }

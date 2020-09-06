@@ -14,14 +14,14 @@ import { executeSetupModulePerStore, getDataProxyHandler } from './helpers/modul
 import { WhereClause, WhereFilterOp, OrderByClause } from './types/clauses'
 import { mergeAndConcat } from 'merge-anything'
 
-export type CollectionInstance<DocDataType extends object = { [prop: string]: any }> = {
+export type CollectionInstance<DocDataType extends Record<string, any> = Record<string, any>> = {
   data: Map<string, DocDataType>
   doc: DocFn<DocDataType>
   id: string
   path: string
   /**
    * A WeakMap of all open streams with the payload passed to `stream(payload)` as key and the `unsubscribe` function as value. In case `stream()` had no payload, use `{}`
-   * @type { WeakMap<object, () => void> }
+   * @type { WeakMap<Record<string, any>, () => void> }
    * @example
    * collection('myDocs').stream()
    * const unsubscribe = collection('myDocs').openStreams.get({})
@@ -29,9 +29,9 @@ export type CollectionInstance<DocDataType extends object = { [prop: string]: an
   openStreams: OpenStreams
 
   // actions
-  get?: VueSyncGetAction<DocDataType, 'collection'>
-  stream?: VueSyncStreamAction
-  insert?: VueSyncInsertAction<DocDataType>
+  get: VueSyncGetAction<DocDataType, 'collection'>
+  stream: VueSyncStreamAction
+  insert: VueSyncInsertAction<DocDataType>
 
   // filters
   where: (fieldPath: string, operator: WhereFilterOp, value: any) => CollectionInstance<DocDataType>
@@ -39,7 +39,7 @@ export type CollectionInstance<DocDataType extends object = { [prop: string]: an
   limit: (limitCount: number) => CollectionInstance<DocDataType>
 }
 
-export function createCollectionWithContext<DocDataType extends object> (
+export function createCollectionWithContext<DocDataType extends Record<string, any>>(
   [collectionPath, docId]: [string, string | undefined],
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
@@ -63,7 +63,7 @@ export function createCollectionWithContext<DocDataType extends object> (
   // Every store will have its 'setupModule' function executed
   executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig)
 
-  function where (
+  function where(
     fieldPath: string,
     operator: WhereFilterOp,
     value: any
@@ -73,7 +73,7 @@ export function createCollectionWithContext<DocDataType extends object> (
     return collectionFn(path, moduleConfigWithClause)
   }
 
-  function orderBy (
+  function orderBy(
     fieldPath: string,
     direction: 'asc' | 'desc' = 'asc'
   ): CollectionInstance<DocDataType> {
@@ -82,7 +82,7 @@ export function createCollectionWithContext<DocDataType extends object> (
     return collectionFn(path, moduleConfigWithClause)
   }
 
-  function limit (limitCount: number): CollectionInstance<DocDataType> {
+  function limit(limitCount: number): CollectionInstance<DocDataType> {
     return collectionFn(path, { ...moduleConfig, limit: limitCount })
   }
 

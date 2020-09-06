@@ -1,8 +1,8 @@
-import { PlainObject, PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/core'
+import { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/core'
 import { ReactiveStoreModuleConfig, ReactiveStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
-export function deleteActionFactory (
-  data: { [collectionPath: string]: Map<string, PlainObject> },
+export function deleteActionFactory(
+  data: { [collectionPath: string]: Map<string, Record<string, any>> },
   reactiveStoreOptions: ReactiveStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeleteAction {

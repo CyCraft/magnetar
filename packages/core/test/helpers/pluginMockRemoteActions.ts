@@ -11,7 +11,6 @@ import {
   PluginInsertAction,
   DoOnGet,
   GetResponse,
-  PlainObject,
   PluginStreamActionPayload,
   PluginRevertActionPayload,
   PluginGetActionPayload,
@@ -27,7 +26,7 @@ import { throwIfEmulatedError } from './throwFns'
 import { generateRandomId } from './generateRandomId'
 import { filterDataPerClauses } from './pluginMockRemoteHelpers'
 
-export function writeActionFactory (
+export function writeActionFactory(
   storePluginOptions: RemoteStoreOptions,
   actionName: 'merge' | 'assign' | 'replace'
 ): PluginWriteAction {
@@ -47,7 +46,7 @@ export function writeActionFactory (
   }
 }
 
-export function insertActionFactory (storePluginOptions: RemoteStoreOptions): PluginInsertAction {
+export function insertActionFactory(storePluginOptions: RemoteStoreOptions): PluginInsertAction {
   return async function ({
     payload,
     collectionPath,
@@ -67,7 +66,7 @@ export function insertActionFactory (storePluginOptions: RemoteStoreOptions): Pl
   }
 }
 
-export function deletePropActionFactory (
+export function deletePropActionFactory(
   storePluginOptions: RemoteStoreOptions
 ): PluginDeletePropAction {
   return async function ({
@@ -86,7 +85,7 @@ export function deletePropActionFactory (
   }
 }
 
-export function deleteActionFactory (storePluginOptions: RemoteStoreOptions): PluginDeleteAction {
+export function deleteActionFactory(storePluginOptions: RemoteStoreOptions): PluginDeleteAction {
   return async function ({
     payload,
     collectionPath,
@@ -101,10 +100,10 @@ export function deleteActionFactory (storePluginOptions: RemoteStoreOptions): Pl
   }
 }
 
-function mockDataRetrieval (
+function mockDataRetrieval(
   moduleType: 'collection' | 'doc',
   pluginModuleConfig: StorePluginModuleConfig
-): PlainObject[] {
+): Record<string, any>[] {
   if (moduleType === 'doc') return [{ name: 'Luca', age: 10, dream: 'job' }]
   const _pokedexMap = pokedexMap()
   const clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
@@ -112,7 +111,7 @@ function mockDataRetrieval (
   return [...filteredMap.values()]
 }
 
-export function getActionFactory (storePluginOptions: RemoteStoreOptions): PluginGetAction {
+export function getActionFactory(storePluginOptions: RemoteStoreOptions): PluginGetAction {
   return async function ({
     payload,
     collectionPath,
@@ -129,7 +128,7 @@ export function getActionFactory (storePluginOptions: RemoteStoreOptions): Plugi
         // this mocks an error during execution
         const dataRetrieved = mockDataRetrieval(docId ? 'doc' : 'collection', pluginModuleConfig)
         // we must trigger `mustExecuteOnGet.added` for each document that was retrieved and return whatever that returns
-        const results = dataRetrieved.map(_data => {
+        const results = dataRetrieved.map((_data) => {
           const _metaData = { data: _data, exists: true, id: _data.id || docId }
           return _metaData
         })
@@ -139,7 +138,7 @@ export function getActionFactory (storePluginOptions: RemoteStoreOptions): Plugi
   }
 }
 
-export function streamActionFactory (storePluginOptions: RemoteStoreOptions): PluginStreamAction {
+export function streamActionFactory(storePluginOptions: RemoteStoreOptions): PluginStreamAction {
   return async function ({
     payload,
     collectionPath,
@@ -182,7 +181,7 @@ export function streamActionFactory (storePluginOptions: RemoteStoreOptions): Pl
         throwIfEmulatedError(payload, storePluginOptions)
       }, 1)
     })
-    function stop (): void {
+    function stop(): void {
       stopStreaming.stopped = true
       stopStreaming.stop()
     }
@@ -190,7 +189,7 @@ export function streamActionFactory (storePluginOptions: RemoteStoreOptions): Pl
   }
 }
 
-export function revertActionFactory (storePluginOptions: RemoteStoreOptions): PluginRevertAction {
+export function revertActionFactory(storePluginOptions: RemoteStoreOptions): PluginRevertAction {
   // this is a `PluginRevertAction`:
   return async function ({
     payload,
