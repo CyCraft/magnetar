@@ -7,7 +7,6 @@
   "author": "Luca Ban - Mesqueeb",
   "dependencies": {},
   "homepage": "https://github.com/cycraft/magnetar#readme",
-  "license": "MIT",
   "keywords": [
     "state-management",
     "syncing-solution",
