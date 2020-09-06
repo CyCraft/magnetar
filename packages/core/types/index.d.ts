@@ -1,4 +1,4 @@
-export * from './VueSync';
+export * from './Magnetar';
 export { CollectionInstance } from './Collection';
 export { DocInstance } from './Doc';
 export * from './types/plugins';

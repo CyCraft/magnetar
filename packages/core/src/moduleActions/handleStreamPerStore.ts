@@ -1,6 +1,6 @@
 import { O } from 'ts-toolbelt'
 import { handleStream } from './handleStream'
-import { ActionConfig, VueSyncStreamAction, OpenStreams } from '../types/actions'
+import { ActionConfig, MagnetarStreamAction, OpenStreams } from '../types/actions'
 import { ActionType } from '../types/actionsInternal'
 import { StreamResponse, DoOnStreamFns, isDoOnStream, DoOnStream } from '../types/plugins'
 import { getEventNameFnsMap } from '../types/events'
@@ -17,7 +17,7 @@ export function handleStreamPerStore(
   globalConfig: O.Compulsory<GlobalConfig>,
   actionType: ActionType,
   openStreams: OpenStreams
-): VueSyncStreamAction {
+): MagnetarStreamAction {
   // returns the action the dev can call with myModule.insert() etc.
   return async function (payload?: any, actionConfig: ActionConfig = {}): Promise<void> {
     // get all the config needed to perform this action

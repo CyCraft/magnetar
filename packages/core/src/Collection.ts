@@ -1,15 +1,15 @@
 import { O } from 'ts-toolbelt'
 import {
-  VueSyncGetAction,
-  VueSyncStreamAction,
-  VueSyncInsertAction,
+  MagnetarGetAction,
+  MagnetarStreamAction,
+  MagnetarInsertAction,
   OpenStreams,
 } from './types/actions'
 import { actionNameTypeMap } from './types/actionsInternal'
 import { handleActionPerStore } from './moduleActions/handleActionPerStore'
 import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
 import { ModuleConfig, GlobalConfig } from './types/config'
-import { DocFn, CollectionFn } from './VueSync'
+import { DocFn, CollectionFn } from './Magnetar'
 import { executeSetupModulePerStore, getDataProxyHandler } from './helpers/moduleHelpers'
 import { WhereClause, WhereFilterOp, OrderByClause } from './types/clauses'
 import { mergeAndConcat } from 'merge-anything'
@@ -29,9 +29,9 @@ export type CollectionInstance<DocDataType extends Record<string, any> = Record<
   openStreams: OpenStreams
 
   // actions
-  get: VueSyncGetAction<DocDataType, 'collection'>
-  stream: VueSyncStreamAction
-  insert: VueSyncInsertAction<DocDataType>
+  get: MagnetarGetAction<DocDataType, 'collection'>
+  stream: MagnetarStreamAction
+  insert: MagnetarInsertAction<DocDataType>
 
   // filters
   where: (fieldPath: string, operator: WhereFilterOp, value: any) => CollectionInstance<DocDataType>
@@ -54,8 +54,8 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
     return docFn(`${path}/${docId}`, _moduleConfig)
   }
 
-  const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.get, docFn, collectionFn) as VueSyncInsertAction<DocDataType> //prettier-ignore
-  const get = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn, collectionFn) as VueSyncGetAction<DocDataType, 'collection'> //prettier-ignore
+  const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.get, docFn, collectionFn) as MagnetarInsertAction<DocDataType> //prettier-ignore
+  const get = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn, collectionFn) as MagnetarGetAction<DocDataType, 'collection'> //prettier-ignore
   const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, openStreams) // prettier-ignore
 
   const actions = { stream, get, insert }

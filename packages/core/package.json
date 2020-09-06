@@ -2,7 +2,7 @@
   "name": "@magnetarjs/core",
   "version": "0.0.0",
   "sideEffects": false,
-  "description": "Vue-Sync core library.",
+  "description": "Magnetar core library.",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "typings": "types/index.d.ts",
@@ -21,10 +21,33 @@
     "ts-toolbelt": "6.12.2"
   },
   "devDependencies": {
+    "ava": "^3.12.1",
     "test-utils": "^0.0.0-beta.0"
   },
   "keywords": [
-    "vue-sync"
+    "vuex-easy-firestore",
+    "magnetar",
+    "magnetarjs",
+    "state-management",
+    "syncing-solution",
+    "db-sync",
+    "auto-sync",
+    "framework-agnostic",
+    "optimistic-ui",
+    "vuejs",
+    "vuex",
+    "vue-sync",
+    "vue-state",
+    "vue-db",
+    "vue-store",
+    "firestore",
+    "data-store",
+    "local-store",
+    "remote-store",
+    "global-store",
+    "database-sync",
+    "database-management",
+    "database"
   ],
   "repository": {
     "type": "git",

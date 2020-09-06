@@ -1,12 +1,12 @@
 import test from 'ava'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex } from 'test-utils'
 import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 
 {
   const testName = 'revert: (remote → local) insert (document)'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance(testName)
+    const { pokedexModule } = await createMagnetarInstance(testName)
     const payload = { ...pokedex(7), shouldFail: 'local' }
     t.deepEqual(pokedexModule.doc('7').data, undefined)
 
@@ -14,7 +14,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     // so when creating a new doc reference we need to pass the `firestorePath`
     const squirtle = pokedexModule.doc('7', {
       configPerStore: {
-        remote: { firestorePath: `vueSyncTests/${testName}/pokedex/7` },
+        remote: { firestorePath: `magnetarTests/${testName}/pokedex/7` },
       },
     })
 
@@ -41,7 +41,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'revert: (remote → local) insert (collection) → random ID'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance(testName)
+    const { pokedexModule } = await createMagnetarInstance(testName)
     const payload = { ...pokedex(7), shouldFail: 'local' }
 
     try {
@@ -71,7 +71,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 //   const testName = 'revert: (remote → local) delete (document)'
 //   test(testName, async t => {
 //     const payload = { ...pokedex(7), shouldFailDelete: 'local' }
-//     const { pokedexModule } = await createVueSyncInstance(testName)
+//     const { pokedexModule } = await createMagnetarInstance(testName)
 //     t.deepEqual(pokedexModule.doc('7').data, undefined)
 //     await pokedexModule.insert(payload)
 //     t.deepEqual(pokedexModule.doc('7').data, payload)
@@ -79,7 +79,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 //     try {
 //       await pokedexModule
 //         .doc('7', {
-//           configPerStore: { remote: { firestorePath: `vueSyncTests/${testName}/pokedex/7` } },
+//           configPerStore: { remote: { firestorePath: `magnetarTests/${testName}/pokedex/7` } },
 //         })
 //         .delete(undefined, {
 //           onError: 'revert',
@@ -107,13 +107,13 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 // }
 
 const conf = (testName: string): any => ({
-  configPerStore: { remote: { firestorePath: `vueSyncTests/${testName}/pokedex/1` } },
+  configPerStore: { remote: { firestorePath: `magnetarTests/${testName}/pokedex/1` } },
 })
 {
   // this tests is _not really_ testing reverting the remote store, they test if the local store is reverted and if the remote store stays untouched on an error
   const testName = 'revert: merge (with extra checks)'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance(testName, {
+    const { pokedexModule } = await createMagnetarInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
     })
     await firestoreDeepEqual(t, testName, 'pokedex/1', pokedex(1))
@@ -156,7 +156,7 @@ const conf = (testName: string): any => ({
   // this tests is _not really_ testing reverting the remote store, they test if the local store is reverted and if the remote store stays untouched on an error
   const testName = 'revert: assign (with extra checks)'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance(testName, {
+    const { pokedexModule } = await createMagnetarInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
     })
     await firestoreDeepEqual(t, testName, 'pokedex/1', pokedex(1))
@@ -194,7 +194,7 @@ const conf = (testName: string): any => ({
   // this tests is _not really_ testing reverting the remote store, they test if the local store is reverted and if the remote store stays untouched on an error
   const testName = 'revert: replace (with extra checks)'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance(testName, {
+    const { pokedexModule } = await createMagnetarInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
     })
     await firestoreDeepEqual(t, testName, 'pokedex/1', pokedex(1))

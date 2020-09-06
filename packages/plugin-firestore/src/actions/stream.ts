@@ -21,8 +21,8 @@ export function streamActionFactory(
   }: PluginStreamActionPayload<FirestoreModuleConfig>): StreamResponse {
     const { added, modified, removed } = mustExecuteOnRead
     const { firestoreInstance } = firestorePluginOptions
-    let resolveStream: () => void
-    let rejectStream: () => void
+    let resolveStream: (() => void) | undefined
+    let rejectStream: (() => void) | undefined
     const streaming: Promise<void> = new Promise((resolve, reject) => {
       resolveStream = resolve
       rejectStream = reject
@@ -37,11 +37,12 @@ export function streamActionFactory(
           const localChange = docSnapshot.metadata.hasPendingWrites
           // do nothing for local changes
           if (localChange) return
+          // do nothing if the doc doesn't exist
+          if (!docSnapshot.exists) return
           // serverChanges only
           const docData = docSnapshot.data() as Record<string, any>
           const docMetadata = docSnapshotToDocMetadata(docSnapshot)
           added(docData, docMetadata)
-          // @ts-ignore
         }, rejectStream)
     }
     // in case of a collection module
@@ -67,11 +68,10 @@ export function streamActionFactory(
             removed(docData, docMetadata)
           }
         })
-        // @ts-ignore
       }, rejectStream)
     }
     function stop(): void {
-      resolveStream()
+      if (resolveStream) resolveStream()
       unsubscribeStream()
     }
     return { stop, streaming }

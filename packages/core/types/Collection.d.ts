@@ -1,7 +1,7 @@
 import { O } from 'ts-toolbelt';
-import { VueSyncGetAction, VueSyncStreamAction, VueSyncInsertAction, OpenStreams } from './types/actions';
+import { MagnetarGetAction, MagnetarStreamAction, MagnetarInsertAction, OpenStreams } from './types/actions';
 import { ModuleConfig, GlobalConfig } from './types/config';
-import { DocFn, CollectionFn } from './VueSync';
+import { DocFn, CollectionFn } from './Magnetar';
 import { WhereFilterOp } from './types/clauses';
 export declare type CollectionInstance<DocDataType extends Record<string, any> = Record<string, any>> = {
     data: Map<string, DocDataType>;
@@ -16,9 +16,9 @@ export declare type CollectionInstance<DocDataType extends Record<string, any> =
      * const unsubscribe = collection('myDocs').openStreams.get({})
      */
     openStreams: OpenStreams;
-    get: VueSyncGetAction<DocDataType, 'collection'>;
-    stream: VueSyncStreamAction;
-    insert: VueSyncInsertAction<DocDataType>;
+    get: MagnetarGetAction<DocDataType, 'collection'>;
+    stream: MagnetarStreamAction;
+    insert: MagnetarInsertAction<DocDataType>;
     where: (fieldPath: string, operator: WhereFilterOp, value: any) => CollectionInstance<DocDataType>;
     orderBy: (fieldPath: string, direction?: 'asc' | 'desc') => CollectionInstance<DocDataType>;
     limit: (limitCount: number) => CollectionInstance<DocDataType>;

@@ -1,9 +1,9 @@
 import test from 'ava'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex, waitMs } from 'test-utils'
 
 test('stream (collection)', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.deepEqual(pokedexModule.data.size, 1)
   const payload = {}
@@ -23,7 +23,7 @@ test('stream (collection)', async (t) => {
 })
 
 test('stream (doc)', async (t) => {
-  const { trainerModule } = createVueSyncInstance()
+  const { trainerModule } = createMagnetarInstance()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
   const streamPayload = {}
 
@@ -42,7 +42,7 @@ test('stream (doc)', async (t) => {
 })
 
 test('stream (collection) where-filter', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   // the original state has 1 pokemon already
   t.deepEqual(pokedexModule.data.size, 1)
   // let's get some more

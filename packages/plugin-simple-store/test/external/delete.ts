@@ -1,8 +1,8 @@
 import test from 'ava'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 
-test('delete', async t => {
-  const { trainerModule } = createVueSyncInstance()
+test('delete', async (t) => {
+  const { trainerModule } = createMagnetarInstance()
   t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
   try {
@@ -14,8 +14,8 @@ test('delete', async t => {
   t.deepEqual(trainerModule.data, undefined)
 })
 
-test('revert: delete', async t => {
-  const { trainerModule } = createVueSyncInstance()
+test('revert: delete', async (t) => {
+  const { trainerModule } = createMagnetarInstance()
   t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
   try {

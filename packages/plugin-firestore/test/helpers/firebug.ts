@@ -3,7 +3,7 @@ import { firestore } from '../helpers/firestore'
 import { waitMs } from 'test-utils'
 
 test('firebase sdk', async (t) => {
-  const pokemonPath = `vueSyncTests/read/pokedex/136`
+  const pokemonPath = `magnetarTests/read/pokedex/136`
   console.log(`1)`)
   await firestore
     .doc(pokemonPath)
@@ -20,7 +20,7 @@ test('firebase sdk', async (t) => {
   // the bug occurs no matter how many seconds is waited
   await waitMs(2000)
 
-  const pokedexPath = `vueSyncTests/read/pokedex`
+  const pokedexPath = `magnetarTests/read/pokedex`
   console.log(`\n2)`)
   await firestore
     .collection(pokedexPath)

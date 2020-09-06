@@ -1,20 +1,24 @@
 import test from 'ava'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
-import { pokedex, PokedexEntry } from 'test-utils'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
+import { pokedex, PokedexEntry, pokedexGetAll, waitMs } from 'test-utils'
 import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 import { DocInstance } from '../../../core/src'
 
 {
   const testName = 'insert (document)'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance(testName, { deletePaths: ['pokedex/7'] })
+    const { pokedexModule } = await createMagnetarInstance(testName, { deletePaths: ['pokedex/7'] })
     const payload = pokedex(7)
     t.deepEqual(pokedexModule.doc('7').data, undefined)
+
+    const { pokedexModule: p } = await createMagnetarInstance('read')
+    pokedexGetAll().forEach((_p) => p.insert(_p))
+    await waitMs(3000)
 
     // in this case `useModulePathsForFirestore` is `false` in the plugin settings
     // so when creating a new doc reference we need to pass the `firestorePath`
     const squirtle = pokedexModule.doc('7', {
-      configPerStore: { remote: { firestorePath: 'vueSyncTests/insert (document)/pokedex/7' } },
+      configPerStore: { remote: { firestorePath: 'magnetarTests/insert (document)/pokedex/7' } },
     })
 
     try {
@@ -31,7 +35,7 @@ import { DocInstance } from '../../../core/src'
 {
   const testName = 'insert (collection) → id from payload'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance(testName, { deletePaths: ['pokedex/7'] })
+    const { pokedexModule } = await createMagnetarInstance(testName, { deletePaths: ['pokedex/7'] })
     const payload = pokedex(7)
 
     let moduleFromResult: DocInstance<PokedexEntry>
@@ -51,7 +55,7 @@ import { DocInstance } from '../../../core/src'
 {
   const testName = 'insert (collection) → random id'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance(testName)
+    const { pokedexModule } = await createMagnetarInstance(testName)
     const payload = pokedex(7)
     delete payload.id
 
@@ -72,7 +76,7 @@ import { DocInstance } from '../../../core/src'
 {
   const testName = 'revert: insert (document)'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance(testName)
+    const { pokedexModule } = await createMagnetarInstance(testName)
     const payload = { ...pokedex(7), shouldFail: undefined }
     t.deepEqual(pokedexModule.doc('7').data, undefined)
 
@@ -80,7 +84,7 @@ import { DocInstance } from '../../../core/src'
     // so when creating a new doc reference we need to pass the `firestorePath`
     const squirtle = pokedexModule.doc('7', {
       configPerStore: {
-        remote: { firestorePath: `vueSyncTests/${testName}/pokedex/7` },
+        remote: { firestorePath: `magnetarTests/${testName}/pokedex/7` },
       },
     })
 
@@ -98,7 +102,7 @@ import { DocInstance } from '../../../core/src'
 {
   const testName = 'revert: insert (collection) → random ID'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance(testName)
+    const { pokedexModule } = await createMagnetarInstance(testName)
     const payload = { ...pokedex(7), shouldFail: undefined }
 
     try {

@@ -1,8 +1,8 @@
 import test from 'ava'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 
-test('delete', async t => {
-  const { trainerModule } = createVueSyncInstance()
+test('delete', async (t) => {
+  const { trainerModule } = createMagnetarInstance()
   t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
   try {
@@ -14,8 +14,8 @@ test('delete', async t => {
   t.deepEqual(trainerModule.data, undefined)
 })
 
-test('revert: delete (local → remote)', async t => {
-  const { trainerModule } = createVueSyncInstance()
+test('revert: delete (local → remote)', async (t) => {
+  const { trainerModule } = createMagnetarInstance()
   t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
   try {
@@ -29,7 +29,7 @@ test('revert: delete (local → remote)', async t => {
 
 // todo: for this test to work we need to mock a data pool for the remote plugin mock
 // test('revert: delete (remote → local)', async t => {
-//   const { trainerModule } = createVueSyncInstance()
+//   const { trainerModule } = createMagnetarInstance()
 //   t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
 //   try {

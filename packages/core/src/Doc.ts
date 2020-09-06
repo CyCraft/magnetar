@@ -1,18 +1,18 @@
 import { O } from 'ts-toolbelt'
 import {
-  VueSyncWriteAction,
-  VueSyncGetAction,
-  VueSyncStreamAction,
-  VueSyncDeleteAction,
-  VueSyncDeletePropAction,
-  VueSyncInsertAction,
+  MagnetarWriteAction,
+  MagnetarGetAction,
+  MagnetarStreamAction,
+  MagnetarDeleteAction,
+  MagnetarDeletePropAction,
+  MagnetarInsertAction,
   OpenStreams,
 } from './types/actions'
 import { actionNameTypeMap } from './types/actionsInternal'
 import { handleActionPerStore } from './moduleActions/handleActionPerStore'
 import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
 import { ModuleConfig, GlobalConfig } from './types/config'
-import { CollectionFn, DocFn } from './VueSync'
+import { CollectionFn, DocFn } from './Magnetar'
 import { executeSetupModulePerStore, getDataProxyHandler } from './helpers/moduleHelpers'
 
 export type DocInstance<DocDataType extends Record<string, any> = Record<string, any>> = {
@@ -23,22 +23,22 @@ export type DocInstance<DocDataType extends Record<string, any> = Record<string,
   openStreams: OpenStreams
 
   // actions
-  get: VueSyncGetAction<DocDataType, 'doc'>
-  stream: VueSyncStreamAction
-  insert: VueSyncInsertAction<DocDataType>
-  merge: VueSyncWriteAction<DocDataType>
-  assign: VueSyncWriteAction<DocDataType>
-  replace: VueSyncWriteAction<DocDataType>
-  deleteProp: VueSyncDeletePropAction<DocDataType>
+  get: MagnetarGetAction<DocDataType, 'doc'>
+  stream: MagnetarStreamAction
+  insert: MagnetarInsertAction<DocDataType>
+  merge: MagnetarWriteAction<DocDataType>
+  assign: MagnetarWriteAction<DocDataType>
+  replace: MagnetarWriteAction<DocDataType>
+  deleteProp: MagnetarDeletePropAction<DocDataType>
   /**
-   * @type {VueSyncDeleteAction} Documentation copied from `VueSyncDeleteAction`
+   * @type {MagnetarDeleteAction} Documentation copied from `MagnetarDeleteAction`
    * @param {*} [payload] The delete action doesn't need any payload. In some cases, a Store Plugin you use might accept a payload.
    * @param {ActionConfig} [actionConfig]
    * @example
    * // first update the server and await that before updating the local store:
    * doc(id).delete(undefined, { executionOrder: ['remote', 'local'] })
    */
-  delete: VueSyncDeleteAction<DocDataType>
+  delete: MagnetarDeleteAction<DocDataType>
 }
 
 export function createDocWithContext<DocDataType extends Record<string, any>>(
@@ -57,13 +57,13 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
   }
 
   const actions = {
-    insert: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert,  docFn) as VueSyncInsertAction<DocDataType>), // prettier-ignore
-    merge: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'merge', actionNameTypeMap.merge, docFn) as VueSyncWriteAction<DocDataType>), // prettier-ignore
-    assign: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'assign', actionNameTypeMap.assign, docFn) as VueSyncWriteAction<DocDataType>), // prettier-ignore
-    replace: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'replace', actionNameTypeMap.replace, docFn) as VueSyncWriteAction<DocDataType>), // prettier-ignore
-    deleteProp: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'deleteProp', actionNameTypeMap.deleteProp, docFn) as VueSyncDeletePropAction<DocDataType>), // prettier-ignore
-    delete: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn) as VueSyncDeleteAction<DocDataType>), // prettier-ignore
-    get: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn) as VueSyncGetAction<DocDataType, 'doc'>), // prettier-ignore
+    insert: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert,  docFn) as MagnetarInsertAction<DocDataType>), // prettier-ignore
+    merge: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'merge', actionNameTypeMap.merge, docFn) as MagnetarWriteAction<DocDataType>), // prettier-ignore
+    assign: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'assign', actionNameTypeMap.assign, docFn) as MagnetarWriteAction<DocDataType>), // prettier-ignore
+    replace: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'replace', actionNameTypeMap.replace, docFn) as MagnetarWriteAction<DocDataType>), // prettier-ignore
+    deleteProp: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'deleteProp', actionNameTypeMap.deleteProp, docFn) as MagnetarDeletePropAction<DocDataType>), // prettier-ignore
+    delete: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn) as MagnetarDeleteAction<DocDataType>), // prettier-ignore
+    get: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn) as MagnetarGetAction<DocDataType, 'doc'>), // prettier-ignore
     stream: handleStreamPerStore(
       [collectionPath, docId],
       moduleConfig,

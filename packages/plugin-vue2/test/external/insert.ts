@@ -1,10 +1,10 @@
 import test from 'ava'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex, PokedexEntry } from 'test-utils'
 import { DocInstance } from '../../../core/src'
 
 test('insert (document)', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const payload = pokedex(7)
   t.deepEqual(pokedexModule.doc('7').data, undefined)
 
@@ -18,7 +18,7 @@ test('insert (document)', async (t) => {
 })
 
 test('insert (collection) → random ID', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const payload = pokedex(7)
 
   let moduleFromResult: DocInstance<PokedexEntry>
@@ -32,7 +32,7 @@ test('insert (collection) → random ID', async (t) => {
 })
 
 test('revert: insert (document)', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const payload = { ...pokedex(7), shouldFail: 'remote' }
   t.deepEqual(pokedexModule.doc('7').data, undefined)
 
@@ -46,7 +46,7 @@ test('revert: insert (document)', async (t) => {
 })
 
 test('revert: insert (collection) → random ID', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const payload = { ...pokedex(7), shouldFail: 'remote' }
 
   try {

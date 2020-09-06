@@ -1,10 +1,10 @@
 import test from 'ava'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex, pokedexEntryDefaults } from 'test-utils'
 import { GetResponse } from '../../src'
 
 test('write + onError: stop -- emits fail events & aborts execution by default', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'local' })
   try {
     await pokedexModule.doc('testid').insert(insertPayload, {
@@ -27,7 +27,7 @@ test('write + onError: stop -- emits fail events & aborts execution by default',
 })
 
 test('write + onError: stop -- fail in second store plugin does not prevent execution first store plugin', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'remote' })
   try {
     await pokedexModule.doc('testid').insert(insertPayload, {
@@ -48,7 +48,7 @@ test('write + onError: stop -- fail in second store plugin does not prevent exec
 })
 
 test('write + onError: continue', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'local' })
   try {
     await pokedexModule.doc('testid').insert(insertPayload, {
@@ -74,7 +74,7 @@ test('write + onError: continue', async (t) => {
 })
 
 test('write + onError: revert', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'remote' })
   try {
     await pokedexModule.doc('testid').insert(insertPayload, {
@@ -103,7 +103,7 @@ test('write + onError: revert', async (t) => {
 })
 
 test('write + onError: revert - will not go to next store', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'local' })
   try {
     await pokedexModule.doc('testid').insert(insertPayload, {
@@ -131,7 +131,7 @@ test('write + onError: revert - will not go to next store', async (t) => {
 })
 
 test('get + onError: stop -- emits fail events & aborts execution by default', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const getPayload = { shouldFail: 'local' }
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   try {
@@ -155,7 +155,7 @@ test('get + onError: stop -- emits fail events & aborts execution by default', a
 })
 
 test('get + onError: stop -- fail in second store plugin does not prevent execution first store plugin', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const getPayload = { shouldFail: 'remote' }
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   let result: any
@@ -179,7 +179,7 @@ test('get + onError: stop -- fail in second store plugin does not prevent execut
 })
 
 test('get + onError: continue', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const getPayload = { shouldFail: 'local' }
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   try {

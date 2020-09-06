@@ -1,11 +1,11 @@
 import test from 'ava'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex, waitMs, PokedexEntry } from 'test-utils'
 import { merge } from 'merge-anything'
 import { DocInstance } from '../../src'
 
 test('write: insert (document)', async (t) => {
-  const { pokedexModule, vueSync } = createVueSyncInstance()
+  const { pokedexModule, magnetar } = createMagnetarInstance()
   const payload = pokedex(7)
   t.deepEqual(pokedexModule.data.get('7'), undefined)
   await pokedexModule.doc('7').insert(payload).catch((e: any) => t.fail(e.message)) // prettier-ignore
@@ -13,12 +13,12 @@ test('write: insert (document)', async (t) => {
   t.deepEqual(pokedexModule.data.get('7'), payload)
   // check data of new references
   t.deepEqual(pokedexModule.doc('7').data, payload)
-  t.deepEqual(vueSync.doc('pokedex/7').data, payload)
-  t.deepEqual(vueSync.collection('pokedex').doc('7').data, payload)
+  t.deepEqual(magnetar.doc('pokedex/7').data, payload)
+  t.deepEqual(magnetar.collection('pokedex').doc('7').data, payload)
 })
 
 test('write: insert (collection) → random ID', async (t) => {
-  const { pokedexModule, vueSync } = createVueSyncInstance()
+  const { pokedexModule, magnetar } = createMagnetarInstance()
   const payload = pokedex(7)
 
   let moduleFromResult: DocInstance<PokedexEntry>
@@ -33,20 +33,20 @@ test('write: insert (collection) → random ID', async (t) => {
   // check data of references executed on
   t.deepEqual(pokedexModule.data.get(newId), payload)
   // check data of new references
-  t.deepEqual(vueSync.doc(`pokedex/${newId}`).data, payload)
-  t.deepEqual(vueSync.collection('pokedex').doc(newId).data, payload)
+  t.deepEqual(magnetar.doc(`pokedex/${newId}`).data, payload)
+  t.deepEqual(magnetar.collection('pokedex').doc(newId).data, payload)
   t.deepEqual(pokedexModule.doc(newId).data, payload)
 })
 
 test('deleteProp: (document)', async (t) => {
-  const { trainerModule, vueSync } = createVueSyncInstance()
+  const { trainerModule, magnetar } = createMagnetarInstance()
   const payload = 'age'
   t.deepEqual(trainerModule.data.age, 10)
 
   // create references on beforehand
-  const vueSyncDoc = vueSync.doc('data/trainer') // prettier-ignore
-  const vueSyncCollectionDoc = vueSync.collection('data').doc('trainer') // prettier-ignore
-  const vueSyncCollectionData = vueSync.collection('data').data // prettier-ignore
+  const magnetarDoc = magnetar.doc('data/trainer') // prettier-ignore
+  const magnetarCollectionDoc = magnetar.collection('data').doc('trainer') // prettier-ignore
+  const magnetarCollectionData = magnetar.collection('data').data // prettier-ignore
 
   try {
     const result = await trainerModule.deleteProp(payload)
@@ -56,21 +56,21 @@ test('deleteProp: (document)', async (t) => {
     t.fail(error)
   }
   // check data of references created on beforehand
-  t.deepEqual(vueSyncDoc.data.age, undefined)
-  t.deepEqual(vueSyncCollectionDoc.data.age, undefined)
-  t.deepEqual(vueSyncCollectionData.get('trainer')?.age, undefined)
+  t.deepEqual(magnetarDoc.data.age, undefined)
+  t.deepEqual(magnetarCollectionDoc.data.age, undefined)
+  t.deepEqual(magnetarCollectionData.get('trainer')?.age, undefined)
   // check data of references executed on
   t.deepEqual(trainerModule.data.age, undefined)
 })
 
 test('delete: (document)', async (t) => {
-  const { trainerModule, vueSync } = createVueSyncInstance()
+  const { trainerModule, magnetar } = createMagnetarInstance()
   t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
   // create references on beforehand
-  const vueSyncCollection = vueSync.collection('data')
-  const vueSyncCollectionDoc = vueSync.collection('data').doc('trainer')
-  const vueSyncDoc = vueSync.doc('data/trainer')
+  const magnetarCollection = magnetar.collection('data')
+  const magnetarCollectionDoc = magnetar.collection('data').doc('trainer')
+  const magnetarDoc = magnetar.doc('data/trainer')
 
   try {
     const result = await trainerModule.delete()
@@ -81,19 +81,19 @@ test('delete: (document)', async (t) => {
     t.fail(error)
   }
   // check data of references created on beforehand
-  t.deepEqual(vueSyncCollection.data.get('trainer'), undefined)
-  t.deepEqual(vueSyncCollectionDoc.data, undefined)
-  t.deepEqual(vueSyncDoc.data, undefined)
+  t.deepEqual(magnetarCollection.data.get('trainer'), undefined)
+  t.deepEqual(magnetarCollectionDoc.data, undefined)
+  t.deepEqual(magnetarDoc.data, undefined)
   // check data of references executed on
   t.deepEqual(trainerModule.data, undefined)
   // check data of new references
-  t.deepEqual(vueSync.collection('data').doc('trainer').data, undefined)
-  t.deepEqual(vueSync.doc('data/trainer').data, undefined)
-  t.deepEqual(vueSync.collection('data').data.get('trainer'), undefined)
+  t.deepEqual(magnetar.collection('data').doc('trainer').data, undefined)
+  t.deepEqual(magnetar.doc('data/trainer').data, undefined)
+  t.deepEqual(magnetar.collection('data').data.get('trainer'), undefined)
 })
 
 test('write: merge (document)', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const payload = { base: { HP: 9000 } }
   const doc = pokedexModule.doc('1')
   t.deepEqual(doc.data, pokedex(1))
@@ -104,7 +104,7 @@ test('write: merge (document)', async (t) => {
 })
 
 test('read: stream (collection)', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.deepEqual(pokedexModule.data.size, 1)
   const payload = {}
@@ -124,7 +124,7 @@ test('read: stream (collection)', async (t) => {
 })
 
 test('read: stream (doc)', async (t) => {
-  const { trainerModule } = createVueSyncInstance()
+  const { trainerModule } = createMagnetarInstance()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
   const payload = {}
   // do not await, because it only resolves when the stream is closed
@@ -141,7 +141,7 @@ test('read: stream (doc)', async (t) => {
 
 test('read: get (collection)', async (t) => {
   // 'get' resolves once all stores have given a response with data
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.deepEqual(pokedexModule.data.size, 1)
   try {
@@ -158,7 +158,7 @@ test('read: get (collection)', async (t) => {
 
 test('read: get (document)', async (t) => {
   // get resolves once all stores have given a response with data
-  const { trainerModule } = createVueSyncInstance()
+  const { trainerModule } = createMagnetarInstance()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
   try {
     const result = await trainerModule.get()
@@ -170,7 +170,7 @@ test('read: get (document)', async (t) => {
 })
 
 test('get (collection) where-filter: ==', async (t) => {
-  const { pokedexModule, vueSync } = createVueSyncInstance()
+  const { pokedexModule, magnetar } = createMagnetarInstance()
 
   const pokedexModuleWithQuery = pokedexModule.where('name', '==', 'Flareon')
   try {
@@ -189,13 +189,13 @@ test('get (collection) where-filter: ==', async (t) => {
   // check the invididual doc refs from pokedexModule
   t.deepEqual(pokedexModule.doc('136').data, pokedex(136))
   // check the invididual doc refs from base
-  t.deepEqual(vueSync.doc('pokedex/136').data, pokedex(136))
+  t.deepEqual(magnetar.doc('pokedex/136').data, pokedex(136))
   // see if the main module has also received this data
   t.deepEqual([...pokedexModule.data.values()], [pokedex(1), pokedex(136)])
 })
 
 // test('stream (collection) opening the same stream twice will pass on the promise of the first stream', async t => {
-//   const { pokedexModule } = createVueSyncInstance()
+//   const { pokedexModule } = createMagnetarInstance()
 //   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
 //   t.deepEqual(pokedexModule.data.size, 1)
 //   const payload = {}

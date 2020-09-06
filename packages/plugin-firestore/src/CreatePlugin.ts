@@ -1,5 +1,5 @@
 import { firestore } from 'firebase'
-import { PluginInstance, VueSyncPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core'
+import { PluginInstance, MagnetarPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core'
 import { insertActionFactory } from './actions/insert'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { deletePropActionFactory } from './actions/deleteProp'
@@ -43,7 +43,7 @@ function firestorePluginOptionsWithDefaults(
 // a Vue Sync plugin is a single function that returns a `PluginInstance`
 // the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
 // each action must have the proper for both collection and doc type modules
-export const CreatePlugin: VueSyncPlugin<FirestorePluginOptions> = (
+export const CreatePlugin: MagnetarPlugin<FirestorePluginOptions> = (
   firestorePluginOptions: FirestorePluginOptions
 ): PluginInstance => {
   const pluginOptions = firestorePluginOptionsWithDefaults(firestorePluginOptions)

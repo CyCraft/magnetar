@@ -1,5 +1,5 @@
 import { firestore } from 'firebase';
-import { VueSyncPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core';
+import { MagnetarPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core';
 export interface FirestorePluginOptions {
     /**
      * This is required to make sure there are not two instances of Firestore running which can cause issues.
@@ -20,4 +20,4 @@ export interface FirestoreModuleConfig {
     orderBy?: OrderByClause[];
     limit?: Limit;
 }
-export declare const CreatePlugin: VueSyncPlugin<FirestorePluginOptions>;
+export declare const CreatePlugin: MagnetarPlugin<FirestorePluginOptions>;

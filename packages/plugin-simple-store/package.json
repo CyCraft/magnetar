@@ -2,7 +2,7 @@
   "name": "@magnetarjs/plugin-simple-store",
   "version": "0.0.0",
   "sideEffects": false,
-  "description": "A simple local store plugin to use with Vue Sync.",
+  "description": "Magnetar plugin simple store",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "typings": "types/index.d.ts",
@@ -29,10 +29,33 @@
   },
   "devDependencies": {
     "@magnetarjs/core": "^0.0.0",
+    "ava": "^3.12.1",
     "test-utils": "^0.0.0-beta.0"
   },
   "keywords": [
-    "vue-sync"
+    "magnetar-plugin",
+    "magnetar",
+    "magnetarjs",
+    "state-management",
+    "syncing-solution",
+    "db-sync",
+    "auto-sync",
+    "framework-agnostic",
+    "optimistic-ui",
+    "vuejs",
+    "vuex",
+    "vue-sync",
+    "vue-state",
+    "vue-db",
+    "vue-store",
+    "firestore",
+    "data-store",
+    "local-store",
+    "remote-store",
+    "global-store",
+    "database-sync",
+    "database-management",
+    "database"
   ],
   "repository": {
     "type": "git",

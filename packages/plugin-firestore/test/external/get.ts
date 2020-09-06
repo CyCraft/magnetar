@@ -1,12 +1,12 @@
 import test from 'ava'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex } from 'test-utils'
 
 {
   const testName = 'get (collection)'
   test(testName, async (t) => {
     /// 'get' resolves once all stores have given a response with data
-    const { pokedexModule } = await createVueSyncInstance('read')
+    const { pokedexModule } = await createMagnetarInstance('read')
     t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
     t.deepEqual(pokedexModule.doc('136').data, undefined)
     t.deepEqual(pokedexModule.data.size, 1)
@@ -25,7 +25,7 @@ import { pokedex } from 'test-utils'
   const testName = 'get (document)'
   test(testName, async (t) => {
     /// get resolves once all stores have given a response with data
-    const { trainerModule } = await createVueSyncInstance('read')
+    const { trainerModule } = await createMagnetarInstance('read')
     t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
     try {
       await trainerModule.get()
@@ -38,7 +38,7 @@ import { pokedex } from 'test-utils'
 {
   const testName = 'get (collection) where-filter: =='
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance('read')
+    const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = await pokedexModule.where('name', '==', 'Flareon').get()
       const actual = [...queryModuleRef.data.values()]
@@ -56,7 +56,7 @@ import { pokedex } from 'test-utils'
 {
   const testName = 'get (collection) where-filter: == nested'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance('read')
+    const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = await pokedexModule.where('base.HP', '==', 10).get()
       const actual = [...queryModuleRef.data.values()]
@@ -74,7 +74,7 @@ import { pokedex } from 'test-utils'
 {
   const testName = 'get (collection) where-filter: <'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance('read')
+    const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = await pokedexModule.where('base.HP', '<', 11).get()
       const actual = [...queryModuleRef.data.values()]
@@ -92,7 +92,7 @@ import { pokedex } from 'test-utils'
 {
   const testName = 'get (collection) where-filter: <='
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance('read')
+    const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = await pokedexModule.where('base.HP', '<=', 10).get()
       const actual = [...queryModuleRef.data.values()]
@@ -110,7 +110,7 @@ import { pokedex } from 'test-utils'
 {
   const testName = 'get (collection) where-filter: >'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance('read')
+    const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = await pokedexModule.where('base.HP', '>', 249).get()
       const actual = [...queryModuleRef.data.values()]
@@ -128,7 +128,7 @@ import { pokedex } from 'test-utils'
 {
   const testName = 'get (collection) where-filter: >='
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance('read')
+    const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = await pokedexModule.where('base.HP', '>=', 250).get()
       const actual = [...queryModuleRef.data.values()]
@@ -146,7 +146,7 @@ import { pokedex } from 'test-utils'
 {
   const testName = 'get (collection) where-filter: array-contains'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance('read')
+    const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = await pokedexModule.where('type', 'array-contains', 'Steel').get()
       const actual = [...queryModuleRef.data.values()]
@@ -164,7 +164,7 @@ import { pokedex } from 'test-utils'
 {
   const testName = 'get (collection) where-filter: in'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance('read')
+    const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = await pokedexModule
         .where('name', 'in', ['Vaporeon', 'Jolteon', 'Flareon'])
@@ -184,7 +184,7 @@ import { pokedex } from 'test-utils'
 {
   const testName = 'get (collection) where-filter: array-contains-any'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance('read')
+    const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = await pokedexModule
         .where('type', 'array-contains-any', ['Steel', 'Ice'])
@@ -213,7 +213,7 @@ import { pokedex } from 'test-utils'
 {
   const testName = 'get (collection) compound queries'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance('read')
+    const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = await pokedexModule
         .where('type', 'array-contains', 'Fire')
@@ -235,7 +235,7 @@ import { pokedex } from 'test-utils'
 {
   const testName = 'get (collection) orderBy + limit'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance('read')
+    const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = await pokedexModule
         .where('id', '<', 10)
@@ -267,7 +267,7 @@ import { pokedex } from 'test-utils'
 {
   const testName = 'get: errors are thrown'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance('read-no-access')
+    const { pokedexModule } = await createMagnetarInstance('read-no-access')
     let error
     try {
       const a = await pokedexModule.get()

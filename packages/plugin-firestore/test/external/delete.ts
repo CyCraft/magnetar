@@ -1,11 +1,11 @@
 import test from 'ava'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 
 {
   const testName = 'delete'
   test(testName, async (t) => {
-    const { trainerModule } = await createVueSyncInstance(testName, {
+    const { trainerModule } = await createMagnetarInstance(testName, {
       insertDocs: { '': { age: 10, name: 'Luca' } },
     })
     t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })

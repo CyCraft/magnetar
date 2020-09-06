@@ -1,5 +1,5 @@
 import test from 'ava'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex, waitMs } from 'test-utils'
 
 test('get: can mutate payload & read response', async (t) => {
@@ -10,7 +10,7 @@ test('get: can mutate payload & read response', async (t) => {
     return { ...payload, auth: 'Bearer 123123' }
   }
   // get resolves once all stores have given a response with data
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   try {
     const result = await pokedexModule.get(
@@ -47,7 +47,7 @@ test('stream: can mutate payload & read response', async (t) => {
   function addToken(payload: any) {
     return { ...payload, auth: 'Bearer 123123' }
   }
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   pokedexModule.stream(
     {},
@@ -76,7 +76,7 @@ test('insert: can mutate payload', async (t) => {
     if (!('seen' in payload)) return { ...payload, seen: true }
   }
   // get resolves once all stores have given a response with data
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   try {
     const payload = pokedex(7)

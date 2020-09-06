@@ -1,16 +1,16 @@
 import test from 'ava'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex } from 'test-utils'
 import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 
 const conf = (testName: string): any => ({
-  configPerStore: { remote: { firestorePath: `vueSyncTests/${testName}/pokedex/1` } },
+  configPerStore: { remote: { firestorePath: `magnetarTests/${testName}/pokedex/1` } },
 })
 
 {
   const testName = 'deleteProp'
   test(testName, async (t) => {
-    const { trainerModule } = await createVueSyncInstance(testName, {
+    const { trainerModule } = await createMagnetarInstance(testName, {
       insertDocs: { '': { age: 10, name: 'Luca' } },
     })
     const deletePayload = 'age'
@@ -30,7 +30,7 @@ const conf = (testName: string): any => ({
 {
   const testName = 'deleteProp nested'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance(testName, {
+    const { pokedexModule } = await createMagnetarInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
     })
     const deletePayload = 'base.HP'
@@ -60,7 +60,7 @@ const conf = (testName: string): any => ({
 {
   const testName = 'deleteProp multiple'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance(testName, {
+    const { pokedexModule } = await createMagnetarInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
     })
     const deletePayload = ['base.HP', 'name']

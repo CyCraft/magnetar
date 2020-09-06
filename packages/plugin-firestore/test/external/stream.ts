@@ -1,12 +1,11 @@
 import test from 'ava'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
-import { pokedex } from 'test-utils'
-import { waitMs } from 'test-utils'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
+import { pokedex, waitMs } from 'test-utils'
 
 {
   const testName = 'stream (collection)'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance('read')
+    const { pokedexModule } = await createMagnetarInstance('read')
     t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
     t.deepEqual(pokedexModule.doc('136').data, undefined)
     t.deepEqual(pokedexModule.data.size, 1)
@@ -29,7 +28,7 @@ import { waitMs } from 'test-utils'
 {
   const testName = 'stream (doc)'
   test(testName, async (t) => {
-    const { trainerModule } = await createVueSyncInstance('read')
+    const { trainerModule } = await createMagnetarInstance('read')
     t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 
     const payload = {}
@@ -47,7 +46,7 @@ import { waitMs } from 'test-utils'
 {
   const testName = 'stream (collection) where-filter'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance('read')
+    const { pokedexModule } = await createMagnetarInstance('read')
     // the original state has 1 pokemon already
     t.deepEqual(pokedexModule.data.size, 1)
     // let's get some more
@@ -81,7 +80,7 @@ import { waitMs } from 'test-utils'
 {
   const testName = 'stream: errors are thrown'
   test(testName, async (t) => {
-    const { pokedexModule } = await createVueSyncInstance('read-no-access')
+    const { pokedexModule } = await createMagnetarInstance('read-no-access')
 
     let error
     try {

@@ -1,9 +1,9 @@
 import test from 'ava'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex } from 'test-utils'
 
 test('delete: emits before & success events', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const insertPayload = pokedex(7)
   await pokedexModule.insert(insertPayload)
   const ranAllEvents: any[] = []
@@ -21,7 +21,7 @@ test('delete: emits before & success events', async (t) => {
 })
 
 test('insert: emits before & success events', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const insertPayload = pokedex(7)
   const ranAllEvents: any[] = []
   await pokedexModule.insert(insertPayload, {
@@ -52,7 +52,7 @@ test('insert: emits before & success events', async (t) => {
 })
 
 test('insert: can abort in before events', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const insertPayload = pokedex(7)
   try {
     const result = await pokedexModule.insert(insertPayload, {
@@ -76,7 +76,7 @@ test('insert: can abort in before events', async (t) => {
 })
 
 test('insert: can abort in success events', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const insertPayload = pokedex(7)
   const ranAllEvents: any[] = []
   try {

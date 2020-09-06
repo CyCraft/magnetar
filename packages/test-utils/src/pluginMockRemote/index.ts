@@ -1,4 +1,10 @@
-import { PluginInstance, VueSyncPlugin, WhereClause, OrderByClause, Limit } from '../../../core/src'
+import {
+  PluginInstance,
+  MagnetarPlugin,
+  WhereClause,
+  OrderByClause,
+  Limit,
+} from '../../../core/src'
 import {
   writeActionFactory,
   insertActionFactory,
@@ -27,7 +33,7 @@ export interface StorePluginModuleConfig {
 // a Vue Sync plugin is a single function that returns a `PluginInstance`
 // the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
 // each action must have the proper for both collection and doc type modules
-export const CreatePlugin: VueSyncPlugin<RemoteStoreOptions> = (
+export const CreatePlugin: MagnetarPlugin<RemoteStoreOptions> = (
   storePluginOptions: RemoteStoreOptions
 ): PluginInstance => {
   // the plugin must try to implement logic for every `ActionName`

@@ -1,10 +1,10 @@
 import test from 'ava'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 
 test('get (collectionGroup)', async (t) => {
   t.pass()
   //   // get resolves once all stores have given a response with data
-  //   const { trainerModule} = createVueSyncInstance()
+  //   const { trainerModule} = createMagnetarInstance()
   //   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 
   //   try {
@@ -18,7 +18,7 @@ test('get (collectionGroup)', async (t) => {
 
 // test('get (collectionGroup) where-filter: ==', async t => {
 //   // get resolves once all stores have given a response with data
-//   const { trainerModule} = createVueSyncInstance()
+//   const { trainerModule} = createMagnetarInstance()
 //   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 
 //   try {

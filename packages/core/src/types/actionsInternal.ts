@@ -1,10 +1,10 @@
 import {
-  VueSyncStreamAction,
-  VueSyncGetAction,
-  VueSyncDeleteAction,
-  VueSyncDeletePropAction,
-  VueSyncInsertAction,
-  VueSyncWriteAction,
+  MagnetarStreamAction,
+  MagnetarGetAction,
+  MagnetarDeleteAction,
+  MagnetarDeletePropAction,
+  MagnetarInsertAction,
+  MagnetarWriteAction,
   ActionName,
 } from './actions'
 
@@ -25,13 +25,13 @@ export const actionNameTypeMap: { [action in ActionName]: ActionType } = {
 }
 
 export type ActionTernary<TActionName extends ActionName> = TActionName extends 'stream'
-  ? VueSyncStreamAction
+  ? MagnetarStreamAction
   : TActionName extends 'get'
-  ? VueSyncGetAction
+  ? MagnetarGetAction
   : TActionName extends 'delete'
-  ? VueSyncDeleteAction
+  ? MagnetarDeleteAction
   : TActionName extends 'deleteProp'
-  ? VueSyncDeletePropAction
+  ? MagnetarDeletePropAction
   : TActionName extends 'insert'
-  ? VueSyncInsertAction
-  : VueSyncWriteAction
+  ? MagnetarInsertAction
+  : MagnetarWriteAction

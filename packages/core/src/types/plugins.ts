@@ -12,7 +12,7 @@ import { Clauses } from './clauses'
 /**
  * A Plugin is a single function that returns a plugin instance. The pluginOptions can be anything the plugin might need to instantiate.
  */
-export type VueSyncPlugin<PluginOptions> = (pluginOptions: PluginOptions) => PluginInstance
+export type MagnetarPlugin<PluginOptions> = (pluginOptions: PluginOptions) => PluginInstance
 
 /**
  * The PluginInstance is what a Store Plugin must return. The plugin must implement end-points for each possible action the dev might trigger.

@@ -5,7 +5,7 @@ import { DocInstance } from '../Doc';
 import { CollectionInstance } from '../Collection';
 /**
  * these are all the actions that Vue Sync streamlines, whichever plugin is used
- * these actions are executable from a `VueSyncModule` and handled by each plugin individually
+ * these actions are executable from a `MagnetarModule` and handled by each plugin individually
  */
 export declare type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp' | 'delete';
 /**
@@ -21,18 +21,18 @@ export declare type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign
 export declare type ActionConfig = O.Merge<{
     executionOrder?: StoreName[];
 }, Partial<O.Omit<SharedConfig, 'dataStoreName' | 'executionOrder'>>>;
-export declare type VueSyncStreamAction = (payload?: Record<string, any> | void, actionConfig?: ActionConfig) => Promise<void>;
-export declare type VueSyncGetAction<DocDataType extends Record<string, any> = Record<string, any>, calledFrom extends 'collection' | 'doc' = 'collection' | 'doc'> = (payload?: Record<string, any> | void, actionConfig?: ActionConfig) => Promise<calledFrom extends 'collection' ? CollectionInstance<DocDataType> : DocInstance<DocDataType>>;
-export declare type VueSyncInsertAction<DocDataType extends Record<string, any> = Record<string, any>> = (payload: DocDataType, actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
-export declare type VueSyncWriteAction<DocDataType extends Record<string, any> = Record<string, any>> = (payload: O.Optional<DocDataType, keyof DocDataType, 'deep'>, actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
-export declare type VueSyncDeletePropAction<DocDataType extends Record<string, any> = Record<string, any>> = (payload: keyof DocDataType | string | (keyof DocDataType | string)[], actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
+export declare type MagnetarStreamAction = (payload?: Record<string, any> | void, actionConfig?: ActionConfig) => Promise<void>;
+export declare type MagnetarGetAction<DocDataType extends Record<string, any> = Record<string, any>, calledFrom extends 'collection' | 'doc' = 'collection' | 'doc'> = (payload?: Record<string, any> | void, actionConfig?: ActionConfig) => Promise<calledFrom extends 'collection' ? CollectionInstance<DocDataType> : DocInstance<DocDataType>>;
+export declare type MagnetarInsertAction<DocDataType extends Record<string, any> = Record<string, any>> = (payload: DocDataType, actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
+export declare type MagnetarWriteAction<DocDataType extends Record<string, any> = Record<string, any>> = (payload: O.Optional<DocDataType, keyof DocDataType, 'deep'>, actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
+export declare type MagnetarDeletePropAction<DocDataType extends Record<string, any> = Record<string, any>> = (payload: keyof DocDataType | string | (keyof DocDataType | string)[], actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
 /**
  * @param {*} [payload] The delete action doesn't need any payload. In some cases, a Store Plugin you use might accept a payload.
  * @param {ActionConfig} [actionConfig]
  * @example // first update the server and await that before updating the local store:
  * doc(id).delete(undefined, { executionOrder: ['remote', 'local'] })
  */
-export declare type VueSyncDeleteAction<DocDataType extends Record<string, any> = Record<string, any>> = (payload?: any, actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
+export declare type MagnetarDeleteAction<DocDataType extends Record<string, any> = Record<string, any>> = (payload?: any, actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
 /**
  * A WeakMap of all open streams with the payload passed to `stream(payload)` as key and the `unsubscribe` function as value. In case `stream()` had no payload, use `{}`
  * @example

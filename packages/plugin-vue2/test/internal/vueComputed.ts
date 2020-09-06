@@ -1,5 +1,5 @@
 import test from 'ava'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex } from 'test-utils'
 // @ts-ignore
 import Vue from 'vue/dist/vue.common.js'
@@ -89,7 +89,7 @@ test('expected behaviour computed prop lifecycle - with reactivity via vue.obser
 })
 
 // test('reactivity: collection - updating', async t => {
-//   const { pokedexModule } = createVueSyncInstance()
+//   const { pokedexModule } = createMagnetarInstance()
 //   const bulbasaurModule = pokedexModule.doc('1')
 //   const ranFns: any[] = []
 //   const vue = new Vue({
@@ -130,7 +130,7 @@ test('expected behaviour computed prop lifecycle - with reactivity via vue.obser
 // })
 
 test('reactivity: document - via data', async (t) => {
-  const { trainerModule } = createVueSyncInstance()
+  const { trainerModule } = createMagnetarInstance()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 
   const ranFns: any[] = []
@@ -174,7 +174,7 @@ test('reactivity: document - via data', async (t) => {
 })
 
 test('reactivity: document - directly', async (t) => {
-  const { trainerModule } = createVueSyncInstance()
+  const { trainerModule } = createMagnetarInstance()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 
   const ranFns: any[] = []
@@ -221,7 +221,7 @@ test('reactivity: document - directly', async (t) => {
 
 // test if a computed prop is re-run or not based on how the underlying data is overwritten
 // test('computed prop lifecycle', async t => {
-//   const { pokedexModule } = createVueSyncInstance()
+//   const { pokedexModule } = createMagnetarInstance()
 //   try { await pokedexModule.get() } catch (error) { t.fail(error) } // prettier-ignore
 
 //   const ranFns: any[] = []

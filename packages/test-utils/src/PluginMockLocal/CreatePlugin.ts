@@ -3,7 +3,7 @@ import { pick } from 'filter-anything'
 import { isArray } from 'is-what'
 import {
   PluginInstance,
-  VueSyncPlugin,
+  MagnetarPlugin,
   Clauses,
   WhereClause,
   OrderByClause,
@@ -40,7 +40,7 @@ export type MakeRestoreBackup = (collectionPath: string, docId: string) => void
 // a Vue Sync plugin is a single function that returns a `PluginInstance`
 // the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
 // each action must have the proper for both collection and doc type modules
-export const CreatePlugin: VueSyncPlugin<StorePluginOptions> = (
+export const CreatePlugin: MagnetarPlugin<StorePluginOptions> = (
   storePluginOptions: StorePluginOptions
 ): PluginInstance => {
   // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar

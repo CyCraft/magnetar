@@ -1,14 +1,10 @@
-import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '../../src'
-import {
-  pokedex,
-  PokedexEntry,
-  generateRandomId,
-  PluginMockLocal,
-  PluginMockRemote,
-} from 'test-utils'
+import { Magnetar, MagnetarInstance, CollectionInstance, DocInstance } from '../../../core/src'
+import { CreatePlugin as CreatePluginLocal } from '../../src'
+import { pokedex, PokedexEntry, generateRandomId, PluginMockRemote } from 'test-utils'
 import { O } from 'ts-toolbelt'
+// @ts-ignore
+import Vue from 'vue/dist/vue.common.js'
 
-const CreatePluginLocal = PluginMockLocal.CreatePlugin
 const CreatePluginRemote = PluginMockRemote.CreatePlugin
 
 const getInitialDataCollection = () => [
@@ -33,14 +29,16 @@ export type TrainerModuleData = {
   shouldFail?: string
 }
 
-export function createVueSyncInstance(): {
+export function createMagnetarInstance(
+  vueInstance: any = Vue
+): {
   pokedexModule: CollectionInstance<PokedexModuleData>
   trainerModule: DocInstance<TrainerModuleData>
-  vueSync: VueSyncInstance
+  magnetar: MagnetarInstance
 } {
-  const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
+  const local = CreatePluginLocal({ storeName: 'local', generateRandomId, vueInstance })
   const remote = CreatePluginRemote({ storeName: 'remote' })
-  const vueSync = VueSync({
+  const magnetar = Magnetar({
     dataStoreName: 'local',
     stores: { local, remote },
     executionOrder: {
@@ -49,17 +47,17 @@ export function createVueSyncInstance(): {
       delete: ['local', 'remote'],
     },
   })
-  const pokedexModule = vueSync.collection<PokedexModuleData>('pokedex', {
+  const pokedexModule = magnetar.collection<PokedexModuleData>('pokedex', {
     configPerStore: {
       local: { initialData: getInitialDataCollection() }, // path for the plugin
       remote: {}, // path for the plugin
     },
   })
-  const trainerModule = vueSync.doc<TrainerModuleData>('data/trainer', {
+  const trainerModule = magnetar.doc<TrainerModuleData>('data/trainer', {
     configPerStore: {
       local: { initialData: getInitialDataDocument() }, // path for the plugin
       remote: {}, // path for the plugin
     },
   })
-  return { pokedexModule, trainerModule, vueSync }
+  return { pokedexModule, trainerModule, magnetar }
 }

@@ -1,4 +1,4 @@
-import { VueSyncPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core';
+import { MagnetarPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core';
 export interface SimpleStoreOptions {
     storeName: string;
     generateRandomId: () => string;
@@ -11,4 +11,4 @@ export interface SimpleStoreModuleConfig {
     limit?: Limit;
 }
 export declare type MakeRestoreBackup = (collectionPath: string, docId: string) => void;
-export declare const CreatePlugin: VueSyncPlugin<SimpleStoreOptions>;
+export declare const CreatePlugin: MagnetarPlugin<SimpleStoreOptions>;

@@ -27,9 +27,9 @@ function configWithDefaults(config: GlobalConfig): O.Compulsory<GlobalConfig> {
 }
 
 /**
- * This is the global Vue Sync instance that is returned when instantiating with VueSync()
+ * This is the global Vue Sync instance that is returned when instantiating with Magnetar()
  */
-export interface VueSyncInstance {
+export interface MagnetarInstance {
   globalConfig: O.Compulsory<GlobalConfig>
   collection: CollectionFn
   doc: DocFn
@@ -55,9 +55,9 @@ export type DocFn<DocDataTypeInherited extends Record<string, any> = Record<stri
   moduleConfig?: ModuleConfig
 ) => DocInstance<DocDataType>
 
-export function VueSync(vueSyncConfig: GlobalConfig): VueSyncInstance {
+export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
   // the passed GlobalConfig is merged onto defaults
-  const globalConfig = configWithDefaults(vueSyncConfig)
+  const globalConfig = configWithDefaults(magnetarConfig)
 
   type ModuleIdentifier = { modulePath: string; moduleConfig: ModuleConfig }
   /**
@@ -114,7 +114,7 @@ export function VueSync(vueSyncConfig: GlobalConfig): VueSyncInstance {
     return getModuleInstance(modulePath, moduleConfig, 'doc', doc as DocFn, collection as CollectionFn) as DocInstance // prettier-ignore
   }
 
-  const instance: VueSyncInstance = {
+  const instance: MagnetarInstance = {
     globalConfig,
     collection: collection as CollectionFn,
     doc: doc as DocFn,

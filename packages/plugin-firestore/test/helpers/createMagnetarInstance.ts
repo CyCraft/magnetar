@@ -1,4 +1,4 @@
-import { VueSync, VueSyncInstance, CollectionInstance, DocInstance } from '../../../core/src'
+import { Magnetar, MagnetarInstance, CollectionInstance, DocInstance } from '../../../core/src'
 import { CreatePlugin as CreatePluginRemote } from '../../src'
 import { pokedex, PokedexEntry, generateRandomId, PluginMockLocal } from 'test-utils'
 import { O } from 'ts-toolbelt'
@@ -31,7 +31,7 @@ export type TrainerModuleData = {
 
 const testNamesUsedSoFar: string[] = []
 
-export async function createVueSyncInstance(
+export async function createMagnetarInstance(
   testName: string,
   {
     insertDocs = {},
@@ -40,7 +40,7 @@ export async function createVueSyncInstance(
 ): Promise<{
   pokedexModule: CollectionInstance<PokedexModuleData>
   trainerModule: DocInstance<TrainerModuleData>
-  vueSync: VueSyncInstance
+  magnetar: MagnetarInstance
 }> {
   if (testName.includes('/')) throw new Error('no / in test names allowed!')
   if (!['read', 'read-no-access'].includes(testName) && testNamesUsedSoFar.includes(testName)) {
@@ -51,11 +51,11 @@ export async function createVueSyncInstance(
 
   // prepare the firestore side
   const deletePromises = deletePaths.map((path) => {
-    const docPath = `vueSyncTests/${testName}${path ? '/' + path : ''}`
+    const docPath = `magnetarTests/${testName}${path ? '/' + path : ''}`
     return firestore.doc(docPath).delete()
   })
   const insertPromises = Object.entries(insertDocs).map(([path, data]) => {
-    const docPath = `vueSyncTests/${testName}${path ? '/' + path : ''}`
+    const docPath = `magnetarTests/${testName}${path ? '/' + path : ''}`
     return firestore.doc(docPath).set(data)
   })
   await Promise.all(deletePromises.concat(insertPromises))
@@ -63,7 +63,7 @@ export async function createVueSyncInstance(
   // create & prepare the modules
   const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
   const remote = CreatePluginRemote({ firestoreInstance: firestore })
-  const vueSync = VueSync({
+  const magnetar = Magnetar({
     dataStoreName: 'local',
     stores: { local, remote },
     executionOrder: {
@@ -72,18 +72,18 @@ export async function createVueSyncInstance(
       delete: ['local', 'remote'],
     },
   })
-  const pokedexModule = vueSync.collection<PokedexModuleData>('pokedex', {
+  const pokedexModule = magnetar.collection<PokedexModuleData>('pokedex', {
     configPerStore: {
       local: { initialData: getInitialDataCollection() },
-      remote: { firestorePath: `vueSyncTests/${testName}/pokedex` },
+      remote: { firestorePath: `magnetarTests/${testName}/pokedex` },
     },
   })
 
-  const trainerModule = vueSync.doc<TrainerModuleData>('data/trainer', {
+  const trainerModule = magnetar.doc<TrainerModuleData>('data/trainer', {
     configPerStore: {
       local: { initialData: getInitialDataDocument() },
-      remote: { firestorePath: `vueSyncTests/${testName}` },
+      remote: { firestorePath: `magnetarTests/${testName}` },
     },
   })
-  return { pokedexModule, trainerModule, vueSync }
+  return { pokedexModule, trainerModule, magnetar }
 }

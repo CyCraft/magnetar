@@ -1,14 +1,14 @@
 import test from 'ava'
-import { VueSync } from '../../src/index'
+import { Magnetar } from '../../src/index'
 import { PluginMockLocal, generateRandomId, pokedex } from 'test-utils'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 
 const CreatePluginLocal = PluginMockLocal.CreatePlugin
 
 test('emits global, module and action events', async (t) => {
   const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
   const ranAllEvents: any[] = []
-  const vueSync = VueSync({
+  const magnetar = Magnetar({
     dataStoreName: 'local',
     stores: { local },
     executionOrder: {
@@ -21,7 +21,7 @@ test('emits global, module and action events', async (t) => {
       },
     },
   })
-  const usersModule = vueSync.collection('users', {
+  const usersModule = magnetar.collection('users', {
     on: {
       before: ({ payload, storeName }) => {
         if (storeName === 'local') ranAllEvents.push(payload)
@@ -43,7 +43,7 @@ test('emits global, module and action events', async (t) => {
 
 test('can modify payload in global, module and action settings', async (t) => {
   const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
-  const vueSync = VueSync({
+  const magnetar = Magnetar({
     dataStoreName: 'local',
     stores: { local },
     executionOrder: {
@@ -56,7 +56,7 @@ test('can modify payload in global, module and action settings', async (t) => {
       },
     },
   })
-  const usersModule = vueSync.collection('users', {
+  const usersModule = magnetar.collection('users', {
     modifyPayloadOn: {
       insert: (payload) => {
         return { ...payload, addedInModule: true }
@@ -81,7 +81,7 @@ test('can modify payload in global, module and action settings', async (t) => {
 })
 
 test('can overwrite execution order', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const insertPayload = pokedex(7)
   await pokedexModule.insert(insertPayload)
   let ranAllEvents: string[] = []

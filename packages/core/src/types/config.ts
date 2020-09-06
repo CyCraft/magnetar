@@ -33,7 +33,7 @@ export type SharedConfig = {
 }
 
 /**
- * The VueSync global options. Can be overwritten on a per-module or per-action basis.
+ * The Magnetar global options. Can be overwritten on a per-module or per-action basis.
  */
 export type GlobalConfig = O.Merge<
   O.Compulsory<Partial<SharedConfig>, 'dataStoreName'>,

@@ -4,11 +4,11 @@ import { handleAction } from './handleAction'
 import { getEventNameFnsMap } from '../types/events'
 import {
   ActionConfig,
-  VueSyncGetAction,
-  VueSyncWriteAction,
-  VueSyncDeleteAction,
-  VueSyncDeletePropAction,
-  VueSyncInsertAction,
+  MagnetarGetAction,
+  MagnetarWriteAction,
+  MagnetarDeleteAction,
+  MagnetarDeletePropAction,
+  MagnetarInsertAction,
   ActionName,
 } from '../types/actions'
 import { ActionType, ActionTernary } from '../types/actionsInternal'
@@ -20,7 +20,7 @@ import { throwIfNoFnsToExecute } from '../helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from '../types/config'
 import { CollectionInstance } from '../Collection'
 import { DocInstance } from '../Doc'
-import { CollectionFn, DocFn } from '../VueSync'
+import { CollectionFn, DocFn } from '../Magnetar'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers'
 
 export function handleActionPerStore<TActionName extends Exclude<ActionName, 'stream'>>(
@@ -42,11 +42,11 @@ export function handleActionPerStore(
   docFn: DocFn, // actions executed on a "doc" will always return `doc()`
   collectionFn?: CollectionFn // actions executed on a "collection" will return `collection()` or `doc()`
 ):
-  | VueSyncGetAction<any>
-  | VueSyncWriteAction<any>
-  | VueSyncInsertAction<any>
-  | VueSyncDeleteAction<any>
-  | VueSyncDeletePropAction<any> {
+  | MagnetarGetAction<any>
+  | MagnetarWriteAction<any>
+  | MagnetarInsertAction<any>
+  | MagnetarDeleteAction<any>
+  | MagnetarDeletePropAction<any> {
   // returns the action the dev can call with myModule.insert() etc.
   return async function (
     payload?: any,

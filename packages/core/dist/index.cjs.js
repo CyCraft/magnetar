@@ -644,9 +644,9 @@ function configWithDefaults(config) {
     const merged = mergeAnything.merge(defaults, config);
     return merged;
 }
-function VueSync(vueSyncConfig) {
+function Magnetar(magnetarConfig) {
     // the passed GlobalConfig is merged onto defaults
-    const globalConfig = configWithDefaults(vueSyncConfig);
+    const globalConfig = configWithDefaults(magnetarConfig);
     /**
      * takes care of the caching instances of modules. Todo: double check memory leaks for when an instance isn't referenced anymore.
      */
@@ -692,7 +692,7 @@ function VueSync(vueSyncConfig) {
     return instance;
 }
 
-exports.VueSync = VueSync;
+exports.Magnetar = Magnetar;
 exports.getCollectionPathDocIdEntry = getCollectionPathDocIdEntry;
 exports.isCollectionModule = isCollectionModule;
 exports.isDoOnGet = isDoOnGet;

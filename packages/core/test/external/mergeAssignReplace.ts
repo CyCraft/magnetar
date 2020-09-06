@@ -1,9 +1,9 @@
 import test from 'ava'
-import { createVueSyncInstance } from '../helpers/createVueSyncInstance'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex } from 'test-utils'
 
 test('merge', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const payload = { base: { HP: 9000 } }
   t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
@@ -30,7 +30,7 @@ test('merge', async (t) => {
 })
 
 test('assign', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const payload = { base: { HP: 9000 } }
   t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
@@ -52,7 +52,7 @@ test('assign', async (t) => {
 })
 
 test('replace', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const payload = { base: { HP: 9000 } }
   t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
@@ -67,7 +67,7 @@ test('replace', async (t) => {
 })
 
 test('revert: merge', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const payload = { base: { HP: 9000 }, shouldFail: 'remote' }
   t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
@@ -82,7 +82,7 @@ test('revert: merge', async (t) => {
 })
 
 test('revert: assign', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const payload = { base: { HP: 9000 }, shouldFail: 'remote' }
   t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
@@ -97,7 +97,7 @@ test('revert: assign', async (t) => {
 })
 
 test('revert: replace', async (t) => {
-  const { pokedexModule } = createVueSyncInstance()
+  const { pokedexModule } = createMagnetarInstance()
   const payload = { base: { HP: 9000 }, shouldFail: 'remote' }
   t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
