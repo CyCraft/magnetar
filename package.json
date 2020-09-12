@@ -1,5 +1,6 @@
 {
   "name": "magnetar",
+  "private": true,
   "scripts": {
     "audit": "lerna-audit",
     "dev": "cd packages/dev && npm run dev",
@@ -10,8 +11,8 @@
     "publish": "npm run build && lerna publish",
     "deploy:docs": "npm run build && firebase deploy --only hosting && git add -A && git commit -m \"chore: deploy\"",
     "dep:install": "npm i && lerna bootstrap",
-    "dep:update-all": "ncu --semverLevel major -u && lerna exec 'ncu --semverLevel major -u' && npm run dep:install",
-    "dep:check-for-updates": "ncu --semverLevel major && lerna exec 'ncu --semverLevel major'",
+    "dep:update-all": "ncu --target minor -u && lerna exec 'ncu --target minor -u' && npm run dep:install",
+    "dep:check-for-updates": "ncu --target minor && lerna exec 'ncu --target minor'",
     "dep:reinstall-all": "rimraf node_modules && lerna clean -y && npm run dep:install"
   },
   "devDependencies": {
@@ -29,7 +30,7 @@
     "jsdom-global": "^3.0.2",
     "lerna": "^3.22.1",
     "node-sass": "^4.14.1",
-    "npm-check-updates": "^8.1.0",
+    "npm-check-updates": "^9.0.1",
     "prettier": "^2.1.1",
     "rimraf": "^3.0.2",
     "rollup": "^2.26.10",
