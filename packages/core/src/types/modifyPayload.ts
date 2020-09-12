@@ -1,5 +1,4 @@
 import { O } from 'ts-toolbelt'
-import {} from './atoms'
 
 export type ModifyWritePayload = (payload: Record<string, any>) => Record<string, any>
 export type ModifyDeletePropPayload = (payload: string | string[]) => string | string[]

@@ -1,6 +1,5 @@
 import { O } from 'ts-toolbelt'
 import { ActionName } from './actions'
-import {} from './atoms'
 import { GetResponse, StreamResponse, DoOnStream, DoOnGet } from './plugins'
 
 // events

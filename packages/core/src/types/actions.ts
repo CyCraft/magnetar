@@ -71,7 +71,7 @@ export type MagnetarDeleteAction<DocDataType extends Record<string, any> = Recor
 ) => Promise<DocInstance<DocDataType>>
 
 /**
- * A WeakMap of all open streams with the payload passed to `stream(payload)` as key and the `unsubscribe` function as value. In case `stream()` had no payload, use `{}`
+ * All open streams with the payload passed to `stream(payload)` as key and the `unsubscribe` function as value. In case `stream()` had no payload, use `{}`
  * @example
  * collection('myDocs').stream()
  * const unsubscribe = collection('myDocs').openStreams.get({})
