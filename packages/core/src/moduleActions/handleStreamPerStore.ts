@@ -1,6 +1,13 @@
 import { O } from 'ts-toolbelt'
 import { handleStream } from './handleStream'
-import { ActionConfig, MagnetarStreamAction, OpenStreams } from '../types/actions'
+import {
+  ActionConfig,
+  MagnetarStreamAction,
+  OpenStreams,
+  FindStream,
+  OpenStreamPromises,
+  FindStreamPromise,
+} from '../types/actions'
 import { ActionType } from '../types/actionsInternal'
 import { StreamResponse, DoOnStreamFns, isDoOnStream, DoOnStream } from '../types/plugins'
 import { getEventNameFnsMap } from '../types/events'
@@ -10,16 +17,25 @@ import { executeOnFns } from '../helpers/executeOnFns'
 import { throwOnIncompleteStreamResponses, throwIfNoFnsToExecute } from '../helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from '../types/config'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers'
+import { isPromise } from 'is-what'
 
 export function handleStreamPerStore(
   [collectionPath, docId]: [string, string | undefined],
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
   actionType: ActionType,
-  openStreams: OpenStreams
+  streams: {
+    openStreams: OpenStreams
+    findStream: FindStream
+    openStreamPromises: OpenStreamPromises
+    findStreamPromise: FindStreamPromise
+  }
 ): MagnetarStreamAction {
   // returns the action the dev can call with myModule.insert() etc.
   return async function (payload?: any, actionConfig: ActionConfig = {}): Promise<void> {
+    const { openStreams, openStreamPromises, findStreamPromise } = streams
+    const foundStreamPromise = findStreamPromise(payload)
+    if (isPromise(foundStreamPromise)) return foundStreamPromise
     // get all the config needed to perform this action
     const eventNameFnsMap = getEventNameFnsMap(globalConfig.on, moduleConfig.on, actionConfig.on)
     const modifyPayloadFnsMap = getModifyPayloadFnsMap(
@@ -94,17 +110,25 @@ export function handleStreamPerStore(
       }
     }
     throwOnIncompleteStreamResponses(streamInfoPerStore, doOnStreamFns)
+    // handle saving the returned promises
+    const openStreamIdentifier = payload ?? undefined
     const streamPromises = Object.values(streamInfoPerStore).map(({ streaming }) => streaming)
-    // create a function to unsubscribe from the stream of each store
-    const unsubscribe = (): void => Object.values(streamInfoPerStore).forEach(({ stop }) => stop())
-    const openStreamIdentifier = payload ?? {}
-    openStreams.set(openStreamIdentifier, unsubscribe)
-    // return all the stream promises as one promise
-    return new Promise((resolve, reject) => {
+    // create a single stream promise from multiple stream promises the store plugins return
+    const streamPromise: Promise<void> = new Promise((resolve, reject) => {
       Promise.all(streamPromises)
         // todo: why can I not just write then(resolve)
         .then(() => resolve())
         .catch(reject)
     })
+    // set the streamPromise in the openStreamPromises
+    openStreamPromises.set(openStreamIdentifier, streamPromise)
+    // create a function to closeStream from the stream of each store
+    const closeStream = (): void => {
+      Object.values(streamInfoPerStore).forEach(({ stop }) => stop())
+      openStreams.delete(openStreamIdentifier)
+    }
+    openStreams.set(openStreamIdentifier, closeStream)
+    // return the stream promise
+    return streamPromise
   }
 }

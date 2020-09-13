@@ -4,6 +4,9 @@ import {
   MagnetarStreamAction,
   MagnetarInsertAction,
   OpenStreams,
+  FindStream,
+  OpenStreamPromises,
+  FindStreamPromise,
 } from './types/actions'
 import { actionNameTypeMap } from './types/actionsInternal'
 import { handleActionPerStore } from './moduleActions/handleActionPerStore'
@@ -19,14 +22,10 @@ export type CollectionInstance<DocDataType extends Record<string, any> = Record<
   doc: DocFn<DocDataType>
   id: string
   path: string
-  /**
-   * All open streams with the payload passed to `stream(payload)` as key and the `unsubscribe` function as value. In case `stream()` had no payload, use `{}`
-   * @type { WeakMap<Record<string, any>, () => void> }
-   * @example
-   * collection('myDocs').stream()
-   * const unsubscribe = collection('myDocs').openStreams.get({})
-   */
   openStreams: OpenStreams
+  findStream: FindStream
+  openStreamPromises: OpenStreamPromises
+  findStreamPromise: FindStreamPromise
 
   // actions
   get: MagnetarGetAction<DocDataType, 'collection'>
@@ -45,8 +44,14 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
   globalConfig: O.Compulsory<GlobalConfig>,
   docFn: DocFn<DocDataType>,
   collectionFn: CollectionFn<DocDataType>,
-  openStreams: OpenStreams
+  streams: {
+    openStreams: OpenStreams
+    findStream: FindStream
+    openStreamPromises: OpenStreamPromises
+    findStreamPromise: FindStreamPromise
+  }
 ): CollectionInstance<DocDataType> {
+  const { openStreams, findStream, openStreamPromises, findStreamPromise } = streams
   const id = collectionPath.split('/').slice(-1)[0]
   const path = collectionPath
 
@@ -56,7 +61,7 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
 
   const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.get, docFn, collectionFn) as MagnetarInsertAction<DocDataType> //prettier-ignore
   const get = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn, collectionFn) as MagnetarGetAction<DocDataType, 'collection'> //prettier-ignore
-  const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, openStreams) // prettier-ignore
+  const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streams) // prettier-ignore
 
   const actions = { stream, get, insert }
 
@@ -93,6 +98,9 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
     id,
     path,
     openStreams,
+    findStream,
+    openStreamPromises,
+    findStreamPromise,
     ...actions,
     ...queryFns,
   }

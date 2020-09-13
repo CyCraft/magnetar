@@ -7,7 +7,7 @@ test('get (collection)', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
   t.deepEqual(pokedexModule.doc('136').data, undefined)
-  t.deepEqual(pokedexModule.data.size, 1)
+  t.is(pokedexModule.data.size, 1)
 
   try {
     await pokedexModule.get()
@@ -16,7 +16,7 @@ test('get (collection)', async (t) => {
   }
   t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
   t.deepEqual(pokedexModule.doc('136').data, pokedex(136))
-  t.deepEqual(pokedexModule.data.size, 151)
+  t.is(pokedexModule.data.size, 151)
 })
 
 test('get (document)', async (t) => {

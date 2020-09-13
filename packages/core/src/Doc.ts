@@ -7,6 +7,9 @@ import {
   MagnetarDeletePropAction,
   MagnetarInsertAction,
   OpenStreams,
+  FindStream,
+  OpenStreamPromises,
+  FindStreamPromise,
 } from './types/actions'
 import { actionNameTypeMap } from './types/actionsInternal'
 import { handleActionPerStore } from './moduleActions/handleActionPerStore'
@@ -21,6 +24,9 @@ export type DocInstance<DocDataType extends Record<string, any> = Record<string,
   id: string
   path: string
   openStreams: OpenStreams
+  findStream: FindStream
+  openStreamPromises: OpenStreamPromises
+  findStreamPromise: FindStreamPromise
 
   // actions
   get: MagnetarGetAction<DocDataType, 'doc'>
@@ -47,8 +53,14 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
   globalConfig: O.Compulsory<GlobalConfig>,
   docFn: DocFn<DocDataType>,
   collectionFn: CollectionFn,
-  openStreams: OpenStreams
+  streams: {
+    openStreams: OpenStreams
+    findStream: FindStream
+    openStreamPromises: OpenStreamPromises
+    findStreamPromise: FindStreamPromise
+  }
 ): DocInstance<DocDataType> {
+  const { openStreams, findStream, openStreamPromises, findStreamPromise } = streams
   const id = docId
   const path = [collectionPath, docId].join('/')
 
@@ -64,13 +76,7 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
     deleteProp: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'deleteProp', actionNameTypeMap.deleteProp, docFn) as MagnetarDeletePropAction<DocDataType>), // prettier-ignore
     delete: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn) as MagnetarDeleteAction<DocDataType>), // prettier-ignore
     get: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn) as MagnetarGetAction<DocDataType, 'doc'>), // prettier-ignore
-    stream: handleStreamPerStore(
-      [collectionPath, docId],
-      moduleConfig,
-      globalConfig,
-      actionNameTypeMap.stream,
-      openStreams
-    ),
+    stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streams), // prettier-ignore
   }
 
   // Every store will have its 'setupModule' function executed
@@ -81,6 +87,9 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
     id: id as string,
     path,
     openStreams,
+    findStream,
+    openStreamPromises,
+    findStreamPromise,
     ...actions,
   }
 

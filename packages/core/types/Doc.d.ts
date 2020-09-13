@@ -1,5 +1,5 @@
 import { O } from 'ts-toolbelt';
-import { MagnetarWriteAction, MagnetarGetAction, MagnetarStreamAction, MagnetarDeleteAction, MagnetarDeletePropAction, MagnetarInsertAction, OpenStreams } from './types/actions';
+import { MagnetarWriteAction, MagnetarGetAction, MagnetarStreamAction, MagnetarDeleteAction, MagnetarDeletePropAction, MagnetarInsertAction, OpenStreams, FindStream, OpenStreamPromises, FindStreamPromise } from './types/actions';
 import { ModuleConfig, GlobalConfig } from './types/config';
 import { CollectionFn, DocFn } from './Magnetar';
 export declare type DocInstance<DocDataType extends Record<string, any> = Record<string, any>> = {
@@ -8,6 +8,9 @@ export declare type DocInstance<DocDataType extends Record<string, any> = Record
     id: string;
     path: string;
     openStreams: OpenStreams;
+    findStream: FindStream;
+    openStreamPromises: OpenStreamPromises;
+    findStreamPromise: FindStreamPromise;
     get: MagnetarGetAction<DocDataType, 'doc'>;
     stream: MagnetarStreamAction;
     insert: MagnetarInsertAction<DocDataType>;
@@ -25,4 +28,9 @@ export declare type DocInstance<DocDataType extends Record<string, any> = Record
      */
     delete: MagnetarDeleteAction<DocDataType>;
 };
-export declare function createDocWithContext<DocDataType extends Record<string, any>>([collectionPath, docId]: [string, string | undefined], moduleConfig: ModuleConfig, globalConfig: O.Compulsory<GlobalConfig>, docFn: DocFn<DocDataType>, collectionFn: CollectionFn, openStreams: OpenStreams): DocInstance<DocDataType>;
+export declare function createDocWithContext<DocDataType extends Record<string, any>>([collectionPath, docId]: [string, string | undefined], moduleConfig: ModuleConfig, globalConfig: O.Compulsory<GlobalConfig>, docFn: DocFn<DocDataType>, collectionFn: CollectionFn, streams: {
+    openStreams: OpenStreams;
+    findStream: FindStream;
+    openStreamPromises: OpenStreamPromises;
+    findStreamPromise: FindStreamPromise;
+}): DocInstance<DocDataType>;

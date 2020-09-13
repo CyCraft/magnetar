@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { pokedex, waitMs, PokedexEntry } from 'test-utils'
+import { pokedex, PokedexEntry } from 'test-utils'
 import { merge } from 'merge-anything'
 import { DocInstance } from '../../src'
 
@@ -103,47 +103,11 @@ test('write: merge (document)', async (t) => {
   t.deepEqual(doc.data, mergedResult)
 })
 
-test('read: stream (collection)', async (t) => {
-  const { pokedexModule } = createMagnetarInstance()
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-  t.deepEqual(pokedexModule.data.size, 1)
-  const payload = {}
-  // do not await, because it only resolves when the stream is closed
-  pokedexModule.stream(payload).catch((e: any) => t.fail(e.message)) // prettier-ignore
-  await waitMs(600)
-  // close the stream:
-  const unsubscribe = pokedexModule.openStreams.get(payload)
-  if (unsubscribe) unsubscribe()
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-  t.deepEqual(pokedexModule.data.get('2'), pokedex(2))
-  t.deepEqual(pokedexModule.data.get('3'), pokedex(3))
-  t.deepEqual(pokedexModule.data.size, 3)
-  await waitMs(1000)
-  t.deepEqual(pokedexModule.data.size, 3)
-  // '4': charmander should come in next, but doesn't because we closed the stream
-})
-
-test('read: stream (doc)', async (t) => {
-  const { trainerModule } = createMagnetarInstance()
-  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
-  const payload = {}
-  // do not await, because it only resolves when the stream is closed
-  trainerModule.stream(payload).catch((e: any) => t.fail(e.message)) // prettier-ignore
-  await waitMs(600)
-  // close the stream:
-  const unsubscribe = trainerModule.openStreams.get(payload)
-  if (unsubscribe) unsubscribe()
-  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
-  await waitMs(1000)
-  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
-  // {colour: 'blue'} should come in 3rd, but doesn't because we closed the stream
-})
-
 test('read: get (collection)', async (t) => {
   // 'get' resolves once all stores have given a response with data
   const { pokedexModule } = createMagnetarInstance()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-  t.deepEqual(pokedexModule.data.size, 1)
+  t.is(pokedexModule.data.size, 1)
   try {
     const result = await pokedexModule.get()
     t.deepEqual(result.data.get('1'), pokedex(1))
@@ -153,7 +117,7 @@ test('read: get (collection)', async (t) => {
   }
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.deepEqual(pokedexModule.data.get('136'), pokedex(136))
-  t.deepEqual(pokedexModule.data.size, 151)
+  t.is(pokedexModule.data.size, 151)
 })
 
 test('read: get (document)', async (t) => {
@@ -193,24 +157,3 @@ test('get (collection) where-filter: ==', async (t) => {
   // see if the main module has also received this data
   t.deepEqual([...pokedexModule.data.values()], [pokedex(1), pokedex(136)])
 })
-
-// test('stream (collection) opening the same stream twice will pass on the promise of the first stream', async t => {
-//   const { pokedexModule } = createMagnetarInstance()
-//   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-//   t.deepEqual(pokedexModule.data.size, 1)
-//   const payload = {}
-//   // do not await, because it only resolves when the stream is closed
-//   pokedexModule.stream(payload).catch((e: any) => t.fail(e.message)) // prettier-ignore
-//   await waitMs(600)
-//   pokedexModule.stream(payload).catch((e: any) => t.fail(e.message)) // prettier-ignore
-//   // close the stream:
-//   const unsubscribe = pokedexModule.openStreams.get(payload)
-//   if (unsubscribe) unsubscribe()
-//   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-//   t.deepEqual(pokedexModule.data.get('2'), pokedex(2))
-//   t.deepEqual(pokedexModule.data.get('3'), pokedex(3))
-//   t.deepEqual(pokedexModule.data.size, 3)
-//   await waitMs(1000)
-//   t.deepEqual(pokedexModule.data.size, 3)
-//   // '4': charmander should come in next, but doesn't because we closed the stream
-// })

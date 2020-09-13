@@ -483,10 +483,14 @@ function handleStream(args) {
     });
 }
 
-function handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionType, openStreams) {
+function handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionType, streams) {
     // returns the action the dev can call with myModule.insert() etc.
     return function (payload, actionConfig = {}) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { openStreams, openStreamPromises, findStreamPromise } = streams;
+            const foundStreamPromise = findStreamPromise(payload);
+            if (isWhat.isPromise(foundStreamPromise))
+                return foundStreamPromise;
             // get all the config needed to perform this action
             const eventNameFnsMap = getEventNameFnsMap(globalConfig.on, moduleConfig.on, actionConfig.on);
             const modifyPayloadFnsMap = getModifyPayloadFnsMap(globalConfig.modifyPayloadOn, moduleConfig.modifyPayloadOn, actionConfig.modifyPayloadOn);
@@ -549,23 +553,32 @@ function handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfi
                 }
             }
             throwOnIncompleteStreamResponses(streamInfoPerStore, doOnStreamFns);
+            // handle saving the returned promises
+            const openStreamIdentifier = payload !== null && payload !== void 0 ? payload : undefined;
             const streamPromises = Object.values(streamInfoPerStore).map(({ streaming }) => streaming);
-            // create a function to unsubscribe from the stream of each store
-            const unsubscribe = () => Object.values(streamInfoPerStore).forEach(({ stop }) => stop());
-            const openStreamIdentifier = payload !== null && payload !== void 0 ? payload : {};
-            openStreams.set(openStreamIdentifier, unsubscribe);
-            // return all the stream promises as one promise
-            return new Promise((resolve, reject) => {
+            // create a single stream promise from multiple stream promises the store plugins return
+            const streamPromise = new Promise((resolve, reject) => {
                 Promise.all(streamPromises)
                     // todo: why can I not just write then(resolve)
                     .then(() => resolve())
                     .catch(reject);
             });
+            // set the streamPromise in the openStreamPromises
+            openStreamPromises.set(openStreamIdentifier, streamPromise);
+            // create a function to closeStream from the stream of each store
+            const closeStream = () => {
+                Object.values(streamInfoPerStore).forEach(({ stop }) => stop());
+                openStreams.delete(openStreamIdentifier);
+            };
+            openStreams.set(openStreamIdentifier, closeStream);
+            // return the stream promise
+            return streamPromise;
         });
     };
 }
 
-function createCollectionWithContext([collectionPath, docId], moduleConfig, globalConfig, docFn, collectionFn, openStreams) {
+function createCollectionWithContext([collectionPath, docId], moduleConfig, globalConfig, docFn, collectionFn, streams) {
+    const { openStreams, findStream, openStreamPromises, findStreamPromise } = streams;
     const id = collectionPath.split('/').slice(-1)[0];
     const path = collectionPath;
     const doc = (docId, _moduleConfig = {}) => {
@@ -573,7 +586,7 @@ function createCollectionWithContext([collectionPath, docId], moduleConfig, glob
     };
     const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.get, docFn, collectionFn); //prettier-ignore
     const get = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn, collectionFn); //prettier-ignore
-    const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, openStreams); // prettier-ignore
+    const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streams); // prettier-ignore
     const actions = { stream, get, insert };
     // Every store will have its 'setupModule' function executed
     executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig);
@@ -594,7 +607,10 @@ function createCollectionWithContext([collectionPath, docId], moduleConfig, glob
     const moduleInstance = Object.assign(Object.assign({ doc,
         id,
         path,
-        openStreams }, actions), queryFns);
+        openStreams,
+        findStream,
+        openStreamPromises,
+        findStreamPromise }, actions), queryFns);
     /**
      * The data returned by the store specified as 'dataStoreName'
      */
@@ -602,7 +618,8 @@ function createCollectionWithContext([collectionPath, docId], moduleConfig, glob
     return new Proxy(moduleInstance, dataProxyHandler);
 }
 
-function createDocWithContext([collectionPath, docId], moduleConfig, globalConfig, docFn, collectionFn, openStreams) {
+function createDocWithContext([collectionPath, docId], moduleConfig, globalConfig, docFn, collectionFn, streams) {
+    const { openStreams, findStream, openStreamPromises, findStreamPromise } = streams;
     const id = docId;
     const path = [collectionPath, docId].join('/');
     const collection = (collectionId, _moduleConfig = {}) => {
@@ -616,17 +633,35 @@ function createDocWithContext([collectionPath, docId], moduleConfig, globalConfi
         deleteProp: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'deleteProp', actionNameTypeMap.deleteProp, docFn),
         delete: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn),
         get: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn),
-        stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, openStreams),
+        stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streams),
     };
     // Every store will have its 'setupModule' function executed
     executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig);
     const moduleInstance = Object.assign({ collection, id: id, path,
-        openStreams }, actions);
+        openStreams,
+        findStream,
+        openStreamPromises,
+        findStreamPromise }, actions);
     /**
      * The data returned by the store specified as 'dataStoreName'
      */
     const dataProxyHandler = getDataProxyHandler([collectionPath, docId], moduleConfig, globalConfig);
     return new Proxy(moduleInstance, dataProxyHandler);
+}
+
+/**
+ * Tries to find a value of a map for a given key. The key does not have to be the original payload passed.
+ */
+function findMapValueForKey(map, mapKey) {
+    if (!map)
+        return undefined;
+    const mapKeys = [...map.keys()];
+    // @ts-ignore
+    const keyIndex = mapKeys.map(JSON.stringify).findIndex((str) => str === JSON.stringify(mapKey)); // prettier-ignore
+    if (keyIndex === -1)
+        return undefined;
+    const originalPayload = mapKeys[keyIndex];
+    return map.get(originalPayload);
 }
 
 function configWithDefaults(config) {
@@ -652,9 +687,13 @@ function Magnetar(magnetarConfig) {
      */
     const moduleMap = new WeakMap(); // apply type upon get/set
     /**
-     * the global storage for subscriptions
+     * the global storage for closeStream functions
      */
-    const streamSubscribtionMap = new Map(); // apply type upon get/set
+    const streamCloseFnMap = new Map(); // apply type upon get/set
+    /**
+     * the global storage for open stream promises
+     */
+    const streamPromiseMap = new Map(); // apply type upon get/set
     function getModuleInstance(modulePath, moduleConfig = {}, moduleType, docFn, collectionFn) {
         throwIfInvalidModulePath(modulePath, moduleType);
         const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath);
@@ -665,15 +704,22 @@ function Magnetar(magnetarConfig) {
         if (cachedInstance)
             return cachedInstance;
         // else create and cache a new instance
-        // first create the stream subscribtion map for this module
-        if (!streamSubscribtionMap.has(modulePath)) {
-            streamSubscribtionMap.set(modulePath, new Map());
+        // first create the streamCloseFnMap and streamPromiseMap for this module
+        if (!streamCloseFnMap.has(modulePath)) {
+            streamCloseFnMap.set(modulePath, new Map());
         }
-        const openStreams = streamSubscribtionMap.get(modulePath);
+        if (!streamPromiseMap.has(modulePath)) {
+            streamPromiseMap.set(modulePath, new Map());
+        }
+        const openStreams = streamCloseFnMap.get(modulePath);
+        const findStream = (streamPayload) => findMapValueForKey(openStreams, streamPayload);
+        const openStreamPromises = streamPromiseMap.get(modulePath);
+        const findStreamPromise = (streamPayload) => findMapValueForKey(openStreamPromises, streamPayload);
+        const streams = { openStreams, findStream, openStreamPromises, findStreamPromise };
         // then create the module instance
         const createInstanceWithContext = moduleType === 'doc' ? createDocWithContext : createCollectionWithContext;
         // @ts-ignore
-        const moduleInstance = createInstanceWithContext([collectionPath, docId], moduleConfig, globalConfig, docFn, collectionFn, openStreams);
+        const moduleInstance = createInstanceWithContext([collectionPath, docId], moduleConfig, globalConfig, docFn, collectionFn, streams);
         moduleMap.set(moduleIdentifier, moduleInstance);
         return moduleInstance;
     }

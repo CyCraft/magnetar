@@ -8,7 +8,7 @@ import { pokedex, waitMs } from 'test-utils'
     const { pokedexModule } = await createMagnetarInstance('read')
     t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
     t.deepEqual(pokedexModule.doc('136').data, undefined)
-    t.deepEqual(pokedexModule.data.size, 1)
+    t.is(pokedexModule.data.size, 1)
 
     const payload = {}
     // do not await, because it only resolves when the stream is closed
@@ -16,13 +16,13 @@ import { pokedex, waitMs } from 'test-utils'
     await waitMs(3500)
 
     // close the stream:
-    const unsubscribe = pokedexModule.openStreams.get(payload)
-    if (unsubscribe) unsubscribe()
+    const closeStream = pokedexModule.openStreams.get(payload)
+    if (closeStream) closeStream()
 
     t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
     t.deepEqual(pokedexModule.data.get('2'), pokedex(2))
     t.deepEqual(pokedexModule.data.get('3'), pokedex(3))
-    t.deepEqual(pokedexModule.data.size, 151)
+    t.is(pokedexModule.data.size, 151)
   })
 }
 {
@@ -37,8 +37,8 @@ import { pokedex, waitMs } from 'test-utils'
     await waitMs(3500)
 
     // close the stream:
-    const unsubscribe = trainerModule.openStreams.get(payload)
-    if (unsubscribe) unsubscribe()
+    const closeStream = trainerModule.openStreams.get(payload)
+    if (closeStream) closeStream()
 
     t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
   })
@@ -48,7 +48,7 @@ import { pokedex, waitMs } from 'test-utils'
   test(testName, async (t) => {
     const { pokedexModule } = await createMagnetarInstance('read')
     // the original state has 1 pokemon already
-    t.deepEqual(pokedexModule.data.size, 1)
+    t.is(pokedexModule.data.size, 1)
     // let's get some more
     const payload = {}
     const pokedexModuleWithQuery = pokedexModule
@@ -62,19 +62,19 @@ import { pokedex, waitMs } from 'test-utils'
     pokedexModuleWithQuery.stream(payload).catch((e: any) => t.fail(e.message))
 
     await waitMs(3500)
-    // the unsubscribe function to close the stream can be retrieved from the openStreams map with the "payload" as key
-    const unsubscribe = pokedexModule
+    // the closeStream function to close the stream can be retrieved from the openStreams map with the "payload" as key
+    const closeStream = pokedexModule
       .where('type', 'array-contains', 'Fire')
       .where('base.Speed', '>=', 100)
       .orderBy('base.Speed', 'asc')
       .orderBy('name', 'asc')
       .openStreams.get(payload)
-    // unsubscribe from the stream:
-    if (unsubscribe) unsubscribe()
+    // closeStream from the stream:
+    if (closeStream) closeStream()
     // the queried instance only has these 3 pokemon
     t.deepEqual([...pokedexModuleWithQuery.data.values()], [pokedex(6), pokedex(38), pokedex(78)])
     // the main instance has one pokemon from the beginning
-    t.deepEqual(pokedexModule.data.size, 4)
+    t.is(pokedexModule.data.size, 4)
   })
 }
 {
