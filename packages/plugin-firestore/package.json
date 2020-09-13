@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/plugin-firestore",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "sideEffects": false,
   "description": "Magnetar plugin firestore",
   "main": "dist/index.cjs.js",
@@ -25,7 +25,7 @@
     "ts-toolbelt": "6.12.2"
   },
   "devDependencies": {
-    "@magnetarjs/core": "^0.0.1",
+    "@magnetarjs/core": "^0.0.2",
     "ava": "^3.12.1",
     "firebase": "^7.19.1",
     "test-utils": "^0.0.1"
