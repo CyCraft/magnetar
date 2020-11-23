@@ -16,12 +16,12 @@
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "peerDependencies": {
-    "@magnetarjs/core": "^0.0.0",
+    "@magnetarjs/core": "^0.0.2",
     "firebase": "^7.19.1"
   },
   "dependencies": {
     "flatten-anything": "^2.0.2",
-    "is-what": "^3.11.2",
+    "is-what": "^3.11.3",
     "ts-toolbelt": "6.12.2"
   },
   "devDependencies": {
