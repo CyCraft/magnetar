@@ -22,7 +22,7 @@ export type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign' | 'rep
  */
 export type ActionConfig = O.Merge<
   { executionOrder?: StoreName[] },
-  Partial<O.Omit<SharedConfig, 'dataStoreName' | 'executionOrder'>>
+  Partial<O.Omit<SharedConfig, 'localStoreName' | 'executionOrder'>>
 >
 
 // these are the action types exposed to the dev via a MagnetarModule, it's what the dev will end up calling.

@@ -1,6 +1,5 @@
 import { MagnetarPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core';
 export interface SimpleStoreOptions {
-    storeName: string;
     generateRandomId: () => string;
 }
 export interface SimpleStoreModuleConfig {

@@ -5,5 +5,5 @@ export declare function throwOnIncompleteStreamResponses(streamInfoPerStore: {
     [storeName: string]: StreamResponse;
 }, doOnStreamFns: DoOnStreamFns): void;
 export declare function throwIfNoFnsToExecute(storesToExecute: string[]): void;
-export declare function throwIfNoDataStoreName(dataStoreName: string): void;
+export declare function throwIfNolocalStoreName(localStoreName: string): void;
 export declare function throwIfInvalidModulePath(modulePath: string, moduleType: 'collection' | 'doc'): void;

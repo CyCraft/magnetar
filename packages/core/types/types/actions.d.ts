@@ -20,7 +20,7 @@ export declare type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign
  */
 export declare type ActionConfig = O.Merge<{
     executionOrder?: StoreName[];
-}, Partial<O.Omit<SharedConfig, 'dataStoreName' | 'executionOrder'>>>;
+}, Partial<O.Omit<SharedConfig, 'localStoreName' | 'executionOrder'>>>;
 export declare type MagnetarStreamAction = (payload?: any | void, actionConfig?: ActionConfig) => Promise<void>;
 export declare type MagnetarGetAction<DocDataType extends Record<string, any> = Record<string, any>, calledFrom extends 'collection' | 'doc' = 'collection' | 'doc'> = (payload?: Record<string, any> | void, actionConfig?: ActionConfig) => Promise<calledFrom extends 'collection' ? CollectionInstance<DocDataType> : DocInstance<DocDataType>>;
 export declare type MagnetarInsertAction<DocDataType extends Record<string, any> = Record<string, any>> = (payload: DocDataType, actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;

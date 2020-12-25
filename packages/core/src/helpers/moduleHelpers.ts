@@ -1,6 +1,6 @@
 import { isFunction, isPlainObject } from 'is-what'
 import { GlobalConfig, ModuleConfig } from '../types/config'
-import { throwIfNoDataStoreName } from './throwFns'
+import { throwIfNolocalStoreName } from './throwFns'
 import { PluginModuleConfig } from '../types/plugins'
 
 /**
@@ -43,7 +43,7 @@ export function executeSetupModulePerStore(
 }
 
 /**
- * Returns the `getModuleData` function form the store specified as 'dataStoreName'
+ * Returns the `getModuleData` function form the store specified as 'localStoreName'
  *
  * @export
  * @template DocDataType
@@ -55,13 +55,13 @@ export function getDataFnFromDataStore<DocDataType>(
   moduleConfig: ModuleConfig,
   globalConfig: GlobalConfig
 ): (collectionPath: string, docId: string | undefined) => Map<string, DocDataType> | DocDataType {
-  const dataStoreName = moduleConfig.dataStoreName || globalConfig.dataStoreName
-  throwIfNoDataStoreName(dataStoreName)
-  const getModuleData = globalConfig.stores[dataStoreName].getModuleData
+  const localStoreName = moduleConfig.localStoreName || globalConfig.localStoreName
+  throwIfNolocalStoreName(localStoreName)
+  const getModuleData = globalConfig.stores[localStoreName].getModuleData
   if (!getModuleData) {
     throw new Error('The data store did not provide a getModuleData function!')
   }
-  const pluginModuleConfig = getPluginModuleConfig(moduleConfig, dataStoreName)
+  const pluginModuleConfig = getPluginModuleConfig(moduleConfig, localStoreName)
 
   return (collectionPath, docId): Map<string, DocDataType> | DocDataType =>
     getModuleData({ collectionPath, docId, pluginModuleConfig }) as any

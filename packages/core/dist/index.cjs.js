@@ -226,10 +226,10 @@ function throwIfNoFnsToExecute(storesToExecute) {
         logErrorAndThrow(errorMessage);
     }
 }
-function throwIfNoDataStoreName(dataStoreName) {
-    if (isWhat.isFullString(dataStoreName))
+function throwIfNolocalStoreName(localStoreName) {
+    if (isWhat.isFullString(localStoreName))
         return;
-    const errorMessage = `No 'dataStoreName' provided.`;
+    const errorMessage = `No 'localStoreName' provided.`;
     logErrorAndThrow(errorMessage);
 }
 function throwIfInvalidModulePath(modulePath, moduleType) {
@@ -282,7 +282,7 @@ function executeSetupModulePerStore(globalConfigStores, [collectionPath, docId],
     }
 }
 /**
- * Returns the `getModuleData` function form the store specified as 'dataStoreName'
+ * Returns the `getModuleData` function form the store specified as 'localStoreName'
  *
  * @export
  * @template DocDataType
@@ -291,13 +291,13 @@ function executeSetupModulePerStore(globalConfigStores, [collectionPath, docId],
  * @returns {(collectionPath: string, docId: string | undefined) => (Map<string, DocDataType> | DocDataType)}
  */
 function getDataFnFromDataStore(moduleConfig, globalConfig) {
-    const dataStoreName = moduleConfig.dataStoreName || globalConfig.dataStoreName;
-    throwIfNoDataStoreName(dataStoreName);
-    const getModuleData = globalConfig.stores[dataStoreName].getModuleData;
+    const localStoreName = moduleConfig.localStoreName || globalConfig.localStoreName;
+    throwIfNolocalStoreName(localStoreName);
+    const getModuleData = globalConfig.stores[localStoreName].getModuleData;
     if (!getModuleData) {
         throw new Error('The data store did not provide a getModuleData function!');
     }
-    const pluginModuleConfig = getPluginModuleConfig(moduleConfig, dataStoreName);
+    const pluginModuleConfig = getPluginModuleConfig(moduleConfig, localStoreName);
     return (collectionPath, docId) => getModuleData({ collectionPath, docId, pluginModuleConfig });
 }
 /**
@@ -612,7 +612,7 @@ function createCollectionWithContext([collectionPath, docId], moduleConfig, glob
         openStreamPromises,
         findStreamPromise }, actions), queryFns);
     /**
-     * The data returned by the store specified as 'dataStoreName'
+     * The data returned by the store specified as 'localStoreName'
      */
     const dataProxyHandler = getDataProxyHandler([collectionPath, docId], moduleConfig, globalConfig);
     return new Proxy(moduleInstance, dataProxyHandler);
@@ -643,7 +643,7 @@ function createDocWithContext([collectionPath, docId], moduleConfig, globalConfi
         openStreamPromises,
         findStreamPromise }, actions);
     /**
-     * The data returned by the store specified as 'dataStoreName'
+     * The data returned by the store specified as 'localStoreName'
      */
     const dataProxyHandler = getDataProxyHandler([collectionPath, docId], moduleConfig, globalConfig);
     return new Proxy(moduleInstance, dataProxyHandler);
@@ -674,7 +674,7 @@ function configWithDefaults(config) {
         on: {},
         modifyPayloadOn: {},
         modifyReadResponseOn: {},
-        dataStoreName: '',
+        localStoreName: '',
     };
     const merged = mergeAnything.merge(defaults, config);
     return merged;

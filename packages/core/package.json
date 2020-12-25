@@ -7,7 +7,8 @@
   "module": "dist/index.esm.js",
   "typings": "types/index.d.ts",
   "scripts": {
-    "build": "npm run test && npm run rollup",
+    "build": "npm run rollup",
+    "test-and-build": "npm run test && npm run build",
     "test": "ava --verbose",
     "test--only": "ava --verbose --match='*only:*'",
     "rollup": "rimraf dist && rimraf types && rollup -c build.js"

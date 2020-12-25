@@ -94,7 +94,7 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
   }
 
   /**
-   * The data returned by the store specified as 'dataStoreName'
+   * The data returned by the store specified as 'localStoreName'
    */
   const dataProxyHandler = getDataProxyHandler<'doc', DocDataType>(
     [collectionPath, docId],

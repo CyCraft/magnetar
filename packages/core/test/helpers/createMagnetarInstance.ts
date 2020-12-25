@@ -41,7 +41,7 @@ export function createMagnetarInstance(): {
   const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
   const remote = CreatePluginRemote({ storeName: 'remote' })
   const magnetar = Magnetar({
-    dataStoreName: 'local',
+    localStoreName: 'local',
     stores: { local, remote },
     executionOrder: {
       read: ['local', 'remote'],

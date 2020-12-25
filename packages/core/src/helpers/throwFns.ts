@@ -2,16 +2,16 @@ import { StreamResponse, DoOnStreamFns } from '../types/plugins'
 import { isFullString } from 'is-what'
 import { isDocModule, isCollectionModule } from './pathHelpers'
 
-export function logError (errorMessage: string): void {
+export function logError(errorMessage: string): void {
   console.error('[@magnetarjs error]\n', errorMessage)
 }
 
-export function logErrorAndThrow (errorMessage: string): void {
+export function logErrorAndThrow(errorMessage: string): void {
   logError(errorMessage)
   throw new Error(errorMessage)
 }
 
-export function throwOnIncompleteStreamResponses (
+export function throwOnIncompleteStreamResponses(
   streamInfoPerStore: { [storeName: string]: StreamResponse },
   doOnStreamFns: DoOnStreamFns
 ): void {
@@ -28,7 +28,7 @@ export function throwOnIncompleteStreamResponses (
   }
 }
 
-export function throwIfNoFnsToExecute (storesToExecute: string[]): void {
+export function throwIfNoFnsToExecute(storesToExecute: string[]): void {
   if (storesToExecute.length === 0) {
     const errorMessage =
       'None of your store plugins have implemented this function or you have not defined an executionOrder anywhere.'
@@ -36,13 +36,13 @@ export function throwIfNoFnsToExecute (storesToExecute: string[]): void {
   }
 }
 
-export function throwIfNoDataStoreName (dataStoreName: string): void {
-  if (isFullString(dataStoreName)) return
-  const errorMessage = `No 'dataStoreName' provided.`
+export function throwIfNolocalStoreName(localStoreName: string): void {
+  if (isFullString(localStoreName)) return
+  const errorMessage = `No 'localStoreName' provided.`
   logErrorAndThrow(errorMessage)
 }
 
-export function throwIfInvalidModulePath (
+export function throwIfInvalidModulePath(
   modulePath: string,
   moduleType: 'collection' | 'doc'
 ): void {

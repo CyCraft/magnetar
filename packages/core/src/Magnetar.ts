@@ -20,7 +20,7 @@ function configWithDefaults(config: GlobalConfig): O.Compulsory<GlobalConfig> {
     on: {},
     modifyPayloadOn: {},
     modifyReadResponseOn: {},
-    dataStoreName: '',
+    localStoreName: '',
   }
   const merged = merge(defaults, config)
   return merged

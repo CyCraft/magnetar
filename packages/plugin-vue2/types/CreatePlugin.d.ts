@@ -4,7 +4,6 @@ export interface ReactiveStoreOptions {
      * This is required to make sure there are not two instances of Vue running which can cause issues.
      */
     vueInstance: any;
-    storeName: string;
     generateRandomId: () => string;
 }
 export interface ReactiveStoreModuleConfig {
@@ -15,4 +14,9 @@ export interface ReactiveStoreModuleConfig {
     limit?: Limit;
 }
 export declare type MakeRestoreBackup = (collectionPath: string, docId: string) => void;
+/**
+ * a Vue Sync plugin is a single function that returns a `PluginInstance`
+ * the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
+ * each action must have the proper for both collection and doc type modules
+ */
 export declare const CreatePlugin: MagnetarPlugin<ReactiveStoreOptions>;

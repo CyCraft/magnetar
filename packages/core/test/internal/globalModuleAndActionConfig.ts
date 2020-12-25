@@ -9,7 +9,7 @@ test('emits global, module and action events', async (t) => {
   const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
   const ranAllEvents: any[] = []
   const magnetar = Magnetar({
-    dataStoreName: 'local',
+    localStoreName: 'local',
     stores: { local },
     executionOrder: {
       read: ['local'],
@@ -44,7 +44,7 @@ test('emits global, module and action events', async (t) => {
 test('can modify payload in global, module and action settings', async (t) => {
   const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
   const magnetar = Magnetar({
-    dataStoreName: 'local',
+    localStoreName: 'local',
     stores: { local },
     executionOrder: {
       read: ['local'],

@@ -19,7 +19,7 @@ export declare function getPluginModuleConfig(moduleConfig: ModuleConfig, storeN
  */
 export declare function executeSetupModulePerStore(globalConfigStores: GlobalConfig['stores'], [collectionPath, docId]: [string, string | undefined], moduleConfig: ModuleConfig): void;
 /**
- * Returns the `getModuleData` function form the store specified as 'dataStoreName'
+ * Returns the `getModuleData` function form the store specified as 'localStoreName'
  *
  * @export
  * @template DocDataType

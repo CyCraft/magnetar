@@ -28,12 +28,12 @@ export declare type SharedConfig = {
     /**
      * the storeName of the plugin that will keep your local data cache for usage with your client.
      */
-    dataStoreName: StoreName;
+    localStoreName: StoreName;
 };
 /**
  * The Magnetar global options. Can be overwritten on a per-module or per-action basis.
  */
-export declare type GlobalConfig = O.Merge<O.Compulsory<Partial<SharedConfig>, 'dataStoreName'>, {
+export declare type GlobalConfig = O.Merge<O.Compulsory<Partial<SharedConfig>, 'localStoreName'>, {
     stores: {
         [storeName: string]: PluginInstance;
     };

@@ -24,7 +24,6 @@ import { filterDataPerClauses } from './helpers/dataHelpers'
 // - SimpleStoreModuleConfig
 
 export interface SimpleStoreOptions {
-  storeName: string
   generateRandomId: () => string
 }
 export interface SimpleStoreModuleConfig {
