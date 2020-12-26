@@ -17,13 +17,13 @@
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
-    "is-what": "^3.11.3",
-    "merge-anything": "^3.0.5",
-    "ts-toolbelt": "6.12.2"
+    "is-what": "^3.12.0",
+    "merge-anything": "^3.0.7",
+    "ts-toolbelt": "6.15.5"
   },
   "devDependencies": {
-    "ava": "^3.12.1",
-    "test-utils": "^0.0.1"
+    "ava": "^3.14.0",
+    "test-utils": "^0.0.10"
   },
   "keywords": [
     "vuex-easy-firestore",
