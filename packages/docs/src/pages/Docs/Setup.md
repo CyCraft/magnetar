@@ -97,13 +97,15 @@ Here we show some of the data and methods you can access on a module:
 
 ### Collection Modules
 
+You can access all documents in a collection via the `data` property. `data` is a Map <small>[？](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)</small> with the document ids as key and the document data as value.
+
 ```js
 const pokedexModule = magnetar.collection('pokedex')
 
 // accessing data
+pokedexModule.data // Map<'001': { name: 'bulbasaur' }, /* etc...*/  >
 pokedexModule.id // 'pokedex'
 pokedexModule.path // 'pokedex' (the full path)
-pokedexModule.data // Map<'001': { name: 'bulbasaur' }, ... >
 
 // methods to write data
 pokedexModule.insert({ name: 'Squirtle' }) // inserts a new document
@@ -116,15 +118,17 @@ pokedexModule.stream() // opens a database stream & adds incoming documents loca
 
 ### Document Modules
 
+You can access a document's data via the `data` property. In this case it will be a single object, since a document module represents only a single object.
+
 ```js
 const pokemonModule = magnetar.doc('pokedex/001')
 // or
 const pokemonModule = magnetar.collection('pokedex').doc('001')
 
 // accessing data
+pokemonModule.data // { name: 'Bulbasaur', level: 1 }
 pokemonModule.id // '001'
 pokemonModule.path // 'pokedex/001'
-pokemonModule.data // { name: 'Bulbasaur', level: 1 }
 
 // methods to write data
 pokemonModule.replace({ name: 'Ivysaur', level: 16 }) // sets new data

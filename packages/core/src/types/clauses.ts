@@ -6,11 +6,12 @@ export type WhereFilterOp =
   | '!='
   | '<'
   | '<='
-  | '>='
   | '>'
+  | '>='
   | 'array-contains'
-  | 'in'
   | 'array-contains-any'
+  | 'in'
+  | 'not-in'
 
 /**
  * Determines the where-filter to be applied.

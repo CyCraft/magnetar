@@ -39,7 +39,7 @@ newDocModule.data // the data you have inserted
 ```
 
 The document data will also be available on your collection module.
-For a collection you'll need to use `data.values()` to list all docs, because collection `data` is a [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)<small> (MDN)</small>.
+For a collection you'll need to use `data.values()` to list all docs, because collection `data` is a Map <small>[？](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)</small>.
 
 ```js
 // or access all collection docs
@@ -123,11 +123,11 @@ bulbasaur.deleteProp('moves.tackle')
 
 ## Modify a Document
 
-There are 3 methods to modify documents:
+There are three methods you can use to modify documents:
 
-- merge
-- assign
-- replace
+- `merge`
+- `assign`
+- `replace`
 
 ### Merge
 
