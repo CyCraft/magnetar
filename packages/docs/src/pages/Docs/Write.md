@@ -1,4 +1,6 @@
-# Add & edit data
+# Write Data
+
+Be sure to first read the [Setup chapter](#) to have a basic understanding.
 
 In the following examples we use this collection instance:
 
@@ -6,11 +8,9 @@ In the following examples we use this collection instance:
 export const pokedexModule = magnetar.collection('pokedex')
 ```
 
-You can instantiate modules and then export them for to use in other files. More on this at the [Setup documentation](#).
+## Insert a Document
 
-## Insert a new document
-
-### Insert with random ID
+### Insert with Random ID
 
 When you insert a new document without specifying an ID, you can do so by calling `insert` directly on the collection:
 
@@ -20,73 +20,110 @@ const pokedexModule = magnetar.collection('pokedex')
 const data = { name: 'squirtle' }
 
 // insert a new document with random ID
-const newDoc = await pokedexModule.insert(data)
+pokedexModule.insert(data)
 ```
 
-`insert` returns a newly created instance of a document-module. You can then retrieve both the generated `id` and the `data` from this.
+This is what happens:
 
-### Insert with pre-set ID
+Your document is passed to both your store plugins. The local store plugin is responsible caching this document, and your remote store plugin is responsible for making the API call to your database.
 
-If you want to provide an ID yourself, you can do so by calling `insert` on the doc instance of that preset id:
+### Access the New Document
+
+You can access the new document's data like so:
+
+```js
+const newDocModule = await pokedexModule.insert(data) // needs await!
+
+newDocModule.id // the randomly generated id
+newDocModule.data // the data you have inserted
+```
+
+The document data will also be available on your collection module.
+For a collection you'll need to use `data.values()` to list all docs, because collection `data` is a [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)<small> (MDN)</small>.
+
+```js
+// or access all collection docs
+pokedexModule.data.values()
+// or access a specific collection doc via ID
+pokedexModule.data.get(newDocModule.id)
+```
+
+### Insert with Optimistic UI
+
+Since your remote store will make an API call, insert will always returns a promise. However, one of the key features of Magnetar is _Optimistic UI_ <sup>[？](https://google.com/search?q=what+is+optimistic+ui)</sup>.
+
+> If the insert promise only resolves **after** the remote store API call, how is this Optimistic UI?
+
+Awaiting an insert promise will never be _Optimistic_! However, when you insert a new document, your _local_ store is responsible for generating a new ID and saving the data in your module's cache. This part is done immidiately and is therefore _Optimistic_!
+
+> How can I achieve Optimistic UI then? (How can I display changes immidiately in the UI?)
+
+Instead of awaiting the insert promise, you need to display the **collection module's data** in your UI, because this is what is updated immidiately. Eg.
+
+```js
+// this would wait for your remote store (NOT optimistic)
+const newDocModule = await pokedexModule.insert(data)
+
+// instead use the collection data:
+pokedexModule.insert(data) // do NOT await
+pokedexModule.data.values() // the collection will already have the new doc here
+```
+
+### Insert with Custom ID
+
+If you want to provide a custom ID yourself, you can do so by first creating the doc module with `doc(id)`, then calling `insert`. Eg.
 
 ```javascript
-await pokedexModule.doc(presetId).insert(data)
+const newId = generateId() // you have to implement this yourself
+
+pokedexModule.doc(newId).insert(data)
 ```
 
-In the case of using a presetId, it will return `Promise<void>`.
+## Delete a Document
 
-:::spoiler How can I batch insert documents?
-
-You can make a simple loop. **Magnetar will automatically optimise** so that only a single "batch" API call is made!
+You can delete a document either via the collection or via the document module.
 
 ```javascript
-const newPokemon = [{ name: 'Flareon' }, { name: 'Vaporeon' }, { name: 'Jolteon' }]
-for (const data of newPokemon) {
-  pokedexModule.insert(data)
-}
+const pokedexModule = magnetar.collection('pokedex')
+
+pokedexModule.delete('001')
+// or
+pokedexModule.doc('001').delete()
 ```
 
-:::
-
-## Delete a document
-
-```javascript
-await pokedexModule.doc('001').delete()
-```
-
-:::spoiler How can I batch delete documents?
-
-You can make a simple loop. **Magnetar will automatically optimise** so that only a single "batch" API call is made!
-
-```javascript
-const idsToDelete = ['001', '004', '007']
-for (const id of idsToDelete) {
-  magnetar.doc(id).delete()
-}
-```
-
-:::
-
-## Delete a document prop
+## Delete a Document Prop
 
 You can delete a single prop or an array of props of a document:
 
+<!-- prettier-ignore-start -->
 ```javascript
-await pokedexModule.doc('001').deleteProp('name')
+const pokedexModule = magnetar.collection('pokedex')
+const bulbasaur = pokedexModule.doc('001')
+
+// bulbasaur.data ≈ { name: 'Bulbasaur', level: 1 }
+
+bulbasaur.deleteProp('level')
 // or
-await pokedexModule.doc('001').deleteProp(['name', ...])
-```
+bulbasaur.deleteProp(['level', /* etc... */])
 
-You can also delete nested props by using the "dot" notation:
+// bulbasaur.data ≈ { name: 'Bulbasaur' }
+```
+<!-- prettier-ignore-end -->
+
+You can also delete _**nested**_ props by using the _**dot notation**_:
 
 ```javascript
-await pokedexModule.doc('001').deleteProp('moves.tackle')
-// will remove 'tackle' from an object called 'moves'
+// bulbasaur.data ≈ { name: 'Bulbasaur', moves: { tackle: true, leafAttack: true } }
+
+bulbasaur.deleteProp('moves.tackle')
+// will remove 'tackle' from the `moves` object
+
+// bulbasaur.data ≈ { name: 'Bulbasaur', moves: { leafAttack: true } }
 ```
 
-## Modify a document
+## Modify a Document
 
-There are 3 ways to modify documents:
+There are 3 methods to modify documents:
 
 - merge
 - assign
@@ -94,32 +131,34 @@ There are 3 ways to modify documents:
 
 ### Merge
 
-Merge will update your document and deep-merge any nested properties.
+Merge will update your document and _**deep merge**_ any nested properties.
 
 ```javascript
+const pokedexModule = magnetar.collection('pokedex')
 const bulbasaur = pokedexModule.doc('001')
 
-// bulbasaur.data === { name: 'bulbasaur', types: { grass: true } }
+// bulbasaur.data ≈ { name: 'bulbasaur', types: { grass: true } }
 
-await bulbasaur.merge({ types: { poison: true } })
+bulbasaur.merge({ types: { poison: true } })
 
-// bulbasaur.data === { name: 'bulbasaur', types: { grass: true, poison: true } }
+// bulbasaur.data ≈ { name: 'bulbasaur', types: { grass: true, poison: true } }
 ```
 
 In the example above, Bulbasaur kept `grass: true` when `{ poison: true }` was merged onto it.
 
 ### Assign
 
-Assign will update your document and shallow-merge any nested properties. That means that nested objects are replaced by what ever you pass.
+Assign will update your document and _**shallow merge**_ any nested properties. That means that nested objects are replaced by what ever you pass.
 
 ```javascript
+const pokedexModule = magnetar.collection('pokedex')
 const bulbasaur = pokedexModule.doc('001')
 
-// bulbasaur.data === { name: 'bulbasaur', types: { grass: true } }
+// bulbasaur.data ≈ { name: 'bulbasaur', types: { grass: true } }
 
-await bulbasaur.merge({ types: { poison: true } })
+bulbasaur.merge({ types: { poison: true } })
 
-// bulbasaur.data === { name: 'bulbasaur', types: { poison: true } }
+// bulbasaur.data ≈ { name: 'bulbasaur', types: { poison: true } }
 ```
 
 In the example above, Bulbasaur lost `grass: true` when `{ poison: true }` was assigned onto it.
@@ -129,13 +168,30 @@ In the example above, Bulbasaur lost `grass: true` when `{ poison: true }` was a
 Replace will replace the entire object of your document with whatever you pass.
 
 ```javascript
+const pokedexModule = magnetar.collection('pokedex')
 const bulbasaur = pokedexModule.doc('001')
 
-// bulbasaur.data === { name: 'bulbasaur', types: { grass: true } }
+// bulbasaur.data ≈ { name: 'bulbasaur', types: { grass: true } }
 
-await bulbasaur.replace({ level: 16 })
+bulbasaur.replace({ level: 16 })
 
-// bulbasaur.data === { level: 16 }
+// bulbasaur.data ≈ { level: 16 }
 ```
 
 In the example above, Bulbasaur **lost** all of its data and it was replaced with whatever was passed.
+
+## Batch Insert / Delete / Modify
+
+**Magnetar will automatically optimise** any write action so that the remote store only makes a single "batch" API call! Therefore, you can simply loop over multiple methods without performance dips. Eg.
+
+```javascript
+const pokedexModule = magnetar.collection('pokedex')
+
+const newPokemon = [{ name: 'Flareon' }, { name: 'Vaporeon' }, { name: 'Jolteon' }]
+
+for (const data of newPokemon) {
+  pokedexModule.insert(data)
+}
+```
+
+Same goes for other methods to delete or modify data.

@@ -1,6 +1,6 @@
 # Setup
 
-## Instantiate Magnetar
+## Main setup
 
 To instantiate Magnetar, you need to first instantiate the store plugins you will use:
 
@@ -61,13 +61,24 @@ Some info on the main Magnetar instance props:
 - `localStoreName` ⸺ the name of the store that saves data locally
 - `executionOrder` ⸺ the execution order of your stores, this order is required for optimistic UI (but can be flipped)
 
-## Instantiate your Modules
+## Working with Modules
 
-Ideally you want to create a separate file for the modules you intend to use (or one file per module). This way you can more easily add some documentation on how the data structure looks for your database documents.
+You can access/create modules with a simple `collection(path)` and `doc(path)` syntax. The path will be interpreted by whichever store plugins you use.
 
-To instantiate a module you need to at least pass a module path. This will be interpreted by whichever store plugins you use to connect to the correct endpoint of your database.
+Eg. Using the Firestore plugin, these module paths will point to the Firestore collection and document paths in our Firebase console.
 
-As per our example, with the Firestore plugin, these module paths will point to the Firestore collection and document paths in our console.
+```javascript
+// access the collection:
+magnetar.collection('pokedex')
+
+// access a sub-doc via its collection:
+magnetar.collection('pokedex').doc('001')
+
+// access a sub-doc via its path:
+magnetar.doc('pokedex/001')
+```
+
+Ideally you want to create a separate file for the modules you intend to use (or one file per module). This way you can more easily add some documentation on how the data structure looks for your database documents. <small>(for more info on this read [Module Setup](#))</small>
 
 ```javascript
 import { magnetar } from 'magnetar-setup.js'
@@ -76,6 +87,53 @@ export const pokedexModule = magnetar.collection('pokedex')
 export const trainerModule = magnetar.doc('data/trainer')
 ```
 
-Actual usage of these modules (reading & writing data) is further explained in [Add & Edit Data](#) and [Read Data](#).
+## Module Data & Methods
 
-PS: It's highly recommended that you **document your data structures** for each module! Be sure to read the chapter on [Module Setup](#).
+Using your collection or document modules, you can access the `data`, `id` and several methods.
+
+**Any data accessed is readonly!** To "mutate" the data, you **have** to use the provided methods. This is good because any kind of mutation is supposed to go through a function so it can be synced to your local & remote stores.
+
+Here we show some of the data and methods you can access on a module:
+
+### Collection Modules
+
+```js
+const pokedexModule = magnetar.collection('pokedex')
+
+// accessing data
+pokedexModule.id // 'pokedex'
+pokedexModule.path // 'pokedex' (the full path)
+pokedexModule.data // Map<'001': { name: 'bulbasaur' }, ... >
+
+// methods to write data
+pokedexModule.insert({ name: 'Squirtle' }) // inserts a new document
+pokedexModule.delete('001') // deletes a document
+
+// methods to read data
+pokedexModule.get() // gets documents from the remote store & adds them locally
+pokedexModule.stream() // opens a database stream & adds incoming documents locally
+```
+
+### Document Modules
+
+```js
+const pokemonModule = magnetar.doc('pokedex/001')
+// or
+const pokemonModule = magnetar.collection('pokedex').doc('001')
+
+// accessing data
+pokemonModule.id // '001'
+pokemonModule.path // 'pokedex/001'
+pokemonModule.data // { name: 'Bulbasaur', level: 1 }
+
+// methods to write data
+pokemonModule.replace({ name: 'Ivysaur', level: 16 }) // sets new data
+pokemonModule.merge({ level: 17 }) // updates the document by deep merging the new data
+pokemonModule.assign({ level: 17 }) // updates the document by shallow merging the new data
+pokemonModule.deleteProp('name') // deletes a property from the document
+pokemonModule.delete() // deletes the document
+
+// methods to read data
+pokemonModule.get() // gets the document from the remote store & adds it locally
+pokemonModule.stream() // opens a database stream & keeps the document up to date locally
+```

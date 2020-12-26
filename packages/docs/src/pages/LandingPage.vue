@@ -17,7 +17,7 @@
 <style lang="sass">
 // $
 .landing-page
-  +C(background, nasa)
+  +C(background, lucy-bg-main)
 </style>
 
 <script lang="ts">

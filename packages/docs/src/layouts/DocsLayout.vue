@@ -39,11 +39,11 @@
 // $
 .docs-layout
   ._layout-header
-    +C(background, nasa)
+    +C(background, lucy-bg-head)
     color: white
-    border-bottom: thin solid white
   .q-drawer
-    +C(background, nasa)
+    +C(background, lucy-bg-menu)
+    border-right: 0.5px solid $c-lucy-bg-head
 </style>
 
 <script lang="ts">

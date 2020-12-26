@@ -18,9 +18,25 @@ import { WhereClause, WhereFilterOp, OrderByClause } from './types/clauses'
 import { mergeAndConcat } from 'merge-anything'
 
 export type CollectionInstance<DocDataType extends Record<string, any> = Record<string, any>> = {
+  /**
+   * The cached data that was written or read so far
+   */
   data: Map<string, DocDataType>
+  /**
+   * `doc` is available on every collection for chaining
+   * @example collection('pokedex').doc('001')
+   */
   doc: DocFn<DocDataType>
+  /**
+   * The id of the collection. When this is a nested collection, it will not include the full path, only the final part
+   * @example 'items'
+   */
   id: string
+  /**
+   * The full path of the collection
+   * @example 'pokedex/001/items'
+   * @example 'pokedex'
+   */
   path: string
   openStreams: OpenStreams
   findStream: FindStream

@@ -11,7 +11,7 @@
 
 .preview-code
   > ._codeblock
-    +C(background, code-space)
+    +C(background, lucy-bg-head)
 </style>
 
 <script lang="ts">

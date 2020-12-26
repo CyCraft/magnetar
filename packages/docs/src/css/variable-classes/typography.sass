@@ -4,7 +4,7 @@
 @import '../variables/colors'
 
 html, body
-  font-size: 16px
+  +t-body1()
 
 br
   display: block
@@ -20,13 +20,6 @@ a
 
 h1, h2, h3, h4, h5, h6
   margin: 0
-  margin-top: 0.6em
-  margin-bottom: 0.3em
-h1
-  +mb($md)
-h2
-  +mt($xl)
-  +mb($sm)
 
 .text-h1, h1
   +t-h1()

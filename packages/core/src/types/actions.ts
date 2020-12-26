@@ -62,8 +62,6 @@ export type MagnetarDeletePropAction<
 /**
  * @param {*} [payload] The delete action doesn't need any payload. In some cases, a Store Plugin you use might accept a payload.
  * @param {ActionConfig} [actionConfig]
- * @example // first update the server and await that before updating the local store:
- * doc(id).delete(undefined, { executionOrder: ['remote', 'local'] })
  */
 export type MagnetarDeleteAction<DocDataType extends Record<string, any> = Record<string, any>> = (
   payload?: any,
