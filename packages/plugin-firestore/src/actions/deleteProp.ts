@@ -1,5 +1,6 @@
 import { isArray } from 'is-what'
-import * as Firebase from 'firebase/app'
+import firebase from 'firebase/app'
+import 'firebase/firestore'
 import { PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { BatchSync } from '../helpers/batchSync'
@@ -22,7 +23,7 @@ export function deletePropActionFactory(
     const firestorePayload = payloadArray.reduce(
       (carry, propPath) => ({
         ...carry,
-        [propPath]: Firebase.firestore.FieldValue.delete(),
+        [propPath]: firebase.firestore.FieldValue.delete(),
       }),
       {} as any
     )

@@ -23,7 +23,7 @@ function configWithDefaults(config: GlobalConfig): O.Compulsory<GlobalConfig> {
     localStoreName: '',
   }
   const merged = merge(defaults, config)
-  return merged
+  return merged as any
 }
 
 /**

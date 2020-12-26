@@ -1,4 +1,4 @@
-import { firestore } from 'firebase'
+import type firebase from 'firebase'
 import { PluginInstance, MagnetarPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core'
 import { insertActionFactory } from './actions/insert'
 import { writeActionFactory } from './actions/mergeAssignReplace'
@@ -9,6 +9,8 @@ import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
 import { batchSyncFactory } from './helpers/batchSync'
 
+type Firestore = firebase.firestore.Firestore
+
 // there are two interfaces to be defined & exported by each plugin
 // - FirestorePluginOptions
 // - FirestoreModuleConfig
@@ -17,7 +19,7 @@ export interface FirestorePluginOptions {
   /**
    * This is required to make sure there are not two instances of Firestore running which can cause issues.
    */
-  firestoreInstance: firestore.Firestore
+  firestoreInstance: Firestore
   /**
    * When this is true, the "modulePath" will be used as firestorePath to sync the data to. Eg. `collection('todos')` will sync data to `todos` on firestore. When this is false (default) the firestorePath must be provided like so: `collection('todos', { firestorePath: 'myTodos' })`
    */

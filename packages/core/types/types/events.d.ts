@@ -21,11 +21,11 @@ declare type EventPayloadPropResult = {
     result: void | string | GetResponse | DoOnGet | StreamResponse | DoOnStream;
 };
 export declare type EventFnBefore = (args: EventSharedPayload) => void | Promise<void>;
-export declare type EventFnSuccess = (args: O.Merge<EventSharedPayload, EventPayloadPropResult>) => void | Promise<void>;
-export declare type EventFnError = (args: O.Merge<EventSharedPayload, {
+export declare type EventFnSuccess = (args: O.Patch<EventSharedPayload, EventPayloadPropResult>) => void | Promise<void>;
+export declare type EventFnError = (args: O.Patch<EventSharedPayload, {
     error: any;
 }>) => void | Promise<void>;
-export declare type EventFnRevert = (args: O.Merge<O.Omit<EventSharedPayload, 'abort'>, EventPayloadPropResult>) => void | Promise<void>;
+export declare type EventFnRevert = (args: O.Patch<O.Omit<EventSharedPayload, 'abort'>, EventPayloadPropResult>) => void | Promise<void>;
 export declare type EventFn = EventFnBefore | EventFnSuccess | EventFnError | EventFnRevert;
 export declare type EventNameFnMap = {
     before?: EventFnBefore;

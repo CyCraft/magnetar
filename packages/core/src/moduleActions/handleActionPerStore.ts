@@ -81,7 +81,7 @@ export function handleActionPerStore(
 
     // create the abort mechanism
     type StopExecution = boolean | 'revert'
-    let stopExecution: StopExecution
+    let stopExecution = false as StopExecution
     /**
      * The abort mechanism for the entire store chain. When executed in handleAction() it won't go to the next store in executionOrder.
      */
@@ -98,7 +98,6 @@ export function handleActionPerStore(
     let resultFromPlugin: void | string | GetResponse | OnAddedFn | any
     for (const [i, storeName] of storesToExecute.entries()) {
       // a previous iteration stopped the execution:
-      // @ts-ignore
       if (stopExecution === true) break
       // find the action on the plugin
       const pluginAction = globalConfig.stores[storeName].actions[actionName]
@@ -119,7 +118,6 @@ export function handleActionPerStore(
             storeName,
           })
       // handle reverting. stopExecution might have been modified by `handleAction`
-      // @ts-ignore
       if (stopExecution === 'revert') {
         const storesToRevert = storesToExecute.slice(0, i)
         storesToRevert.reverse()

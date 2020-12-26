@@ -37,7 +37,7 @@ export interface PluginInstance {
 /**
  * Where, orderBy, limit clauses or extra config a dev might pass when instanciates a module as second param (under `configPerStore`). Eg. `collection('pokedex', { configPerStore: { local: pluginModuleConfig } })`
  */
-export declare type PluginModuleConfig = O.Merge<Clauses, {
+export declare type PluginModuleConfig = O.Patch<Clauses, {
     [key: string]: any;
 }>;
 export declare type PluginActionPayloadBase<SpecificPluginModuleConfig = PluginModuleConfig> = {
@@ -54,7 +54,7 @@ export declare type PluginActionPayloadBase<SpecificPluginModuleConfig = PluginM
      */
     pluginModuleConfig: SpecificPluginModuleConfig;
 };
-export declare type PluginStreamActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Merge<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
+export declare type PluginStreamActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
     /**
      * Whatever payload was passed to the action that was triggered
      */
@@ -69,7 +69,7 @@ export declare type PluginStreamActionPayload<SpecificPluginModuleConfig = Plugi
  * Should handle 'stream' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc). Should return `StreamResponse` when acting as a "remote" Store Plugin, and `DoOnStream` when acting as "local" Store Plugin.
  */
 export declare type PluginStreamAction = (payload: PluginStreamActionPayload) => StreamResponse | DoOnStream | Promise<StreamResponse | DoOnStream>;
-export declare type PluginGetActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Merge<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
+export declare type PluginGetActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
     /**
      * Whatever payload was passed to the action that was triggered
      */
@@ -79,7 +79,7 @@ export declare type PluginGetActionPayload<SpecificPluginModuleConfig = PluginMo
  * Should handle 'get' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc). Should return `GetResponse` when acting as a "remote" Store Plugin, and `DoOnGet` when acting as "local" Store Plugin.
  */
 export declare type PluginGetAction = (payload: PluginGetActionPayload) => GetResponse | DoOnGet | Promise<GetResponse | DoOnGet>;
-export declare type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Merge<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
+export declare type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
     /**
      * Whatever payload was passed to the action that was triggered
      */
@@ -89,7 +89,7 @@ export declare type PluginWriteActionPayload<SpecificPluginModuleConfig = Plugin
  * Should handle 'merge' 'assign' 'replace' for docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
  */
 export declare type PluginWriteAction = (payload: PluginWriteActionPayload) => void | Promise<void>;
-export declare type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Merge<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
+export declare type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
     /**
      * Whatever payload was passed to the action that was triggered
      */
@@ -99,7 +99,7 @@ export declare type PluginInsertActionPayload<SpecificPluginModuleConfig = Plugi
  * Should handle 'insert' for collections & docs. Must return the new document's ID! When executed on a collection, the plugin must provide a newly generated ID. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc)
  */
 export declare type PluginInsertAction = (payload: PluginInsertActionPayload) => string | Promise<string>;
-export declare type PluginDeletePropActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Merge<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
+export declare type PluginDeletePropActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
     /**
      * Whatever payload was passed to the action that was triggered
      */
@@ -113,7 +113,7 @@ export declare type PluginDeletePropActionPayload<SpecificPluginModuleConfig = P
  * Should handle 'deleteProp' for docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
  */
 export declare type PluginDeletePropAction = (payload: PluginDeletePropActionPayload) => void | Promise<void>;
-export declare type PluginDeleteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Merge<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
+export declare type PluginDeleteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
     /**
      * Whatever payload was passed to the action that was triggered
      */
@@ -123,7 +123,7 @@ export declare type PluginDeleteActionPayload<SpecificPluginModuleConfig = Plugi
  * Should handle 'delete' for docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
  */
 export declare type PluginDeleteAction = (payload: PluginDeleteActionPayload) => void | Promise<void>;
-export declare type PluginRevertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Merge<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
+export declare type PluginRevertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
     /**
      * Whatever payload was passed to the action that was triggered
      */

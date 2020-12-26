@@ -342,7 +342,7 @@ collectionFn // actions executed on a "collection" will return `collection()` or
             for (const modifyFn of modifyPayloadFnsMap[actionName]) {
                 payload = modifyFn(payload);
             }
-            let stopExecution;
+            let stopExecution = false;
             /**
              * The abort mechanism for the entire store chain. When executed in handleAction() it won't go to the next store in executionOrder.
              */
@@ -357,7 +357,6 @@ collectionFn // actions executed on a "collection" will return `collection()` or
             let resultFromPlugin;
             for (const [i, storeName] of storesToExecute.entries()) {
                 // a previous iteration stopped the execution:
-                // @ts-ignore
                 if (stopExecution === true)
                     break;
                 // find the action on the plugin
@@ -379,7 +378,6 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                         storeName,
                     });
                 // handle reverting. stopExecution might have been modified by `handleAction`
-                // @ts-ignore
                 if (stopExecution === 'revert') {
                     const storesToRevert = storesToExecute.slice(0, i);
                     storesToRevert.reverse();

@@ -20,9 +20,9 @@ This is a complete setup example which uses:
 // 1. the plugin firestore for remote data store
 // ---------------------------------------------
 import { CreatePlugin as PluginFirestore } from '@magnetarjs/firestore'
-import Firebase from 'firebase'
+import firebase from 'firebase'
 
-const firestoreInstance = Firebase.firestore()
+const firestoreInstance = firebase.firestore()
 
 // create the remote store plugin instance:
 const remote = PluginFirestore({ firestoreInstance })
@@ -34,7 +34,7 @@ import { CreatePlugin as PluginVue } from '@magnetarjs/vue2'
 import Vue from 'vue'
 
 const vueInstance = Vue
-const generateRandomId = () => Firebase.firestore().collection('random').doc().id
+const generateRandomId = () => firebase.firestore().collection('random').doc().id
 
 // create the local store plugin instance:
 const local = PluginVue({ vueInstance, generateRandomId })

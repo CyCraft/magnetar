@@ -1,10 +1,10 @@
-import { firestore } from 'firebase';
+import type firebase from 'firebase';
 import { FirestoreModuleConfig } from '../CreatePlugin';
 import { DocMetadata } from '@magnetarjs/core';
-declare type Firestore = firestore.Firestore;
-declare type Query = firestore.Query;
-declare type DocumentSnapshot = firestore.DocumentSnapshot;
-declare type QueryDocumentSnapshot = firestore.QueryDocumentSnapshot;
+declare type Query = firebase.firestore.Query;
+declare type DocumentSnapshot = firebase.firestore.DocumentSnapshot;
+declare type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot;
+declare type Firestore = firebase.firestore.Firestore;
 export declare function getQueryInstance(collectionPath: string, pluginModuleConfig: FirestoreModuleConfig, firestoreInstance: Firestore): Query;
 export declare function docSnapshotToDocMetadata(docSnapshot: DocumentSnapshot | QueryDocumentSnapshot): DocMetadata;
 export {};

@@ -6,12 +6,16 @@
   "module": "src/index.ts",
   "main": "src/index.ts",
   "author": "Luca Ban - Mesqueeb",
+  "scripts": {
+    "build": "npm run rollup",
+    "rollup": "rimraf dist && rimraf types && rollup -c build.js"
+  },
   "dependencies": {
     "copy-anything": "^2.0.1",
     "fast-sort": "^2.2.0",
     "filter-anything": "^2.1.7",
     "is-what": "^3.12.0",
-    "merge-anything": "^3.0.7",
+    "merge-anything": "^4.0.0",
     "path-to-prop": "^1.0.0"
   },
   "homepage": "https://github.com/cycraft/magnetar#readme",

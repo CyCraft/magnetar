@@ -1,7 +1,11 @@
 import { FirestorePluginOptions } from '../CreatePlugin'
 import { Countdown, CountdownInstance } from './Countdown'
 // just for types:
-import { firestore } from 'firebase'
+import type firebase from 'firebase'
+
+type SetOptions = firebase.firestore.SetOptions
+type WriteBatch = firebase.firestore.WriteBatch
+type DocumentReference = firebase.firestore.DocumentReference
 
 // https://firebase.google.com/docs/firestore/manage-data/transactions#batched-writes
 // A batched write can contain up to 500 operations.
@@ -43,11 +47,7 @@ function countOperations(payload: Record<string, any>): number {
 }
 
 export type BatchSync = {
-  set: (
-    documentPath: string,
-    payload: Record<string, any>,
-    options?: firestore.SetOptions
-  ) => Promise<void>
+  set: (documentPath: string, payload: Record<string, any>, options?: SetOptions) => Promise<void>
   update: (documentPath: string, payload: Record<string, any>) => Promise<void>
   delete: (documentPath: string) => Promise<void>
 }
@@ -57,7 +57,7 @@ type SyncStack = {
    * Maximum 500! If < 500 additional operations can be added to this same syncStack.
    */
   operationCount: number
-  batch: firestore.WriteBatch
+  batch: WriteBatch
   resolves: (() => void)[]
   rejects: ((error: any) => void)[]
 }
@@ -97,7 +97,7 @@ export function batchSyncFactory(
     return syncStack
   }
 
-  function prepareRef(documentPath: string): firebase.firestore.DocumentReference {
+  function prepareRef(documentPath: string): DocumentReference {
     return firestoreInstance.doc(documentPath)
   }
 
@@ -148,7 +148,7 @@ export function batchSyncFactory(
   function set(
     documentPath: string,
     _payload: Record<string, any>,
-    options?: firestore.SetOptions
+    options?: SetOptions
   ): Promise<void> {
     const { payload, operationCount } = preparePayload(_payload)
     const { batch, resolves, rejects } = prepareSyncStack(operationCount)

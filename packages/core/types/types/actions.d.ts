@@ -18,7 +18,7 @@ export declare type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign
  * // don't throw errors for this action, wherever it might fail
  * { onError: 'continue' }
  */
-export declare type ActionConfig = O.Merge<{
+export declare type ActionConfig = O.Patch<{
     executionOrder?: StoreName[];
 }, Partial<O.Omit<SharedConfig, 'localStoreName' | 'executionOrder'>>>;
 export declare type MagnetarStreamAction = (payload?: any | void, actionConfig?: ActionConfig) => Promise<void>;

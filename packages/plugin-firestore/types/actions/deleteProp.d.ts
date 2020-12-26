@@ -1,3 +1,4 @@
+import 'firebase/firestore';
 import { PluginDeletePropAction } from '@magnetarjs/core';
 import { FirestorePluginOptions } from '../CreatePlugin';
 import { BatchSync } from '../helpers/batchSync';

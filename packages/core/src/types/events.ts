@@ -28,15 +28,15 @@ type EventPayloadPropResult = {
 export type EventFnBefore = (args: EventSharedPayload) => void | Promise<void>
 
 export type EventFnSuccess = (
-  args: O.Merge<EventSharedPayload, EventPayloadPropResult>
+  args: O.Patch<EventSharedPayload, EventPayloadPropResult>
 ) => void | Promise<void>
 
 export type EventFnError = (
-  args: O.Merge<EventSharedPayload, { error: any }>
+  args: O.Patch<EventSharedPayload, { error: any }>
 ) => void | Promise<void>
 
 export type EventFnRevert = (
-  args: O.Merge<O.Omit<EventSharedPayload, 'abort'>, EventPayloadPropResult>
+  args: O.Patch<O.Omit<EventSharedPayload, 'abort'>, EventPayloadPropResult>
 ) => void | Promise<void>
 
 export type EventFn = EventFnBefore | EventFnSuccess | EventFnError | EventFnRevert

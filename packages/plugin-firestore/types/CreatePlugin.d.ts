@@ -1,10 +1,11 @@
-import { firestore } from 'firebase';
+import type firebase from 'firebase';
 import { MagnetarPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core';
+declare type Firestore = firebase.firestore.Firestore;
 export interface FirestorePluginOptions {
     /**
      * This is required to make sure there are not two instances of Firestore running which can cause issues.
      */
-    firestoreInstance: firestore.Firestore;
+    firestoreInstance: Firestore;
     /**
      * When this is true, the "modulePath" will be used as firestorePath to sync the data to. Eg. `collection('todos')` will sync data to `todos` on firestore. When this is false (default) the firestorePath must be provided like so: `collection('todos', { firestorePath: 'myTodos' })`
      */
@@ -21,3 +22,4 @@ export interface FirestoreModuleConfig {
     limit?: Limit;
 }
 export declare const CreatePlugin: MagnetarPlugin<FirestorePluginOptions>;
+export {};

@@ -17,7 +17,7 @@ const getInitialDataCollection = () => [
 ]
 const getInitialDataDocument = () => ({ name: 'Luca', age: 10 })
 
-export type PokedexModuleData = O.Merge<
+export type PokedexModuleData = O.Patch<
   PokedexEntry,
   {
     seen?: boolean

@@ -33,7 +33,7 @@ export declare type SharedConfig = {
 /**
  * The Magnetar global options. Can be overwritten on a per-module or per-action basis.
  */
-export declare type GlobalConfig = O.Merge<O.Compulsory<Partial<SharedConfig>, 'localStoreName'>, {
+export declare type GlobalConfig = O.Patch<O.Compulsory<Partial<SharedConfig>, 'localStoreName'>, {
     stores: {
         [storeName: string]: PluginInstance;
     };

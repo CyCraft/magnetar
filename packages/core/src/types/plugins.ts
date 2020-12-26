@@ -47,7 +47,7 @@ export interface PluginInstance {
 /**
  * Where, orderBy, limit clauses or extra config a dev might pass when instanciates a module as second param (under `configPerStore`). Eg. `collection('pokedex', { configPerStore: { local: pluginModuleConfig } })`
  */
-export type PluginModuleConfig = O.Merge<Clauses, { [key: string]: any }>
+export type PluginModuleConfig = O.Patch<Clauses, { [key: string]: any }>
 
 // each of the following actions must be implemented by the plugin!
 
@@ -66,7 +66,7 @@ export type PluginActionPayloadBase<SpecificPluginModuleConfig = PluginModuleCon
   pluginModuleConfig: SpecificPluginModuleConfig
 }
 
-export type PluginStreamActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Merge<
+export type PluginStreamActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -88,7 +88,7 @@ export type PluginStreamAction = (
   payload: PluginStreamActionPayload
 ) => StreamResponse | DoOnStream | Promise<StreamResponse | DoOnStream>
 
-export type PluginGetActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Merge<
+export type PluginGetActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -104,7 +104,7 @@ export type PluginGetAction = (
   payload: PluginGetActionPayload
 ) => GetResponse | DoOnGet | Promise<GetResponse | DoOnGet>
 
-export type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Merge<
+export type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -118,7 +118,7 @@ export type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleCo
  */
 export type PluginWriteAction = (payload: PluginWriteActionPayload) => void | Promise<void>
 
-export type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Merge<
+export type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -134,7 +134,7 @@ export type PluginInsertAction = (payload: PluginInsertActionPayload) => string 
 
 export type PluginDeletePropActionPayload<
   SpecificPluginModuleConfig = PluginModuleConfig
-> = O.Merge<
+> = O.Patch<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -154,7 +154,7 @@ export type PluginDeletePropAction = (
   payload: PluginDeletePropActionPayload
 ) => void | Promise<void>
 
-export type PluginDeleteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Merge<
+export type PluginDeleteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -168,7 +168,7 @@ export type PluginDeleteActionPayload<SpecificPluginModuleConfig = PluginModuleC
  */
 export type PluginDeleteAction = (payload: PluginDeleteActionPayload) => void | Promise<void>
 
-export type PluginRevertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Merge<
+export type PluginRevertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
