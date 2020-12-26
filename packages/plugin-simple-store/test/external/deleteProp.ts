@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { pokedex } from 'test-utils'
+import { pokedex } from '@magnetarjs/test-utils'
 
 test('deleteProp', async (t) => {
   const { trainerModule } = createMagnetarInstance()

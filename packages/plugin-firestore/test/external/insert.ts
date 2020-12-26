@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { pokedex, PokedexEntry, pokedexGetAll, waitMs } from 'test-utils'
+import { pokedex, PokedexEntry, pokedexGetAll, waitMs } from '@magnetarjs/test-utils'
 import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 import { DocInstance } from '../../../core/src'
 

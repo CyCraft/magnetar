@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { pokedex, pokedexEntryDefaults } from 'test-utils'
+import { pokedex, pokedexEntryDefaults } from '@magnetarjs/test-utils'
 import { GetResponse } from '../../src'
 
 test('write + onError: stop -- emits fail events & aborts execution by default', async (t) => {

@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { pokedex } from 'test-utils'
+import { pokedex } from '@magnetarjs/test-utils'
 
 test('delete: emits before & success events', async (t) => {
   const { pokedexModule } = createMagnetarInstance()

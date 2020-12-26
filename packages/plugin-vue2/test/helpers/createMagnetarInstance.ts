@@ -1,6 +1,6 @@
 import { Magnetar, MagnetarInstance, CollectionInstance, DocInstance } from '../../../core/src'
 import { CreatePlugin as CreatePluginLocal } from '../../src'
-import { pokedex, PokedexEntry, generateRandomId, PluginMockRemote } from 'test-utils'
+import { pokedex, PokedexEntry, generateRandomId, PluginMockRemote } from '@magnetarjs/test-utils'
 import { O } from 'ts-toolbelt'
 // @ts-ignore
 import Vue from 'vue/dist/vue.common.js'

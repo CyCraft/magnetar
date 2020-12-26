@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { pokedex, PokedexEntry } from 'test-utils'
+import { pokedex, PokedexEntry } from '@magnetarjs/test-utils'
 import { merge } from 'merge-anything'
 import { DocInstance } from '../../src'
 

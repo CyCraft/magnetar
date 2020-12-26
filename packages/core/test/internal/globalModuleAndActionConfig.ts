@@ -1,6 +1,6 @@
 import test from 'ava'
 import { Magnetar } from '../../src/index'
-import { PluginMockLocal, generateRandomId, pokedex } from 'test-utils'
+import { PluginMockLocal, generateRandomId, pokedex } from '@magnetarjs/test-utils'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 
 const CreatePluginLocal = PluginMockLocal.CreatePlugin

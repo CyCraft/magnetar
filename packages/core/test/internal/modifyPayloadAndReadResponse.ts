@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { pokedex, waitMs } from 'test-utils'
+import { pokedex, waitMs } from '@magnetarjs/test-utils'
 
 test('get: can mutate payload & read response', async (t) => {
   function addSeen(payload: any) {

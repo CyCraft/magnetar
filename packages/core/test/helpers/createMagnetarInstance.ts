@@ -5,7 +5,7 @@ import {
   generateRandomId,
   PluginMockLocal,
   PluginMockRemote,
-} from 'test-utils'
+} from '@magnetarjs/test-utils'
 import { O } from 'ts-toolbelt'
 
 const CreatePluginLocal = PluginMockLocal.CreatePlugin

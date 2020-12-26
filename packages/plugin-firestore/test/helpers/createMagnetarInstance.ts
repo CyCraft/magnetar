@@ -1,6 +1,6 @@
 import { Magnetar, MagnetarInstance, CollectionInstance, DocInstance } from '../../../core/src'
 import { CreatePlugin as CreatePluginRemote } from '../../src'
-import { pokedex, PokedexEntry, generateRandomId, PluginMockLocal } from 'test-utils'
+import { pokedex, PokedexEntry, generateRandomId, PluginMockLocal } from '@magnetarjs/test-utils'
 import { O } from 'ts-toolbelt'
 import { firestore } from './firestore'
 

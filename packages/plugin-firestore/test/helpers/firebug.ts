@@ -1,6 +1,6 @@
 import test from 'ava'
 import { firestore } from '../helpers/firestore'
-import { waitMs } from 'test-utils'
+import { waitMs } from '@magnetarjs/test-utils'
 
 test('firebase sdk', async (t) => {
   const pokemonPath = `magnetarTests/read/pokedex/136`

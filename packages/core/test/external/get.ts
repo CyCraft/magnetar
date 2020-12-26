@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { pokedex } from 'test-utils'
+import { pokedex } from '@magnetarjs/test-utils'
 
 test('get (collection)', async (t) => {
   /// 'get' resolves once all stores have given a response with data
