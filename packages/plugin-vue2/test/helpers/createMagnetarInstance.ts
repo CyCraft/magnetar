@@ -36,7 +36,7 @@ export function createMagnetarInstance(
   trainerModule: DocInstance<TrainerModuleData>
   magnetar: MagnetarInstance
 } {
-  const local = CreatePluginLocal({ storeName: 'local', generateRandomId, vueInstance })
+  const local = CreatePluginLocal({ generateRandomId, vueInstance })
   const remote = CreatePluginRemote({ storeName: 'remote' })
   const magnetar = Magnetar({
     localStoreName: 'local',

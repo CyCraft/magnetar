@@ -32,7 +32,7 @@ export function createMagnetarInstance(): {
   trainerModule: DocInstance<TrainerModuleData>
   magnetar: MagnetarInstance
 } {
-  const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
+  const local = CreatePluginLocal({ generateRandomId })
   const remote = CreatePluginRemote({ storeName: 'remote' })
   const magnetar = Magnetar({
     localStoreName: 'local',

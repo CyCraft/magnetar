@@ -19,7 +19,7 @@ import {
 // - RemoteStoreOptions
 // - StorePluginModuleConfig
 
-export type RemoteStoreOptions = { [key in string]: any }
+export type RemoteStoreOptions = { storeName: string }
 export interface StorePluginModuleConfig {
   path?: string
   initialData?: Record<string, any> | [string, Record<string, any>][]

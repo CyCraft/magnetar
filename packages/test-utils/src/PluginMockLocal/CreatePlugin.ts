@@ -25,6 +25,7 @@ import { filterDataPerClauses } from './helpers/dataHelpers'
 
 export interface StorePluginOptions {
   generateRandomId: () => string
+  storeName: string
 }
 export interface StorePluginModuleConfig {
   path?: string
