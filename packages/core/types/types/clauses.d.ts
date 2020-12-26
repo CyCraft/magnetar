@@ -1,7 +1,7 @@
 /**
  * The operator of a where filter.
  */
-export declare type WhereFilterOp = '==' | '<' | '<=' | '>=' | '>' | 'array-contains' | 'in' | 'array-contains-any';
+export declare type WhereFilterOp = '==' | '!=' | '<' | '<=' | '>' | '>=' | 'array-contains' | 'array-contains-any' | 'in' | 'not-in';
 /**
  * Determines the where-filter to be applied.
  */

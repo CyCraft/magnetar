@@ -3,9 +3,24 @@ import { MagnetarWriteAction, MagnetarGetAction, MagnetarStreamAction, MagnetarD
 import { ModuleConfig, GlobalConfig } from './types/config';
 import { CollectionFn, DocFn } from './Magnetar';
 export declare type DocInstance<DocDataType extends Record<string, any> = Record<string, any>> = {
+    /**
+     * The cached data that was written or read so far
+     */
     data: DocDataType;
+    /**
+     * `collection` is available on every document for chaining
+     * @example doc('001').collection('items')
+     */
     collection: CollectionFn;
+    /**
+     * The id of the document. When this is a nested document, it will not include the full path, only the final part
+     * @example '001'
+     */
     id: string;
+    /**
+     * The full path of the document
+     * @example 'pokedex/001'
+     */
     path: string;
     openStreams: OpenStreams;
     findStream: FindStream;
@@ -22,9 +37,6 @@ export declare type DocInstance<DocDataType extends Record<string, any> = Record
      * @type {MagnetarDeleteAction} Documentation copied from `MagnetarDeleteAction`
      * @param {*} [payload] The delete action doesn't need any payload. In some cases, a Store Plugin you use might accept a payload.
      * @param {ActionConfig} [actionConfig]
-     * @example
-     * // first update the server and await that before updating the local store:
-     * doc(id).delete(undefined, { executionOrder: ['remote', 'local'] })
      */
     delete: MagnetarDeleteAction<DocDataType>;
 };
