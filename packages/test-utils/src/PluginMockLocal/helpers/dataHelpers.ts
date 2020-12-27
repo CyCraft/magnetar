@@ -29,6 +29,9 @@ export function filterDataPerClauses(
         case '==':
           passes = valueAtFieldPath == expectedValue
           break
+        case '!=':
+          passes = valueAtFieldPath != expectedValue
+          break
         case '<':
           passes = valueAtFieldPath < expectedValue
           break
@@ -43,6 +46,9 @@ export function filterDataPerClauses(
           break
         case 'in':
           passes = isArray(expectedValue) && expectedValue.includes(valueAtFieldPath)
+          break
+        case 'not-in':
+          passes = isArray(expectedValue) && !expectedValue.includes(valueAtFieldPath)
           break
         case 'array-contains':
           passes = isArray(valueAtFieldPath) && valueAtFieldPath.includes(expectedValue)

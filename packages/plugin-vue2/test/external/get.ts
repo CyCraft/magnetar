@@ -43,6 +43,18 @@ test('get (collection) where-filter: ==', async (t) => {
   }
 })
 
+test('get (collection) where-filter: !=', async (t) => {
+  const { pokedexModule } = createMagnetarInstance()
+  try {
+    const queryModuleRef = await pokedexModule.where('name', '!=', 'Bulbasaur').limit(1).get()
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [pokedex(2)]
+    t.deepEqual(actual, expected as any)
+  } catch (error) {
+    t.fail(error)
+  }
+})
+
 test('get (collection) where-filter: == nested', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
@@ -123,6 +135,21 @@ test('get (collection) where-filter: in', async (t) => {
       .get()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(134), pokedex(135), pokedex(136)]
+    t.deepEqual(actual, expected as any)
+  } catch (error) {
+    t.fail(error)
+  }
+})
+
+test('get (collection) where-filter: not-in', async (t) => {
+  const { pokedexModule } = createMagnetarInstance()
+  try {
+    const queryModuleRef = await pokedexModule
+      .where('type', 'array-contains', 'Ice')
+      .where('name', 'not-in', [pokedex(91).name, pokedex(131).name])
+      .get()
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [pokedex(87), pokedex(124), pokedex(144)]
     t.deepEqual(actual, expected as any)
   } catch (error) {
     t.fail(error)

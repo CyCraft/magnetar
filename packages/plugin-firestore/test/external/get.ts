@@ -54,6 +54,28 @@ import { pokedex } from '@magnetarjs/test-utils'
   })
 }
 {
+  const testName = 'get (collection) where-filter: !='
+  test(testName, async (t) => {
+    const { pokedexModule } = await createMagnetarInstance('read')
+    try {
+      const queryModuleRef = await pokedexModule
+        .orderBy('name')
+        .where('name', '!=', 'Abra')
+        .limit(1)
+        .get()
+      const actual = [...queryModuleRef.data.values()]
+      const expected = [pokedex(142)]
+      t.deepEqual(actual, expected as any)
+      // also check the collection without query
+      const actualDocCountWithoutQuery = pokedexModule.data.size
+      const expectedDocCountWithoutQuery = expected.length + 1
+      t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
+    } catch (error) {
+      t.fail(error)
+    }
+  })
+}
+{
   const testName = 'get (collection) where-filter: == nested'
   test(testName, async (t) => {
     const { pokedexModule } = await createMagnetarInstance('read')
@@ -171,6 +193,28 @@ import { pokedex } from '@magnetarjs/test-utils'
         .get()
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(134), pokedex(135), pokedex(136)]
+      t.deepEqual(actual, expected as any)
+      // also check the collection without query
+      const actualDocCountWithoutQuery = pokedexModule.data.size
+      const expectedDocCountWithoutQuery = expected.length + 1
+      t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
+    } catch (error) {
+      t.fail(error)
+    }
+  })
+}
+{
+  const testName = 'get (collection) where-filter: not-in'
+  test(testName, async (t) => {
+    const { pokedexModule } = await createMagnetarInstance('read')
+    try {
+      const queryModuleRef = await pokedexModule
+        .orderBy('name')
+        .where('name', 'not-in', ['Abra', 'Alakazam', 'Arcanine'])
+        .limit(3)
+        .get()
+      const actual = [...queryModuleRef.data.values()]
+      const expected = [pokedex(142), pokedex(24), pokedex(144)]
       t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
