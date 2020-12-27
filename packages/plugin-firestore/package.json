@@ -29,8 +29,7 @@
     "@magnetarjs/core": "^0.0.2",
     "@magnetarjs/test-utils": "^0.0.1",
     "ava": "^3.14.0",
-    "firebase": "^8.2.1",
-    "test-utils": "^0.0.10"
+    "firebase": "^8.2.1"
   },
   "keywords": [
     "magnetar-plugin",

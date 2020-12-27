@@ -27,14 +27,14 @@ const plugins = [
 // ------------------------------------------------------------------------------------------
 // Builds
 // ------------------------------------------------------------------------------------------
-function defaults (config) {
+function defaults(config) {
   // defaults
   const defaults = {
     plugins,
     external,
   }
   // defaults.output
-  config.output = config.output.map(output => {
+  config.output = config.output.map((output) => {
     return Object.assign(
       {
         sourcemap: false,
