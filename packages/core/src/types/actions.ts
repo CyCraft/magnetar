@@ -60,8 +60,10 @@ export type MagnetarDeletePropAction<
 ) => Promise<DocInstance<DocDataType>>
 
 /**
- * @param {*} [payload] The delete action doesn't need any payload. In some cases, a Store Plugin you use might accept a payload.
+ * @param {*} [payload] When executing on a doc: no payload needed. When executing on a collection: you need to pass the document ID you want to delete.
  * @param {ActionConfig} [actionConfig]
+ * @example collection('pokedex').delete('001')
+ * @example doc('pokedex/001').delete()
  */
 export type MagnetarDeleteAction<DocDataType extends Record<string, any> = Record<string, any>> = (
   payload?: any,

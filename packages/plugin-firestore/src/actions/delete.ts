@@ -1,3 +1,4 @@
+import { isFullString } from 'is-what'
 import { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { BatchSync } from '../helpers/batchSync'
@@ -13,9 +14,10 @@ export function deleteActionFactory(
     docId,
     pluginModuleConfig,
   }: PluginDeleteActionPayload<FirestoreModuleConfig>): Promise<void> {
-    if (!docId) throw new Error('An non-existent action was triggered on a collection')
+    const _docId = docId || payload
+    if (!isFullString(_docId)) throw new Error('No ID passed to delete action.')
 
-    const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
+    const documentPath = getFirestoreDocPath(collectionPath, _docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
     await batchSync.delete(documentPath)
   }
 }

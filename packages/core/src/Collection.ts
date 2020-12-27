@@ -7,6 +7,7 @@ import {
   FindStream,
   OpenStreamPromises,
   FindStreamPromise,
+  MagnetarDeleteAction,
 } from './types/actions'
 import { actionNameTypeMap } from './types/actionsInternal'
 import { handleActionPerStore } from './moduleActions/handleActionPerStore'
@@ -47,6 +48,7 @@ export type CollectionInstance<DocDataType extends Record<string, any> = Record<
   get: MagnetarGetAction<DocDataType, 'collection'>
   stream: MagnetarStreamAction
   insert: MagnetarInsertAction<DocDataType>
+  delete: MagnetarDeleteAction<DocDataType>
 
   // filters
   where: (fieldPath: string, operator: WhereFilterOp, value: any) => CollectionInstance<DocDataType>
@@ -75,11 +77,12 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
     return docFn(`${path}/${docId}`, _moduleConfig)
   }
 
-  const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.get, docFn, collectionFn) as MagnetarInsertAction<DocDataType> //prettier-ignore
+  const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, docFn, collectionFn) as MagnetarInsertAction<DocDataType> //prettier-ignore
+  const _delete = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn, collectionFn) as MagnetarDeleteAction<DocDataType> //prettier-ignore
   const get = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn, collectionFn) as MagnetarGetAction<DocDataType, 'collection'> //prettier-ignore
   const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streams) // prettier-ignore
 
-  const actions = { stream, get, insert }
+  const actions = { stream, get, insert, delete: _delete }
 
   // Every store will have its 'setupModule' function executed
   executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig)

@@ -1,3 +1,4 @@
+import { isFullString } from 'is-what'
 import { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
@@ -12,11 +13,11 @@ export function deleteActionFactory(
     docId,
     pluginModuleConfig,
   }: PluginDeleteActionPayload<SimpleStoreModuleConfig>): void {
-    // delete cannot be executed on collections
-    if (!docId) throw new Error('An non-existent action was triggered on a collection')
+    const _docId = docId || payload
+    if (!isFullString(_docId)) throw new Error('No ID passed to delete action.')
 
-    if (makeBackup) makeBackup(collectionPath, docId)
+    if (makeBackup) makeBackup(collectionPath, _docId)
 
-    data[collectionPath].delete(docId)
+    data[collectionPath].delete(_docId)
   }
 }

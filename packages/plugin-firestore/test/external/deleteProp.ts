@@ -3,6 +3,12 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex } from '@magnetarjs/test-utils'
 import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 
+/**
+ * This is to overwrite the default firestorePath of this test.
+ * The defaults are:
+ * collection: `{ firestorePath: `magnetarTests/${testName}/pokedex` }`
+ * doc: `{ firestorePath: `magnetarTests/${testName}` }`
+ */
 const conf = (testName: string): any => ({
   configPerStore: { remote: { firestorePath: `magnetarTests/${testName}/pokedex/1` } },
 })

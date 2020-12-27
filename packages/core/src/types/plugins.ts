@@ -160,11 +160,11 @@ export type PluginDeleteActionPayload<SpecificPluginModuleConfig = PluginModuleC
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: void
+    payload: void | any
   }
 >
 /**
- * Should handle 'delete' for docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
+ * Should handle 'delete' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
  */
 export type PluginDeleteAction = (payload: PluginDeleteActionPayload) => void | Promise<void>
 

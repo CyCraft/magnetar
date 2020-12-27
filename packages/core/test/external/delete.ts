@@ -1,7 +1,8 @@
+import { pokedex } from '@magnetarjs/test-utils'
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 
-test('delete', async (t) => {
+test('delete (document)', async (t) => {
   const { trainerModule } = createMagnetarInstance()
   t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
@@ -12,6 +13,20 @@ test('delete', async (t) => {
   }
 
   t.deepEqual(trainerModule.data, undefined)
+})
+
+test('delete (collection)', async (t) => {
+  const { pokedexModule } = createMagnetarInstance()
+  t.deepEqual(pokedexModule.data.size, 1)
+  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+
+  try {
+    await pokedexModule.delete('1')
+  } catch (error) {
+    t.fail(error)
+  }
+  t.deepEqual(pokedexModule.data.size, 0)
+  t.deepEqual(pokedexModule.data.get('1'), undefined)
 })
 
 test('revert: delete (local → remote)', async (t) => {
