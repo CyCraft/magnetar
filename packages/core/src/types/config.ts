@@ -43,7 +43,7 @@ export type GlobalConfig = O.Patch<
 /**
  * Extra options the dev can pass when creating a module with collection() or doc(). These will take precedence over the global config.
  */
-export type ModuleConfig = O.Compact<
+export type ModuleConfig = O.PatchAll<
   Clauses,
   [
     Partial<SharedConfig>,
