@@ -88,47 +88,6 @@ test('expected behaviour computed prop lifecycle - with reactivity via vue.obser
   t.deepEqual(ranFns, ['ran', 'ran'])
 })
 
-// test('reactivity: collection - updating', async t => {
-//   const { pokedexModule } = createMagnetarInstance()
-//   const bulbasaurModule = pokedexModule.doc('1')
-//   const ranFns: any[] = []
-//   const vue = new Vue({
-//     computed: {
-//       allPokemon () {
-//         ranFns.push('allPokemon')
-//         return [...pokedexModule.data.values()]
-//       },
-//       bulbasaur () {
-//         ranFns.push('bulbasaur')
-//         return bulbasaurModule.data
-//       },
-//       bulbasaurDirect () {
-//         ranFns.push('bulbasaurDirect')
-//         return pokedexModule.data.get('1')
-//       },
-//     },
-//   })
-
-//   let a: any
-//   a = vue.bulbasaur
-//   a = vue.bulbasaur
-//   // should have only ran once
-//   console.log(`vue.allPokemon[0] → `, vue.allPokemon[0])
-//   t.deepEqual(ranFns, ['bulbasaur', 'allPokemon'])
-//   // update
-//   pokedexModule.doc('1').merge({ name: 'Bsaur' })
-//   console.log(`vue.allPokemon[0] → `, vue.allPokemon[0])
-//   a = vue.bulbasaur
-//   a = vue.bulbasaur
-//   t.deepEqual(ranFns, ['bulbasaur', 'allPokemon', 'bulbasaur'])
-//   // check pokedexModule directly
-//   t.is(pokedexModule.doc('1').data.name, 'Bsaur')
-//   t.is(pokedexModule.data.get('1').name, 'Bsaur')
-//   t.is(vue.bulbasaur.name, 'Bsaur')
-//   t.is(vue.bulbasaurDirect.name, 'Bsaur')
-//   t.deepEqual(ranFns, ['bulbasaur', 'bulbasaur'])
-// })
-
 test('reactivity: document - via data', async (t) => {
   const { trainerModule } = createMagnetarInstance()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
@@ -219,50 +178,75 @@ test('reactivity: document - directly', async (t) => {
   t.deepEqual(ranFns, ['ran', 'ran', 'ran'])
 })
 
-// test if a computed prop is re-run or not based on how the underlying data is overwritten
-// test('computed prop lifecycle', async t => {
-//   const { pokedexModule } = createMagnetarInstance()
-//   try { await pokedexModule.get() } catch (error) { t.fail(error) } // prettier-ignore
+test('reactivity: collection - inserting', async (t) => {
+  const { pokedexModule } = createMagnetarInstance()
+  const ranFns: any[] = []
+  const vue = new Vue({
+    computed: {
+      countPokemon() {
+        ranFns.push('countPokemon')
+        return pokedexModule.data.size
+      },
+      allPokemon() {
+        ranFns.push('allPokemon')
+        return [...pokedexModule.data.values()]
+      },
+    },
+  })
 
+  let a: any
+  a = vue.countPokemon
+  a = vue.allPokemon
+  // should have only ran once
+  t.deepEqual(ranFns, ['countPokemon', 'allPokemon'])
+  t.is(vue.countPokemon, 1)
+  // update
+  pokedexModule.insert(pokedex(4))
+  a = vue.countPokemon
+  a = vue.allPokemon
+  t.is(vue.countPokemon, 2)
+  t.deepEqual(ranFns, ['countPokemon', 'allPokemon', 'countPokemon', 'allPokemon'])
+  // check pokedexModule directly
+})
+
+// test('reactivity: collection - updating', async (t) => {
+//   const { pokedexModule } = createMagnetarInstance()
+//   const bulbasaurModule = pokedexModule.doc('1')
 //   const ranFns: any[] = []
 //   const vue = new Vue({
 //     computed: {
-//       allPokemon () {
+//       allPokemon() {
 //         ranFns.push('allPokemon')
-//         return pokedexModule.data.values()
+//         return [...pokedexModule.data.values()]
 //       },
-//       flareon () {
-//         ranFns.push('flareon')
-//         return pokedexModule.data.get('136')
+//       bulbasaur() {
+//         ranFns.push('bulbasaur')
+//         return bulbasaurModule.data
+//       },
+//       bulbasaurDirect() {
+//         ranFns.push('bulbasaurDirect')
+//         return pokedexModule.data.get('1')
 //       },
 //     },
 //   })
 
 //   let a: any
-//   a = vue.allPokemon
-//   a = vue.allPokemon
+//   a = vue.bulbasaurDirect
+//   a = vue.bulbasaurDirect
 //   // should have only ran once
-//   t.deepEqual(ranFns, ['allPokemon'])
-//   // log flareon twice
-//   a = vue.flareon
-//   a = vue.flareon
-//   // should have only ran once
-//   t.deepEqual(ranFns, ['allPokemon', 'flareon'])
-//   // // update b text
-//   // vue.updateB()
-//   // // log flareon twice
-//   // a = vue.flareon
-//   // a = vue.flareon
-//   // // should have only ran once
-//   // t.deepEqual(ranFns, ['allPokemon', 'flareon', 'flareon'])
-//   // // update A
-//   // vue.updateA()
-//   // // log flareon again, should have not run in this case
-//   // a = vue.flareon
-//   // t.deepEqual(ranFns, ['allPokemon', 'flareon', 'flareon'])
-//   // // update All
-//   // vue.updateAll()
-//   // // log flareon again, should have not run in this case
-//   // a = vue.flareon
-//   // t.deepEqual(ranFns, ['allPokemon', 'flareon', 'flareon'])
+//   console.log(`vue.allPokemon[0] → `, vue.allPokemon[0])
+//   t.deepEqual(ranFns, ['bulbasaurDirect', 'allPokemon'])
+//   // update
+//   pokedexModule.doc('1').merge({ name: 'Bsaur' })
+//   console.log(`vue.allPokemon[0] → `, vue.allPokemon[0])
+//   a = vue.bulbasaurDirect
+//   a = vue.bulbasaurDirect
+//   // t.deepEqual(ranFns, ['bulbasaurDirect', 'allPokemon', 'bulbasaurDirect'])
+//   // check pokedexModule directly
+//   t.is(pokedexModule.doc('1').data.name, 'Bsaur')
+//   t.is(pokedexModule.data.get('1')?.name, 'Bsaur')
+//   console.log(vue.bulbasaurDirect.name)
+//   t.is(vue.bulbasaurDirect.name, 'Bsaur')
+//   t.is(vue.bulbasaur.name, 'Bsaur')
+//   t.deepEqual(ranFns, ['bulbasaurDirect', 'allPokemon', 'bulbasaurDirect', 'bulbasaur'])
 // })
