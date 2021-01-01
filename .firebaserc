@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "cycraft-ecosystem"
+  },
+  "targets": {
+    "cycraft-ecosystem": {
+      "hosting": {
+        "magnetar": [
+          "magnetar"
+        ]
+      }
+    }
+  }
+}
