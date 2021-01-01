@@ -5,13 +5,13 @@ import {
   DoOnStream,
   PluginStreamActionPayload,
 } from '@magnetarjs/core'
-import { ReactiveStoreModuleConfig, ReactiveStoreOptions } from '../CreatePlugin'
+import { Vue2StoreModuleConfig, Vue2StoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 import { deleteActionFactory } from './delete'
 
 export function streamActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
-  reactiveStoreOptions: ReactiveStoreOptions
+  reactiveStoreOptions: Vue2StoreOptions
 ): PluginStreamAction {
   return function ({
     payload,
@@ -19,7 +19,7 @@ export function streamActionFactory(
     docId,
     pluginModuleConfig,
     mustExecuteOnRead,
-  }: PluginStreamActionPayload<ReactiveStoreModuleConfig>):
+  }: PluginStreamActionPayload<Vue2StoreModuleConfig>):
     | StreamResponse
     | DoOnStream
     | Promise<StreamResponse | DoOnStream> {

@@ -1,5 +1,5 @@
 import { PluginDeletePropAction } from '@magnetarjs/core';
-import { ReactiveStoreOptions, MakeRestoreBackup } from '../CreatePlugin';
+import { Vue2StoreOptions, MakeRestoreBackup } from '../CreatePlugin';
 export declare function deletePropActionFactory(data: {
     [collectionPath: string]: Map<string, Record<string, any>>;
-}, reactiveStoreOptions: ReactiveStoreOptions, makeBackup?: MakeRestoreBackup): PluginDeletePropAction;
+}, reactiveStoreOptions: Vue2StoreOptions, makeBackup?: MakeRestoreBackup): PluginDeletePropAction;

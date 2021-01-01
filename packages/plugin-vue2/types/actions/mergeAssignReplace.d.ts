@@ -1,5 +1,5 @@
 import { PluginWriteAction } from '@magnetarjs/core';
-import { ReactiveStoreOptions, MakeRestoreBackup } from '../CreatePlugin';
+import { Vue2StoreOptions, MakeRestoreBackup } from '../CreatePlugin';
 export declare function writeActionFactory(data: {
     [collectionPath: string]: Map<string, Record<string, any>>;
-}, reactiveStoreOptions: ReactiveStoreOptions, actionName: 'merge' | 'assign' | 'replace', makeBackup?: MakeRestoreBackup): PluginWriteAction;
+}, reactiveStoreOptions: Vue2StoreOptions, actionName: 'merge' | 'assign' | 'replace', makeBackup?: MakeRestoreBackup): PluginWriteAction;

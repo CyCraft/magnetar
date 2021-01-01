@@ -1,1 +1,1 @@
-export { ReactiveStoreOptions, ReactiveStoreModuleConfig, CreatePlugin } from './CreatePlugin'
+export { Vue2StoreOptions, Vue2StoreModuleConfig, CreatePlugin } from './CreatePlugin'

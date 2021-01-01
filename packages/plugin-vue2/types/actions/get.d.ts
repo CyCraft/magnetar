@@ -1,5 +1,5 @@
 import { PluginGetAction } from '@magnetarjs/core';
-import { ReactiveStoreOptions } from '../CreatePlugin';
+import { Vue2StoreOptions } from '../CreatePlugin';
 export declare function getActionFactory(data: {
     [collectionPath: string]: Map<string, Record<string, any>>;
-}, reactiveStoreOptions: ReactiveStoreOptions): PluginGetAction;
+}, reactiveStoreOptions: Vue2StoreOptions): PluginGetAction;

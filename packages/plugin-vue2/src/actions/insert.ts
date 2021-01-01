@@ -1,10 +1,10 @@
 import { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/core'
-import { ReactiveStoreModuleConfig, ReactiveStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { Vue2StoreModuleConfig, Vue2StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'
 
 export function insertActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
-  reactiveStoreOptions: ReactiveStoreOptions,
+  reactiveStoreOptions: Vue2StoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginInsertAction {
   const { generateRandomId, vueInstance } = reactiveStoreOptions
@@ -13,7 +13,7 @@ export function insertActionFactory(
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginInsertActionPayload<ReactiveStoreModuleConfig>): string {
+  }: PluginInsertActionPayload<Vue2StoreModuleConfig>): string {
     if (!docId) {
       const newDocId =
         isFullString(payload.id) || isNumber(payload.id) ? String(payload.id) : generateRandomId()

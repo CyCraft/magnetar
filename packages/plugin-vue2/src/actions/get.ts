@@ -1,17 +1,17 @@
 import { PluginGetAction, GetResponse, DoOnGet, PluginGetActionPayload } from '@magnetarjs/core'
-import { ReactiveStoreModuleConfig, ReactiveStoreOptions } from '../CreatePlugin'
+import { Vue2StoreModuleConfig, Vue2StoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 
 export function getActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
-  reactiveStoreOptions: ReactiveStoreOptions
+  reactiveStoreOptions: Vue2StoreOptions
 ): PluginGetAction {
   return function ({
     payload,
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginGetActionPayload<ReactiveStoreModuleConfig>): GetResponse | DoOnGet {
+  }: PluginGetActionPayload<Vue2StoreModuleConfig>): GetResponse | DoOnGet {
     const doOnGetAction: DoOnGet = (payload, meta): void => {
       insertActionFactory(
         data,

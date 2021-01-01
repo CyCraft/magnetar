@@ -20,10 +20,10 @@ import { revertActionFactory } from './actions/revert'
 import { filterDataPerClauses } from './helpers/dataHelpers'
 
 // there are two interfaces to be defined & exported by each plugin
-// - ReactiveStoreOptions
-// - ReactiveStoreModuleConfig
+// - Vue2StoreOptions
+// - Vue2StoreModuleConfig
 
-export interface ReactiveStoreOptions {
+export interface Vue2StoreOptions {
   /**
    * This is required to make sure there are not two instances of Vue running which can cause issues.
    */
@@ -35,7 +35,7 @@ export interface ReactiveStoreOptions {
   generateRandomId: () => string
 }
 
-export interface ReactiveStoreModuleConfig {
+export interface Vue2StoreModuleConfig {
   path?: string
   initialData?: Record<string, any> | [string, Record<string, any>][]
   where?: WhereClause[]
@@ -50,8 +50,8 @@ export type MakeRestoreBackup = (collectionPath: string, docId: string) => void
  * the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
  * each action must have the proper for both collection and doc type modules
  */
-export const CreatePlugin: MagnetarPlugin<ReactiveStoreOptions> = (
-  reactiveStoreOptions: ReactiveStoreOptions
+export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
+  reactiveStoreOptions: Vue2StoreOptions
 ): PluginInstance => {
   // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
@@ -97,7 +97,7 @@ export const CreatePlugin: MagnetarPlugin<ReactiveStoreOptions> = (
     collectionPath,
     docId,
     pluginModuleConfig = {},
-  }: PluginActionPayloadBase<ReactiveStoreModuleConfig>): void => {
+  }: PluginActionPayloadBase<Vue2StoreModuleConfig>): void => {
     const modulePath = [collectionPath, docId].filter(Boolean).join('/')
     if (modulesAlreadySetup.has(modulePath)) return
     // always set up a new Map for the collection, but only when it's undefined!
@@ -131,7 +131,7 @@ export const CreatePlugin: MagnetarPlugin<ReactiveStoreOptions> = (
     collectionPath,
     docId,
     pluginModuleConfig = {},
-  }: PluginActionPayloadBase<ReactiveStoreModuleConfig>): any => {
+  }: PluginActionPayloadBase<Vue2StoreModuleConfig>): any => {
     const collectionDB = data[collectionPath]
     // if it's a doc, return the specific doc
     // console.log(`collectionDB.get(docId).__ob__ → `, collectionDB.get(docId).__ob__)

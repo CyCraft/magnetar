@@ -1,9 +1,9 @@
 import { PluginRevertAction, PluginRevertActionPayload } from '@magnetarjs/core'
-import { ReactiveStoreModuleConfig, ReactiveStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { Vue2StoreModuleConfig, Vue2StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function revertActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
-  reactiveStoreOptions: ReactiveStoreOptions,
+  reactiveStoreOptions: Vue2StoreOptions,
   restoreBackup: MakeRestoreBackup
 ): PluginRevertAction {
   return function ({
@@ -13,7 +13,7 @@ export function revertActionFactory(
     pluginModuleConfig,
     actionName,
     error,
-  }: PluginRevertActionPayload<ReactiveStoreModuleConfig>): void {
+  }: PluginRevertActionPayload<Vue2StoreModuleConfig>): void {
     // revert all write actions when called on a doc
     if (
       docId &&

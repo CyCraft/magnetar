@@ -1,10 +1,10 @@
 import { merge } from 'merge-anything'
 import { PluginWriteAction, PluginWriteActionPayload } from '@magnetarjs/core'
-import { ReactiveStoreModuleConfig, ReactiveStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { Vue2StoreModuleConfig, Vue2StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function writeActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
-  reactiveStoreOptions: ReactiveStoreOptions,
+  reactiveStoreOptions: Vue2StoreOptions,
   actionName: 'merge' | 'assign' | 'replace',
   makeBackup?: MakeRestoreBackup
 ): PluginWriteAction {
@@ -14,7 +14,7 @@ export function writeActionFactory(
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginWriteActionPayload<ReactiveStoreModuleConfig>): void {
+  }: PluginWriteActionPayload<Vue2StoreModuleConfig>): void {
     // write actions cannot be executed on collections
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 

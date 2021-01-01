@@ -1,5 +1,5 @@
 import { MagnetarPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core';
-export interface ReactiveStoreOptions {
+export interface Vue2StoreOptions {
     /**
      * This is required to make sure there are not two instances of Vue running which can cause issues.
      */
@@ -10,7 +10,7 @@ export interface ReactiveStoreOptions {
      */
     generateRandomId: () => string;
 }
-export interface ReactiveStoreModuleConfig {
+export interface Vue2StoreModuleConfig {
     path?: string;
     initialData?: Record<string, any> | [string, Record<string, any>][];
     where?: WhereClause[];
@@ -23,4 +23,4 @@ export declare type MakeRestoreBackup = (collectionPath: string, docId: string) 
  * the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
  * each action must have the proper for both collection and doc type modules
  */
-export declare const CreatePlugin: MagnetarPlugin<ReactiveStoreOptions>;
+export declare const CreatePlugin: MagnetarPlugin<Vue2StoreOptions>;

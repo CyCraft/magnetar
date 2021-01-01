@@ -1,10 +1,10 @@
 import { isFullString } from 'is-what'
 import { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/core'
-import { ReactiveStoreModuleConfig, ReactiveStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { Vue2StoreModuleConfig, Vue2StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function deleteActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
-  reactiveStoreOptions: ReactiveStoreOptions,
+  reactiveStoreOptions: Vue2StoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeleteAction {
   return function ({
@@ -12,7 +12,7 @@ export function deleteActionFactory(
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginDeleteActionPayload<ReactiveStoreModuleConfig>): void {
+  }: PluginDeleteActionPayload<Vue2StoreModuleConfig>): void {
     const _docId = docId || payload
     if (!isFullString(_docId)) throw new Error('No ID passed to delete action.')
 

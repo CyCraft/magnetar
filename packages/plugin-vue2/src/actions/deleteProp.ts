@@ -1,11 +1,11 @@
 import { isArray } from 'is-what'
 import { getProp } from 'path-to-prop'
 import { PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetarjs/core'
-import { ReactiveStoreModuleConfig, ReactiveStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { Vue2StoreModuleConfig, Vue2StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function deletePropActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
-  reactiveStoreOptions: ReactiveStoreOptions,
+  reactiveStoreOptions: Vue2StoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeletePropAction {
   return function ({
@@ -13,7 +13,7 @@ export function deletePropActionFactory(
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginDeletePropActionPayload<ReactiveStoreModuleConfig>): void {
+  }: PluginDeletePropActionPayload<Vue2StoreModuleConfig>): void {
     // `deleteProp` action cannot be executed on collections
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 
