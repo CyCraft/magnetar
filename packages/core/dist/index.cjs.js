@@ -582,10 +582,11 @@ function createCollectionWithContext([collectionPath, docId], moduleConfig, glob
     const doc = (docId, _moduleConfig = {}) => {
         return docFn(`${path}/${docId}`, _moduleConfig);
     };
-    const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.get, docFn, collectionFn); //prettier-ignore
+    const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, docFn, collectionFn); //prettier-ignore
+    const _delete = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn, collectionFn); //prettier-ignore
     const get = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn, collectionFn); //prettier-ignore
     const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streams); // prettier-ignore
-    const actions = { stream, get, insert };
+    const actions = { stream, get, insert, delete: _delete };
     // Every store will have its 'setupModule' function executed
     executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig);
     function where(fieldPath, operator, value) {

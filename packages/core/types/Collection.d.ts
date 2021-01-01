@@ -1,5 +1,5 @@
 import { O } from 'ts-toolbelt';
-import { MagnetarGetAction, MagnetarStreamAction, MagnetarInsertAction, OpenStreams, FindStream, OpenStreamPromises, FindStreamPromise } from './types/actions';
+import { MagnetarGetAction, MagnetarStreamAction, MagnetarInsertAction, OpenStreams, FindStream, OpenStreamPromises, FindStreamPromise, MagnetarDeleteAction } from './types/actions';
 import { ModuleConfig, GlobalConfig } from './types/config';
 import { DocFn, CollectionFn } from './Magnetar';
 import { WhereFilterOp } from './types/clauses';
@@ -31,6 +31,7 @@ export declare type CollectionInstance<DocDataType extends Record<string, any> =
     get: MagnetarGetAction<DocDataType, 'collection'>;
     stream: MagnetarStreamAction;
     insert: MagnetarInsertAction<DocDataType>;
+    delete: MagnetarDeleteAction<DocDataType>;
     where: (fieldPath: string, operator: WhereFilterOp, value: any) => CollectionInstance<DocDataType>;
     orderBy: (fieldPath: string, direction?: 'asc' | 'desc') => CollectionInstance<DocDataType>;
     limit: (limitCount: number) => CollectionInstance<DocDataType>;

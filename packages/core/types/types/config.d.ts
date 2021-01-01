@@ -41,7 +41,7 @@ export declare type GlobalConfig = O.Patch<O.Compulsory<Partial<SharedConfig>, '
 /**
  * Extra options the dev can pass when creating a module with collection() or doc(). These will take precedence over the global config.
  */
-export declare type ModuleConfig = O.Compact<Clauses, [
+export declare type ModuleConfig = O.PatchAll<Clauses, [
     Partial<SharedConfig>,
     {
         /**

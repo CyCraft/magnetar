@@ -117,10 +117,10 @@ export declare type PluginDeleteActionPayload<SpecificPluginModuleConfig = Plugi
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: void;
+    payload: void | any;
 }>;
 /**
- * Should handle 'delete' for docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
+ * Should handle 'delete' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
  */
 export declare type PluginDeleteAction = (payload: PluginDeleteActionPayload) => void | Promise<void>;
 export declare type PluginRevertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
