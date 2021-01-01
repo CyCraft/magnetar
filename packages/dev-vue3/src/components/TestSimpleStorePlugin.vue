@@ -11,6 +11,7 @@
 </style>
 
 <script>
+import { reactive, computed } from 'vue'
 import { magnetar } from '../magnetar.js'
 import TodoApp from './TodoApp.vue'
 
@@ -21,18 +22,15 @@ export default {
   name: 'TestSimpleStorePlugin',
   components: { TodoApp },
   props: {},
-  data() {
-    return { data: itemsModule.data }
-  },
-  computed: {
-    items() {
-      return [...this.data.values()]
-    },
-  },
-  methods: {
-    addNew(newItem) {
+  setup() {
+    const itemsMap = reactive(itemsModule.data)
+    const items = computed(() => [...itemsMap.values()])
+
+    function addNew(newItem) {
       itemsModule.insert(newItem)
-    },
+    }
+
+    return { items, addNew }
   },
 }
 </script>
