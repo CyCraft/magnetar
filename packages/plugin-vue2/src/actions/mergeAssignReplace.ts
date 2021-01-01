@@ -8,6 +8,7 @@ export function writeActionFactory(
   actionName: 'merge' | 'assign' | 'replace',
   makeBackup?: MakeRestoreBackup
 ): PluginWriteAction {
+  const { vueInstance } = reactiveStoreOptions
   return function ({
     payload,
     collectionPath,
@@ -23,7 +24,7 @@ export function writeActionFactory(
 
     // always start from an empty document on 'replace' or when the doc is non existent
     if (actionName === 'replace' || !collectionMap.get(docId)) {
-      collectionMap.set(docId, reactiveStoreOptions.vueInstance.observable({}))
+      collectionMap.set(docId, vueInstance.observable({}))
     }
     const docDataToMutate = collectionMap.get(docId)
 
@@ -33,18 +34,14 @@ export function writeActionFactory(
     if (actionName === 'merge') {
       Object.entries(payload).forEach(([key, value]) => {
         // docDataToMutate[key] = merge(docDataToMutate[key], value)
-        reactiveStoreOptions.vueInstance.set(
-          docDataToMutate,
-          key,
-          merge(docDataToMutate[key], value)
-        )
+        vueInstance.set(docDataToMutate, key, merge(docDataToMutate[key], value))
       })
     }
     // console.log(`docDataToMutate.name → `, docDataToMutate.name)
     if (actionName === 'assign' || actionName === 'replace') {
       Object.entries(payload).forEach(([key, value]) => {
         // docDataToMutate[key] = value
-        reactiveStoreOptions.vueInstance.set(docDataToMutate, key, value)
+        vueInstance.set(docDataToMutate, key, value)
       })
     }
   }
