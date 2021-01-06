@@ -1,13 +1,13 @@
 {
   "name": "dev-vue3",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
     "dev": "vite",
     "build--": "vuedx-typecheck . && vite build"
   },
   "dependencies": {
-    "@magnetarjs/core": "^0.0.2",
-    "@magnetarjs/plugin-simple-store": "^0.0.2",
+    "@magnetarjs/core": "^0.0.3",
+    "@magnetarjs/plugin-simple-store": "^0.0.3",
     "vue": "^3.0.5"
   },
   "devDependencies": {
