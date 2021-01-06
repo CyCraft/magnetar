@@ -32,7 +32,7 @@
   "devDependencies": {
     "@magnetarjs/core": "^0.0.2",
     "@magnetarjs/test-utils": "^0.0.1",
-    "ava": "^3.14.0",
+    "ava": "^3.15.0",
     "vue": "^2.6.12"
   },
   "keywords": [

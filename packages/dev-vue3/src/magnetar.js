@@ -1,12 +1,13 @@
 // ---------------------------------------
 // plugin vue2 for local data store
 // ---------------------------------------
-import { Magnetar, PluginSimpleStore } from 'magnetar'
+import { Magnetar } from '@magnetarjs/core'
+import { CreatePlugin } from '@magnetarjs/plugin-simple-store'
 
 const generateRandomId = () => Math.random().toString()
 
 // create the local store plugin instance:
-const local = PluginSimpleStore.CreatePlugin({ generateRandomId })
+const local = CreatePlugin({ generateRandomId })
 
 // -----------------------------------------------------
 // instantiate the Magnetar instance with the store plugins
