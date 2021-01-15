@@ -5,20 +5,18 @@
 </template>
 
 <style lang="sass" scoped>
-// $
-
-// .test
 </style>
 
-<script>
-import { reactive, computed } from 'vue'
-import { magnetar } from '../magnetar.js'
+<script lang="ts">
+import { reactive, computed, defineComponent } from 'vue'
+import { magnetar } from '../magnetar'
 import TodoApp from './TodoApp.vue'
 
 const itemsModule = magnetar.collection('items')
+// @ts-ignore
 window.itemsModule = itemsModule
 
-export default {
+export default defineComponent({
   name: 'TestSimpleStorePlugin',
   components: { TodoApp },
   props: {},
@@ -26,11 +24,12 @@ export default {
     const itemsMap = reactive(itemsModule.data)
     const items = computed(() => [...itemsMap.values()])
 
-    function addNew(newItem) {
+    function addNew(newItem: any) {
+      console.log(`newItem → `, newItem)
       itemsModule.insert(newItem)
     }
 
     return { items, addNew }
   },
-}
+})
 </script>

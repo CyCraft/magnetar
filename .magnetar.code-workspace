@@ -1,0 +1,23 @@
+{
+  "folders": [
+    {
+      "name": "ROOT",
+      "path": "."
+    },
+    { "path": "packages/core" },
+    { "path": "packages/dev-vue2" },
+    { "path": "packages/dev-vue3" },
+    { "path": "packages/docs" },
+    { "path": "packages/magnetar" },
+    { "path": "packages/plugin-firestore" },
+    { "path": "packages/plugin-simple-store" },
+    { "path": "packages/plugin-vue2" },
+    { "path": "packages/test-utils" }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/node_modules/**": true,
+      "packages/*/*": true
+    }
+  }
+}

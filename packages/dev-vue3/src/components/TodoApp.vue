@@ -6,27 +6,25 @@
 </template>
 
 <style lang="sass" scoped>
-// $
-
-// .todo-app
 </style>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent, ref } from 'vue'
+
+export default defineComponent({
   name: 'TodoApp',
   props: {
     items: { type: Array, default: () => [] },
   },
-  data() {
-    return { newItem: '' }
+  setup(props, { emit }) {
+    const newItem = ref('')
+
+    function addNew () {
+      emit('add', newItem.value)
+      newItem.value = ''
+    }
+    
+    return { newItem, addNew }
   },
-  computed: {},
-  methods: {
-    addNew() {
-      const { newItem } = this
-      this.$emit('add', newItem)
-      this.newItem = ''
-    },
-  },
-}
+})
 </script>
