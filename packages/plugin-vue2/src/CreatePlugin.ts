@@ -134,7 +134,12 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
     // but remember, the return type MUST be a map with id as keys and the docs as value
     const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
 
-    return objectToMap(filterDataPerClauses(dataCollectionDic, clauses))
+    const result = filterDataPerClauses(dataCollectionDic, clauses)
+    if (result === 'no-filter') {
+      return objectToMap(dataCollectionDic)
+    }
+    const resultAsDic = Object.fromEntries(result)
+    return objectToMap(resultAsDic, result)
   }
 
   // the plugin must try to implement logic for every `ActionName`

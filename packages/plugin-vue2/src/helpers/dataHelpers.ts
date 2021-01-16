@@ -1,23 +1,23 @@
 import { Clauses } from '@magnetarjs/core'
-import { isNumber, isArray, isUndefined } from 'is-what'
+import { isNumber, isArray } from 'is-what'
 import { getProp } from 'path-to-prop'
 import sort from 'fast-sort'
 import { ISortByObjectSorter } from 'fast-sort'
 
 /**
- * Filters a Collection module's data map `Map<string, DocData>` based on provided clauses.
+ * Filters a Collection module's data based on provided clauses.
  *
  * @param {Record<string, Record<string, any>>} collectionDB
  * @param {Clauses} clauses
- * @returns {Record<string, Record<string, any>>}
+ * @returns {'no-filter' | [string, Record<string, any>][]} filtered and sorted entries
  */
 export function filterDataPerClauses(
   collectionDB: Record<string, Record<string, any>>,
   clauses: Clauses
-): Record<string, Record<string, any>> {
+): 'no-filter' | [string, Record<string, any>][] {
   const { where = [], orderBy = [], limit } = clauses
-  // return the same collectionDB to be sure to keep reactivity
-  if (!where.length && !orderBy.length && !isNumber(limit)) return collectionDB
+  // return 'no-filter' if no filtering is needed
+  if (!where.length && !orderBy.length && !isNumber(limit)) return 'no-filter'
   // all other cases we need to create a new Map() with the results
   const entries: [string, Record<string, any>][] = []
   Object.entries(collectionDB).forEach(([docId, docData]) => {
@@ -76,10 +76,9 @@ export function filterDataPerClauses(
   }, [] as ISortByObjectSorter<[string, Record<string, any>]>[])
   const entriesOrdered = orderBy.length ? sort(entries).by(by) : entries
   // limit
-  const entriesLimited = isNumber(limit) ? entriesOrdered.slice(0, limit) : entriesOrdered
-  // turn back into MAP
-  const filteredDataDic: Record<string, Record<string, any>> = Object.fromEntries(entriesLimited)
-  return filteredDataDic
+  const entriesOrderedAndLimited = isNumber(limit) ? entriesOrdered.slice(0, limit) : entriesOrdered
+
+  return entriesOrderedAndLimited
 }
 
 type CustomMap<DocDataType = Record<string, any>> = {
@@ -130,7 +129,8 @@ type CustomMap<DocDataType = Record<string, any>> = {
 }
 
 export function objectToMap(
-  object: Record<string, any> | undefined = {}
+  object: Record<string, any> | undefined = {},
+  entriesInCustomOrder?: [string, Record<string, any>][]
 ): Map<string, Record<string, any>> {
   const dic = object
 
@@ -141,21 +141,26 @@ export function objectToMap(
     return !!dic[id]
   }
   function keys() {
+    if (entriesInCustomOrder) return entriesInCustomOrder.map((e) => e[0])
     return Object.keys(dic)
     // return IterableIterator<string>
   }
   function values() {
+    if (entriesInCustomOrder) return entriesInCustomOrder.map((e) => e[1])
     return Object.values(dic)
     // return IterableIterator<Record<string, any>>
   }
   function entries() {
+    if (entriesInCustomOrder) return entriesInCustomOrder
     return Object.entries(dic)
     // return IterableIterator<[string, Record<string, any>]>
   }
   function forEach(
     callbackfn: (value: any, key: string, map: Map<string, any>, thisArg?: any) => void
   ) {
-    Object.entries(dic).forEach(([k, v]) => {
+    const _entries = entriesInCustomOrder || Object.entries(dic)
+
+    _entries.forEach(([k, v]) => {
       callbackfn(v, k, new Map())
     })
   }
