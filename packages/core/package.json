@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/core",
-  "version": "0.0.4",
+  "version": "0.0.3",
   "sideEffects": false,
   "description": "Magnetar core library.",
   "main": "dist/index.cjs.js",
@@ -13,7 +13,7 @@
     "test--only": "ava --verbose --match='*only:*'",
     "rollup": "rimraf dist && rimraf types && rollup -c build.js"
   },
-  "author": "Luca & Louis",
+  "author": "Luca Ban - Mesqueeb",
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
