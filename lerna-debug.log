@@ -1,15 +1,8 @@
-0 silly argv {
-0 silly argv   _: [ 'add' ],
-0 silly argv   D: true,
-0 silly argv   dev: true,
-0 silly argv   scope: '@magnetarjs/core',
-0 silly argv   globs: [],
-0 silly argv   lernaVersion: '3.22.1',
-0 silly argv   '$0': '/usr/local/bin/lerna',
-0 silly argv   pkg: '@magnetarjs/test-utils'
-0 silly argv }
-1 notice cli v3.22.1
-2 verbose rootPath /Users/lucaban/ghq/github.com/CyCraft/magnetar
-3 info versioning independent
-4 error Error: 404 Not Found - GET https://registry.npmjs.org/@magnetarjs%2ftest-utils - Not found
-4 error     at /Users/lucaban/ghq/github.com/CyCraft/magnetar/node_modules/@evocateur/npm-registry-fetch/check-response.js:104:15
+107 warn complete Waiting for 2 child processes to exit. CTRL-C to exit immediately.
+108 error Error: Command failed: git tag dev-vue3@0.0.1 -m dev-vue3@0.0.1
+108 error fatal: tag 'dev-vue3@0.0.1' already exists
+108 error
+108 error     at makeError (/Users/lucaban/ghq/github.com/CyCraft/magnetar/node_modules/execa/index.js:174:9)
+108 error     at /Users/lucaban/ghq/github.com/CyCraft/magnetar/node_modules/execa/index.js:278:16
+108 error     at processTicksAndRejections (node:internal/process/task_queues:93:5)
+108 error     at async Promise.all (index 2)
