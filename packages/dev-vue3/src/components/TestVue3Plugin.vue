@@ -33,20 +33,17 @@ export default defineComponent({
 
     const size = computed(() => itemsModule.data.size)
     const items = computed(() => {
-      const _all = showAll.value
-      const _ordered = alphabetically.value
-      const result =
-        _all && _ordered
-          ? itemsModule.orderBy('title').data.values()
-          : _all && !_ordered
-          ? itemsModule.data.values()
-          : !_all && _ordered
+      const _showAll = showAll.value
+      const _alphabetically = alphabetically.value
+      const _module =
+        _showAll && _alphabetically
+          ? itemsModule.orderBy('title')
+          : _showAll && !_alphabetically
           ? itemsModule
-              .where('isDone', '==', false)
-              .orderBy('title')
-              .data.values()
-          : itemsModule.where('isDone', '==', false).data.values()
-      return [...result]
+          : !_showAll && _alphabetically
+          ? itemsModule.where('isDone', '==', false).orderBy('title')
+          : itemsModule.where('isDone', '==', false)
+      return [..._module.data.values()]
     })
 
     function addItem(item: Item) {

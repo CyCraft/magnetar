@@ -35,16 +35,15 @@ export default {
     },
     items() {
       const { showAll, alphabetically } = this
-      return showAll && alphabetically
-        ? itemsModule.orderBy('title').data.values()
-        : showAll && !alphabetically
-        ? itemsModule.data.values()
-        : !showAll && alphabetically
-        ? itemsModule
-            .where('isDone', '==', false)
-            .orderBy('title')
-            .data.values()
-        : itemsModule.where('isDone', '==', false).data.values()
+      const _module =
+        showAll && alphabetically
+          ? itemsModule.orderBy('title')
+          : showAll && !alphabetically
+          ? itemsModule
+          : !showAll && alphabetically
+          ? itemsModule.where('isDone', '==', false).orderBy('title')
+          : itemsModule.where('isDone', '==', false)
+      return _module.data.values()
     },
   },
   methods: {
