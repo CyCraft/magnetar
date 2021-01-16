@@ -1,16 +1,19 @@
 <template>
   <div id="app">
     <Test />
+    <TestManual />
   </div>
 </template>
 
 <script>
 import Test from './components/Test.vue'
+import TestManual from './components/TestManual.vue'
 
 export default {
   name: 'App',
   components: {
     Test,
+    TestManual,
   },
 }
 </script>
