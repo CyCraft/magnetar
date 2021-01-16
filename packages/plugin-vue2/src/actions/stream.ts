@@ -10,8 +10,8 @@ import { insertActionFactory } from './insert'
 import { deleteActionFactory } from './delete'
 
 export function streamActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, any>> },
-  reactiveStoreOptions: Vue2StoreOptions
+  data: { [collectionPath: string]: Record<string, Record<string, any>> },
+  vue2StoreOptions: Vue2StoreOptions
 ): PluginStreamAction {
   return function ({
     payload,
@@ -28,7 +28,7 @@ export function streamActionFactory(
       added: (payload, meta) => {
         insertActionFactory(
           data,
-          reactiveStoreOptions
+          vue2StoreOptions
         )({
           payload,
           collectionPath,
@@ -39,7 +39,7 @@ export function streamActionFactory(
       modified: (payload, meta) => {
         insertActionFactory(
           data,
-          reactiveStoreOptions
+          vue2StoreOptions
         )({
           payload,
           collectionPath,
@@ -56,7 +56,7 @@ export function streamActionFactory(
         const [_cPath, _dId] = collectionPathDocIdToDelete
         deleteActionFactory(
           data,
-          reactiveStoreOptions
+          vue2StoreOptions
         )({
           payload: undefined,
           collectionPath: _cPath,

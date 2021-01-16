@@ -3,8 +3,8 @@ import { Vue2StoreModuleConfig, Vue2StoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 
 export function getActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, any>> },
-  reactiveStoreOptions: Vue2StoreOptions
+  data: { [collectionPath: string]: Record<string, Record<string, any>> },
+  vue2StoreOptions: Vue2StoreOptions
 ): PluginGetAction {
   return function ({
     payload,
@@ -15,7 +15,7 @@ export function getActionFactory(
     const doOnGetAction: DoOnGet = (payload, meta): void => {
       insertActionFactory(
         data,
-        reactiveStoreOptions
+        vue2StoreOptions
       )({
         payload,
         collectionPath,

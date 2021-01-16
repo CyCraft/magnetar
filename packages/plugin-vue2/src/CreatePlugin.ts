@@ -17,7 +17,7 @@ import { deleteActionFactory } from './actions/delete'
 import { getActionFactory } from './actions/get'
 import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
-import { filterDataPerClauses } from './helpers/dataHelpers'
+import { filterDataPerClauses, objectToMap } from './helpers/dataHelpers'
 
 // there are two interfaces to be defined & exported by each plugin: `StoreOptions` and `StoreModuleConfig`
 // for this plugin we use:
@@ -52,11 +52,12 @@ export type MakeRestoreBackup = (collectionPath: string, docId: string) => void
  * each action must have the proper for both collection and doc type modules
  */
 export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
-  reactiveStoreOptions: Vue2StoreOptions
+  vue2StoreOptions: Vue2StoreOptions
 ): PluginInstance => {
+  const { vueInstance: vue } = vue2StoreOptions
   // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
-  const data: { [collectionPath: string]: Map<string, Record<string, any>> } = {}
+  const data: { [collectionPath: string]: Record<string, Record<string, any>> } = {}
 
   const dataBackups: { [collectionPath: string]: Map<string, Record<string, any>[]> } = {}
   const makeBackup: MakeRestoreBackup = (collectionPath, docId) => {
@@ -66,7 +67,7 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
     // set the backup array for the doc
     if (!backupCollectionMap.has(docId)) backupCollectionMap.set(docId, [])
     // make a backup of whatever is found in the data
-    const docBackup = copy(data[collectionPath].get(docId))
+    const docBackup = copy(data[collectionPath][docId])
     const arr = backupCollectionMap.get(docId)
     if (docBackup && arr) arr.push(docBackup)
   }
@@ -80,14 +81,14 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
     const docBackupArray = backupCollectionMap.get(docId)
     if (!docBackupArray || !docBackupArray.length) {
       // the backup was "undefined", so we need to delete it
-      data[collectionPath].delete(docId)
+      vue.delete(data[collectionPath], docId)
       return
     }
     // restore the backup of whatever is found and replace with the data
     const docBackup = docBackupArray.pop()
-    if (docBackup) data[collectionPath].set(docId, docBackup)
+    if (docBackup) vue.set(data[collectionPath], docId, docBackup)
     // the backup was "undefined", so we need to delete it
-    if (docBackup === undefined) data[collectionPath].delete(docId)
+    if (docBackup === undefined) vue.delete(data[collectionPath], docId)
   }
 
   /**
@@ -103,20 +104,17 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
     if (modulesAlreadySetup.has(modulePath)) return
     // always set up a new Map for the collection, but only when it's undefined!
     // the reason for this is that the module can be instantiated multiple times
-    if (!(collectionPath in data)) data[collectionPath] = new Map()
-    const dataCollectionMap = data[collectionPath]
+    if (!(collectionPath in data)) data[collectionPath] = vue.observable({})
+    const dataCollectionDic = data[collectionPath]
     // then do anything specific for your plugin, like setting initial data
     const { initialData } = pluginModuleConfig
     if (!initialData) return
     if (!docId && isArray(initialData)) {
       for (const [_docId, _docData] of initialData) {
-        dataCollectionMap.set(_docId, reactiveStoreOptions.vueInstance.observable(_docData))
+        vue.set(dataCollectionDic, _docId, _docData)
       }
     } else if (docId) {
-      dataCollectionMap.set(
-        docId,
-        reactiveStoreOptions.vueInstance.observable(initialData) as Record<string, any>
-      )
+      vue.set(dataCollectionDic, docId, initialData as Record<string, any>)
     }
     modulesAlreadySetup.add(modulePath)
   }
@@ -124,7 +122,10 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
   /**
    * Queried local data stored in weakmaps "per query" for the least CPU cycles and preventing memory leaks
    */
-  const queriedData: WeakMap<Clauses, Map<string, Record<string, any>>> = new WeakMap()
+  // const queriedData: WeakMap<Clauses, Record<string, Record<string, any>>> = new WeakMap()
+  type ClausesId = string
+  type CollectionPath = string
+  const queriedData: Record<ClausesId, Record<CollectionPath, Record<string, any>>> = {}
 
   /**
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
@@ -136,31 +137,38 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
   }: PluginActionPayloadBase<Vue2StoreModuleConfig>): any => {
     const collectionDB = data[collectionPath]
     // if it's a doc, return the specific doc
+    console.log(`collectionDB.__ob__ → `, collectionDB.__ob__)
     // console.log(`collectionDB.get(docId).__ob__ → `, collectionDB.get(docId).__ob__)
     // console.log(`collectionDB.get(docId).name → `, collectionDB.get(docId).name)
-    if (docId) return collectionDB.get(docId)
+    if (docId) return collectionDB[docId]
     // if it's a collection, we must return the collectionDB but with applied query clauses
     // but remember, the return type MUST be a map with id as keys and the docs as value
     const clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
+    const clausesId = JSON.stringify(clauses)
     // return from cache
-    if (queriedData.has(clauses)) return queriedData.get(clauses)
+    const b = objectToMap(collectionDB)
+    console.log(`b.raw.__ob__ → `, (b as any).raw.__ob__)
+    return collectionDB
+    if (queriedData[clausesId]) return objectToMap(queriedData[clausesId])
+    // if (queriedData.has(clauses)) return objectToMap(queriedData.get(clauses))
     // otherwise create a new filter and return that
-    const filteredMap = filterDataPerClauses(collectionDB, clauses)
-    queriedData.set(clauses, filteredMap)
-    return filteredMap
+    const filteredDic = filterDataPerClauses(collectionDB, clauses)
+    // queriedData.set(clauses, filteredDic)
+    vue.set(queriedData, clausesId, filteredDic)
+    return objectToMap(filteredDic)
   }
 
   // the plugin must try to implement logic for every `ActionName`
-  const get = getActionFactory(data, reactiveStoreOptions)
-  const stream = streamActionFactory(data, reactiveStoreOptions)
-  const insert = insertActionFactory(data, reactiveStoreOptions, makeBackup)
-  const _merge = writeActionFactory(data, reactiveStoreOptions, 'merge', makeBackup)
-  const assign = writeActionFactory(data, reactiveStoreOptions, 'assign', makeBackup)
-  const replace = writeActionFactory(data, reactiveStoreOptions, 'replace', makeBackup)
-  const deleteProp = deletePropActionFactory(data, reactiveStoreOptions, makeBackup)
-  const _delete = deleteActionFactory(data, reactiveStoreOptions, makeBackup)
+  const get = getActionFactory(data, vue2StoreOptions)
+  const stream = streamActionFactory(data, vue2StoreOptions)
+  const insert = insertActionFactory(data, vue2StoreOptions, makeBackup)
+  const _merge = writeActionFactory(data, vue2StoreOptions, 'merge', makeBackup)
+  const assign = writeActionFactory(data, vue2StoreOptions, 'assign', makeBackup)
+  const replace = writeActionFactory(data, vue2StoreOptions, 'replace', makeBackup)
+  const deleteProp = deletePropActionFactory(data, vue2StoreOptions, makeBackup)
+  const _delete = deleteActionFactory(data, vue2StoreOptions, makeBackup)
 
-  const revert = revertActionFactory(data, reactiveStoreOptions, restoreBackup)
+  const revert = revertActionFactory(data, vue2StoreOptions, restoreBackup)
 
   // the plugin function must return a `PluginInstance`
   const instance: PluginInstance = {
