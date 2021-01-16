@@ -18,7 +18,6 @@ type Item = { title: string; id: string }
 const itemsModule = magnetar.collection<Item>('items')
 
 export default defineComponent({
-  name: 'TestSimpleStorePlugin',
   components: { TodoApp },
   props: {},
   setup() {

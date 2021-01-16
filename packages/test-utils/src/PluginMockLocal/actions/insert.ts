@@ -17,33 +17,26 @@ export function insertActionFactory(
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
-
-    if (!docId) {
-      const newDocId =
-        isFullString(payload.id) || isNumber(payload.id)
-          ? String(payload.id)
-          : storePluginOptions.generateRandomId()
-
-      if (makeBackup) makeBackup(collectionPath, newDocId)
-
-      data[collectionPath].set(newDocId, payload)
-      return newDocId
-    }
-    // else it's a doc
     const collectionMap = data[collectionPath]
 
-    if (makeBackup) makeBackup(collectionPath, docId)
+    const _docId =
+      docId ||
+      (isFullString(payload.id) || isNumber(payload.id)
+        ? String(payload.id)
+        : storePluginOptions.generateRandomId())
+
+    if (makeBackup) makeBackup(collectionPath, _docId)
 
     // reset the doc to be able to overwrite
-    collectionMap.set(docId, {})
-    const docDataToMutate = collectionMap.get(docId)
+    collectionMap.set(_docId, {})
+    const docDataToMutate = collectionMap.get(_docId)
 
     if (!docDataToMutate)
-      throw new Error(`Document data not found for id: ${collectionPath} ${docId}`)
+      throw new Error(`Document data not found for id: ${collectionPath} ${_docId}`)
 
     Object.entries(payload).forEach(([key, value]) => {
       docDataToMutate[key] = value
     })
-    return docId
+    return _docId
   }
 }

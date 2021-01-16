@@ -26,7 +26,6 @@ const itemsModuleManual = {
 }
 
 export default defineComponent({
-  name: 'TestSimpleStorePlugin',
   components: { TodoApp },
   props: {},
   setup() {

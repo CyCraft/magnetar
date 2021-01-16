@@ -1,7 +1,7 @@
 import { copy } from 'copy-anything'
 import { pick } from 'filter-anything'
 import { isArray } from 'is-what'
-import { reactive } from 'vue'
+import { vue3 } from 'vue'
 import {
   PluginInstance,
   MagnetarPlugin,
@@ -53,7 +53,7 @@ export type MakeRestoreBackup = (collectionPath: string, docId: string) => void
  * each action must have the proper for both collection and doc type modules
  */
 export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
-  reactiveStoreOptions: Vue3StoreOptions
+  vue3StoreOptions: Vue3StoreOptions
 ): PluginInstance => {
   // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
@@ -104,7 +104,7 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
     if (modulesAlreadySetup.has(modulePath)) return
     // always set up a new Map for the collection, but only when it's undefined!
     // the reason for this is that the module can be instantiated multiple times
-    if (!(collectionPath in data)) data[collectionPath] = reactive(new Map())
+    if (!(collectionPath in data)) data[collectionPath] = vue3(new Map())
     const dataCollectionMap = data[collectionPath]
     // then do anything specific for your plugin, like setting initial data
     const { initialData } = pluginModuleConfig
@@ -114,10 +114,7 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
         dataCollectionMap.set(_docId, _docData)
       }
     } else if (docId) {
-      dataCollectionMap.set(
-        docId,
-        initialData as Record<string, any>
-      )
+      dataCollectionMap.set(docId, initialData as Record<string, any>)
     }
     modulesAlreadySetup.add(modulePath)
   }
@@ -152,16 +149,16 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
   }
 
   // the plugin must try to implement logic for every `ActionName`
-  const get = getActionFactory(data, reactiveStoreOptions)
-  const stream = streamActionFactory(data, reactiveStoreOptions)
-  const insert = insertActionFactory(data, reactiveStoreOptions, makeBackup)
-  const _merge = writeActionFactory(data, reactiveStoreOptions, 'merge', makeBackup)
-  const assign = writeActionFactory(data, reactiveStoreOptions, 'assign', makeBackup)
-  const replace = writeActionFactory(data, reactiveStoreOptions, 'replace', makeBackup)
-  const deleteProp = deletePropActionFactory(data, reactiveStoreOptions, makeBackup)
-  const _delete = deleteActionFactory(data, reactiveStoreOptions, makeBackup)
+  const get = getActionFactory(data, vue3StoreOptions)
+  const stream = streamActionFactory(data, vue3StoreOptions)
+  const insert = insertActionFactory(data, vue3StoreOptions, makeBackup)
+  const _merge = writeActionFactory(data, vue3StoreOptions, 'merge', makeBackup)
+  const assign = writeActionFactory(data, vue3StoreOptions, 'assign', makeBackup)
+  const replace = writeActionFactory(data, vue3StoreOptions, 'replace', makeBackup)
+  const deleteProp = deletePropActionFactory(data, vue3StoreOptions, makeBackup)
+  const _delete = deleteActionFactory(data, vue3StoreOptions, makeBackup)
 
-  const revert = revertActionFactory(data, reactiveStoreOptions, restoreBackup)
+  const revert = revertActionFactory(data, vue3StoreOptions, restoreBackup)
 
   // the plugin function must return a `PluginInstance`
   const instance: PluginInstance = {
