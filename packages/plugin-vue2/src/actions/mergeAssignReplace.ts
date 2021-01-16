@@ -33,13 +33,11 @@ export function writeActionFactory(
 
     if (actionName === 'merge') {
       Object.entries(payload).forEach(([key, value]) => {
-        // docDataToMutate[key] = merge(docDataToMutate[key], value)
         vue.set(docDataToMutate, key, merge(docDataToMutate[key], value))
       })
     }
     if (actionName === 'assign' || actionName === 'replace') {
       Object.entries(payload).forEach(([key, value]) => {
-        // docDataToMutate[key] = value
         vue.set(docDataToMutate, key, value)
       })
     }

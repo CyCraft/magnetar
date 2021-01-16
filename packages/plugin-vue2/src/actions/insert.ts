@@ -14,7 +14,7 @@ export function insertActionFactory(
     docId,
     pluginModuleConfig,
   }: PluginInsertActionPayload<Vue2StoreModuleConfig>): string {
-    const collectionMap = data[collectionPath]
+    const collectionDic = data[collectionPath]
 
     const _docId =
       docId ||
@@ -22,17 +22,18 @@ export function insertActionFactory(
 
     if (makeBackup) makeBackup(collectionPath, _docId)
 
-    const docDataToMutate = collectionMap[_docId]
+    const docDataToMutate = collectionDic[_docId]
 
     // we're setting a new doc
     if (!docDataToMutate) {
-      vue.set(collectionMap, _docId, payload)
+      vue.set(collectionDic, _docId, payload)
       return _docId
     }
 
     // we're overwriting a doc with a new doc
-    vue.delete(collectionMap, _docId)
-    vue.set(collectionMap, _docId, payload)
+    Object.entries(payload).forEach(([key, value]) => {
+      vue.set(docDataToMutate, key, value)
+    })
     return _docId
   }
 }

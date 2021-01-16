@@ -100,7 +100,6 @@ test('reactivity: document - via data', async (t) => {
     computed: {
       dataComputed(): any {
         ranFns.push('ran')
-        console.log(`this.data.__ob__ → `, (this as any).data.__ob__)
         return { ...(this as any).data, name: (this as any).data.name + '!' }
       },
     },

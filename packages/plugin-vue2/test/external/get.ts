@@ -205,15 +205,7 @@ test('get (collection) orderBy', async (t) => {
     // Ninetales 38
     // Charizard 6
     const actual = [...queryModuleRef.data.values()]
-    console.log(
-      `actual.map(p => p.name) → `,
-      actual.map((p) => p.name)
-    )
     const expected = [pokedex(78), pokedex(38), pokedex(6)]
-    console.log(
-      `expected.map(p => p.name) → `,
-      expected.map((p) => p.name)
-    )
     t.deepEqual(actual, expected as any)
   } catch (error) {
     t.fail(error)
