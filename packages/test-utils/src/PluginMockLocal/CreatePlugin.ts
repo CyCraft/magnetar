@@ -19,7 +19,8 @@ import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
 import { filterDataPerClauses } from './helpers/dataHelpers'
 
-// there are two interfaces to be defined & exported by each plugin
+// there are two interfaces to be defined & exported by each plugin: `StoreOptions` and `StoreModuleConfig`
+// for this plugin we use:
 // - StorePluginOptions
 // - StorePluginModuleConfig
 
@@ -92,16 +93,17 @@ export const CreatePlugin: MagnetarPlugin<StorePluginOptions> = (
     if (modulesAlreadySetup.has(modulePath)) return
     // always set up a new Map for the collection, but only when it's undefined!
     // the reason for this is that the module can be instantiated multiple times
-    data[collectionPath] = data[collectionPath] ?? new Map()
+    if (!(collectionPath in data)) data[collectionPath] = new Map()
+    const dataCollectionMap = data[collectionPath]
     // then do anything specific for your plugin, like setting initial data
     const { initialData } = pluginModuleConfig
     if (!initialData) return
     if (!docId && isArray(initialData)) {
       for (const [_docId, _docData] of initialData) {
-        data[collectionPath].set(_docId, _docData)
+        dataCollectionMap.set(_docId, _docData)
       }
     } else if (docId) {
-      data[collectionPath].set(docId, initialData as Record<string, any>)
+      dataCollectionMap.set(docId, initialData as Record<string, any>)
     }
     modulesAlreadySetup.add(modulePath)
   }

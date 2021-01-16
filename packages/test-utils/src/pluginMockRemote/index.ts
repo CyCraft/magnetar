@@ -15,7 +15,8 @@ import {
   revertActionFactory,
 } from './actions'
 
-// there are two interfaces to be defined & exported by each plugin
+// there are two interfaces to be defined & exported by each plugin: `StoreOptions` and `StoreModuleConfig`
+// for this plugin we use:
 // - RemoteStoreOptions
 // - StorePluginModuleConfig
 

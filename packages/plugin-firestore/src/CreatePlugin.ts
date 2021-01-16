@@ -11,7 +11,8 @@ import { batchSyncFactory } from './helpers/batchSync'
 
 type Firestore = firebase.firestore.Firestore
 
-// there are two interfaces to be defined & exported by each plugin
+// there are two interfaces to be defined & exported by each plugin: `StoreOptions` and `StoreModuleConfig`
+// for this plugin we use:
 // - FirestorePluginOptions
 // - FirestoreModuleConfig
 

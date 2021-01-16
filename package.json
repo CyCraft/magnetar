@@ -13,6 +13,7 @@
     "test:plugin-firestore": "cd packages/plugin-firestore && npm run test",
     "test:plugin-simple-store": "cd packages/plugin-simple-store && npm run test",
     "test:plugin-vue2": "cd packages/plugin-vue2 && npm run test",
+    "test:plugin-vue3": "cd packages/plugin-vue3 && npm run test",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "publish": "npm run test && npm run build && lerna publish",
     "deploy:docs": "npm run build:favicon && lerna run build:docs && firebase deploy --only hosting && git add -A && git commit -m \"chore: deploy\"",

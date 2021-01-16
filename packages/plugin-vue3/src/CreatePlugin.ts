@@ -1,6 +1,7 @@
 import { copy } from 'copy-anything'
 import { pick } from 'filter-anything'
 import { isArray } from 'is-what'
+import { reactive } from 'vue'
 import {
   PluginInstance,
   MagnetarPlugin,
@@ -21,13 +22,22 @@ import { filterDataPerClauses } from './helpers/dataHelpers'
 
 // there are two interfaces to be defined & exported by each plugin: `StoreOptions` and `StoreModuleConfig`
 // for this plugin we use:
-// - SimpleStoreOptions
-// - SimpleStoreModuleConfig
+// - Vue3StoreOptions
+// - Vue3StoreModuleConfig
 
-export interface SimpleStoreOptions {
+export interface Vue3StoreOptions {
+  /**
+   * This is required to make sure there are not two instances of Vue running which can cause issues.
+   */
+  // vueInstance: any
+  /**
+   * To support optimistic UI you need to provide a function that can generate unique IDs.
+   * @example () => firestore.collection('random').doc().id
+   */
   generateRandomId: () => string
 }
-export interface SimpleStoreModuleConfig {
+
+export interface Vue3StoreModuleConfig {
   path?: string
   initialData?: Record<string, any> | [string, Record<string, any>][]
   where?: WhereClause[]
@@ -37,11 +47,13 @@ export interface SimpleStoreModuleConfig {
 
 export type MakeRestoreBackup = (collectionPath: string, docId: string) => void
 
-// a Vue Sync plugin is a single function that returns a `PluginInstance`
-// the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
-// each action must have the proper for both collection and doc type modules
-export const CreatePlugin: MagnetarPlugin<SimpleStoreOptions> = (
-  simpleStoreOptions: SimpleStoreOptions
+/**
+ * a Vue Sync plugin is a single function that returns a `PluginInstance`
+ * the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
+ * each action must have the proper for both collection and doc type modules
+ */
+export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
+  reactiveStoreOptions: Vue3StoreOptions
 ): PluginInstance => {
   // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
@@ -87,12 +99,12 @@ export const CreatePlugin: MagnetarPlugin<SimpleStoreOptions> = (
     collectionPath,
     docId,
     pluginModuleConfig = {},
-  }: PluginActionPayloadBase<SimpleStoreModuleConfig>): void => {
+  }: PluginActionPayloadBase<Vue3StoreModuleConfig>): void => {
     const modulePath = [collectionPath, docId].filter(Boolean).join('/')
     if (modulesAlreadySetup.has(modulePath)) return
     // always set up a new Map for the collection, but only when it's undefined!
     // the reason for this is that the module can be instantiated multiple times
-    if (!(collectionPath in data)) data[collectionPath] = new Map()
+    if (!(collectionPath in data)) data[collectionPath] = reactive(new Map())
     const dataCollectionMap = data[collectionPath]
     // then do anything specific for your plugin, like setting initial data
     const { initialData } = pluginModuleConfig
@@ -102,7 +114,10 @@ export const CreatePlugin: MagnetarPlugin<SimpleStoreOptions> = (
         dataCollectionMap.set(_docId, _docData)
       }
     } else if (docId) {
-      dataCollectionMap.set(docId, initialData as Record<string, any>)
+      dataCollectionMap.set(
+        docId,
+        initialData as Record<string, any>
+      )
     }
     modulesAlreadySetup.add(modulePath)
   }
@@ -119,9 +134,11 @@ export const CreatePlugin: MagnetarPlugin<SimpleStoreOptions> = (
     collectionPath,
     docId,
     pluginModuleConfig = {},
-  }: PluginActionPayloadBase<SimpleStoreModuleConfig>): any => {
+  }: PluginActionPayloadBase<Vue3StoreModuleConfig>): any => {
     const collectionDB = data[collectionPath]
     // if it's a doc, return the specific doc
+    // console.log(`collectionDB.get(docId).__ob__ → `, collectionDB.get(docId).__ob__)
+    // console.log(`collectionDB.get(docId).name → `, collectionDB.get(docId).name)
     if (docId) return collectionDB.get(docId)
     // if it's a collection, we must return the collectionDB but with applied query clauses
     // but remember, the return type MUST be a map with id as keys and the docs as value
@@ -135,16 +152,16 @@ export const CreatePlugin: MagnetarPlugin<SimpleStoreOptions> = (
   }
 
   // the plugin must try to implement logic for every `ActionName`
-  const get = getActionFactory(data, simpleStoreOptions)
-  const stream = streamActionFactory(data, simpleStoreOptions)
-  const insert = insertActionFactory(data, simpleStoreOptions, makeBackup)
-  const _merge = writeActionFactory(data, simpleStoreOptions, 'merge', makeBackup)
-  const assign = writeActionFactory(data, simpleStoreOptions, 'assign', makeBackup)
-  const replace = writeActionFactory(data, simpleStoreOptions, 'replace', makeBackup)
-  const deleteProp = deletePropActionFactory(data, simpleStoreOptions, makeBackup)
-  const _delete = deleteActionFactory(data, simpleStoreOptions, makeBackup)
+  const get = getActionFactory(data, reactiveStoreOptions)
+  const stream = streamActionFactory(data, reactiveStoreOptions)
+  const insert = insertActionFactory(data, reactiveStoreOptions, makeBackup)
+  const _merge = writeActionFactory(data, reactiveStoreOptions, 'merge', makeBackup)
+  const assign = writeActionFactory(data, reactiveStoreOptions, 'assign', makeBackup)
+  const replace = writeActionFactory(data, reactiveStoreOptions, 'replace', makeBackup)
+  const deleteProp = deletePropActionFactory(data, reactiveStoreOptions, makeBackup)
+  const _delete = deleteActionFactory(data, reactiveStoreOptions, makeBackup)
 
-  const revert = revertActionFactory(data, simpleStoreOptions, restoreBackup)
+  const revert = revertActionFactory(data, reactiveStoreOptions, restoreBackup)
 
   // the plugin function must return a `PluginInstance`
   const instance: PluginInstance = {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 // npm i -D @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint eslint-config-prettier eslint-plugin-tree-shaking
 module.exports = {
   root: true,

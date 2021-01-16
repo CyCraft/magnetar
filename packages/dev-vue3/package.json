@@ -8,6 +8,7 @@
   "dependencies": {
     "@magnetarjs/core": "^0.0.3",
     "@magnetarjs/plugin-simple-store": "^0.0.3",
+    "@magnetarjs/plugin-vue3": "^0.0.0",
     "vue": "^3.0.5"
   },
   "devDependencies": {

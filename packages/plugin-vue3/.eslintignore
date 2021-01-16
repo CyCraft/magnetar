@@ -4,9 +4,6 @@ node_modules
 dist
 # don't lint nyc coverage output
 
-/packages/dev-vue2
-/packages/dev-vue3
-
 coverage
 
 /test/**.*
