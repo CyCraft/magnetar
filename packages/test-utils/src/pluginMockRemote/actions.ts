@@ -18,6 +18,7 @@ import {
   PluginDeletePropActionPayload,
   PluginInsertActionPayload,
   PluginWriteActionPayload,
+  Clauses,
 } from '../../../core/src'
 import { StorePluginModuleConfig, RemoteStoreOptions } from './index'
 import { throwIfEmulatedError, waitMs, pokedexMap, generateRandomId } from '../helpers'
@@ -103,7 +104,7 @@ function mockDataRetrieval(
 ): Record<string, any>[] {
   if (moduleType === 'doc') return [{ name: 'Luca', age: 10, dream: 'job' }]
   const _pokedexMap = pokedexMap()
-  const clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
+  const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
   const filteredMap = filterDataPerClauses(_pokedexMap, clauses)
   return [...filteredMap.values()]
 }

@@ -132,7 +132,7 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
     if (docId) return dataCollectionMap.get(docId)
     // if it's a collection, we must return the dataCollectionMap but with applied query clauses
     // but remember, the return type MUST be a map with id as keys and the docs as value
-    const clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
+    const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
 
     return filterDataPerClauses(dataCollectionMap, clauses)
   }
