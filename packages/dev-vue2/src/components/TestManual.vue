@@ -14,10 +14,11 @@ import TodoApp from './TodoApp.vue'
 import vue from 'vue'
 
 const itemsModule = {
-  data: vue.observable({}),
+  collections: vue.observable({
+    data: {},
+  }),
   insert(item) {
-    console.log(`this.data.__ob__ → `, this.data.__ob__)
-    vue.set(this.data, `${Math.random()}`, item)
+    vue.set(this.collections.data, `${Math.random()}`, item)
   },
 }
 
@@ -26,10 +27,10 @@ export default {
   props: {},
   computed: {
     itemsModuleData() {
-      return itemsModule.data
+      return itemsModule.collections
     },
     items() {
-      return Object.values(itemsModule.data)
+      return Object.values(itemsModule.collections.data)
     },
   },
   methods: {

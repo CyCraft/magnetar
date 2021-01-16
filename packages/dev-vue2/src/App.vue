@@ -1,19 +1,19 @@
 <template>
   <div id="app">
-    <Test />
-    <TestManual />
+    <TestVue2Plugin />
+    <!-- <TestManual /> -->
   </div>
 </template>
 
 <script>
-import Test from './components/Test.vue'
-import TestManual from './components/TestManual.vue'
+import TestVue2Plugin from './components/TestVue2Plugin.vue'
+// import TestManual from './components/TestManual.vue'
 
 export default {
   name: 'App',
   components: {
-    Test,
-    TestManual,
+    TestVue2Plugin,
+    // TestManual,
   },
 }
 </script>

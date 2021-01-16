@@ -1,6 +1,13 @@
 <template>
   <div class="todo-app">
-    <div class="_item" v-for="(item, i) in items" :key="i">
+    <div
+      class="_item"
+      :class="item.isDone ? '_is-done' : ''"
+      v-for="(item, i) in items"
+      :key="item.id"
+    >
+      <button @click="toggleItemDone(item)" class="_done">{{ item.isDone ? '☑️' : '◻️' }}</button>
+
       <div @dblclick="editItem(i)" v-if="editingIndex !== i">{{ item.title }}</div>
       <input
         type="text"
@@ -10,6 +17,7 @@
       />
 
       <button @click="saveEdits" v-if="editingIndex === i">✅</button>
+      <button @click="editItem(i)" v-if="editingIndex !== i">✏️</button>
       <button @click="deleteItem(item)" v-if="editingIndex !== i">❌</button>
     </div>
     <div class="_item-new">
@@ -29,6 +37,15 @@
     border-radius: 0.3rem
     border: none
     padding: 0.3rem
+    display: flex
+    justify-content: center
+    align-items: center
+    cursor: pointer
+    &._done
+      background: none
+      font-size: 1.5rem
+      padding: 0
+      outline: none
   input
     padding: 0.5rem
     border: none
@@ -39,6 +56,8 @@
       margin: 0.5rem
   ._item
     border-bottom: thin solid lightgrey
+    &._is-done > div
+      opacity: 0.6
   ._item-new
     margin-top: 1rem
     input
@@ -46,7 +65,7 @@
 </style>
 
 <script>
-// type Item = { title: string; id: string }
+// type Item = { title: string; isDone: boolean; id: string }
 
 export default {
   name: 'TodoApp',
@@ -65,7 +84,7 @@ export default {
   },
   methods: {
     addItem() {
-      const payload = { title: this.newItem, id: `${Math.random()}` }
+      const payload = { title: this.newItem, isDone: false, id: `${Math.random()}` }
       this.$emit('add', payload)
       this.newItem = ''
     },
@@ -76,14 +95,18 @@ export default {
     },
     saveEdits() {
       const title = this.editingTitle
-      const { id } = this.items[this.editingIndex]
-      const payload = { title, id }
+      const item = this.items[this.editingIndex]
+      const payload = { ...item, title }
       this.editingIndex = -1
       this.editingTitle = ''
       this.$emit('edit', payload)
     },
     deleteItem(item) {
       this.$emit('delete', item)
+    },
+    toggleItemDone(item) {
+      const payload = { ...item, isDone: !item.isDone }
+      this.$emit('edit', payload)
     },
   },
 }

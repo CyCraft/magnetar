@@ -130,9 +130,8 @@ type CustomMap<DocDataType = Record<string, any>> = {
 }
 
 export function objectToMap(
-  object: Record<string, any> | undefined
+  object: Record<string, any> | undefined = {}
 ): Map<string, Record<string, any>> {
-  if (isUndefined(object)) return new Map()
   const dic = object
 
   function get(id: string) {
@@ -164,7 +163,7 @@ export function objectToMap(
   const raw = dic
 
   const customMap: CustomMap = {
-    size: 0,
+    size: Object.keys(dic).length,
     get,
     has,
     keys,

@@ -1,7 +1,10 @@
 <template>
   <div class="test">
-    <h6>vue 2 store:</h6>
-    <pre>{{ itemsModuleData }}</pre>
+    <h6>plugin-vue2 Todo list ({{ size }})</h6>
+    <div>
+      <label for="odi">show done items</label>
+      <input type="checkbox" name="" v-model="showDoneItems" id="odi" />
+    </div>
     <TodoApp @add="addItem" @edit="editItem" @delete="deleteItem" :items="items" />
   </div>
 </template>
@@ -21,13 +24,17 @@ window.itemsModule = itemsModule
 export default {
   components: { TodoApp },
   props: {},
+  data() {
+    return { showDoneItems: true }
+  },
   computed: {
-    itemsModuleData() {
-      return itemsModule.data
+    size() {
+      return itemsModule.data.size
     },
     items() {
-      return []
-      // return Object.values(itemsModule.data.raw)
+      return this.showDoneItems
+        ? itemsModule.data.values()
+        : itemsModule.where('isDone', '==', false).data.values()
     },
   },
   methods: {

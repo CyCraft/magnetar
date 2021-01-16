@@ -7,4 +7,4 @@ import { Clauses } from '@magnetarjs/core';
  * @returns {Record<string, Record<string, any>>}
  */
 export declare function filterDataPerClauses(collectionDB: Record<string, Record<string, any>>, clauses: Clauses): Record<string, Record<string, any>>;
-export declare function objectToMap(object: Record<string, any> | undefined): Map<string, Record<string, any>>;
+export declare function objectToMap(object?: Record<string, any> | undefined): Map<string, Record<string, any>>;

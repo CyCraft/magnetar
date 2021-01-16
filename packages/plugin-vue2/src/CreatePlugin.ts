@@ -57,7 +57,7 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
   const { vueInstance: vue } = vue2StoreOptions
   // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
-  const data: { [collectionPath: string]: Record<string, Record<string, any>> } = {}
+  const data: { [collectionPath: string]: Record<string, Record<string, any>> } = vue.observable({})
 
   const dataBackups: { [collectionPath: string]: Map<string, Record<string, any>[]> } = {}
   const makeBackup: MakeRestoreBackup = (collectionPath, docId) => {
@@ -104,7 +104,7 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
     if (modulesAlreadySetup.has(modulePath)) return
     // always set up a new Map for the collection, but only when it's undefined!
     // the reason for this is that the module can be instantiated multiple times
-    if (!(collectionPath in data)) data[collectionPath] = vue.observable({})
+    if (!(collectionPath in data)) vue.set(data, collectionPath, {})
     const dataCollectionDic = data[collectionPath]
     // then do anything specific for your plugin, like setting initial data
     const { initialData } = pluginModuleConfig
@@ -120,14 +120,6 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
   }
 
   /**
-   * Queried local data stored in weakmaps "per query" for the least CPU cycles and preventing memory leaks
-   */
-  // const queriedData: WeakMap<Clauses, Record<string, Record<string, any>>> = new WeakMap()
-  type ClausesId = string
-  type CollectionPath = string
-  const queriedData: Record<ClausesId, Record<CollectionPath, Record<string, any>>> = {}
-
-  /**
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
    */
   const getModuleData = ({
@@ -135,27 +127,14 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
     docId,
     pluginModuleConfig = {},
   }: PluginActionPayloadBase<Vue2StoreModuleConfig>): any => {
-    const collectionDB = data[collectionPath]
+    const dataCollectionDic = data[collectionPath]
     // if it's a doc, return the specific doc
-    console.log(`collectionDB.__ob__ → `, collectionDB.__ob__)
-    // console.log(`collectionDB.get(docId).__ob__ → `, collectionDB.get(docId).__ob__)
-    // console.log(`collectionDB.get(docId).name → `, collectionDB.get(docId).name)
-    if (docId) return collectionDB[docId]
-    // if it's a collection, we must return the collectionDB but with applied query clauses
+    if (docId) return dataCollectionDic[docId]
+    // if it's a collection, we must return the dataCollectionDic but with applied query clauses
     // but remember, the return type MUST be a map with id as keys and the docs as value
-    const clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
-    const clausesId = JSON.stringify(clauses)
-    // return from cache
-    const b = objectToMap(collectionDB)
-    console.log(`b.raw.__ob__ → `, (b as any).raw.__ob__)
-    return collectionDB
-    if (queriedData[clausesId]) return objectToMap(queriedData[clausesId])
-    // if (queriedData.has(clauses)) return objectToMap(queriedData.get(clauses))
-    // otherwise create a new filter and return that
-    const filteredDic = filterDataPerClauses(collectionDB, clauses)
-    // queriedData.set(clauses, filteredDic)
-    vue.set(queriedData, clausesId, filteredDic)
-    return objectToMap(filteredDic)
+    const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
+
+    return objectToMap(filterDataPerClauses(dataCollectionDic, clauses))
   }
 
   // the plugin must try to implement logic for every `ActionName`
