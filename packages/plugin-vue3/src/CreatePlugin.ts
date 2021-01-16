@@ -127,14 +127,14 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
     docId,
     pluginModuleConfig = {},
   }: PluginActionPayloadBase<Vue3StoreModuleConfig>): any => {
-    const collectionDB = data[collectionPath]
+    const dataCollectionMap = data[collectionPath]
     // if it's a doc, return the specific doc
-    if (docId) return collectionDB.get(docId)
-    // if it's a collection, we must return the collectionDB but with applied query clauses
+    if (docId) return dataCollectionMap.get(docId)
+    // if it's a collection, we must return the dataCollectionMap but with applied query clauses
     // but remember, the return type MUST be a map with id as keys and the docs as value
     const clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
 
-    return filterDataPerClauses(collectionDB, clauses)
+    return filterDataPerClauses(dataCollectionMap, clauses)
   }
 
   // the plugin must try to implement logic for every `ActionName`
