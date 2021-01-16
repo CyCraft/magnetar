@@ -1,20 +1,20 @@
 <template>
-  <TestSimpleStorePlugin />
+  <!-- <TestSimpleStorePlugin /> -->
   <TestVue3Plugin />
   <div></div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import TestSimpleStorePlugin from './components/TestSimpleStorePlugin.vue'
+// import TestSimpleStorePlugin from './components/TestSimpleStorePlugin.vue'
 import TestVue3Plugin from './components/TestVue3Plugin.vue'
 
 export default defineComponent({
   name: 'App',
   components: {
-    TestSimpleStorePlugin,
+    // TestSimpleStorePlugin,
     TestVue3Plugin,
-  }
+  },
 })
 </script>
 

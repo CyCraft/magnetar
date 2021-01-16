@@ -1,6 +1,13 @@
 <template>
   <div class="todo-app">
-    <div class="_item" v-for="(item, i) in items" :key="i">
+    <div
+      class="_item"
+      :class="item.isDone ? '_is-done' : ''"
+      v-for="(item, i) in items"
+      :key="item.id"
+    >
+      <button @click="toggleItemDone(item)" class="_done">{{ item.isDone ? '☑️' : '◻️' }}</button>
+
       <div @dblclick="editItem(i)" v-if="editingIndex !== i">{{ item.title }}</div>
       <input
         type="text"
@@ -10,6 +17,7 @@
       />
 
       <button @click="saveEdits" v-if="editingIndex === i">✅</button>
+      <button @click="editItem(i)" v-if="editingIndex !== i">✏️</button>
       <button @click="deleteItem(item)" v-if="editingIndex !== i">❌</button>
     </div>
     <div class="_item-new">
@@ -29,6 +37,15 @@
     border-radius: 0.3rem
     border: none
     padding: 0.3rem
+    display: flex
+    justify-content: center
+    align-items: center
+    cursor: pointer
+    &._done
+      background: none
+      font-size: 1.5rem
+      padding: 0
+      outline: none
   input
     padding: 0.5rem
     border: none
@@ -39,6 +56,8 @@
       margin: 0.5rem
   ._item
     border-bottom: thin solid lightgrey
+    &._is-done > div
+      opacity: 0.6
   ._item-new
     margin-top: 1rem
     input
@@ -48,7 +67,7 @@
 <script lang="ts">
 import { defineComponent, ref, PropType } from 'vue'
 
-type Item = { title: string; id: string }
+type Item = { title: string; isDone: boolean; id: string }
 
 export default defineComponent({
   name: 'TodoApp',
@@ -58,7 +77,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const newItem = ref('')
     function addItem() {
-      const payload: Item = { title: newItem.value, id: `${Math.random()}` }
+      const payload: Item = { title: newItem.value, isDone: false, id: `${Math.random()}` }
       emit('add', payload)
       newItem.value = ''
     }
@@ -72,8 +91,8 @@ export default defineComponent({
     }
     function saveEdits() {
       const title = editingTitle.value
-      const { id } = props.items[editingIndex.value]
-      const payload: Item = { title, id }
+      const item = props.items[editingIndex.value]
+      const payload = { ...item, title }
       editingIndex.value = -1
       editingTitle.value = ''
       emit('edit', payload)
@@ -83,7 +102,21 @@ export default defineComponent({
       emit('delete', item)
     }
 
-    return { newItem, addItem, editItem, editingIndex, saveEdits, editingTitle, deleteItem }
+    function toggleItemDone(item: Item) {
+      const payload = { ...item, isDone: !item.isDone }
+      emit('edit', payload)
+    }
+
+    return {
+      newItem,
+      addItem,
+      editItem,
+      editingIndex,
+      saveEdits,
+      editingTitle,
+      deleteItem,
+      toggleItemDone,
+    }
   },
 })
 </script>

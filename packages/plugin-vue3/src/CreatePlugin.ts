@@ -1,7 +1,7 @@
 import { copy } from 'copy-anything'
 import { pick } from 'filter-anything'
 import { isArray } from 'is-what'
-import { vue3 } from 'vue'
+import { reactive } from 'vue'
 import {
   PluginInstance,
   MagnetarPlugin,
@@ -104,7 +104,7 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
     if (modulesAlreadySetup.has(modulePath)) return
     // always set up a new Map for the collection, but only when it's undefined!
     // the reason for this is that the module can be instantiated multiple times
-    if (!(collectionPath in data)) data[collectionPath] = vue3(new Map())
+    if (!(collectionPath in data)) data[collectionPath] = reactive(new Map())
     const dataCollectionMap = data[collectionPath]
     // then do anything specific for your plugin, like setting initial data
     const { initialData } = pluginModuleConfig
@@ -120,11 +120,6 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
   }
 
   /**
-   * Queried local data stored in weakmaps "per query" for the least CPU cycles and preventing memory leaks
-   */
-  const queriedData: WeakMap<Clauses, Map<string, Record<string, any>>> = new WeakMap()
-
-  /**
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
    */
   const getModuleData = ({
@@ -134,18 +129,12 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
   }: PluginActionPayloadBase<Vue3StoreModuleConfig>): any => {
     const collectionDB = data[collectionPath]
     // if it's a doc, return the specific doc
-    // console.log(`collectionDB.get(docId).__ob__ → `, collectionDB.get(docId).__ob__)
-    // console.log(`collectionDB.get(docId).name → `, collectionDB.get(docId).name)
     if (docId) return collectionDB.get(docId)
     // if it's a collection, we must return the collectionDB but with applied query clauses
     // but remember, the return type MUST be a map with id as keys and the docs as value
     const clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
-    // return from cache
-    if (queriedData.has(clauses)) return queriedData.get(clauses)
-    // otherwise create a new filter and return that
-    const filteredMap = filterDataPerClauses(collectionDB, clauses)
-    queriedData.set(clauses, filteredMap)
-    return filteredMap
+
+    return filterDataPerClauses(collectionDB, clauses)
   }
 
   // the plugin must try to implement logic for every `ActionName`
