@@ -2,8 +2,10 @@
   <div class="test">
     <h6>plugin-vue3 Todo list ({{ size }})</h6>
     <div>
-      <label for="odi">show done items</label>
-      <input type="checkbox" name="" v-model="showDoneItems" id="odi" />
+      <label for="all">show done items</label>
+      <input type="checkbox" name="" v-model="showAll" id="all" />
+      <label for="order" style="padding-left: 1rem">alphabetically</label>
+      <input type="checkbox" name="" v-model="alphabetically" id="order" />
     </div>
     <TodoApp @add="addItem" @edit="editItem" @delete="deleteItem" :items="items" />
   </div>
@@ -26,14 +28,26 @@ export default defineComponent({
   components: { TodoApp },
   props: {},
   setup() {
-    const showDoneItems = ref(true)
+    const showAll = ref(true)
+    const alphabetically = ref(false)
 
     const size = computed(() => itemsModule.data.size)
-    const items = computed(() =>
-      showDoneItems.value
-        ? [...itemsModule.data.values()]
-        : [...itemsModuleOnlyIncomplete.data.values()]
-    )
+    const items = computed(() => {
+      const _all = showAll.value
+      const _ordered = alphabetically.value
+      const result =
+        _all && _ordered
+          ? itemsModule.orderBy('title').data.values()
+          : _all && !_ordered
+          ? itemsModule.data.values()
+          : !_all && _ordered
+          ? itemsModule
+              .where('isDone', '==', false)
+              .orderBy('title')
+              .data.values()
+          : itemsModule.where('isDone', '==', false).data.values()
+      return [...result]
+    })
 
     function addItem(item: Item) {
       console.log(`add item → `, item)
@@ -50,7 +64,7 @@ export default defineComponent({
       itemsModule.delete(item.id)
     }
 
-    return { size, items, addItem, editItem, deleteItem, showDoneItems }
+    return { size, items, addItem, editItem, deleteItem, showAll, alphabetically }
   },
 })
 </script>

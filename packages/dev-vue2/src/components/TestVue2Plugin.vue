@@ -2,8 +2,10 @@
   <div class="test">
     <h6>plugin-vue2 Todo list ({{ size }})</h6>
     <div>
-      <label for="odi">show done items</label>
-      <input type="checkbox" name="" v-model="showDoneItems" id="odi" />
+      <label for="all">show done items</label>
+      <input type="checkbox" name="" v-model="showAll" id="all" />
+      <label for="order" style="padding-left: 1rem">alphabetically</label>
+      <input type="checkbox" name="" v-model="alphabetically" id="order" />
     </div>
     <TodoApp @add="addItem" @edit="editItem" @delete="deleteItem" :items="items" />
   </div>
@@ -25,15 +27,23 @@ export default {
   components: { TodoApp },
   props: {},
   data() {
-    return { showDoneItems: true }
+    return { showAll: true, alphabetically: false }
   },
   computed: {
     size() {
       return itemsModule.data.size
     },
     items() {
-      return this.showDoneItems
+      const { showAll, alphabetically } = this
+      return showAll && alphabetically
+        ? itemsModule.orderBy('title').data.values()
+        : showAll && !alphabetically
         ? itemsModule.data.values()
+        : !showAll && alphabetically
+        ? itemsModule
+            .where('isDone', '==', false)
+            .orderBy('title')
+            .data.values()
         : itemsModule.where('isDone', '==', false).data.values()
     },
   },
