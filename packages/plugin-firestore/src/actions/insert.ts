@@ -4,7 +4,7 @@ import { isFullString, isNumber } from 'is-what'
 import { BatchSync } from '../helpers/batchSync'
 import { getFirestoreDocPath } from '../helpers/pathHelpers'
 
-export function insertActionFactory (
+export function insertActionFactory(
   batchSync: BatchSync,
   firestorePluginOptions: Required<FirestorePluginOptions>
 ): PluginInsertAction {
@@ -24,7 +24,7 @@ export function insertActionFactory (
           : firestoreInstance.collection('random').doc().id
     }
     const documentPath = getFirestoreDocPath(collectionPath, _docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
-    await batchSync.set(documentPath, payload)
+    await batchSync.set(documentPath, payload, 'insert')
     return _docId
   }
 }

@@ -17,14 +17,6 @@ export function writeActionFactory(
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 
     const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
-    if (actionName === 'merge') {
-      await batchSync.set(documentPath, payload, { merge: true })
-    }
-    if (actionName === 'assign') {
-      await batchSync.set(documentPath, payload, { mergeFields: Object.keys(payload) })
-    }
-    if (actionName === 'replace') {
-      await batchSync.set(documentPath, payload)
-    }
+    await batchSync.set(documentPath, payload, actionName)
   }
 }

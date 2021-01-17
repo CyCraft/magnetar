@@ -10,28 +10,6 @@ type DocumentReference = firebase.firestore.DocumentReference
 // https://firebase.google.com/docs/firestore/manage-data/transactions#batched-writes
 // A batched write can contain up to 500 operations.
 
-// Eg.
-// function pathToRef (firestorePath) {}
-// // Get a new write batch
-// var batch = db.batch();
-
-// // Set the value of 'NYC'
-// var nycRef = db.collection("cities").doc("NYC");
-// batch.set(nycRef, {name: "New York City"});
-
-// // Update the population of 'SF'
-// var sfRef = db.collection("cities").doc("SF");
-// batch.update(sfRef, {"population": 1000000});
-
-// // Delete the city 'LA'
-// var laRef = db.collection("cities").doc("LA");
-// batch.delete(laRef);
-
-// // Commit the batch
-// batch.commit().then(function () {
-//     // ...
-// });
-
 /**
  * Each write operation in a batch counts towards the 500 limit.
  * Within a write operation, field transforms like serverTimestamp,
@@ -47,9 +25,21 @@ function countOperations(payload: Record<string, any>): number {
 }
 
 export type BatchSync = {
-  set: (documentPath: string, payload: Record<string, any>, options?: SetOptions) => Promise<void>
+  set: (
+    documentPath: string,
+    payload: Record<string, any>,
+    actionName: 'insert' | 'merge' | 'assign' | 'replace'
+  ) => Promise<void>
   update: (documentPath: string, payload: Record<string, any>) => Promise<void>
   delete: (documentPath: string) => Promise<void>
+}
+
+type DebugInfo = {
+  [key in 'insert' | 'merge' | 'assign' | 'replace' | 'delete' | 'deleteProp']?:
+    | {
+        [documentPath in string]: any[]
+      }
+    | string[]
 }
 
 type SyncStack = {
@@ -60,6 +50,7 @@ type SyncStack = {
   batch: WriteBatch
   resolves: (() => void)[]
   rejects: ((error: any) => void)[]
+  debugInfo: DebugInfo
 }
 
 type State = {
@@ -76,7 +67,7 @@ type State = {
 export function batchSyncFactory(
   firestorePluginOptions: Required<FirestorePluginOptions>
 ): BatchSync {
-  const { firestoreInstance, syncDebounceMs } = firestorePluginOptions
+  const { firestoreInstance, syncDebounceMs, debug } = firestorePluginOptions
 
   const state: State = {
     queue: [],
@@ -88,6 +79,7 @@ export function batchSyncFactory(
     batch: firestoreInstance.batch(),
     resolves: [],
     rejects: [],
+    debugInfo: {},
   })
 
   function prepareSyncStack(operationCount: number): SyncStack {
@@ -110,6 +102,23 @@ export function batchSyncFactory(
     return { payload, operationCount }
   }
 
+  function addToDebugInfo(
+    debugInfo: DebugInfo,
+    actionName: keyof DebugInfo,
+    documentPath: string,
+    payload: any
+  ) {
+    if (actionName === 'delete') {
+      if (!(actionName in debugInfo)) debugInfo[actionName] = [] as any
+      ;(debugInfo[actionName] as any).push(documentPath as any)
+      return
+    }
+    if (!(actionName in debugInfo)) debugInfo[actionName] = {}
+    const actionInfo = debugInfo[actionName] as any
+    if (!(documentPath in actionInfo)) actionInfo[documentPath] = []
+    actionInfo[documentPath]?.push(payload)
+  }
+
   /**
    * Removes one `syncStack` entry from the `queue` & executes batch.commit() and makes sure to reject or resolve all actions when this promise is resolved
    */
@@ -118,6 +127,11 @@ export function batchSyncFactory(
     if (!syncStack || !syncStack.batch) {
       throw new Error('executeSync executed before it was instantiated')
     }
+
+    if (debug) {
+      console.log('[magnetar] Syncing to firestore...', syncStack.debugInfo)
+    }
+
     syncStack.batch
       .commit()
       .then(() => syncStack.resolves.forEach((r) => r()))
@@ -148,12 +162,21 @@ export function batchSyncFactory(
   function set(
     documentPath: string,
     _payload: Record<string, any>,
-    options?: SetOptions
+    actionName: 'insert' | 'merge' | 'assign' | 'replace'
   ): Promise<void> {
+    const options: SetOptions =
+      actionName === 'merge'
+        ? { merge: true }
+        : actionName === 'assign'
+        ? { mergeFields: Object.keys(_payload) }
+        : {} // 'replace' / 'insert'
     const { payload, operationCount } = preparePayload(_payload)
-    const { batch, resolves, rejects } = prepareSyncStack(operationCount)
+    const { batch, resolves, rejects, debugInfo } = prepareSyncStack(operationCount)
+
+    if (debug) addToDebugInfo(debugInfo, actionName, documentPath, payload)
+
     const ref = prepareRef(documentPath)
-    batch.set(ref, payload, options || {})
+    batch.set(ref, payload, options)
     const promise: Promise<void> = new Promise((resolve, reject) => {
       resolves.push(resolve)
       rejects.push(reject)
@@ -164,7 +187,10 @@ export function batchSyncFactory(
 
   function update(documentPath: string, _payload: Record<string, any>): Promise<void> {
     const { payload, operationCount } = preparePayload(_payload)
-    const { batch, resolves, rejects } = prepareSyncStack(operationCount)
+    const { batch, resolves, rejects, debugInfo } = prepareSyncStack(operationCount)
+
+    if (debug) addToDebugInfo(debugInfo, 'deleteProp', documentPath, payload)
+
     const ref = prepareRef(documentPath)
     batch.update(ref, payload)
     const promise: Promise<void> = new Promise((resolve, reject) => {
@@ -177,7 +203,10 @@ export function batchSyncFactory(
 
   function _delete(documentPath: string): Promise<void> {
     const operationCount = 1
-    const { batch, resolves, rejects } = prepareSyncStack(operationCount)
+    const { batch, resolves, rejects, debugInfo } = prepareSyncStack(operationCount)
+
+    if (debug) addToDebugInfo(debugInfo, 'delete', documentPath, documentPath)
+
     const ref = prepareRef(documentPath)
     batch.delete(ref)
     const promise: Promise<void> = new Promise((resolve, reject) => {

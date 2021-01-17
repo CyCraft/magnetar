@@ -29,6 +29,12 @@ export interface FirestorePluginOptions {
    * Defaults to 1000ms. The amount of milliseconds before an action is synced to Firestore. Every time a consecutive action is triggered the debounce will reset.
    */
   syncDebounceMs?: number
+  /**
+   * Logs extra information in the developer console every time it interacts with the server.
+   *
+   * Be sure to disable this on production!
+   */
+  debug?: boolean
 }
 export interface FirestoreModuleConfig {
   firestorePath?: string
@@ -40,7 +46,12 @@ export interface FirestoreModuleConfig {
 function firestorePluginOptionsWithDefaults(
   firestorePluginOptions: FirestorePluginOptions
 ): Required<FirestorePluginOptions> {
-  return { syncDebounceMs: 1000, useModulePathsForFirestore: false, ...firestorePluginOptions }
+  return {
+    syncDebounceMs: 1000,
+    useModulePathsForFirestore: false,
+    debug: false,
+    ...firestorePluginOptions,
+  }
 }
 
 // a Vue Sync plugin is a single function that returns a `PluginInstance`
