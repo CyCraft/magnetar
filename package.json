@@ -4,6 +4,7 @@
   "scripts": {
     "audit": "lerna-audit",
     "dev": "cd packages/dev && npm run dev",
+    "dev:firestore": "cd packages/dev-firestore && npm run dev",
     "dev:vue2": "cd packages/dev-vue2 && npm run dev",
     "dev:vue3": "cd packages/dev-vue3 && npm run dev",
     "dev:docs": "cd packages/docs && npm run dev",

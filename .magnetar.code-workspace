@@ -5,6 +5,7 @@
       "path": "."
     },
     { "path": "packages/core" },
+    { "path": "packages/dev-firestore" },
     { "path": "packages/dev-vue2" },
     { "path": "packages/dev-vue3" },
     { "path": "packages/docs" },

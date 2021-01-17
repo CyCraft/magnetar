@@ -13,5 +13,10 @@ module.exports = {
    * Support for monorepos
    * See docs: https://vuejs.github.io/vetur/reference/#example
    */
-  projects: ['./packages/dev-vue2', './packages/dev-vue3', './packages/docs'],
+  projects: [
+    './packages/dev-firestore',
+    './packages/dev-vue2',
+    './packages/dev-vue3',
+    './packages/docs',
+  ],
 }
