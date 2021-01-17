@@ -22,7 +22,6 @@ import TodoApp from './TodoApp.vue'
 type Item = { title: string; id: string }
 
 const itemsModule = magnetar.collection<Item>('items')
-const itemsModuleOnlyIncomplete = magnetar.collection<Item>('items').where('isDone', '==', false)
 
 export default defineComponent({
   components: { TodoApp },
