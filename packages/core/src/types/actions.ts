@@ -5,7 +5,7 @@ import { DocInstance } from '../Doc'
 import { CollectionInstance } from '../Collection'
 
 /**
- * these are all the actions that Vue Sync streamlines, whichever plugin is used
+ * these are all the actions that Magnetar streamlines, whichever plugin is used
  * these actions are executable from a `MagnetarModule` and handled by each plugin individually
  */
 export type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp' | 'delete' // prettier-ignore

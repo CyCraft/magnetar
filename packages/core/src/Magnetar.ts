@@ -27,7 +27,7 @@ function configWithDefaults(config: GlobalConfig): O.Compulsory<GlobalConfig> {
 }
 
 /**
- * This is the global Vue Sync instance that is returned when instantiating with Magnetar()
+ * This is the global Magnetar instance that is returned when instantiating with Magnetar()
  */
 export interface MagnetarInstance {
   globalConfig: O.Compulsory<GlobalConfig>

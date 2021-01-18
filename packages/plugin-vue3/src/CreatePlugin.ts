@@ -48,8 +48,8 @@ export interface Vue3StoreModuleConfig {
 export type MakeRestoreBackup = (collectionPath: string, docId: string) => void
 
 /**
- * a Vue Sync plugin is a single function that returns a `PluginInstance`
- * the plugin implements the logic for all actions that a can be called from a Vue Sync module instance
+ * a Magnetar plugin is a single function that returns a `PluginInstance`
+ * the plugin implements the logic for all actions that a can be called from a Magnetar module instance
  * each action must have the proper for both collection and doc type modules
  */
 export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
