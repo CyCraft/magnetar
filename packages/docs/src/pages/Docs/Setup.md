@@ -6,7 +6,7 @@ To instantiate Magnetar, you need to first instantiate the store plugins you wil
 
 1. instantiate a plugin for a _**remote**_ data store
 2. instantiate a plugin for a _**local**_ data store
-3. _Then_ instantiate the Magnetar instance with those plugins
+3. _then_ instantiate the Magnetar instance with those plugins
 
 This is a complete setup example which uses:
 
