@@ -8,8 +8,10 @@ It's always recommended at the very least to document your data structures! Othe
 
 The recommended way to document a data structure is by defining the default values that each document should inherit. This way you can also set up your modules so **whenever you insert a new record, you automatically merge that onto these default values.**
 
+### Example collection module setup
+
 ```javascript
-import { magnetar } from 'magnetar-setup.js'
+import { magnetar } from 'magnetarSetup.js'
 
 /**
  * applies default data structure of each document in the 'pokedex' collection
@@ -23,6 +25,12 @@ export const pokedexModule = magnetar.collection('pokedex', {
   modifyPayloadOn: { insert: pokemonDefaults },
   modifyReadResponseOn: { added: pokemonDefaults },
 })
+```
+
+### Example doc module setup
+
+```javascript
+import { magnetar } from 'magnetarSetup.js'
 
 /**
  * applies default data structure of the 'trainer' document
@@ -66,20 +74,33 @@ In this example we will filter out documents that have `isArchived: true`.
 
 <!-- prettier-ignore-start -->
 ```javascript
-import { magnetar } from 'magnetar-setup.js'
+import { magnetar } from 'magnetarSetup.js'
 
-const config = {
+export const pokedexModule = magnetar.collection('pokedex', {
   // Fixed query for this module:
   where: [['isArchived', '==', false]],
   orderBy: ['createdAt', 'asc'],
+  
   // Other options:
   modifyPayloadOn: { insert: (payload) => { /* ... */ } },
   modifyReadResponseOn: { added: (payload) => { /* ... */ } },
-}
-
-export const pokedexModule = magnetar.collection('pokedex', config)
+})
 ```
 <!-- prettier-ignore-end -->
+
+The above example will always have the query enabled whenever you import and use this pokedexModule
+
+```js
+import { pokedexModule } from 'pokedexModule.js'
+
+(async () => {
+  // making a read request will retrieve docs with the fixed query enabled:
+  await pokedexModule.get()
+
+  // accessing local data will also filter on just docs as per the fixed query:
+  pokedexModule.data.values()
+})()
+```
 
 Example use case 2: **User specific documents**
 
@@ -87,22 +108,38 @@ In this example we need to fetch the documents for a specific user. In this case
 
 <!-- prettier-ignore-start -->
 ```javascript
-import { magnetar } from 'magnetar-setup.js'
-
-const config = {
-  // Fixed query for this module:
-  where: [['userId', '==', userId]],
-  // Other options:
-  modifyPayloadOn: { insert: (payload) => { /* ... */ } },
-  modifyReadResponseOn: { added: (payload) => { /* ... */ } },
-}
+import { magnetar } from 'magnetarSetup.js'
 
 /**
  * @param {string} userId - this must be fetched first to instantiate the pokedexModule module
  */
-export const pokedexModule = (userId) => magnetar.collection('pokedex', config)
+export const userPokedexModule = (userId) => {
+  return magnetar.collection('pokedex', {
+    // Fixed query for this module:
+    where: [['userId', '==', userId]],
+    
+    // Other options:
+    modifyPayloadOn: { insert: (payload) => { /* ... */ } },
+    modifyReadResponseOn: { added: (payload) => { /* ... */ } },
+  })
+}
 ```
 <!-- prettier-ignore-end -->
+
+You will always need to pass a userId in order to use this userPokedexModule in the example above:
+
+```js
+import { userPokedexModule } from 'userPokedexModule.js'
+
+(async () => {
+  const userId = 'abc123'
+  const currentUserPokedexModule = userPokedexModule(userId)
+
+  await currentUserPokedexModule.get()
+
+  currentUserPokedexModule.data.values()
+})()
+```
 
 ### Set up a Query Wherever you Read Data
 
@@ -111,7 +148,7 @@ In some cases you might need to query on various things dependening on the user 
 Example use case: **Query documents based on search controls**
 
 ```javascript
-import { pokedexModule } from 'db-modules.js'
+import { pokedexModule } from 'magnetarModules.js'
 
 /**
  * @param {string} type - the Pokemon Type that's being searched
@@ -134,6 +171,45 @@ As you can see in the example, using a query in Magnetar is very powerful becaus
 
 You can find more information on reading data at [Read Data](#).
 
+## Dynamic module paths
+
+If you need to retrieve documents at a path which includes the user ID, you will need to provide this ID as part of the module path.
+
+```js
+import { magnetar } from 'magnetarSetup.js'
+
+const userId = 'abc123'
+const userPokedexModule = magnetar.collection(`users/${userId}/pokedex`)
+```
+
+In your app you probably need to encapsule this in a function which you can trigger once you have the user ID:
+
+```js
+import { magnetar } from 'magnetarSetup.js'
+
+/**
+ * @param {string} userId - this must be fetched first to instantiate the pokedexModule module
+ */
+export const userPokedexModule = (userId) => {
+  return magnetar.collection(`users/${userId}/pokedex`)
+}
+```
+
+You will always need to pass a userId in order to use this userPokedexModule in the example above:
+
+```js
+import { userPokedexModule } from 'userPokedexModule.js'
+
+(async () => {
+  const userId = 'abc123'
+  const currentUserPokedexModule = userPokedexModule(userId)
+
+  await currentUserPokedexModule.get()
+
+  currentUserPokedexModule.data.values()
+})()
+```
+
 ## Setup for TypeScript
 
 Magnetar has extremely good TypeScript support. You only need to pass the type of your document once and all actions the collection or document instance will be enforce that type.
@@ -142,7 +218,7 @@ This example sets up the 'pokedex' module which we pass the `Pokemon` type:
 
 <!-- prettier-ignore-start -->
 ```js
-import { magnetar } from 'magnetar-setup.js'
+import { magnetar } from 'magnetarSetup.js'
 
 export type Pokemon = { name: string, nickName?: string, id: string, level: number }
 
@@ -165,7 +241,7 @@ export const pokedexModule = magnetar.collection<Pokemon>('pokedex', config)
 Now, when writing data, types are enforced. See this example where an error will be thrown:
 
 ```js
-import { pokedexModule, pokemonDefaults } from 'db-modules'
+import { pokedexModule, pokemonDefaults } from 'magnetarModules'
 
 pokedexModule.insert({ name: 'Charmander' }) // error!
 /**
@@ -180,7 +256,7 @@ pokedexModule.insert(pokemonDefaults({ name: 'Charmander' })) // OK
 Also when reading data, types are enforced:
 
 ```js
-import { pokedexModule } from 'db-modules'
+import { pokedexModule } from 'magnetarModules'
 
 async function getPokemonById(id) {
   if (!pokedexModule.data.has(id)) {

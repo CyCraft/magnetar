@@ -81,7 +81,7 @@ magnetar.doc('pokedex/001')
 Ideally you want to create a separate file for the modules you intend to use (or one file per module). This way you can more easily add some documentation on how the data structure looks for your database documents. <small>(for more info on this read [Module Setup](#))</small>
 
 ```javascript
-import { magnetar } from 'magnetar-setup.js'
+import { magnetar } from 'magnetarSetup.js'
 
 export const pokedexModule = magnetar.collection('pokedex')
 export const trainerModule = magnetar.doc('data/trainer')
