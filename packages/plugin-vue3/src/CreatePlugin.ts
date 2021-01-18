@@ -102,10 +102,11 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
   }: PluginActionPayloadBase<Vue3StoreModuleConfig>): void => {
     const modulePath = [collectionPath, docId].filter(Boolean).join('/')
     if (modulesAlreadySetup.has(modulePath)) return
-    // always set up a new Map for the collection, but only when it's undefined!
-    // the reason for this is that the module can be instantiated multiple times
+    // always set up a new Map for the **collection**, but only when it is still undefined!
+    // the reason for this is that the module can be instantiated for multiple documents in the same collection
     if (!(collectionPath in data)) data[collectionPath] = reactive(new Map())
     const dataCollectionMap = data[collectionPath]
+    modulesAlreadySetup.add(modulePath)
     // then do anything specific for your plugin, like setting initial data
     const { initialData } = pluginModuleConfig
     if (!initialData) return
@@ -116,7 +117,6 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
     } else if (docId) {
       dataCollectionMap.set(docId, initialData as Record<string, any>)
     }
-    modulesAlreadySetup.add(modulePath)
   }
 
   /**
