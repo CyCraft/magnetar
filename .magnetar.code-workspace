@@ -8,12 +8,14 @@
     { "path": "packages/dev-firestore" },
     { "path": "packages/dev-vue2" },
     { "path": "packages/dev-vue3" },
+    { "path": "packages/dev-vuex" },
     { "path": "packages/docs" },
     { "path": "packages/magnetar" },
     { "path": "packages/plugin-firestore" },
     { "path": "packages/plugin-simple-store" },
     { "path": "packages/plugin-vue2" },
     { "path": "packages/plugin-vue3" },
+    { "path": "packages/plugin-vuex" },
     { "path": "packages/test-utils" }
   ],
   "settings": {

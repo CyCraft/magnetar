@@ -1,9 +1,18 @@
-import { PluginRevertAction, PluginRevertActionPayload } from '@magnetarjs/core'
-import { Vue3StoreModuleConfig, Vue3StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import {
+  PluginActionPayloadBase,
+  PluginRevertAction,
+  PluginRevertActionPayload,
+} from '@magnetarjs/core'
+import {
+  VuexStorePluginModuleConfig,
+  VuexStorePluginOptions,
+  MakeRestoreBackup,
+} from '../CreatePlugin'
+import { Store } from 'vuex'
 
 export function revertActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, any>> },
-  Vue3StoreOptions: Vue3StoreOptions,
+  store: Store<Record<string, any>>,
+  vuexStorePluginOptions: VuexStorePluginOptions,
   restoreBackup: MakeRestoreBackup
 ): PluginRevertAction {
   return function ({
@@ -13,7 +22,7 @@ export function revertActionFactory(
     pluginModuleConfig,
     actionName,
     error,
-  }: PluginRevertActionPayload<Vue3StoreModuleConfig>): void {
+  }: PluginRevertActionPayload<VuexStorePluginModuleConfig>): void {
     // revert all write actions when called on a doc
     if (
       docId &&
@@ -25,6 +34,6 @@ export function revertActionFactory(
     // insert on collection (no id)
     if (!docId && actionName === 'insert') actionName = 'insert on collections' as any
     // haven't implemented reverting 'get', 'stream' actions yet
-    console.error(`[@magnetarjs/plugin-vue3] revert not yet implemented for ${actionName}`)
+    console.error(`[@magnetarjs/plugin-vuex] revert not yet implemented for ${actionName}`)
   }
 }

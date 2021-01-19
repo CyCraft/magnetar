@@ -1,0 +1,29 @@
+{
+  "name": "dev-vuex",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vue-cli-service serve",
+    "build--": "vue-cli-service build"
+  },
+  "dependencies": {
+    "@magnetarjs/core": "^0.0.4",
+    "@magnetarjs/plugin-vuex": "^0.0.0",
+    "core-js": "^3.8.2",
+    "vue": "^2.6.12",
+    "vuex": "^3.6.0"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.10",
+    "@vue/cli-plugin-vuex": "~4.5.10",
+    "@vue/cli-service": "~4.5.10",
+    "sass": "^1.32.4",
+    "sass-loader": "^8.0.2",
+    "vue-template-compiler": "^2.6.12"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

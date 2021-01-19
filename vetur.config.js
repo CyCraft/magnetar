@@ -17,6 +17,7 @@ module.exports = {
     './packages/dev-firestore',
     './packages/dev-vue2',
     './packages/dev-vue3',
+    './packages/dev-vuex',
     './packages/docs',
   ],
 }

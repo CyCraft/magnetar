@@ -1,0 +1,79 @@
+{
+  "name": "@magnetarjs/plugin-vuex",
+  "version": "0.0.0",
+  "sideEffects": false,
+  "description": "Magnetar plugin Vuex",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "typings": "types/index.d.ts",
+  "scripts": {
+    "build": "npm run rollup",
+    "test-and-build": "npm run test && npm run build",
+    "test": "ava --verbose",
+    "test--only": "ava --verbose --match='*only:*'",
+    "rollup": "rimraf dist && rimraf types && rollup -c build.js"
+  },
+  "author": "Luca Ban - Mesqueeb",
+  "license": "TBD",
+  "homepage": "https://github.com/cycraft/magnetar#readme",
+  "peerDependencies": {
+    "@magnetarjs/core": "^0.0.3",
+    "vuex": "^3.6.0"
+  },
+  "dependencies": {
+    "copy-anything": "^2.0.1",
+    "fast-sort": "^2.2.0",
+    "filter-anything": "^2.1.7",
+    "is-what": "^3.12.0",
+    "merge-anything": "^4.0.0",
+    "path-to-prop": "1.0.0",
+    "ts-toolbelt": "^8.4.0"
+  },
+  "devDependencies": {
+    "@magnetarjs/core": "^0.0.4",
+    "@magnetarjs/test-utils": "^0.0.3",
+    "ava": "^3.15.0",
+    "vuex": "^3.6.0"
+  },
+  "keywords": [
+    "magnetar-plugin",
+    "magnetar",
+    "magnetarjs",
+    "state-management",
+    "syncing-solution",
+    "db-sync",
+    "auto-sync",
+    "framework-agnostic",
+    "optimistic-ui",
+    "vuejs",
+    "vuex",
+    "vue-sync",
+    "vue-state",
+    "vue-db",
+    "vue-store",
+    "firestore",
+    "data-store",
+    "local-store",
+    "remote-store",
+    "global-store",
+    "database-sync",
+    "database-management",
+    "database"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cycraft/magnetar.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cycraft/magnetar/issues"
+  },
+  "ava": {
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "timeout": "60s"
+  }
+}

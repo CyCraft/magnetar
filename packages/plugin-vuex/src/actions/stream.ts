@@ -1,0 +1,75 @@
+import { isString } from 'is-what'
+import {
+  PluginStreamAction,
+  StreamResponse,
+  DoOnStream,
+  PluginStreamActionPayload,
+  PluginActionPayloadBase,
+} from '@magnetarjs/core'
+import { VuexStorePluginModuleConfig, VuexStorePluginOptions } from '../CreatePlugin'
+import { insertActionFactory } from './insert'
+import { deleteActionFactory } from './delete'
+import { Store } from 'vuex'
+
+export function streamActionFactory(
+  store: Store<Record<string, any>>,
+  vuexStorePluginOptions: VuexStorePluginOptions,
+  setupModule: (payload: PluginActionPayloadBase<VuexStorePluginModuleConfig>) => void | 'exists'
+): PluginStreamAction {
+  return function ({
+    payload,
+    collectionPath,
+    docId,
+    pluginModuleConfig,
+    mustExecuteOnRead,
+  }: PluginStreamActionPayload<VuexStorePluginModuleConfig>):
+    | StreamResponse
+    | DoOnStream
+    | Promise<StreamResponse | DoOnStream> {
+    // hover over the prop names below to see more info on when they are triggered:
+    const doOnStream: DoOnStream = {
+      added: (payload, meta) => {
+        insertActionFactory(
+          store,
+          vuexStorePluginOptions,
+          setupModule
+        )({
+          payload,
+          collectionPath,
+          docId,
+          pluginModuleConfig,
+        })
+      },
+      modified: (payload, meta) => {
+        insertActionFactory(
+          store,
+          vuexStorePluginOptions,
+          setupModule
+        )({
+          payload,
+          collectionPath,
+          docId,
+          pluginModuleConfig,
+        })
+      },
+      removed: (payload, meta) => {
+        const collectionPathDocIdToDelete: [string, string] = docId
+          ? [collectionPath, docId]
+          : isString(payload)
+          ? [collectionPath, payload]
+          : [collectionPath, meta.id]
+        const [_cPath, _dId] = collectionPathDocIdToDelete
+        deleteActionFactory(
+          store,
+          vuexStorePluginOptions
+        )({
+          payload: undefined,
+          collectionPath: _cPath,
+          docId: _dId,
+          pluginModuleConfig,
+        })
+      },
+    }
+    return doOnStream
+  }
+}
