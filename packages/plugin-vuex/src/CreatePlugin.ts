@@ -1,4 +1,3 @@
-import { copy } from 'copy-anything'
 import { pick } from 'filter-anything'
 import { merge } from 'merge-anything'
 import { isAnyObject, isFullString } from 'is-what'
@@ -102,9 +101,6 @@ export const CreatePlugin: MagnetarPlugin<VuexStorePluginOptions> = (
     if (modulesAlreadySetup.has(modulePath)) return
     const docModuleAlreadyExists = store.hasModule(modulePath.split('/')) && isDocModule
     if (docModuleAlreadyExists) {
-      console.error(
-        'Magnetar tried to register a module that already existed... modulePath: ' + modulePath
-      )
       return 'exists'
     }
 
@@ -118,7 +114,7 @@ export const CreatePlugin: MagnetarPlugin<VuexStorePluginOptions> = (
         state: () => merge({}, isDocModule ? {} : state),
         mutations: { ...(isDocModule ? {} : mutations) },
         actions: { ...(isDocModule ? {} : actions) },
-        getters: { ...(isDocModule ? {} : getters) },
+        getters: { ...(isDocModule ? {} : getters), magnetarPath: () => collectionPath },
       })
     }
     modulesAlreadySetup.add(modulePath)
@@ -133,7 +129,10 @@ export const CreatePlugin: MagnetarPlugin<VuexStorePluginOptions> = (
         ...docMutations,
       },
       actions: { ...(isDocModule ? actions : {}) },
-      getters: { ...(isDocModule ? getters : {}) },
+      getters: {
+        ...(isDocModule ? getters : {}),
+        magnetarPath: () => `${collectionPath}/${docId}`,
+      },
     })
   }
 

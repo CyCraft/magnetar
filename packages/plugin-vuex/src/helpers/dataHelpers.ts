@@ -88,11 +88,10 @@ type CustomMap<DocDataType = Record<string, any>> = {
    */
   size: number
 
-  // Do not implement:
-  // /**
-  //  * Removes all key-value pairs from the Map object.
-  //  */
-  // clear: () => void
+  /**
+   * Removes all key-value pairs from the Map object.
+   */
+  clear: () => void
 
   /**
    * Returns the value associated to the key, or undefined if there is none.
@@ -164,8 +163,10 @@ export function objectToMap(
       callbackfn(v, k, new Map())
     })
   }
-
-  const raw = dic
+  function clear() {
+    // todo
+    console.log(`todo`)
+  }
 
   const customMap: CustomMap = {
     size: Object.keys(dic).length,
@@ -175,7 +176,7 @@ export function objectToMap(
     values,
     entries,
     forEach,
-    raw,
+    clear,
   } as any
   return customMap as any
 }

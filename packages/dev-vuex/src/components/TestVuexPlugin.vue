@@ -15,14 +15,17 @@
 </style>
 
 <script>
+import { vuexEasyFirestoreActionsCollection } from '@magnetarjs/plugin-vuex'
 import { magnetar } from '../magnetar.js'
 import TodoApp from './TodoApp.vue'
 
 // type Item = { title: string; id: string }
-
 const itemsModule = magnetar.collection('items', {
   configPerStore: {
     local: {
+      actions: {
+        ...vuexEasyFirestoreActionsCollection(magnetar),
+      },
       getters: {
         doneItems(state) {
           return Object.values(state).filter((i) => i.isDone)
