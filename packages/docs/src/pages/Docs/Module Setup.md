@@ -62,13 +62,13 @@ To learn more about these functions and other possibilities read [Hooks before W
 When you need to have only a sub-set of your documents in a collection, you have two options to set up a query.
 
 - Set up a query at the _**module level**_
-- OR Set up a query _**wherever you read data**_
+- OR Set up a query _**whenever you read data**_
 
 ### Set up a Query at the Module Level
 
 At the module level the query will be active whenever you try to read data with [get](#) or [stream](#). You should only set up the query at the module when you never need to query for other data in the same collection throughout your app.
 
-Example use case 1: **Never query archived documents** and **always sort ascending**
+Example use case 1: **Filter and order documents based on some fields**
 
 In this example we will filter out documents that have `isArchived: true`.
 
@@ -80,7 +80,7 @@ export const pokedexModule = magnetar.collection('pokedex', {
   // Fixed query for this module:
   where: [['isArchived', '==', false]],
   orderBy: ['createdAt', 'asc'],
-  
+
   // Other options:
   modifyPayloadOn: { insert: (payload) => { /* ... */ } },
   modifyReadResponseOn: { added: (payload) => { /* ... */ } },
@@ -92,8 +92,7 @@ The above example will always have the query enabled whenever you import and use
 
 ```js
 import { pokedexModule } from 'pokedexModule.js'
-
-(async () => {
+;(async () => {
   // making a read request will retrieve docs with the fixed query enabled:
   await pokedexModule.get()
 
@@ -102,7 +101,7 @@ import { pokedexModule } from 'pokedexModule.js'
 })()
 ```
 
-Example use case 2: **User specific documents**
+Example use case 2: **Filter for user specific documents**
 
 In this example we need to fetch the documents for a specific user. In this case you might want to wrap your module in a function that accepts the userId:
 
@@ -117,7 +116,7 @@ export const userPokedexModule = (userId) => {
   return magnetar.collection('pokedex', {
     // Fixed query for this module:
     where: [['userId', '==', userId]],
-    
+
     // Other options:
     modifyPayloadOn: { insert: (payload) => { /* ... */ } },
     modifyReadResponseOn: { added: (payload) => { /* ... */ } },
@@ -130,8 +129,7 @@ You will always need to pass a userId in order to use this userPokedexModule in 
 
 ```js
 import { userPokedexModule } from 'userPokedexModule.js'
-
-(async () => {
+;(async () => {
   const userId = 'abc123'
   const currentUserPokedexModule = userPokedexModule(userId)
 
@@ -140,6 +138,8 @@ import { userPokedexModule } from 'userPokedexModule.js'
   currentUserPokedexModule.data.values()
 })()
 ```
+
+However, if your database structure is set up that you don't need to filter on the field `userId` but the `userId` is a **part of the module path** then see the documentation at [Dynamic module paths](#dynamic-module-paths).
 
 ### Set up a Query Wherever you Read Data
 
@@ -199,8 +199,7 @@ You will always need to pass a userId in order to use this userPokedexModule in 
 
 ```js
 import { userPokedexModule } from 'userPokedexModule.js'
-
-(async () => {
+;(async () => {
   const userId = 'abc123'
   const currentUserPokedexModule = userPokedexModule(userId)
 
@@ -209,6 +208,8 @@ import { userPokedexModule } from 'userPokedexModule.js'
   currentUserPokedexModule.data.values()
 })()
 ```
+
+However, if your database structure is set up that the user ID is not a part of the module path, but you need to filter documents with a certain `userId` field, then see the documentation at [Filtering Data with Queries](#filtering-data-with-queries).
 
 ## Setup for TypeScript
 
