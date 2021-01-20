@@ -16,7 +16,7 @@ import { writeActionFactory } from './actions/mergeAssignReplace'
 import { insertActionFactory } from './actions/insert'
 import { deletePropActionFactory } from './actions/deleteProp'
 import { deleteActionFactory } from './actions/delete'
-import { getActionFactory } from './actions/get'
+import { fetchActionFactory } from './actions/fetch'
 import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
 import { filterDataPerClauses, objectToMap } from './helpers/dataHelpers'
@@ -108,8 +108,24 @@ export const CreatePlugin: MagnetarPlugin<VuexStorePluginOptions> = (
 
     const collectionModuleAlreadyExists = store.hasModule(collectionPath.split('/'))
     if (!collectionModuleAlreadyExists) {
+      // register modules up to this one:
+      const pathsToRegister: string[] = []
+      modulePath.split('/').forEach((part, i, array) => {
+        pathsToRegister.push(array.slice(0, i + 1).join('/'))
+      })
+      const lastPath = pathsToRegister.pop() as string
+      for (const pathToRegister of pathsToRegister) {
+        if (store.hasModule(pathToRegister.split('/'))) continue
+        store.registerModule(pathToRegister.split('/'), {
+          namespaced: true,
+          state: () => ({}),
+          mutations: {},
+          actions: {},
+          getters: { magnetarPath: () => pathToRegister },
+        })
+      }
       // collection module
-      store.registerModule(modulePath.split('/'), {
+      store.registerModule(lastPath.split('/'), {
         namespaced: true,
         state: () => merge({}, isDocModule ? {} : state),
         mutations: { ...(isDocModule ? {} : mutations) },
@@ -165,7 +181,7 @@ export const CreatePlugin: MagnetarPlugin<VuexStorePluginOptions> = (
   }
 
   // the plugin must try to implement logic for every `ActionName`
-  const get = getActionFactory(store, vuexStorePluginOptions, setupModule)
+  const fetch = fetchActionFactory(store, vuexStorePluginOptions, setupModule)
   const stream = streamActionFactory(store, vuexStorePluginOptions, setupModule)
   const insert = insertActionFactory(store, vuexStorePluginOptions, setupModule, makeBackup)
   const _merge = writeActionFactory(store, vuexStorePluginOptions, setupModule, 'merge', makeBackup)
@@ -192,7 +208,7 @@ export const CreatePlugin: MagnetarPlugin<VuexStorePluginOptions> = (
   const instance: PluginInstance = {
     revert,
     actions: {
-      get,
+      fetch,
       stream,
       insert,
       merge: _merge,

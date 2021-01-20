@@ -18,6 +18,7 @@
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "peerDependencies": {
     "@magnetarjs/core": "^0.0.3",
+    "vue": "^2.6.12",
     "vuex": "^3.6.0"
   },
   "dependencies": {
@@ -33,6 +34,7 @@
     "@magnetarjs/core": "^0.0.4",
     "@magnetarjs/test-utils": "^0.0.3",
     "ava": "^3.15.0",
+    "vue": "^2.6.12",
     "vuex": "^3.6.0"
   },
   "keywords": [

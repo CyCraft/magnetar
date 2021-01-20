@@ -2,6 +2,12 @@ import { Magnetar, MagnetarInstance, CollectionInstance, DocInstance } from '../
 import { CreatePlugin as CreatePluginLocal } from '../../src'
 import { pokedex, PokedexEntry, generateRandomId, PluginMockRemote } from '@magnetarjs/test-utils'
 import { O } from 'ts-toolbelt'
+// @ts-ignore
+import Vue from 'vue/dist/vue.common.js'
+// @ts-ignore
+import Vuex from 'vuex/dist/vuex.common.js'
+
+Vue.use(Vuex)
 
 const CreatePluginRemote = PluginMockRemote.CreatePlugin
 
@@ -32,7 +38,13 @@ export function createMagnetarInstance(): {
   trainerModule: DocInstance<TrainerModuleData>
   magnetar: MagnetarInstance
 } {
-  const local = CreatePluginLocal({ generateRandomId })
+  const store = new Vuex.Store({
+    state: {},
+    mutations: {},
+    actions: {},
+    modules: {},
+  })
+  const local = CreatePluginLocal({ generateRandomId, store })
   const remote = CreatePluginRemote({ storeName: 'remote' })
   const magnetar = Magnetar({
     localStoreName: 'local',
