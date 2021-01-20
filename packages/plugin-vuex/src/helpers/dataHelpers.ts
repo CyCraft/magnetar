@@ -96,7 +96,7 @@ type CustomMap<DocDataType = Record<string, any>> = {
   /**
    * Returns the value associated to the key, or undefined if there is none.
    */
-  get: (id: string) => DocDataType
+  fetch: (id: string) => DocDataType
   /**
    * Returns a boolean asserting whether a value has been associated to the key in the Map object or not.
    */

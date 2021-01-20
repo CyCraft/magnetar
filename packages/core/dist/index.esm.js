@@ -2,7 +2,7 @@ import { mergeAndConcat, merge } from 'merge-anything';
 import { isPlainObject, isFunction, isArray, isFullString, isPromise } from 'is-what';
 
 const actionNameTypeMap = {
-    get: 'read',
+    fetch: 'read',
     stream: 'read',
     insert: 'write',
     merge: 'write',
@@ -114,15 +114,15 @@ function isDoOnStream(payload) {
     return !isNotDoOnStream;
 }
 /**
- * DoOnGet type guard
+ * DoOnFetch type guard
  */
-function isDoOnGet(payload) {
+function isDoOnFetch(payload) {
     return isFunction(payload);
 }
 /**
- * GetResponse type guard
+ * FetchResponse type guard
  */
-function isGetResponse(payload) {
+function isFetchResponse(payload) {
     return isPlainObject(payload) && isArray(payload.docs);
 }
 
@@ -139,7 +139,7 @@ function getModifyPayloadFnsMap(...onMaps) {
         deleteProp: _onMaps.flatMap((on) => { var _a; return (_a = on.deleteProp) !== null && _a !== void 0 ? _a : []; }),
         delete: [],
         stream: _onMaps.flatMap((on) => { var _a; return (_a = on.stream) !== null && _a !== void 0 ? _a : []; }).concat(readFns),
-        get: _onMaps.flatMap((on) => { var _a; return (_a = on.get) !== null && _a !== void 0 ? _a : []; }).concat(readFns),
+        fetch: _onMaps.flatMap((on) => { var _a; return (_a = on.fetch) !== null && _a !== void 0 ? _a : []; }).concat(readFns),
     };
     return result;
 }
@@ -350,9 +350,9 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                 stopExecution = trueOrRevert;
             }
             /**
-             * each each time a store returns a `GetResponse` then all `doOnGetFns` need to be executed
+             * each each time a store returns a `FetchResponse` then all `doOnFetchFns` need to be executed
              */
-            const doOnGetFns = modifyReadResponseMap.added;
+            const doOnFetchFns = modifyReadResponseMap.added;
             // handle and await each action in sequence
             let resultFromPlugin;
             for (const [i, storeName] of storesToExecute.entries()) {
@@ -408,14 +408,14 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                         docId = resultFromPlugin;
                     }
                 }
-                // special handling for 'get' (resultFromPlugin will always be `GetResponse | OnAddedFn`)
-                if (actionName === 'get') {
-                    if (isDoOnGet(resultFromPlugin)) {
-                        doOnGetFns.push(resultFromPlugin);
+                // special handling for 'fetch' (resultFromPlugin will always be `FetchResponse | OnAddedFn`)
+                if (actionName === 'fetch') {
+                    if (isDoOnFetch(resultFromPlugin)) {
+                        doOnFetchFns.push(resultFromPlugin);
                     }
-                    if (isGetResponse(resultFromPlugin)) {
+                    if (isFetchResponse(resultFromPlugin)) {
                         for (const docRetrieved of resultFromPlugin.docs) {
-                            executeOnFns(doOnGetFns, docRetrieved.data, [docRetrieved]);
+                            executeOnFns(doOnFetchFns, docRetrieved.data, [docRetrieved]);
                         }
                     }
                 }
@@ -430,7 +430,7 @@ collectionFn // actions executed on a "collection" will return `collection()` or
             // anything that's executed from a "doc" module:
             if (docId || !collectionFn)
                 return docFn(modulePath, moduleConfig);
-            // all other actions triggered on collections ('get' is the only possibility left)
+            // all other actions triggered on collections ('fetch' is the only possibility left)
             // should return the collection:
             return collectionFn(modulePath, moduleConfig);
         });
@@ -580,9 +580,9 @@ function createCollectionWithContext([collectionPath, docId], moduleConfig, glob
     };
     const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, docFn, collectionFn); //prettier-ignore
     const _delete = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn, collectionFn); //prettier-ignore
-    const get = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn, collectionFn); //prettier-ignore
+    const fetch = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, docFn, collectionFn); //prettier-ignore
     const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streams); // prettier-ignore
-    const actions = { stream, get, insert, delete: _delete };
+    const actions = { stream, fetch, insert, delete: _delete };
     // Every store will have its 'setupModule' function executed
     executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig);
     function where(fieldPath, operator, value) {
@@ -627,7 +627,7 @@ function createDocWithContext([collectionPath, docId], moduleConfig, globalConfi
         replace: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'replace', actionNameTypeMap.replace, docFn),
         deleteProp: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'deleteProp', actionNameTypeMap.deleteProp, docFn),
         delete: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn),
-        get: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn),
+        fetch: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, docFn),
         stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streams),
     };
     // Every store will have its 'setupModule' function executed
@@ -733,4 +733,4 @@ function Magnetar(magnetarConfig) {
     return instance;
 }
 
-export { Magnetar, getCollectionPathDocIdEntry, isCollectionModule, isDoOnGet, isDoOnStream, isDocModule, isGetResponse };
+export { Magnetar, getCollectionPathDocIdEntry, isCollectionModule, isDoOnFetch, isDoOnStream, isDocModule, isFetchResponse };

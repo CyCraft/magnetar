@@ -6,5 +6,5 @@
     // This must be specified if "paths" is set
     "baseUrl": "."
   },
-  "include": ["src/**/*", "src/*"]
+  "include": ["./src/**/*"]
 }

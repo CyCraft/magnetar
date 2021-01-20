@@ -25,7 +25,7 @@ export type ModifyPayloadFnMap = {
   deleteProp?: ModifyDeletePropPayload
   read?: ModifyReadPayload
   stream?: ModifyReadPayload
-  get?: ModifyReadPayload
+  fetch?: ModifyReadPayload
 }
 
 /**
@@ -41,7 +41,7 @@ export type ModifyPayloadFnsMap = {
   delete: never[]
   read: ModifyReadPayload[]
   stream: ModifyReadPayload[]
-  get: ModifyReadPayload[]
+  fetch: ModifyReadPayload[]
 }
 
 export function getModifyPayloadFnsMap(
@@ -59,7 +59,7 @@ export function getModifyPayloadFnsMap(
     deleteProp: _onMaps.flatMap((on) => on.deleteProp ?? []),
     delete: [] as never[], // delete has no payload
     stream: _onMaps.flatMap((on) => on.stream ?? []).concat(readFns),
-    get: _onMaps.flatMap((on) => on.get ?? []).concat(readFns),
+    fetch: _onMaps.flatMap((on) => on.fetch ?? []).concat(readFns),
   }
   return result
 }

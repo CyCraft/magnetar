@@ -1,7 +1,7 @@
 import { O } from 'ts-toolbelt'
 import {
   MagnetarWriteAction,
-  MagnetarGetAction,
+  MagnetarFetchAction,
   MagnetarStreamAction,
   MagnetarDeleteAction,
   MagnetarDeletePropAction,
@@ -44,7 +44,7 @@ export type DocInstance<DocDataType extends Record<string, any> = Record<string,
   findStreamPromise: FindStreamPromise
 
   // actions
-  get: MagnetarGetAction<DocDataType, 'doc'>
+  fetch: MagnetarFetchAction<DocDataType, 'doc'>
   stream: MagnetarStreamAction
   insert: MagnetarInsertAction<DocDataType>
   merge: MagnetarWriteAction<DocDataType>
@@ -87,7 +87,7 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
     replace: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'replace', actionNameTypeMap.replace, docFn) as MagnetarWriteAction<DocDataType>), // prettier-ignore
     deleteProp: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'deleteProp', actionNameTypeMap.deleteProp, docFn) as MagnetarDeletePropAction<DocDataType>), // prettier-ignore
     delete: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn) as MagnetarDeleteAction<DocDataType>), // prettier-ignore
-    get: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn) as MagnetarGetAction<DocDataType, 'doc'>), // prettier-ignore
+    fetch: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, docFn) as MagnetarFetchAction<DocDataType, 'doc'>), // prettier-ignore
     stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streams), // prettier-ignore
   }
 

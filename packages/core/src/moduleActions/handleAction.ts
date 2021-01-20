@@ -4,12 +4,12 @@ import { SharedConfig } from '../types/config'
 import { EventNameFnsMap } from '../types/events'
 import {
   PluginModuleConfig,
-  PluginGetAction,
+  PluginFetchAction,
   PluginWriteAction,
   PluginDeleteAction,
   PluginDeletePropAction,
   PluginInsertAction,
-  GetResponse,
+  FetchResponse,
 } from '../types/plugins'
 import { OnAddedFn } from '../types/modifyReadResponse'
 
@@ -21,14 +21,14 @@ export async function handleAction(args: {
   collectionPath: string
   docId: string | undefined
   pluginModuleConfig: PluginModuleConfig
-  pluginAction: PluginGetAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction // prettier-ignore
+  pluginAction: PluginFetchAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction // prettier-ignore
   payload: void | Record<string, any> | Record<string, any>[] | string | string[]
   eventNameFnsMap: EventNameFnsMap
   onError: SharedConfig['onError']
   actionName: Exclude<ActionName, 'stream'>
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
   storeName: string
-}): Promise<void | string | GetResponse | OnAddedFn> {
+}): Promise<void | string | FetchResponse | OnAddedFn> {
   const {
     collectionPath,
     docId,
@@ -55,7 +55,7 @@ export async function handleAction(args: {
     stopExecutionAfterAction()
     return
   }
-  let result: void | string | GetResponse | OnAddedFn
+  let result: void | string | FetchResponse | OnAddedFn
   try {
     // triggering the action provided by the plugin
     result = await pluginAction({ payload, collectionPath, docId, pluginModuleConfig } as any)

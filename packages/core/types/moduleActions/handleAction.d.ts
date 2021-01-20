@@ -1,7 +1,7 @@
 import { ActionName } from '../types/actions';
 import { SharedConfig } from '../types/config';
 import { EventNameFnsMap } from '../types/events';
-import { PluginModuleConfig, PluginGetAction, PluginWriteAction, PluginDeleteAction, PluginDeletePropAction, PluginInsertAction, GetResponse } from '../types/plugins';
+import { PluginModuleConfig, PluginFetchAction, PluginWriteAction, PluginDeleteAction, PluginDeletePropAction, PluginInsertAction, FetchResponse } from '../types/plugins';
 import { OnAddedFn } from '../types/modifyReadResponse';
 /**
  * handleAction is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success (4) optional: onNextStoresSuccess.
@@ -11,11 +11,11 @@ export declare function handleAction(args: {
     collectionPath: string;
     docId: string | undefined;
     pluginModuleConfig: PluginModuleConfig;
-    pluginAction: PluginGetAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction;
+    pluginAction: PluginFetchAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction;
     payload: void | Record<string, any> | Record<string, any>[] | string | string[];
     eventNameFnsMap: EventNameFnsMap;
     onError: SharedConfig['onError'];
     actionName: Exclude<ActionName, 'stream'>;
     stopExecutionAfterAction: (arg?: boolean | 'revert') => void;
     storeName: string;
-}): Promise<void | string | GetResponse | OnAddedFn>;
+}): Promise<void | string | FetchResponse | OnAddedFn>;

@@ -10,7 +10,7 @@ import {
   insertActionFactory,
   deletePropActionFactory,
   deleteActionFactory,
-  getActionFactory,
+  fetchActionFactory,
   streamActionFactory,
   revertActionFactory,
 } from './actions'
@@ -36,7 +36,7 @@ export const CreatePlugin: MagnetarPlugin<RemoteStoreOptions> = (
   storePluginOptions: RemoteStoreOptions
 ): PluginInstance => {
   // the plugin must try to implement logic for every `ActionName`
-  const get = getActionFactory(storePluginOptions)
+  const fetch = fetchActionFactory(storePluginOptions)
   const stream = streamActionFactory(storePluginOptions)
   const insert = insertActionFactory(storePluginOptions)
   const _merge = writeActionFactory(storePluginOptions, 'merge')
@@ -50,7 +50,7 @@ export const CreatePlugin: MagnetarPlugin<RemoteStoreOptions> = (
   const instance: PluginInstance = {
     revert,
     actions: {
-      get,
+      fetch,
       stream,
       insert,
       merge: _merge,

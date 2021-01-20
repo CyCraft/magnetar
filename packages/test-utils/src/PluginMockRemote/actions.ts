@@ -5,15 +5,15 @@ import {
   PluginStreamAction,
   StreamResponse,
   DoOnStream,
-  PluginGetAction,
+  PluginFetchAction,
   PluginRevertAction,
   PluginDeletePropAction,
   PluginInsertAction,
-  DoOnGet,
-  GetResponse,
+  DoOnFetch,
+  FetchResponse,
   PluginStreamActionPayload,
   PluginRevertActionPayload,
-  PluginGetActionPayload,
+  PluginFetchActionPayload,
   PluginDeleteActionPayload,
   PluginDeletePropActionPayload,
   PluginInsertActionPayload,
@@ -109,13 +109,13 @@ function mockDataRetrieval(
   return [...filteredMap.values()]
 }
 
-export function getActionFactory(storePluginOptions: RemoteStoreOptions): PluginGetAction {
+export function fetchActionFactory(storePluginOptions: RemoteStoreOptions): PluginFetchAction {
   return async function ({
     payload,
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginGetActionPayload<StorePluginModuleConfig>): Promise<DoOnGet | GetResponse> {
+  }: PluginFetchActionPayload<StorePluginModuleConfig>): Promise<DoOnFetch | FetchResponse> {
     // this is custom logic to be implemented by the plugin author
 
     // this mocks an error during execution
@@ -198,7 +198,7 @@ export function revertActionFactory(storePluginOptions: RemoteStoreOptions): Plu
     actionName,
   }: PluginRevertActionPayload<StorePluginModuleConfig>): Promise<void> {
     // reverting on read actions is not neccesary
-    const isReadAction = ['get', 'stream'].includes(actionName)
+    const isReadAction = ['fetch', 'stream'].includes(actionName)
     if (isReadAction) return
 
     // this is custom logic to be implemented by the plugin author

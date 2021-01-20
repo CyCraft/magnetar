@@ -8,7 +8,7 @@
   "typings": "types/index.d.ts",
   "author": "Luca Ban - Mesqueeb",
   "scripts": {
-    "build--": "npm run rollup",
+    "build--see-issue-#19": "npm run rollup",
     "rollup": "rimraf dist && rimraf types && rollup -c build.js"
   },
   "dependencies": {

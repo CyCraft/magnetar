@@ -112,7 +112,7 @@ pokedexModule.insert({ name: 'Squirtle' }) // inserts a new document
 pokedexModule.delete('001') // deletes a document
 
 // methods to read data
-pokedexModule.get() // gets documents from the remote store & adds them locally
+pokedexModule.fetch() // fetches documents from the remote store & adds them locally
 pokedexModule.stream() // opens a database stream & adds incoming documents locally
 ```
 
@@ -138,6 +138,6 @@ pokemonModule.deleteProp('name') // deletes a property from the document
 pokemonModule.delete() // deletes the document
 
 // methods to read data
-pokemonModule.get() // gets the document from the remote store & adds it locally
+pokemonModule.fetch() // fetches the document from the remote store & adds it locally
 pokemonModule.stream() // opens a database stream & keeps the document up to date locally
 ```

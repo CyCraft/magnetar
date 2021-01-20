@@ -104,12 +104,12 @@ test('write: merge (document)', async (t) => {
 })
 
 test('read: get (collection)', async (t) => {
-  // 'get' resolves once all stores have given a response with data
+  // 'fetch' resolves once all stores have given a response with data
   const { pokedexModule } = createMagnetarInstance()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.is(pokedexModule.data.size, 1)
   try {
-    const result = await pokedexModule.get()
+    const result = await pokedexModule.fetch()
     t.deepEqual(result.data.get('1'), pokedex(1))
     t.deepEqual(result.data.get('136'), pokedex(136))
   } catch (error) {
@@ -125,7 +125,7 @@ test('read: get (document)', async (t) => {
   const { trainerModule } = createMagnetarInstance()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
   try {
-    const result = await trainerModule.get()
+    const result = await trainerModule.fetch()
     t.deepEqual(result.data, { name: 'Luca', age: 10, dream: 'job' })
   } catch (error) {
     t.fail(error)
@@ -133,12 +133,12 @@ test('read: get (document)', async (t) => {
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })
 
-test('get (collection) where-filter: ==', async (t) => {
+test('fetch (collection) where-filter: ==', async (t) => {
   const { pokedexModule, magnetar } = createMagnetarInstance()
 
   const pokedexModuleWithQuery = pokedexModule.where('name', '==', 'Flareon')
   try {
-    const queryModuleRef = await pokedexModuleWithQuery.get()
+    const queryModuleRef = await pokedexModuleWithQuery.fetch()
     t.deepEqual([...queryModuleRef.data.values()], [pokedex(136)])
   } catch (error) {
     t.fail(error)

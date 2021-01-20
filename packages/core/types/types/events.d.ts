@@ -1,6 +1,6 @@
 import { O } from 'ts-toolbelt';
 import { ActionName } from './actions';
-import { GetResponse, StreamResponse, DoOnStream, DoOnGet } from './plugins';
+import { FetchResponse, StreamResponse, DoOnStream, DoOnFetch } from './plugins';
 export declare type EventName = 'before' | 'success' | 'error' | 'revert';
 declare type EventSharedPayload = {
     /**
@@ -18,7 +18,7 @@ declare type EventSharedPayload = {
     abort: () => void;
 };
 declare type EventPayloadPropResult = {
-    result: void | string | GetResponse | DoOnGet | StreamResponse | DoOnStream;
+    result: void | string | FetchResponse | DoOnFetch | StreamResponse | DoOnStream;
 };
 export declare type EventFnBefore = (args: EventSharedPayload) => void | Promise<void>;
 export declare type EventFnSuccess = (args: O.Patch<EventSharedPayload, EventPayloadPropResult>) => void | Promise<void>;

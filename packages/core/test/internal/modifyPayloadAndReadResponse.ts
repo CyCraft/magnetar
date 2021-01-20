@@ -2,7 +2,7 @@ import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex, waitMs } from '@magnetarjs/test-utils'
 
-test('get: can mutate payload & read response', async (t) => {
+test('fetch: can mutate payload & read response', async (t) => {
   function addSeen(payload: any) {
     return { ...payload, seen: true }
   }
@@ -13,7 +13,7 @@ test('get: can mutate payload & read response', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   try {
-    const result = await pokedexModule.get(
+    const result = await pokedexModule.fetch(
       {},
       {
         modifyPayloadOn: {

@@ -2,15 +2,15 @@ import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex } from '@magnetarjs/test-utils'
 
-test('get (collection)', async (t) => {
-  /// 'get' resolves once all stores have given a response with data
+test('fetch (collection)', async (t) => {
+  /// 'fetch' resolves once all stores have given a response with data
   const { pokedexModule } = createMagnetarInstance()
   t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
   t.deepEqual(pokedexModule.doc('136').data, undefined)
   t.is(pokedexModule.data.size, 1)
 
   try {
-    await pokedexModule.get()
+    await pokedexModule.fetch()
   } catch (error) {
     t.fail(error)
   }
@@ -19,22 +19,22 @@ test('get (collection)', async (t) => {
   t.is(pokedexModule.data.size, 151)
 })
 
-test('get (document)', async (t) => {
-  /// get resolves once all stores have given a response with data
+test('fetch (document)', async (t) => {
+  /// fetch resolves once all stores have given a response with data
   const { trainerModule } = createMagnetarInstance()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
   try {
-    await trainerModule.get()
+    await trainerModule.fetch()
   } catch (error) {
     t.fail(error)
   }
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })
 
-test('get (collection) where-filter: ==', async (t) => {
+test('fetch (collection) where-filter: ==', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
-    const queryModuleRef = await pokedexModule.where('name', '==', 'Flareon').get()
+    const queryModuleRef = await pokedexModule.where('name', '==', 'Flareon').fetch()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(136)]
     t.deepEqual(actual, expected as any)
@@ -43,10 +43,10 @@ test('get (collection) where-filter: ==', async (t) => {
   }
 })
 
-test('get (collection) where-filter: !=', async (t) => {
+test('fetch (collection) where-filter: !=', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
-    const queryModuleRef = await pokedexModule.where('name', '!=', 'Bulbasaur').limit(1).get()
+    const queryModuleRef = await pokedexModule.where('name', '!=', 'Bulbasaur').limit(1).fetch()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(2)]
     t.deepEqual(actual, expected as any)
@@ -55,10 +55,10 @@ test('get (collection) where-filter: !=', async (t) => {
   }
 })
 
-test('get (collection) where-filter: == nested', async (t) => {
+test('fetch (collection) where-filter: == nested', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
-    const queryModuleRef = await pokedexModule.where('base.HP', '==', 10).get()
+    const queryModuleRef = await pokedexModule.where('base.HP', '==', 10).fetch()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(50)]
     t.deepEqual(actual, expected as any)
@@ -67,10 +67,10 @@ test('get (collection) where-filter: == nested', async (t) => {
   }
 })
 
-test('get (collection) where-filter: <', async (t) => {
+test('fetch (collection) where-filter: <', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
-    const queryModuleRef = await pokedexModule.where('base.HP', '<', 11).get()
+    const queryModuleRef = await pokedexModule.where('base.HP', '<', 11).fetch()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(50)]
     t.deepEqual(actual, expected as any)
@@ -79,10 +79,10 @@ test('get (collection) where-filter: <', async (t) => {
   }
 })
 
-test('get (collection) where-filter: <=', async (t) => {
+test('fetch (collection) where-filter: <=', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
-    const queryModuleRef = await pokedexModule.where('base.HP', '<=', 10).get()
+    const queryModuleRef = await pokedexModule.where('base.HP', '<=', 10).fetch()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(50)]
     t.deepEqual(actual, expected as any)
@@ -91,10 +91,10 @@ test('get (collection) where-filter: <=', async (t) => {
   }
 })
 
-test('get (collection) where-filter: >', async (t) => {
+test('fetch (collection) where-filter: >', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
-    const queryModuleRef = await pokedexModule.where('base.HP', '>', 249).get()
+    const queryModuleRef = await pokedexModule.where('base.HP', '>', 249).fetch()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(113)]
     t.deepEqual(actual, expected as any)
@@ -103,10 +103,10 @@ test('get (collection) where-filter: >', async (t) => {
   }
 })
 
-test('get (collection) where-filter: >=', async (t) => {
+test('fetch (collection) where-filter: >=', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
-    const queryModuleRef = await pokedexModule.where('base.HP', '>=', 250).get()
+    const queryModuleRef = await pokedexModule.where('base.HP', '>=', 250).fetch()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(113)]
     t.deepEqual(actual, expected as any)
@@ -115,10 +115,10 @@ test('get (collection) where-filter: >=', async (t) => {
   }
 })
 
-test('get (collection) where-filter: array-contains', async (t) => {
+test('fetch (collection) where-filter: array-contains', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
-    const queryModuleRef = await pokedexModule.where('type', 'array-contains', 'Steel').get()
+    const queryModuleRef = await pokedexModule.where('type', 'array-contains', 'Steel').fetch()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(81), pokedex(82)]
     t.deepEqual(actual, expected as any)
@@ -127,12 +127,12 @@ test('get (collection) where-filter: array-contains', async (t) => {
   }
 })
 
-test('get (collection) where-filter: in', async (t) => {
+test('fetch (collection) where-filter: in', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
     const queryModuleRef = await pokedexModule
       .where('name', 'in', ['Vaporeon', 'Jolteon', 'Flareon'])
-      .get()
+      .fetch()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(134), pokedex(135), pokedex(136)]
     t.deepEqual(actual, expected as any)
@@ -141,27 +141,27 @@ test('get (collection) where-filter: in', async (t) => {
   }
 })
 
-test('get (collection) where-filter: not-in', async (t) => {
+test('fetch (collection) where-filter: not-in', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
     const queryModuleRef = await pokedexModule
-      .where('type', 'array-contains', 'Ice')
-      .where('name', 'not-in', [pokedex(91).name, pokedex(131).name])
-      .get()
+      .where('type', 'array-contains-any', ['Steel', 'Ice'])
+      .where('name', 'not-in', [pokedex(81).name, pokedex(82).name, pokedex(91).name])
+      .fetch()
     const actual = [...queryModuleRef.data.values()]
-    const expected = [pokedex(87), pokedex(124), pokedex(144)]
+    const expected = [pokedex(87), pokedex(124), pokedex(131), pokedex(144)]
     t.deepEqual(actual, expected as any)
   } catch (error) {
     t.fail(error)
   }
 })
 
-test('get (collection) where-filter: array-contains-any', async (t) => {
+test('fetch (collection) where-filter: array-contains-any', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
     const queryModuleRef = await pokedexModule
       .where('type', 'array-contains-any', ['Steel', 'Ice'])
-      .get()
+      .fetch()
     const actual = [...queryModuleRef.data.values()]
     const expected = [
       pokedex(81),
@@ -178,13 +178,13 @@ test('get (collection) where-filter: array-contains-any', async (t) => {
   }
 })
 
-test('get (collection) compound queries', async (t) => {
+test('fetch (collection) compound queries', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
     const queryModuleRef = await pokedexModule
       .where('type', 'array-contains', 'Fire')
       .where('base.Speed', '>=', 100)
-      .get()
+      .fetch()
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(6), pokedex(38), pokedex(78)]
     t.deepEqual(actual, expected as any)
@@ -193,14 +193,14 @@ test('get (collection) compound queries', async (t) => {
   }
 })
 
-test('get (collection) orderBy', async (t) => {
+test('fetch (collection) orderBy', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
     const queryModuleRef = await pokedexModule
       .where('type', 'array-contains', 'Fire')
       .where('base.Speed', '>=', 100)
       .orderBy('name', 'desc')
-      .get()
+      .fetch()
     // Rapidash 78
     // Ninetales 38
     // Charizard 6
@@ -212,10 +212,10 @@ test('get (collection) orderBy', async (t) => {
   }
 })
 
-test('get (collection) limit', async (t) => {
+test('fetch (collection) limit', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
-    const queryModuleRef = await pokedexModule.limit(10).get()
+    const queryModuleRef = await pokedexModule.limit(10).fetch()
     const actual = [...queryModuleRef.data.values()]
     const expected = [
       pokedex(1),

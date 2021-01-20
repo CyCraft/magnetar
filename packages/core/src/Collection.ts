@@ -1,6 +1,6 @@
 import { O } from 'ts-toolbelt'
 import {
-  MagnetarGetAction,
+  MagnetarFetchAction,
   MagnetarStreamAction,
   MagnetarInsertAction,
   OpenStreams,
@@ -45,7 +45,7 @@ export type CollectionInstance<DocDataType extends Record<string, any> = Record<
   findStreamPromise: FindStreamPromise
 
   // actions
-  get: MagnetarGetAction<DocDataType, 'collection'>
+  fetch: MagnetarFetchAction<DocDataType, 'collection'>
   stream: MagnetarStreamAction
   insert: MagnetarInsertAction<DocDataType>
   delete: MagnetarDeleteAction<DocDataType>
@@ -79,10 +79,10 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
 
   const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, docFn, collectionFn) as MagnetarInsertAction<DocDataType> //prettier-ignore
   const _delete = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn, collectionFn) as MagnetarDeleteAction<DocDataType> //prettier-ignore
-  const get = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'get', actionNameTypeMap.get, docFn, collectionFn) as MagnetarGetAction<DocDataType, 'collection'> //prettier-ignore
+  const fetch = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, docFn, collectionFn) as MagnetarFetchAction<DocDataType, 'collection'> //prettier-ignore
   const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streams) // prettier-ignore
 
-  const actions = { stream, get, insert, delete: _delete }
+  const actions = { stream, fetch, insert, delete: _delete }
 
   // Every store will have its 'setupModule' function executed
   executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig)

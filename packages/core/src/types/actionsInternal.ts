@@ -1,6 +1,6 @@
 import {
   MagnetarStreamAction,
-  MagnetarGetAction,
+  MagnetarFetchAction,
   MagnetarDeleteAction,
   MagnetarDeletePropAction,
   MagnetarInsertAction,
@@ -14,7 +14,7 @@ import {
 export type ActionType = 'read' | 'write' | 'delete'
 
 export const actionNameTypeMap: { [action in ActionName]: ActionType } = {
-  get: 'read',
+  fetch: 'read',
   stream: 'read',
   insert: 'write',
   merge: 'write',
@@ -26,8 +26,8 @@ export const actionNameTypeMap: { [action in ActionName]: ActionType } = {
 
 export type ActionTernary<TActionName extends ActionName> = TActionName extends 'stream'
   ? MagnetarStreamAction
-  : TActionName extends 'get'
-  ? MagnetarGetAction
+  : TActionName extends 'fetch'
+  ? MagnetarFetchAction
   : TActionName extends 'delete'
   ? MagnetarDeleteAction
   : TActionName extends 'deleteProp'

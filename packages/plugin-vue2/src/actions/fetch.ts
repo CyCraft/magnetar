@@ -1,18 +1,23 @@
-import { PluginGetAction, GetResponse, DoOnGet, PluginGetActionPayload } from '@magnetarjs/core'
+import {
+  PluginFetchAction,
+  FetchResponse,
+  DoOnFetch,
+  PluginFetchActionPayload,
+} from '@magnetarjs/core'
 import { Vue2StoreModuleConfig, Vue2StoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 
-export function getActionFactory(
+export function fetchActionFactory(
   data: { [collectionPath: string]: Record<string, Record<string, any>> },
   vue2StoreOptions: Vue2StoreOptions
-): PluginGetAction {
+): PluginFetchAction {
   return function ({
     payload,
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginGetActionPayload<Vue2StoreModuleConfig>): GetResponse | DoOnGet {
-    const doOnGetAction: DoOnGet = (payload, meta): void => {
+  }: PluginFetchActionPayload<Vue2StoreModuleConfig>): FetchResponse | DoOnFetch {
+    const doOnFetchAction: DoOnFetch = (payload, meta): void => {
       insertActionFactory(
         data,
         vue2StoreOptions
@@ -23,6 +28,6 @@ export function getActionFactory(
         pluginModuleConfig,
       })
     }
-    return doOnGetAction
+    return doOnFetchAction
   }
 }

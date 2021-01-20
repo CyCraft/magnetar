@@ -24,7 +24,7 @@ export function revertActionFactory(
     }
     // insert on collection (no id)
     if (!docId && actionName === 'insert') actionName = 'insert on collections' as any
-    // haven't implemented reverting 'get', 'stream' actions yet
+    // haven't implemented reverting 'fetch', 'stream' actions yet
     console.error(`[@magnetarjs/plugin-vue3] revert not yet implemented for ${actionName}`)
   }
 }

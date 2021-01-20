@@ -1,18 +1,23 @@
-import { PluginGetAction, GetResponse, DoOnGet, PluginGetActionPayload } from '@magnetarjs/core'
+import {
+  PluginFetchAction,
+  FetchResponse,
+  DoOnFetch,
+  PluginFetchActionPayload,
+} from '@magnetarjs/core'
 import { SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 
-export function getActionFactory(
+export function fetchActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
   simpleStoreOptions: SimpleStoreOptions
-): PluginGetAction {
+): PluginFetchAction {
   return function ({
     payload,
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginGetActionPayload<SimpleStoreModuleConfig>): GetResponse | DoOnGet {
-    const doOnGetAction: DoOnGet = (payload, meta): void => {
+  }: PluginFetchActionPayload<SimpleStoreModuleConfig>): FetchResponse | DoOnFetch {
+    const doOnFetchAction: DoOnFetch = (payload, meta): void => {
       insertActionFactory(
         data,
         simpleStoreOptions
@@ -23,6 +28,6 @@ export function getActionFactory(
         pluginModuleConfig,
       })
     }
-    return doOnGetAction
+    return doOnFetchAction
   }
 }

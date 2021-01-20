@@ -2,16 +2,16 @@
 
 There are two ways to retrieve data from your remote stores. Either of these methods can be used with documents and collections.
 
-- Execute a function to get data once
+- Execute a function to fetch data once
 - Set up a "stream" to receive realtime updates
 
-## Get data once
+## Fetch data once
 
-When you get data by executing `get()`, the data will be fetched from a server by your "remote" store plugin and then added to your module's data by your "local" store plugin.
+When you get data by executing `fetch()`, the data will be fetched from a server by your "remote" store plugin and then added to your module's data by your "local" store plugin.
 
-### Get a single document
+### Fetch a single document
 
-When you call `get()` on a document module, your remote store will go and fetch the document from your database and add it to your local store.
+When you call `fetch()` on a document module, your remote store will go and fetch the document from your database and add it to your local store.
 
 ```javascript
 const bulbasaur = magnetar.doc('pokedex/001')
@@ -19,7 +19,7 @@ const bulbasaur = magnetar.doc('pokedex/001')
 // bulbasaur's data is not yet in local data
 // bulbasaur.data ≈ {}
 
-await pokedexModule.get()
+await pokedexModule.fetch()
 
 // now it is available locally:
 
@@ -27,16 +27,16 @@ const data = bulbasaur.data
 // bulbasaur.data ≈ { name: 'Bulbasaur' }
 ```
 
-The get action will also return a doc or collection module you can use:
+The `fetch` action will also return a doc or collection module you can use:
 
 ```js
-// create the module and immidiately await the get()
-const bulbasaur = await magnetar.doc('pokedex/001').get()
+// create the module and immidiately await the fetch()
+const bulbasaur = await magnetar.doc('pokedex/001').fetch()
 
 // bulbasaur.data ≈ { name: 'Bulbasaur' }
 ```
 
-### Get multiple documents
+### Fetch multiple documents
 
 ```javascript
 const pokedexModule = magnetar.collection('pokedex')
@@ -44,7 +44,7 @@ const pokedexModule = magnetar.collection('pokedex')
 // pokedexModule.data ≈ Map<> // empty!
 // pokedexModule.data.values() ≈ [] // empty!
 
-await pokedexModule.get()
+await pokedexModule.fetch()
 
 // now they are available locally:
 // pokedexModule.data ≈ Map<
@@ -58,7 +58,7 @@ const allPokemon = pokedexModule.data.values()
 
 ## Stream realtime updates
 
-When you set up a _**stream**_ for a document or collection, just like `get()`, your the data will be fetched from a server by your _remote_ store plugin and then added to your module's _local_ data.
+When you set up a _**stream**_ for a document or collection, just like `fetch()`, your the data will be fetched from a server by your _remote_ store plugin and then added to your module's _local_ data.
 
 Afterwards, any changes to this document remotely will automatically be reflected in your module's _local_ data while the stream is open.
 
@@ -160,12 +160,12 @@ You can execute and chain these methods on collections to create a _queried modu
 
 When you apply a query it affects both the remote and local stores:
 
-- If you make a `get()` call with a _queried module_, it will pass the queries to the remote store, which will make sure that your query is applied to the API call.
+- If you make a `fetch()` call with a _queried module_, it will pass the queries to the remote store, which will make sure that your query is applied to the API call.
 - If you access module data with a _queried module_, the local store will also make sure that your query is applied to whatever data it returns.
 
 ```js
 const queriedModule = pokedexModule.where('type', '==', 'fire')
-await queriedModule.get()
+await queriedModule.fetch()
 
 queriedModule.data.values() // returns just the queried docs that were fetched
 pokedexModule.data.values() // returns all docs fetched so far
@@ -235,11 +235,11 @@ You can combine `where` with `orderBy`:
 pokedexModule.where('type', '==', type).orderBy('name', 'asc')
 ```
 
-You can either `stream` or `get` a queried module:
+You can either `stream` or `fetch` a queried module:
 
 ```js
 const queriedModule = pokedexModule.where('type', '==', type).orderBy('name', 'asc')
-queriedModule.get()
+queriedModule.fetch()
 // or
 queriedModule.stream()
 ```
@@ -254,7 +254,7 @@ const pokedexModule = magnetar.collection('pokedex')
  */
 async function searchPokemon(type) {
   const queriedPokedex = pokedexModule.where('type', '==', type).orderBy('name', 'asc')
-  await queriedPokedex.get()
+  await queriedPokedex.fetch()
 
   // return all Pokemon for just this query
   return queriedPokedex.data.values()

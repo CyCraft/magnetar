@@ -4,7 +4,7 @@ import { handleAction } from './handleAction'
 import { getEventNameFnsMap } from '../types/events'
 import {
   ActionConfig,
-  MagnetarGetAction,
+  MagnetarFetchAction,
   MagnetarWriteAction,
   MagnetarDeleteAction,
   MagnetarDeletePropAction,
@@ -12,7 +12,7 @@ import {
   ActionName,
 } from '../types/actions'
 import { ActionType, ActionTernary } from '../types/actionsInternal'
-import { GetResponse, isDoOnGet, isGetResponse, DoOnGet } from '../types/plugins'
+import { FetchResponse, isDoOnFetch, isFetchResponse, DoOnFetch } from '../types/plugins'
 import { getModifyPayloadFnsMap } from '../types/modifyPayload'
 import { OnAddedFn, getModifyReadResponseFnsMap } from '../types/modifyReadResponse'
 import { executeOnFns } from '../helpers/executeOnFns'
@@ -42,7 +42,7 @@ export function handleActionPerStore(
   docFn: DocFn, // actions executed on a "doc" will always return `doc()`
   collectionFn?: CollectionFn // actions executed on a "collection" will return `collection()` or `doc()`
 ):
-  | MagnetarGetAction<any>
+  | MagnetarFetchAction<any>
   | MagnetarWriteAction<any>
   | MagnetarInsertAction<any>
   | MagnetarDeleteAction<any>
@@ -90,12 +90,12 @@ export function handleActionPerStore(
     }
 
     /**
-     * each each time a store returns a `GetResponse` then all `doOnGetFns` need to be executed
+     * each each time a store returns a `FetchResponse` then all `doOnFetchFns` need to be executed
      */
-    const doOnGetFns: DoOnGet[] = modifyReadResponseMap.added
+    const doOnFetchFns: DoOnFetch[] = modifyReadResponseMap.added
 
     // handle and await each action in sequence
-    let resultFromPlugin: void | string | GetResponse | OnAddedFn | any
+    let resultFromPlugin: void | string | FetchResponse | OnAddedFn | any
     for (const [i, storeName] of storesToExecute.entries()) {
       // a previous iteration stopped the execution:
       if (stopExecution === true) break
@@ -150,14 +150,14 @@ export function handleActionPerStore(
         }
       }
 
-      // special handling for 'get' (resultFromPlugin will always be `GetResponse | OnAddedFn`)
-      if (actionName === 'get') {
-        if (isDoOnGet(resultFromPlugin)) {
-          doOnGetFns.push(resultFromPlugin)
+      // special handling for 'fetch' (resultFromPlugin will always be `FetchResponse | OnAddedFn`)
+      if (actionName === 'fetch') {
+        if (isDoOnFetch(resultFromPlugin)) {
+          doOnFetchFns.push(resultFromPlugin)
         }
-        if (isGetResponse(resultFromPlugin)) {
+        if (isFetchResponse(resultFromPlugin)) {
           for (const docRetrieved of resultFromPlugin.docs) {
-            executeOnFns(doOnGetFns, docRetrieved.data, [docRetrieved])
+            executeOnFns(doOnFetchFns, docRetrieved.data, [docRetrieved])
           }
         }
       }
@@ -175,7 +175,7 @@ export function handleActionPerStore(
     // anything that's executed from a "doc" module:
     if (docId || !collectionFn) return docFn(modulePath, moduleConfig)
 
-    // all other actions triggered on collections ('get' is the only possibility left)
+    // all other actions triggered on collections ('fetch' is the only possibility left)
     // should return the collection:
     return collectionFn(modulePath, moduleConfig)
   }

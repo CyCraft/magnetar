@@ -14,7 +14,7 @@ export function revertActionFactory(
     error,
   }: PluginRevertActionPayload<FirestoreModuleConfig>): Promise<void> {
     // reverting on read actions is not neccesary
-    const isReadAction = ['get', 'stream'].includes(actionName)
+    const isReadAction = ['fetch', 'stream'].includes(actionName)
     if (isReadAction) return
     // revert all write actions when called on a doc
     if (docId) {

@@ -1,6 +1,6 @@
 import { DocMetadata } from './atoms';
 /**
- * Can be used to modify docs that come in from 'stream' or 'get' actions, before they are added to your store data. When returning `undefined` they will be discarded & won't be added to the store data.
+ * Can be used to modify docs that come in from 'stream' or 'fetch' actions, before they are added to your store data. When returning `undefined` they will be discarded & won't be added to the store data.
  */
 export declare type OnAddedFn = (docData: Record<string, any>, docMetadata: DocMetadata) => Record<string, any> | void;
 /**
@@ -16,7 +16,7 @@ export declare type OnRemovedFn = (docData: Record<string, any> | string, docMet
  */
 export interface ModifyReadResponseFnMap {
     /**
-     * Can be used to modify docs that come in from 'stream' or 'get' actions, before they are added to your store data. When returning `undefined` they will be discarded & won't be added to the store data.
+     * Can be used to modify docs that come in from 'stream' or 'fetch' actions, before they are added to your store data. When returning `undefined` they will be discarded & won't be added to the store data.
      */
     added?: OnAddedFn;
     /**

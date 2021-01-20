@@ -74,9 +74,9 @@ export function filterDataPerClauses(
     carry.push(sorter)
     return carry
   }, [] as ISortByObjectSorter<[string, Record<string, any>]>[])
-  const entriesOrdered = orderBy.length ? sort(entries).by(by) : entries
+  if (orderBy.length) sort(entries).by(by)
   // limit
-  const entriesLimited = isNumber(limit) ? entriesOrdered.slice(0, limit) : entriesOrdered
+  const entriesLimited = isNumber(limit) ? entries.slice(0, limit) : entries
   // turn back into MAP
   const filteredDataMap: Map<string, Record<string, any>> = new Map(entriesLimited)
   return filteredDataMap

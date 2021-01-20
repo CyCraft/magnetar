@@ -4,10 +4,10 @@ import { StoreName } from './atoms';
 import { DocInstance } from '../Doc';
 import { CollectionInstance } from '../Collection';
 /**
- * these are all the actions that Vue Sync streamlines, whichever plugin is used
+ * these are all the actions that Magnetar streamlines, whichever plugin is used
  * these actions are executable from a `MagnetarModule` and handled by each plugin individually
  */
-export declare type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp' | 'delete';
+export declare type ActionName = 'fetch' | 'stream' | 'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp' | 'delete';
 /**
  * You can pass options to this action specifically;
  * This is what the dev can provide as second param when executing any action in addition to the payload.
@@ -22,7 +22,7 @@ export declare type ActionConfig = O.Patch<{
     executionOrder?: StoreName[];
 }, Partial<O.Omit<SharedConfig, 'localStoreName' | 'executionOrder'>>>;
 export declare type MagnetarStreamAction = (payload?: any | void, actionConfig?: ActionConfig) => Promise<void>;
-export declare type MagnetarGetAction<DocDataType extends Record<string, any> = Record<string, any>, calledFrom extends 'collection' | 'doc' = 'collection' | 'doc'> = (payload?: Record<string, any> | void, actionConfig?: ActionConfig) => Promise<calledFrom extends 'collection' ? CollectionInstance<DocDataType> : DocInstance<DocDataType>>;
+export declare type MagnetarFetchAction<DocDataType extends Record<string, any> = Record<string, any>, calledFrom extends 'collection' | 'doc' = 'collection' | 'doc'> = (payload?: Record<string, any> | void, actionConfig?: ActionConfig) => Promise<calledFrom extends 'collection' ? CollectionInstance<DocDataType> : DocInstance<DocDataType>>;
 export declare type MagnetarInsertAction<DocDataType extends Record<string, any> = Record<string, any>> = (payload: DocDataType, actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
 export declare type MagnetarWriteAction<DocDataType extends Record<string, any> = Record<string, any>> = (payload: O.Optional<DocDataType, keyof DocDataType, 'deep'>, actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
 export declare type MagnetarDeletePropAction<DocDataType extends Record<string, any> = Record<string, any>> = (payload: keyof DocDataType | string | (keyof DocDataType | string)[], actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;

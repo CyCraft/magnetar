@@ -120,9 +120,9 @@ import test from 'ava'
 //   // now it should have re-run
 //   t.deepEqual(ranFns, ['ran', 'ran'])
 //   // get data from server
-//   try { await trainerModule.get() } catch (error) { t.fail(error) } // prettier-ignore
+//   try { await trainerModule.fetch() } catch (error) { t.fail(error) } // prettier-ignore
 //   // the server mock doesn't really update the server data
-//   // so a get() call should reset the name back to 'Luca'
+//   // so a fetch() call should reset the name back to 'Luca'
 //   t.deepEqual(trainerModule.data, { name: 'Luca', dream: 'job', age: 10 })
 
 //   t.is(vue.dataComputed.name, 'Luca!')
@@ -165,9 +165,9 @@ import test from 'ava'
 //   // // now it should have re-run
 //   t.deepEqual(ranFns, ['ran', 'ran'])
 //   // // get data from server
-//   try { await trainerModule.get() } catch (error) { t.fail(error) } // prettier-ignore
+//   try { await trainerModule.fetch() } catch (error) { t.fail(error) } // prettier-ignore
 //   // the server mock doesn't really update the server data
-//   // so a get() call should reset the name back to 'Luca'
+//   // so a fetch() call should reset the name back to 'Luca'
 //   t.deepEqual(trainerModule.data, { name: 'Luca', dream: 'job', age: 10 })
 //   t.deepEqual(ranFns, ['ran', 'ran'])
 

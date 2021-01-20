@@ -63,7 +63,7 @@ export const vuexEasyFirestoreActionsDoc = (
   },
   fetchAndAdd(ctx) {
     const modulePath = ctx.getters.magnetarPath
-    magnetar.doc(modulePath).get()
+    magnetar.doc(modulePath).fetch()
   },
 })
 
@@ -139,13 +139,13 @@ export const vuexEasyFirestoreActionsCollection = (
 
     const ref = magnetar.collection(modulePath)
     const refWithClauses = applyClauses(ref, payload)
-    refWithClauses.get()
+    refWithClauses.fetch()
   },
   fetchById(ctx, docId: string) {
     const modulePath = ctx.getters.magnetarPath
     if (!docId) {
       throw new Error(`docId wasn't passed during: \`dispatch('${modulePath}/fetch', docId)\``)
     }
-    magnetar.doc(`${modulePath}/${docId}`).get()
+    magnetar.doc(`${modulePath}/${docId}`).fetch()
   },
 })

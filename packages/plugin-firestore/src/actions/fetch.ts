@@ -1,5 +1,10 @@
 import type firebase from 'firebase'
-import { PluginGetAction, GetResponse, DocMetadata, PluginGetActionPayload } from '@magnetarjs/core'
+import {
+  PluginFetchAction,
+  FetchResponse,
+  DocMetadata,
+  PluginFetchActionPayload,
+} from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { getFirestoreDocPath, getFirestoreCollectionPath } from '../helpers/pathHelpers'
 import { getQueryInstance, docSnapshotToDocMetadata } from '../helpers/queryHelpers'
@@ -7,15 +12,15 @@ import { getQueryInstance, docSnapshotToDocMetadata } from '../helpers/queryHelp
 type DocumentSnapshot = firebase.firestore.DocumentSnapshot
 type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot
 
-export function getActionFactory(
+export function fetchActionFactory(
   firestorePluginOptions: Required<FirestorePluginOptions>
-): PluginGetAction {
+): PluginFetchAction {
   return async function ({
     payload,
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginGetActionPayload<FirestoreModuleConfig>): Promise<GetResponse> {
+  }: PluginFetchActionPayload<FirestoreModuleConfig>): Promise<FetchResponse> {
     const { firestoreInstance } = firestorePluginOptions
     // in case of a doc module
     let snapshots: (DocumentSnapshot | QueryDocumentSnapshot)[] | undefined

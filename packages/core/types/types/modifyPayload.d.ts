@@ -23,7 +23,7 @@ export declare type ModifyPayloadFnMap = {
     deleteProp?: ModifyDeletePropPayload;
     read?: ModifyReadPayload;
     stream?: ModifyReadPayload;
-    get?: ModifyReadPayload;
+    fetch?: ModifyReadPayload;
 };
 /**
  * These functions will be executed everytime BEFORE the related action is triggered. The function defined will receive the payload of the action. You can then modify and return this payload.
@@ -38,6 +38,6 @@ export declare type ModifyPayloadFnsMap = {
     delete: never[];
     read: ModifyReadPayload[];
     stream: ModifyReadPayload[];
-    get: ModifyReadPayload[];
+    fetch: ModifyReadPayload[];
 };
 export declare function getModifyPayloadFnsMap(...onMaps: (ModifyPayloadFnMap | void)[]): O.Omit<ModifyPayloadFnsMap, 'write' | 'read'>;

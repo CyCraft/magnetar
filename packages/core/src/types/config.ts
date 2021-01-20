@@ -15,7 +15,7 @@ export type SharedConfig = {
     write?: StoreName[]
     delete?: StoreName[]
     deleteProp?: StoreName[]
-    get?: StoreName[]
+    fetch?: StoreName[]
     stream?: StoreName[]
     insert?: StoreName[]
     merge?: StoreName[]

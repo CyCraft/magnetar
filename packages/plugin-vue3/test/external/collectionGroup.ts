@@ -1,14 +1,14 @@
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 
-test('get (collectionGroup)', async (t) => {
+test('fetch (collectionGroup)', async (t) => {
   t.pass()
   //   // get resolves once all stores have given a response with data
   //   const { trainerModule} = createMagnetarInstance()
   //   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 
   //   try {
-  //     await trainerModule.get()
+  //     await trainerModule.fetch()
   //   } catch (error) {
   //     t.fail(error)
   //   }
@@ -16,13 +16,13 @@ test('get (collectionGroup)', async (t) => {
   //   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })
 
-// test('get (collectionGroup) where-filter: ==', async t => {
+// test('fetch (collectionGroup) where-filter: ==', async t => {
 //   // get resolves once all stores have given a response with data
 //   const { trainerModule} = createMagnetarInstance()
 //   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 
 //   try {
-//     await trainerModule.get()
+//     await trainerModule.fetch()
 //   } catch (error) {
 //     t.fail(error)
 //   }

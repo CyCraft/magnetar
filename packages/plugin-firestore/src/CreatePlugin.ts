@@ -4,7 +4,7 @@ import { insertActionFactory } from './actions/insert'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { deletePropActionFactory } from './actions/deleteProp'
 import { deleteActionFactory } from './actions/delete'
-import { getActionFactory } from './actions/get'
+import { fetchActionFactory } from './actions/fetch'
 import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
 import { batchSyncFactory } from './helpers/batchSync'
@@ -65,7 +65,7 @@ export const CreatePlugin: MagnetarPlugin<FirestorePluginOptions> = (
   const batchSync = batchSyncFactory(pluginOptions)
 
   // the plugin must try to implement logic for every `ActionName`
-  const get = getActionFactory(pluginOptions)
+  const fetch = fetchActionFactory(pluginOptions)
   const stream = streamActionFactory(pluginOptions)
   const insert = insertActionFactory(batchSync, pluginOptions)
   const _merge = writeActionFactory(batchSync, pluginOptions, 'merge')
@@ -75,7 +75,7 @@ export const CreatePlugin: MagnetarPlugin<FirestorePluginOptions> = (
   const _delete = deleteActionFactory(batchSync, pluginOptions)
 
   const actions = {
-    get,
+    fetch,
     stream,
     insert,
     merge: _merge,

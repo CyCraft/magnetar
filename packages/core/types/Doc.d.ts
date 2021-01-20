@@ -1,5 +1,5 @@
 import { O } from 'ts-toolbelt';
-import { MagnetarWriteAction, MagnetarGetAction, MagnetarStreamAction, MagnetarDeleteAction, MagnetarDeletePropAction, MagnetarInsertAction, OpenStreams, FindStream, OpenStreamPromises, FindStreamPromise } from './types/actions';
+import { MagnetarWriteAction, MagnetarFetchAction, MagnetarStreamAction, MagnetarDeleteAction, MagnetarDeletePropAction, MagnetarInsertAction, OpenStreams, FindStream, OpenStreamPromises, FindStreamPromise } from './types/actions';
 import { ModuleConfig, GlobalConfig } from './types/config';
 import { CollectionFn, DocFn } from './Magnetar';
 export declare type DocInstance<DocDataType extends Record<string, any> = Record<string, any>> = {
@@ -26,7 +26,7 @@ export declare type DocInstance<DocDataType extends Record<string, any> = Record
     findStream: FindStream;
     openStreamPromises: OpenStreamPromises;
     findStreamPromise: FindStreamPromise;
-    get: MagnetarGetAction<DocDataType, 'doc'>;
+    fetch: MagnetarFetchAction<DocDataType, 'doc'>;
     stream: MagnetarStreamAction;
     insert: MagnetarInsertAction<DocDataType>;
     merge: MagnetarWriteAction<DocDataType>;

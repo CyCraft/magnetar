@@ -66,7 +66,7 @@ When you need to have only a sub-set of your documents in a collection, you have
 
 ### Set up a Query at the Module Level
 
-At the module level the query will be active whenever you try to read data with [get](#) or [stream](#). You should only set up the query at the module when you never need to query for other data in the same collection throughout your app.
+At the module level the query will be active whenever you try to read data with [fetch](#) or [stream](#). You should only set up the query at the module when you never need to query for other data in the same collection throughout your app.
 
 Example use case 1: **Filter and order documents based on some fields**
 
@@ -94,7 +94,7 @@ The above example will always have the query enabled whenever you import and use
 import { pokedexModule } from 'pokedexModule.js'
 ;(async () => {
   // making a read request will retrieve docs with the fixed query enabled:
-  await pokedexModule.get()
+  await pokedexModule.fetch()
 
   // accessing local data will also filter on just docs as per the fixed query:
   pokedexModule.data.values()
@@ -133,7 +133,7 @@ import { userPokedexModule } from 'userPokedexModule.js'
   const userId = 'abc123'
   const currentUserPokedexModule = userPokedexModule(userId)
 
-  await currentUserPokedexModule.get()
+  await currentUserPokedexModule.fetch()
 
   currentUserPokedexModule.data.values()
 })()
@@ -155,7 +155,7 @@ import { pokedexModule } from 'magnetarModules.js'
  */
 async function searchPokemon(type) {
   const queriedPokedex = pokedexModule.where('type', '==', type).orderBy('name', 'asc')
-  await queriedPokedex.get()
+  await queriedPokedex.fetch()
 
   // return all Pokemon for just this query
   return queriedPokedex.data.values()
@@ -203,7 +203,7 @@ import { userPokedexModule } from 'userPokedexModule.js'
   const userId = 'abc123'
   const currentUserPokedexModule = userPokedexModule(userId)
 
-  await currentUserPokedexModule.get()
+  await currentUserPokedexModule.fetch()
 
   currentUserPokedexModule.data.values()
 })()
@@ -259,14 +259,14 @@ Also when reading data, types are enforced:
 ```js
 import { pokedexModule } from 'magnetarModules'
 
-async function getPokemonById(id) {
+async function fetchPokemonById(id) {
   if (!pokedexModule.data.has(id)) {
-    await pokedexModule.doc(id).get()
+    await pokedexModule.doc(id).fetch()
   }
   return pokedexModule.data.get(id)
 }
 
-const pokemon = await getPokemonById('001')
+const pokemon = await fetchPokemonById('001')
 // on hover shows:
 /**
   const pokemon: { name: string, nickName?: string, id: string, level: number };

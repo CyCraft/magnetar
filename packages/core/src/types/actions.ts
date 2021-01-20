@@ -8,7 +8,7 @@ import { CollectionInstance } from '../Collection'
  * these are all the actions that Magnetar streamlines, whichever plugin is used
  * these actions are executable from a `MagnetarModule` and handled by each plugin individually
  */
-export type ActionName = 'get' | 'stream' | 'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp' | 'delete' // prettier-ignore
+export type ActionName = 'fetch' | 'stream' | 'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp' | 'delete' // prettier-ignore
 
 /**
  * You can pass options to this action specifically;
@@ -32,7 +32,7 @@ export type MagnetarStreamAction = (
   actionConfig?: ActionConfig
 ) => Promise<void>
 
-export type MagnetarGetAction<
+export type MagnetarFetchAction<
   DocDataType extends Record<string, any> = Record<string, any>,
   calledFrom extends 'collection' | 'doc' = 'collection' | 'doc'
 > = (

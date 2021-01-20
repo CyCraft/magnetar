@@ -4,7 +4,7 @@ import { GlobalConfig, ModuleConfig } from './types/config';
 import { DocInstance } from './Doc';
 export { isDocModule, isCollectionModule } from './helpers/pathHelpers';
 /**
- * This is the global Vue Sync instance that is returned when instantiating with Magnetar()
+ * This is the global Magnetar instance that is returned when instantiating with Magnetar()
  */
 export interface MagnetarInstance {
     globalConfig: O.Compulsory<GlobalConfig>;

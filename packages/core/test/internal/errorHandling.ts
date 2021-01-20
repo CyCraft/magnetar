@@ -1,7 +1,7 @@
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex, pokedexEntryDefaults } from '@magnetarjs/test-utils'
-import { GetResponse } from '../../src'
+import { FetchResponse } from '../../src'
 
 test('write + onError: stop -- emits fail events & aborts execution by default', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
@@ -130,12 +130,12 @@ test('write + onError: revert - will not go to next store', async (t) => {
   t.is(pokedexModule.data.get('testid'), undefined)
 })
 
-test('get + onError: stop -- emits fail events & aborts execution by default', async (t) => {
+test('fetch + onError: stop -- emits fail events & aborts execution by default', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   const getPayload = { shouldFail: 'local' }
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   try {
-    await pokedexModule.get(getPayload, {
+    await pokedexModule.fetch(getPayload, {
       onError: 'stop',
       on: {
         error: ({ payload, storeName }) => {
@@ -154,13 +154,13 @@ test('get + onError: stop -- emits fail events & aborts execution by default', a
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
 })
 
-test('get + onError: stop -- fail in second store plugin does not prevent execution first store plugin', async (t) => {
+test('fetch + onError: stop -- fail in second store plugin does not prevent execution first store plugin', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   const getPayload = { shouldFail: 'remote' }
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   let result: any
   try {
-    result = await pokedexModule.get(getPayload, {
+    result = await pokedexModule.fetch(getPayload, {
       onError: 'stop',
       on: {
         error: ({ payload, storeName }) => {
@@ -178,12 +178,12 @@ test('get + onError: stop -- fail in second store plugin does not prevent execut
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
 })
 
-test('get + onError: continue', async (t) => {
+test('fetch + onError: continue', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   const getPayload = { shouldFail: 'local' }
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   try {
-    const result = await pokedexModule.get(getPayload, {
+    const result = await pokedexModule.fetch(getPayload, {
       onError: 'continue',
       on: {
         error: ({ payload, storeName }) => {
@@ -196,7 +196,7 @@ test('get + onError: continue', async (t) => {
           if (storeName === 'remote') {
             t.deepEqual(payload, getPayload)
             // even though the local store failed, we got the result of the remote store
-            t.deepEqual((result as GetResponse).docs.length, 151)
+            t.deepEqual((result as FetchResponse).docs.length, 151)
           }
         },
       },

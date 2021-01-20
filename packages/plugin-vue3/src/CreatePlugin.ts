@@ -15,7 +15,7 @@ import { writeActionFactory } from './actions/mergeAssignReplace'
 import { insertActionFactory } from './actions/insert'
 import { deletePropActionFactory } from './actions/deleteProp'
 import { deleteActionFactory } from './actions/delete'
-import { getActionFactory } from './actions/get'
+import { fetchActionFactory } from './actions/fetch'
 import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
 import { filterDataPerClauses } from './helpers/dataHelpers'
@@ -138,7 +138,7 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
   }
 
   // the plugin must try to implement logic for every `ActionName`
-  const get = getActionFactory(data, vue3StoreOptions)
+  const fetch = fetchActionFactory(data, vue3StoreOptions)
   const stream = streamActionFactory(data, vue3StoreOptions)
   const insert = insertActionFactory(data, vue3StoreOptions, makeBackup)
   const _merge = writeActionFactory(data, vue3StoreOptions, 'merge', makeBackup)
@@ -153,7 +153,7 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
   const instance: PluginInstance = {
     revert,
     actions: {
-      get,
+      fetch,
       stream,
       insert,
       merge: _merge,

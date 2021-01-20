@@ -19,7 +19,7 @@ export type MagnetarPlugin<PluginOptions> = (pluginOptions: PluginOptions) => Pl
  */
 export interface PluginInstance {
   actions: {
-    get?: PluginGetAction
+    fetch?: PluginFetchAction
     stream?: PluginStreamAction
     insert?: PluginInsertAction
     merge?: PluginWriteAction
@@ -88,7 +88,7 @@ export type PluginStreamAction = (
   payload: PluginStreamActionPayload
 ) => StreamResponse | DoOnStream | Promise<StreamResponse | DoOnStream>
 
-export type PluginGetActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
+export type PluginFetchActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -98,11 +98,11 @@ export type PluginGetActionPayload<SpecificPluginModuleConfig = PluginModuleConf
   }
 >
 /**
- * Should handle 'get' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc). Should return `GetResponse` when acting as a "remote" Store Plugin, and `DoOnGet` when acting as "local" Store Plugin.
+ * Should handle 'fetch' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc). Should return `FetchResponse` when acting as a "remote" Store Plugin, and `DoOnFetch` when acting as "local" Store Plugin.
  */
-export type PluginGetAction = (
-  payload: PluginGetActionPayload
-) => GetResponse | DoOnGet | Promise<GetResponse | DoOnGet>
+export type PluginFetchAction = (
+  payload: PluginFetchActionPayload
+) => FetchResponse | DoOnFetch | Promise<FetchResponse | DoOnFetch>
 
 export type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
@@ -192,8 +192,8 @@ export type PluginRevertAction = (payload: PluginRevertActionPayload) => void | 
 
 export type PluginActionTernary<TActionName extends ActionName> = TActionName extends 'stream'
   ? PluginStreamAction
-  : TActionName extends 'get'
-  ? PluginGetAction
+  : TActionName extends 'fetch'
+  ? PluginFetchAction
   : TActionName extends 'delete'
   ? PluginDeleteAction
   : TActionName extends 'deleteProp'
@@ -214,7 +214,7 @@ export type StreamResponse = { streaming: Promise<void>; stop: () => void }
  */
 export type DoOnStream = {
   /**
-   * 'added' is/should be triggered per document on 3 occasions: on 'get' when a document is read; on 'stream' when initial documents are read; on 'stream' when there are consequent insertions of documents on the end-point.
+   * 'added' is/should be triggered per document on 3 occasions: on 'fetch' when a document is read; on 'stream' when initial documents are read; on 'stream' when there are consequent insertions of documents on the end-point.
    */
   added?: OnAddedFn
   /**
@@ -254,30 +254,30 @@ export function isDoOnStream(payload: any): payload is DoOnStream {
   return !isNotDoOnStream
 }
 
-// 'get' related
+// 'fetch' related
 
 /**
- * Plugin's response to a 'get' action, when acting as a "remote" Store Plugin.
+ * Plugin's response to a 'fetch' action, when acting as a "remote" Store Plugin.
  */
-export type GetResponse = {
+export type FetchResponse = {
   docs: DocMetadata[]
 }
 
 /**
- * Plugin's response to a 'get' action, when acting as a "local" Store Plugin.
+ * Plugin's response to a 'fetch' action, when acting as a "local" Store Plugin.
  */
-export type DoOnGet = OnAddedFn
+export type DoOnFetch = OnAddedFn
 
 /**
- * DoOnGet type guard
+ * DoOnFetch type guard
  */
-export function isDoOnGet(payload: any): payload is DoOnGet {
+export function isDoOnFetch(payload: any): payload is DoOnFetch {
   return isFunction(payload)
 }
 
 /**
- * GetResponse type guard
+ * FetchResponse type guard
  */
-export function isGetResponse(payload: any): payload is GetResponse {
+export function isFetchResponse(payload: any): payload is FetchResponse {
   return isPlainObject(payload) && isArray(payload.docs)
 }

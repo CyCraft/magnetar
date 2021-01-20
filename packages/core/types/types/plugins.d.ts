@@ -12,7 +12,7 @@ export declare type MagnetarPlugin<PluginOptions> = (pluginOptions: PluginOption
  */
 export interface PluginInstance {
     actions: {
-        get?: PluginGetAction;
+        fetch?: PluginFetchAction;
         stream?: PluginStreamAction;
         insert?: PluginInsertAction;
         merge?: PluginWriteAction;
@@ -69,16 +69,16 @@ export declare type PluginStreamActionPayload<SpecificPluginModuleConfig = Plugi
  * Should handle 'stream' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc). Should return `StreamResponse` when acting as a "remote" Store Plugin, and `DoOnStream` when acting as "local" Store Plugin.
  */
 export declare type PluginStreamAction = (payload: PluginStreamActionPayload) => StreamResponse | DoOnStream | Promise<StreamResponse | DoOnStream>;
-export declare type PluginGetActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
+export declare type PluginFetchActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
     /**
      * Whatever payload was passed to the action that was triggered
      */
     payload: Record<string, any> | void;
 }>;
 /**
- * Should handle 'get' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc). Should return `GetResponse` when acting as a "remote" Store Plugin, and `DoOnGet` when acting as "local" Store Plugin.
+ * Should handle 'fetch' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc). Should return `FetchResponse` when acting as a "remote" Store Plugin, and `DoOnFetch` when acting as "local" Store Plugin.
  */
-export declare type PluginGetAction = (payload: PluginGetActionPayload) => GetResponse | DoOnGet | Promise<GetResponse | DoOnGet>;
+export declare type PluginFetchAction = (payload: PluginFetchActionPayload) => FetchResponse | DoOnFetch | Promise<FetchResponse | DoOnFetch>;
 export declare type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<PluginActionPayloadBase<SpecificPluginModuleConfig>, {
     /**
      * Whatever payload was passed to the action that was triggered
@@ -141,7 +141,7 @@ export declare type PluginRevertActionPayload<SpecificPluginModuleConfig = Plugi
  * The 'revert' action is triggered when another Store Plugin had an error during the execution of an action, and any changes already made need to be reverted. Please use the `payload` and `actionName` parameters to determine how to revert the plugin's state to its previous state.
  */
 export declare type PluginRevertAction = (payload: PluginRevertActionPayload) => void | Promise<void>;
-export declare type PluginActionTernary<TActionName extends ActionName> = TActionName extends 'stream' ? PluginStreamAction : TActionName extends 'get' ? PluginGetAction : TActionName extends 'delete' ? PluginDeleteAction : TActionName extends 'deleteProp' ? PluginDeletePropAction : TActionName extends 'insert' ? PluginInsertAction : PluginWriteAction;
+export declare type PluginActionTernary<TActionName extends ActionName> = TActionName extends 'stream' ? PluginStreamAction : TActionName extends 'fetch' ? PluginFetchAction : TActionName extends 'delete' ? PluginDeleteAction : TActionName extends 'deleteProp' ? PluginDeletePropAction : TActionName extends 'insert' ? PluginInsertAction : PluginWriteAction;
 /**
  * Plugin's response to a 'stream' action, when acting as a "remote" Store Plugin.
  */
@@ -154,7 +154,7 @@ export declare type StreamResponse = {
  */
 export declare type DoOnStream = {
     /**
-     * 'added' is/should be triggered per document on 3 occasions: on 'get' when a document is read; on 'stream' when initial documents are read; on 'stream' when there are consequent insertions of documents on the end-point.
+     * 'added' is/should be triggered per document on 3 occasions: on 'fetch' when a document is read; on 'stream' when initial documents are read; on 'stream' when there are consequent insertions of documents on the end-point.
      */
     added?: OnAddedFn;
     /**
@@ -184,20 +184,20 @@ export declare type MustExecuteOnRead = O.Compulsory<DoOnStream>;
  */
 export declare function isDoOnStream(payload: any): payload is DoOnStream;
 /**
- * Plugin's response to a 'get' action, when acting as a "remote" Store Plugin.
+ * Plugin's response to a 'fetch' action, when acting as a "remote" Store Plugin.
  */
-export declare type GetResponse = {
+export declare type FetchResponse = {
     docs: DocMetadata[];
 };
 /**
- * Plugin's response to a 'get' action, when acting as a "local" Store Plugin.
+ * Plugin's response to a 'fetch' action, when acting as a "local" Store Plugin.
  */
-export declare type DoOnGet = OnAddedFn;
+export declare type DoOnFetch = OnAddedFn;
 /**
- * DoOnGet type guard
+ * DoOnFetch type guard
  */
-export declare function isDoOnGet(payload: any): payload is DoOnGet;
+export declare function isDoOnFetch(payload: any): payload is DoOnFetch;
 /**
- * GetResponse type guard
+ * FetchResponse type guard
  */
-export declare function isGetResponse(payload: any): payload is GetResponse;
+export declare function isFetchResponse(payload: any): payload is FetchResponse;
