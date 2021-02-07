@@ -2,6 +2,7 @@
   "name": "@magnetarjs/plugin-vuex",
   "version": "0.0.0",
   "sideEffects": false,
+  "private": true,
   "description": "Magnetar plugin Vuex",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
