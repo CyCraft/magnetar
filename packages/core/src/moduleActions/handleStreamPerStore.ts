@@ -58,7 +58,7 @@ export function handleStreamPerStore(
     throwIfNoFnsToExecute(storesToExecute)
     // update the payload
     for (const modifyFn of modifyPayloadFnsMap['stream']) {
-      payload = modifyFn(payload)
+      payload = modifyFn(payload, docId)
     }
 
     const streamInfoPerStore: { [storeName: string]: StreamResponse } = {}

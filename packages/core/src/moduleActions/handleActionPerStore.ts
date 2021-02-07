@@ -76,7 +76,7 @@ export function handleActionPerStore(
     throwIfNoFnsToExecute(storesToExecute)
     // update the payload
     for (const modifyFn of modifyPayloadFnsMap[actionName]) {
-      payload = modifyFn(payload)
+      payload = modifyFn(payload, docId)
     }
 
     // create the abort mechanism
