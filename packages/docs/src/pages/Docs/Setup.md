@@ -30,7 +30,7 @@ const remote = PluginFirestore({ firestoreInstance })
 // ---------------------------------------
 // 2. the plugin vue2 for local data store
 // ---------------------------------------
-import { CreatePlugin as PluginVue } from '@magnetarjs/vue2'
+import { CreatePlugin as PluginVue } from '@magnetarjs/plugin-vue2'
 import Vue from 'vue'
 
 const vueInstance = Vue
