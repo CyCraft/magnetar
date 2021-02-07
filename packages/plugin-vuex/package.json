@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/plugin-vuex",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "sideEffects": false,
   "private": true,
   "description": "Magnetar plugin Vuex",
@@ -32,8 +32,8 @@
     "ts-toolbelt": "^8.4.0"
   },
   "devDependencies": {
-    "@magnetarjs/core": "^0.0.4",
-    "@magnetarjs/test-utils": "^0.0.3",
+    "@magnetarjs/core": "^0.0.5",
+    "@magnetarjs/test-utils": "^0.0.4",
     "ava": "^3.15.0",
     "vue": "^2.6.12",
     "vuex": "^3.6.0"
