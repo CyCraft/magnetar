@@ -9,7 +9,7 @@ export async function firestoreDeepEqual(
   message?: string
 ) {
   const docRef = firestore.doc(`magnetarTests/${testName}/${documentPath}`)
-  const docSnapshot = await docRef.fetch()
+  const docSnapshot = await docRef.get()
   const docData = docSnapshot.data()
   t.deepEqual(expected, docData, message)
 }

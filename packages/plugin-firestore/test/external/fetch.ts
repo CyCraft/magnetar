@@ -233,7 +233,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       const queryModuleRef = await pokedexModule
         .where('type', 'array-contains-any', ['Steel', 'Ice'])
         .orderBy('id', 'asc')
-        .get(undefined, { onError: 'stop' })
+        .fetch(undefined, { onError: 'stop' })
       const actual = [...queryModuleRef.data.values()]
       const expected = [
         pokedex(81),
@@ -263,7 +263,7 @@ import { pokedex } from '@magnetarjs/test-utils'
         .where('type', 'array-contains', 'Fire')
         .where('base.Speed', '>=', 100)
         .orderBy('base.Speed', 'asc')
-        .get(undefined, { onError: 'stop' })
+        .fetch(undefined, { onError: 'stop' })
       const actual = [...queryModuleRef.data.values()].map((p) => p.base.Speed)
       const expected = [pokedex(6), pokedex(38), pokedex(78)].map((p) => p.base.Speed)
       t.deepEqual(actual, expected as any)
@@ -285,7 +285,7 @@ import { pokedex } from '@magnetarjs/test-utils'
         .where('id', '<', 10)
         .orderBy('id', 'desc')
         .limit(10)
-        .get(undefined, { onError: 'stop' })
+        .fetch(undefined, { onError: 'stop' })
       const actual = [...queryModuleRef.data.values()].map((p) => p.id)
       const expected = [
         pokedex(9),
