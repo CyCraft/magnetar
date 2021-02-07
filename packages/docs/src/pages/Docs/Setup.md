@@ -19,7 +19,7 @@ This is a complete setup example which uses:
 // ---------------------------------------------
 // 1. the plugin firestore for remote data store
 // ---------------------------------------------
-import { CreatePlugin as PluginFirestore } from '@magnetarjs/firestore'
+import { CreatePlugin as PluginFirestore } from '@magnetarjs/plugin-firestore'
 import firebase from 'firebase/app'
 
 const firestoreInstance = firebase.firestore()
