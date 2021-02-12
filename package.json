@@ -1,8 +1,10 @@
 {
-  "name": "magnetar",
+  "name": "magnetar-monorepo",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "audit": "lerna-audit",
     "dev": "cd packages/dev && npm run dev",
     "dev:firestore": "cd packages/dev-firestore && npm run dev",
     "dev:vue2": "cd packages/dev-vue2 && npm run dev",
@@ -20,25 +22,20 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "publish": "npm run test && npm run build && lerna publish",
     "deploy:docs": "npm run build:favicon && lerna run build:docs && firebase deploy --only hosting && git add -A && git commit -m \"chore: deploy\"",
-    "dep:install": "npm i && lerna bootstrap",
-    "dep:update-all": "ncu --target minor -u && lerna exec 'ncu --target minor -u' && npm run dep:install",
+    "dep:update-all": "ncu --target minor -u && lerna exec 'ncu --target minor -u' && npm i",
     "dep:check-for-updates": "ncu --target minor && lerna exec 'ncu --target minor'",
-    "dep:reinstall-all": "rimraf node_modules && lerna clean -y && npm run dep:install"
+    "dep:reinstall-all": "lerna clean -y && rimraf node_modules && npm i"
   },
   "devDependencies": {
     "@types/node": "^14.14.21",
     "@typescript-eslint/eslint-plugin": "^4.13.0",
     "@typescript-eslint/parser": "^4.13.0",
     "ava": "^3.15.0",
-    "browser-env": "^3.3.0",
     "copyfiles": "^2.4.1",
     "eslint": "^7.17.0",
     "eslint-config-prettier": "^7.1.0",
     "eslint-loader": "^4.0.2",
     "eslint-plugin-tree-shaking": "^1.8.0",
-    "eslint-plugin-vue": "^7.4.1",
-    "jsdom": "^16.4.0",
-    "jsdom-global": "^3.0.2",
     "lerna": "^3.22.1",
     "npm-check-updates": "^10.2.5",
     "prettier": "^2.2.1",
@@ -46,7 +43,6 @@
     "rollup": "^2.36.1",
     "rollup-plugin-typescript2": "^0.29.0",
     "ts-node": "^9.1.1",
-    "tsconfig-paths": "^3.9.0",
     "typescript": "^4.1.3"
   },
   "author": "Luca Ban - Mesqueeb",

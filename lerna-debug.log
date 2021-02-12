@@ -1,8 +1,0 @@
-107 warn complete Waiting for 2 child processes to exit. CTRL-C to exit immediately.
-108 error Error: Command failed: git tag dev-vue3@0.0.1 -m dev-vue3@0.0.1
-108 error fatal: tag 'dev-vue3@0.0.1' already exists
-108 error
-108 error     at makeError (/Users/lucaban/ghq/github.com/CyCraft/magnetar/node_modules/execa/index.js:174:9)
-108 error     at /Users/lucaban/ghq/github.com/CyCraft/magnetar/node_modules/execa/index.js:278:16
-108 error     at processTicksAndRejections (node:internal/process/task_queues:93:5)
-108 error     at async Promise.all (index 2)

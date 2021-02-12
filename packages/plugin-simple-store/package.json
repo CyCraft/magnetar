@@ -31,7 +31,8 @@
   "devDependencies": {
     "@magnetarjs/core": "^0.0.7",
     "@magnetarjs/test-utils": "^0.0.4",
-    "ava": "^3.15.0"
+    "ava": "^3.15.0",
+    "browser-env": "^3.3.0"
   },
   "keywords": [
     "magnetar-plugin",

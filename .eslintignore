@@ -4,8 +4,11 @@ node_modules
 dist
 # don't lint nyc coverage output
 
+/packages/dev-firestore
 /packages/dev-vue2
 /packages/dev-vue3
+/packages/dev-vuex
+/packages/docs
 
 coverage
 
