@@ -53,5 +53,6 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cycraft/magnetar.git"
-  }
+  },
+  "version": "0.0.0"
 }
