@@ -1,24 +1,67 @@
 # About
 
-Magnetar is a library that brings a unified syntax for reading and writing data and allows you to easily work with this data in your app like a "global" store.
+- Magnetar is a **state management** library.<br />A library that brings a unified syntax for reading and writing data and allows you to easily work with this data in your app like a _global store_.
 
-You can power Magnetar with "store plugins" that work in the background to keep this data automatically in sync with whatever service/database or local store you use.
+- Magnetar has **database integration** for Google Firestore and others.<br />Whenever you modify data in your global store, Magnetar will keep this data automatically in sync with your database.
 
-## Benefits of Magnetar
+- Magnetar has **built-in reactivity** for Vue 2/3.<br />Just like Vuex, displaying data in Vue just works as you would expect.
 
-- an easy to use global store
-- unified syntax for reading and writing data
-- integration of cloud services and databases (like Firebase, MongoDB, ...)
-- integration of local state libraries (like Vuex, Redux, ...)
-- your data automatically stays in sync with external services
-- you do not need to learn each service's SDK
-- API calls are optimised and handled for you (to be as economic as possible)
-- optimistic UI <sup>[？](https://google.com/search?q=what+is+optimistic+ui)</sup> built in by default (can be opt out of)
-- dynamic modules for maximum flexibility in your data structure
-- small footprint by using only the store plugins you need
-- (TS users) type safety and helpers when reading/writing data
+<!-- ![](/Magnetar Value Proposition.jpg) -->
+<img src="/Magnetar Value Proposition.jpg" style="width: 100%" />
 
-> It's like graphQL but much simpler with CRUD-like functions
+## Learn by example
+
+Here is a hypothetical example of a To Do list powered by Magnetar that uses the Vue 2 and Firestore plugins.
+
+```js
+// See Setup chapter for how to instantiate the main instance
+import { magnetar } from './my-magnetar-setup.js'
+
+/**
+ * A module for data in firestore, at path 'todo-items'
+ */
+const todoItemsModule = magnetar.collection('todo-items')
+
+new Vue({
+  data: {},
+  created() {
+    // fetch all documents from Firestore & continue to watch for any changes
+    // will keep local data up to date when changes on database occur
+    todoItemsModule.stream()
+  },
+  computed: {
+    /**
+     * Displays the local data of your module
+     */
+    items() {
+      return todoItemsModule.data.values()
+    },
+  },
+  methods: {
+    /**
+     * Adds a new item to the local data & makes API call to Firestore
+     */
+    addItem(id, newData) {
+      itemsModule.insert(newData)
+    },
+    /**
+     * Edits an item in the local data & makes API call to Firestore
+     */
+    editItem(id, newData) {
+      itemsModule.doc(id).merge(newData)
+    },
+    /**
+     * Deletes an item from the local data & makes API call to Firestore
+     */
+    deleteItem(id) {
+      itemsModule.delete(id)
+    },
+  },
+  template: `<div>
+    <div v-for="item in items" :key="item.id">{{ item.name }}<div>
+  </div>`,
+})
+```
 
 ## Store plugins
 

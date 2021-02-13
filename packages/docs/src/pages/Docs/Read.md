@@ -265,3 +265,9 @@ async function searchPokemon(type) {
   // return pokedexModule.data.values()
 }
 ```
+
+### Query Limitations
+
+Based on your remote store plugin there might be limitations to what/how you can query data.
+
+For Cloud Firestore be sure check the [Query Limitations](https://firebase.google.com/docs/firestore/query-data/queries#query_limitations) in their official documentation.

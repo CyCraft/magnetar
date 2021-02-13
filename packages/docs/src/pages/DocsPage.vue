@@ -1,20 +1,36 @@
 <template>
-  <q-page class="page-docs" padding>
-    <DocPage
-      :pathToChapterFiles="pathToChapterFiles"
-      :chapterOrder="chapterOrder"
-      @TOC="(TOC) => $emit('set-toc', TOC)"
-    />
+  <q-page class="page-docs">
+    <div class="_doc-page-wrapper">
+      <DocPage
+        class="_doc-page"
+        :pathToChapterFiles="pathToChapterFiles"
+        :chapterOrder="chapterOrder"
+        @TOC="(TOC) => $emit('set-toc', TOC)"
+      />
+    </div>
   </q-page>
 </template>
 
 <style lang="sass">
 // $
 .page-docs
-  h1, h2, h3, h4, h5, h6
-    margin-top: 1.6em
+  display: flex
+  align-items: center
+  flex-direction: column
+  +pa($lg)
+  @media (min-width: 861px)
+    +px($xl)
+  ._doc-page-wrapper
+    max-width: 900px
+    width: 100%
+  h1, h2
+    margin-top: 3em
+    margin-bottom: 1em
+  h3, h4, h5, h6
+    margin-top: 2em
     margin-bottom: 0.6em
-
+  li br
+    margin-top: 0.3em
   blockquote
     position: relative
     margin-left: 0
