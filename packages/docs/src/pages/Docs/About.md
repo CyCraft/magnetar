@@ -1,10 +1,14 @@
 # About
 
-- Magnetar is a **state management** library.<br />A library that brings a unified syntax for reading and writing data and allows you to easily work with this data in your app like a _global store_.
+## TLDR;
 
-- Magnetar has **database integration** for Google Firestore and others.<br />Whenever you modify data in your global store, Magnetar will keep this data automatically in sync with your database.
+- Magnetar is a **_state management_** library.<br />A library that brings a unified syntax for reading and writing data and allows you to easily work with this data in your app like a global store.
 
-- Magnetar has **built-in reactivity** for Vue 2/3.<br />Just like Vuex, displaying data in Vue just works as you would expect.
+- Magnetar has **_database integration_** for Google Firestore and others.<br />Whenever you modify data in your global store, Magnetar will keep this data automatically in sync with your database. It also keeps the local data up to date on server changes.
+
+- Magnetar's main focus is to be the **_local representation of your database_**.
+
+- Magnetar has **_built-in reactivity_** for Vue 2 & Vue 3.<br />Just like Vuex, displaying data in Vue just works as you would expect and is reactive on local/server changes. (Magnetar does not rely on Vuex)
 
 <!-- ![](/Magnetar Value Proposition.jpg) -->
 <img src="/Magnetar Value Proposition.jpg" style="width: 100%" />
@@ -14,7 +18,8 @@
 Here is a hypothetical example of a To Do list powered by Magnetar that uses the Vue 2 and Firestore plugins.
 
 ```js
-// See Setup chapter for how to instantiate the main instance
+// magnetar is instantiated with the firestore and vue 2 plugins
+// (See the Setup chapter)
 import { magnetar } from './my-magnetar-setup.js'
 
 /**
@@ -22,8 +27,27 @@ import { magnetar } from './my-magnetar-setup.js'
  */
 const todoItemsModule = magnetar.collection('todo-items')
 
-new Vue({
-  data: {},
+// This example is the top level component representing a todo list
+// it holds the logic to display your UI and act on user interaction
+
+Vue.component('TodoList', {
+  // the TodoItem and AddNewTodoItem are hypothetical UI components
+  // they should emit events based on user input
+  template: `<div>
+    <TodoItem
+      v-for="item in items"
+      :key="item.id"
+      @edit-item="editItem"
+      @delete-item="deleteItem"
+    >
+      {{ item.name }}
+    </TodoItem>
+
+    <AddNewTodoItem
+      @add-item="addItem"
+    />
+  </div>`,
+
   created() {
     // fetch all documents from Firestore & continue to watch for any changes
     // will keep local data up to date when changes on database occur
@@ -31,37 +55,40 @@ new Vue({
   },
   computed: {
     /**
-     * Displays the local data of your module
+     * Displays the local data of your module (data comes in via the stream)
      */
     items() {
+      // in magnetar, the collection `.data` is a JS Map
       return todoItemsModule.data.values()
     },
   },
   methods: {
     /**
      * Adds a new item to the local data & makes API call to Firestore
+     * UI is reflected automatically
      */
-    addItem(id, newData) {
+    addItem(newData) {
       itemsModule.insert(newData)
     },
     /**
      * Edits an item in the local data & makes API call to Firestore
+     * UI is reflected automatically
      */
     editItem(id, newData) {
       itemsModule.doc(id).merge(newData)
     },
     /**
      * Deletes an item from the local data & makes API call to Firestore
+     * UI is reflected automatically
      */
     deleteItem(id) {
       itemsModule.delete(id)
     },
   },
-  template: `<div>
-    <div v-for="item in items" :key="item.id">{{ item.name }}<div>
-  </div>`,
 })
 ```
+
+# Concepts
 
 ## Store plugins
 

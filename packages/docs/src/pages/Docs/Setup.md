@@ -141,3 +141,46 @@ pokemonModule.delete() // deletes the document
 pokemonModule.fetch() // fetches the document from the remote store & adds it locally
 pokemonModule.stream() // opens a database stream & keeps the document up to date locally
 ```
+
+## Displaying data in the DOM
+
+- A Magnetar collection's `.data` is a _**Map**_ <small>[？](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)</small>
+- A document's `.data` is a _**plain object**_
+
+Here we show to how make sure your DOM is updated reactively whenever this data changes.
+
+### Vue example
+
+In Vue you must make sure you use the Vue 2 or Vue 3 plugin as local store which will enable reactivity.
+
+You can use a computed prop to show the data in your template like so:
+
+```html
+<template>
+  <div>
+    <div v-for="p in pokemon" :key="p.id">{{ p.name }}</div>
+  </div>
+</template>
+```
+
+```js
+export default {
+  computed: {
+    pokemon() {
+      return pokedexModule.data.values()
+    },
+  },
+}
+```
+
+### React example
+
+// todo
+
+### Svelte example
+
+// todo
+
+### Vanilla JS example
+
+// todo

@@ -9,6 +9,8 @@ There are two ways to retrieve data from your remote stores. Either of these met
 
 When you get data by executing `fetch()`, the data will be fetched from a server by your "remote" store plugin and then added to your module's data by your "local" store plugin.
 
+For displaying fetched data in the DOM see the [Displaying data in the DOM](#displaying-data-in-the-dom).
+
 ### Fetch a single document
 
 When you call `fetch()` on a document module, your remote store will go and fetch the document from your database and add it to your local store.
@@ -63,6 +65,8 @@ When you set up a _**stream**_ for a document or collection, just like `fetch()`
 Afterwards, any changes to this document remotely will automatically be reflected in your module's _local_ data while the stream is open.
 
 Please note: a streaming promise will never resolve as long as your stream is open! There is **no way** to know when or how many documents will be loaded in, as this depends on your remote store.
+
+For displaying streamed data in the DOM see the [Displaying data in the DOM](#displaying-data-in-the-dom).
 
 ### Stream a collection
 
@@ -264,6 +268,30 @@ async function searchPokemon(type) {
   // ↓
   // return pokedexModule.data.values()
 }
+```
+
+### Query Groups
+
+If you need to query data from multiple sub modules you can do so by using a _Collection Group_.
+
+Say your database looks like this:
+
+collection: `'pokedex'`<br />records:
+
+▪ '001': `{ name: 'Bulbasaur' }`<br />subcollection: `'pokedex/001/attacks'`<br />records:
+
+- 'leaf-attack': `{ name: 'Leaf Attack', effectiveAgainst: { water: true } }`
+
+▪ '002': `{ name: 'Ivysaur' }`<br />subcollection: 'pokedex/002/attacks'<br />records:
+
+- 'leaf-attack': `{ name: 'Leaf Attack', effectiveAgainst: { water: true } }`
+
+```js
+const queriedModule = magnetar
+  .collectionGroup(`pokedex/*/attacks`)
+  .where('effectiveAgainst.water', '==', true)
+
+queriedModule.fetch()
 ```
 
 ### Query Limitations
