@@ -1,8 +1,7 @@
 import { Clauses } from '@magnetarjs/core'
 import { isNumber, isArray } from 'is-what'
 import { getProp } from 'path-to-prop'
-import sort from 'fast-sort'
-import { ISortByObjectSorter } from 'fast-sort'
+import sort, { ISortByObjectSorter } from 'fast-sort'
 
 /**
  * Filters a Collection module's data based on provided clauses.
@@ -88,11 +87,10 @@ type CustomMap<DocDataType = Record<string, any>> = {
    */
   size: number
 
-  // Do not implement:
-  // /**
-  //  * Removes all key-value pairs from the Map object.
-  //  */
-  // clear: () => void
+  /**
+   * Removes all key-value pairs from the Map object.
+   */
+  clear: () => void
 
   /**
    * Returns the value associated to the key, or undefined if there is none.
@@ -129,10 +127,11 @@ type CustomMap<DocDataType = Record<string, any>> = {
 }
 
 export function objectToMap(
-  object: Record<string, any> | undefined = {},
+  object: Record<string, any> | undefined,
+  originalObjectToClear: Record<string, any> | undefined,
   entriesInCustomOrder?: [string, Record<string, any>][]
 ): Map<string, Record<string, any>> {
-  const dic = object
+  const dic = object || {}
 
   function get(id: string) {
     return dic[id]
@@ -155,6 +154,18 @@ export function objectToMap(
     return Object.entries(dic)
     // return IterableIterator<[string, Record<string, any>]>
   }
+  function clear() {
+    if (!originalObjectToClear) return
+    if (entriesInCustomOrder) {
+      entriesInCustomOrder.forEach(([key]) => {
+        delete originalObjectToClear[key]
+      })
+    } else {
+      Object.keys(originalObjectToClear).forEach((key) => {
+        delete originalObjectToClear[key]
+      })
+    }
+  }
   function forEach(
     callbackfn: (value: any, key: string, map: Map<string, any>, thisArg?: any) => void
   ) {
@@ -175,6 +186,7 @@ export function objectToMap(
     values,
     entries,
     forEach,
+    clear,
     raw,
   } as any
   return customMap as any

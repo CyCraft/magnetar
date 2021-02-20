@@ -136,12 +136,11 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
 
     const result = filterDataPerClauses(dataCollectionDic, clauses)
     if (result === 'no-filter') {
-      return objectToMap(dataCollectionDic)
+      return objectToMap(dataCollectionDic, dataCollectionDic)
     }
     const resultAsDic = Object.fromEntries(result)
-    return objectToMap(resultAsDic, result)
+    return objectToMap(resultAsDic, dataCollectionDic, result)
   }
-
   // the plugin must try to implement logic for every `ActionName`
   const fetch = fetchActionFactory(data, vue2StoreOptions)
   const stream = streamActionFactory(data, vue2StoreOptions)
