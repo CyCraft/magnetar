@@ -95,10 +95,10 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     if (!streamPromiseMap.has(modulePath)) {
       streamPromiseMap.set(modulePath, new Map())
     }
-    const openStreams = streamCloseFnMap.get(modulePath)
+    const openStreams = streamCloseFnMap.get(modulePath) as OpenStreams
     const findStream: FindStream = (streamPayload: any) =>
       findMapValueForKey(openStreams, streamPayload)
-    const openStreamPromises = streamPromiseMap.get(modulePath)
+    const openStreamPromises = streamPromiseMap.get(modulePath) as OpenStreamPromises
     const findStreamPromise: FindStreamPromise = (streamPayload: any) =>
       findMapValueForKey(openStreamPromises, streamPayload)
     const streams = { openStreams, findStream, openStreamPromises, findStreamPromise }
