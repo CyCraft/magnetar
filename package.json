@@ -1,9 +1,6 @@
 {
   "name": "magnetar-monorepo",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
     "dev": "cd packages/dev && npm run dev",
     "dev:firestore": "cd packages/dev-firestore && npm run dev",
@@ -22,9 +19,10 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "publish": "npm run test && npm run build && lerna publish",
     "deploy:docs": "npm run build:favicon && lerna run build:docs && firebase deploy --only hosting && git add -A && git commit -m \"chore: deploy\"",
-    "dep:update-all": "ncu --target minor -u && lerna exec 'ncu --target minor -u' && npm i",
+    "dep:i": "npm i && lerna bootstrap",
+    "dep:update-all": "ncu --target minor -u && lerna exec 'ncu --target minor -u' && npm run dep:i",
     "dep:check-for-updates": "ncu --target minor && lerna exec 'ncu --target minor'",
-    "dep:reinstall-all": "lerna clean -y && rimraf node_modules && npm i"
+    "dep:reinstall-all": "lerna clean -y && rimraf node_modules && npm run dep:i"
   },
   "devDependencies": {
     "@types/node": "^14.14.21",
