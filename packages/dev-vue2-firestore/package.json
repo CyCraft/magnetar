@@ -1,15 +1,15 @@
 {
   "name": "dev-vue2-firestore",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",
     "build--": "vue-cli-service build"
   },
   "dependencies": {
-    "@magnetarjs/core": "^0.0.8",
-    "@magnetarjs/plugin-vue2": "^0.0.8",
-    "@magnetarjs/plugin-firestore": "^0.0.8",
+    "@magnetarjs/core": "^0.0.9",
+    "@magnetarjs/plugin-firestore": "^0.0.9",
+    "@magnetarjs/plugin-vue2": "^0.0.9",
     "core-js": "^3.9.0",
     "firebase": "^8.2.9",
     "vue": "^2.6.12",
