@@ -1,4 +1,4 @@
-import { isString } from 'is-what'
+import { isFullString, isString } from 'is-what'
 import {
   PluginStreamAction,
   StreamResponse,
@@ -26,29 +26,31 @@ export function streamActionFactory(
     // hover over the prop names below to see more info on when they are triggered:
     const doOnStream: DoOnStream = {
       added: (payload, meta) => {
+        const _docId = docId || meta.id
         insertActionFactory(
           data,
           vue2StoreOptions
         )({
           payload,
           collectionPath,
-          docId,
+          docId: _docId,
           pluginModuleConfig,
         })
       },
       modified: (payload, meta) => {
+        const _docId = docId || meta.id
         insertActionFactory(
           data,
           vue2StoreOptions
         )({
           payload,
           collectionPath,
-          docId,
+          docId: _docId,
           pluginModuleConfig,
         })
       },
       removed: (payload, meta) => {
-        const collectionPathDocIdToDelete: [string, string] = docId
+        const collectionPathDocIdToDelete: [string, string] = isFullString(docId)
           ? [collectionPath, docId]
           : isString(payload)
           ? [collectionPath, payload]
