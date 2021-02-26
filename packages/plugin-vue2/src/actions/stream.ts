@@ -26,7 +26,7 @@ export function streamActionFactory(
     // hover over the prop names below to see more info on when they are triggered:
     const doOnStream: DoOnStream = {
       added: (payload, meta) => {
-        const _docId = docId || meta.id
+        const _docId = docId || `${meta.id}`
         insertActionFactory(
           data,
           vue2StoreOptions
@@ -38,7 +38,7 @@ export function streamActionFactory(
         })
       },
       modified: (payload, meta) => {
-        const _docId = docId || meta.id
+        const _docId = docId || `${meta.id}`
         insertActionFactory(
           data,
           vue2StoreOptions
