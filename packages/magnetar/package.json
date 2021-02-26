@@ -2,10 +2,14 @@
   "name": "magnetar",
   "version": "0.0.8",
   "description": "State-management done right with automatic sync to remote databases and services. Framework-agnostic & optimistic-UI built-in 🌟",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
   "typings": "types/index.d.ts",
   "author": "Luca Ban - Mesqueeb",
+  "scripts": {
+    "build": "npm run rollup",
+    "rollup": "rimraf dist && rollup -c build.js"
+  },
   "dependencies": {
     "@magnetarjs/core": "^0.0.8",
     "@magnetarjs/plugin-firestore": "^0.0.8",
