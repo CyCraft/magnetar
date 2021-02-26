@@ -10,7 +10,7 @@
   "scripts": {
     "build": "npm run rollup",
     "test-and-build": "npm run test && npm run build",
-    "test": "ava --verbose",
+    "test--": "ava --verbose",
     "test--only": "ava --verbose --match='*only:*'",
     "rollup": "rimraf dist && rimraf types && rollup -c build.js"
   },
@@ -19,24 +19,24 @@
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "peerDependencies": {
     "vue": "^2.6.12",
-    "vuex": "^3.6.0"
+    "vuex": "^3.6.2"
   },
   "dependencies": {
     "@magnetarjs/core": "^0.0.8",
-    "copy-anything": "^2.0.1",
+    "copy-anything": "^2.0.3",
     "fast-sort": "^2.2.0",
-    "filter-anything": "^2.1.7",
-    "is-what": "^3.12.0",
-    "merge-anything": "^4.0.0",
+    "filter-anything": "^2.1.9",
+    "is-what": "^3.14.1",
+    "merge-anything": "^4.0.1",
     "path-to-prop": "1.0.0",
-    "ts-toolbelt": "8.0.7"
+    "ts-toolbelt": "^9.3.12"
   },
   "devDependencies": {
     "@magnetarjs/test-utils": "^0.0.5",
     "ava": "^3.15.0",
     "browser-env": "^3.3.0",
     "vue": "^2.6.12",
-    "vuex": "^3.6.0"
+    "vuex": "^3.6.2"
   },
   "keywords": [
     "magnetar-plugin",

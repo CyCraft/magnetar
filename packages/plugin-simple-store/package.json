@@ -18,13 +18,13 @@
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
     "@magnetarjs/core": "^0.0.8",
-    "copy-anything": "^2.0.1",
+    "copy-anything": "^2.0.3",
     "fast-sort": "^2.2.0",
-    "filter-anything": "^2.1.7",
-    "is-what": "^3.12.0",
-    "merge-anything": "^4.0.0",
+    "filter-anything": "^2.1.9",
+    "is-what": "^3.14.1",
+    "merge-anything": "^4.0.1",
     "path-to-prop": "1.0.0",
-    "ts-toolbelt": "8.0.7"
+    "ts-toolbelt": "^9.3.12"
   },
   "devDependencies": {
     "@magnetarjs/test-utils": "^0.0.5",
