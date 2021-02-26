@@ -2,7 +2,7 @@ import { O } from 'ts-toolbelt';
 /**
  * This function will be executed everytime BEFORE the related action is triggered. The function defined will receive the payload of the action. You can then modify and return this payload.
  */
-export declare type ModifyWritePayload = (payload: Record<string, any>) => Record<string, any>;
+export declare type ModifyWritePayload = (payload: Record<string, any>, docId?: string | void) => Record<string, any>;
 /**
  * This function will be executed everytime BEFORE the related action is triggered. The function defined will receive the payload of the action. You can then modify and return this payload.
  */
@@ -10,7 +10,7 @@ export declare type ModifyDeletePropPayload = (payload: string | string[]) => st
 /**
  * This function will be executed everytime BEFORE the related action is triggered. The function defined will receive the payload of the action. You can then modify and return this payload.
  */
-export declare type ModifyReadPayload = (payload: Record<string, any> | void) => Record<string, any> | void;
+export declare type ModifyReadPayload = (payload: Record<string, any> | void, docId?: string | void) => Record<string, any> | void;
 /**
  * These functions will be executed everytime BEFORE the related action is triggered. The function defined will receive the payload of the action. You can then modify and return this payload.
  */

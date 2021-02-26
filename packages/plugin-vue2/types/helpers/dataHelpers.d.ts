@@ -7,4 +7,4 @@ import { Clauses } from '@magnetarjs/core';
  * @returns {'no-filter' | [string, Record<string, any>][]} filtered and sorted entries
  */
 export declare function filterDataPerClauses(collectionDB: Record<string, Record<string, any>>, clauses: Clauses): 'no-filter' | [string, Record<string, any>][];
-export declare function objectToMap(object?: Record<string, any> | undefined, entriesInCustomOrder?: [string, Record<string, any>][]): Map<string, Record<string, any>>;
+export declare function objectToMap(object: Record<string, any> | undefined, originalObjectToClear: Record<string, any> | undefined, entriesInCustomOrder?: [string, Record<string, any>][]): Map<string, Record<string, any>>;

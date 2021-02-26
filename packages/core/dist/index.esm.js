@@ -340,7 +340,7 @@ collectionFn // actions executed on a "collection" will return `collection()` or
             throwIfNoFnsToExecute(storesToExecute);
             // update the payload
             for (const modifyFn of modifyPayloadFnsMap[actionName]) {
-                payload = modifyFn(payload);
+                payload = modifyFn(payload, docId);
             }
             let stopExecution = false;
             /**
@@ -390,7 +390,7 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                             docId,
                             pluginModuleConfig,
                             actionName,
-                            error: resultFromPlugin,
+                            error: resultFromPlugin, // in this case the result is the error
                         });
                         // revert eventFns, handle and await each eventFn in sequence
                         for (const fn of eventNameFnsMap.revert) {
@@ -498,7 +498,7 @@ function handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfi
             throwIfNoFnsToExecute(storesToExecute);
             // update the payload
             for (const modifyFn of modifyPayloadFnsMap['stream']) {
-                payload = modifyFn(payload);
+                payload = modifyFn(payload, docId);
             }
             const streamInfoPerStore = {};
             const doOnStreamFns = {
@@ -628,7 +628,7 @@ function createDocWithContext([collectionPath, docId], moduleConfig, globalConfi
         deleteProp: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'deleteProp', actionNameTypeMap.deleteProp, docFn),
         delete: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn),
         fetch: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, docFn),
-        stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streams),
+        stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streams), // prettier-ignore
     };
     // Every store will have its 'setupModule' function executed
     executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig);
