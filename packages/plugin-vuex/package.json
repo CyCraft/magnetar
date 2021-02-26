@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/plugin-vuex",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "sideEffects": false,
   "private": true,
   "description": "Magnetar plugin Vuex",
@@ -22,7 +22,7 @@
     "vuex": "^3.6.2"
   },
   "dependencies": {
-    "@magnetarjs/core": "^0.0.9",
+    "@magnetarjs/core": "^0.0.10",
     "copy-anything": "^2.0.3",
     "fast-sort": "^2.2.0",
     "filter-anything": "^2.1.9",
