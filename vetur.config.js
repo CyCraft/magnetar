@@ -14,8 +14,8 @@ module.exports = {
    * See docs: https://vuejs.github.io/vetur/reference/#example
    */
   projects: [
-    './packages/dev-firestore',
-    './packages/dev-vue2',
+    './packages/dev-vue2-firestore',
+    './packages/dev-vue3-firestore',
     './packages/dev-vue3',
     './packages/dev-vuex',
     './packages/docs',

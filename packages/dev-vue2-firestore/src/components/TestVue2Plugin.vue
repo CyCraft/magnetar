@@ -20,12 +20,15 @@ import TodoApp from './TodoApp.vue'
 
 // type Item = { title: string; id: string }
 
-const itemsModule = magnetar.collection('items')
+const itemsModule = magnetar.collection('magnetarTests/dev-firestore/items')
 window.itemsModule = itemsModule
 
 export default {
   components: { TodoApp },
   props: {},
+  created() {
+    itemsModule.stream()
+  },
   data() {
     return { showAll: true, alphabetically: false }
   },

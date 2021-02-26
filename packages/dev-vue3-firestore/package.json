@@ -1,5 +1,5 @@
 {
-  "name": "dev-firestore",
+  "name": "dev-vue3-firestore",
   "version": "0.0.4",
   "private": true,
   "scripts": {
