@@ -14,8 +14,8 @@
   "dependencies": {
     "copy-anything": "^2.0.3",
     "fast-sort": "^2.2.0",
-    "filter-anything": "^2.1.9",
-    "is-what": "^3.14.1",
+    "filter-anything": "^2.2.1",
+    "is-what": "^4.0.0",
     "merge-anything": "^4.0.1",
     "path-to-prop": "^1.0.0"
   },

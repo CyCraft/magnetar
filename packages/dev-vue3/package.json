@@ -10,15 +10,15 @@
     "@magnetarjs/core": "^0.0.10",
     "@magnetarjs/plugin-simple-store": "^0.0.10",
     "@magnetarjs/plugin-vue3": "^0.0.7",
-    "vue": "3.0.5"
+    "vue": "3.0.7"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^1.1.4",
-    "@vue/compiler-sfc": "3.0.5",
+    "@vitejs/plugin-vue": "^1.1.5",
+    "@vue/compiler-sfc": "3.0.7",
     "@vuedx/typecheck": "^0.6.3",
     "@vuedx/typescript-plugin-vue": "^0.6.3",
     "sass": "^1.32.8",
-    "typescript": "^4.2.2",
-    "vite": "^2.0.3"
+    "typescript": "^4.2.3",
+    "vite": "^2.0.5"
   }
 }

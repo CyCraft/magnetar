@@ -17,18 +17,18 @@
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "peerDependencies": {
-    "firebase": "^8.2.9"
+    "firebase": "^8.3.0"
   },
   "dependencies": {
     "@magnetarjs/core": "^0.0.10",
     "flatten-anything": "^2.0.4",
-    "is-what": "^3.14.1",
-    "ts-toolbelt": "^9.3.12"
+    "is-what": "^4.0.0",
+    "ts-toolbelt": "^9.6.0"
   },
   "devDependencies": {
     "@magnetarjs/test-utils": "^0.0.6",
     "ava": "^3.15.0",
-    "firebase": "^8.2.9"
+    "firebase": "^8.3.0"
   },
   "keywords": [
     "magnetar-plugin",

@@ -13,25 +13,25 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
-    "@quasar/extras": "^1.9.17",
+    "@quasar/extras": "^1.9.19",
     "@vue/composition-api": "^0.6.7",
     "copy-anything": "^2.0.3",
-    "core-js": "^3.9.0",
-    "is-what": "^3.14.1",
+    "core-js": "^3.9.1",
+    "is-what": "^4.0.0",
     "planetar": "^0.7.15",
-    "quasar": "^1.15.4"
+    "quasar": "^1.15.5"
   },
   "devDependencies": {
-    "@quasar/app": "^2.1.15",
+    "@quasar/app": "^2.2.1",
     "@quasar/icongenie": "^2.3.3",
-    "@types/node": "^14.14.31",
-    "@typescript-eslint/eslint-plugin": "^4.15.2",
-    "@typescript-eslint/parser": "^4.15.2",
+    "@types/node": "^14.14.34",
+    "@typescript-eslint/eslint-plugin": "^4.17.0",
+    "@typescript-eslint/parser": "^4.17.0",
     "babel-eslint": "^10.1.0",
-    "eslint": "^7.20.0",
+    "eslint": "^7.22.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-loader": "^4.0.2",
-    "eslint-plugin-vue": "^7.6.0"
+    "eslint-plugin-vue": "^7.7.0"
   },
   "browserslist": [
     "last 10 Chrome versions",
