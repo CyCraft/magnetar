@@ -3,9 +3,10 @@
   "private": true,
   "scripts": {
     "dev": "cd packages/dev && npm run dev",
-    "dev:firestore": "cd packages/dev-firestore && npm run dev",
     "dev:vue2": "cd packages/dev-vue2 && npm run dev",
+    "dev:vue2-firestore": "cd packages/dev-vue2-firestore && npm run dev",
     "dev:vue3": "cd packages/dev-vue3 && npm run dev",
+    "dev:vue3-firestore": "cd packages/dev-vue3-firestore && npm run dev",
     "dev:docs": "cd packages/docs && npm run dev",
     "build:favicon": "copyfiles media/* packages/docs/public && cd packages/docs && npm run build:favicon",
     "build": "lerna run build",
