@@ -36,10 +36,11 @@ export async function handleStream(args: {
   // no aborting possible in stream actions
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   const abort = () => {}
+  const path = [collectionPath, docId].filter(Boolean).join('/')
 
   // handle and await each eventFn in sequence
   for (const fn of on.before) {
-    await fn({ payload, actionName, storeName, abort })
+    await fn({ payload, actionName, storeName, abort, collectionPath, docId, path })
   }
 
   let result: StreamResponse | DoOnStream
@@ -57,13 +58,13 @@ export async function handleStream(args: {
   } catch (error) {
     // handle and await each eventFn in sequence
     for (const fn of on.error) {
-      await fn({ payload, actionName, storeName, error, abort })
+      await fn({ payload, actionName, storeName, error, abort, collectionPath, docId, path })
     }
     throw error
   }
   // handle and await each eventFn in sequence
   for (const fn of on.success) {
-    await fn({ payload, result, actionName, storeName, abort })
+    await fn({ payload, result, actionName, storeName, abort, collectionPath, docId, path })
   }
   return result
 }

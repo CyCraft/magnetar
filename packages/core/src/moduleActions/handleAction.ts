@@ -20,6 +20,7 @@ import { OnAddedFn } from '../types/modifyReadResponse'
 export async function handleAction(args: {
   collectionPath: string
   docId: string | undefined
+  modulePath: string
   pluginModuleConfig: PluginModuleConfig
   pluginAction: PluginFetchAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction // prettier-ignore
   payload: void | Record<string, any> | Record<string, any>[] | string | string[]
@@ -32,6 +33,7 @@ export async function handleAction(args: {
   const {
     collectionPath,
     docId,
+    modulePath,
     pluginModuleConfig,
     pluginAction,
     payload,
@@ -48,7 +50,7 @@ export async function handleAction(args: {
   }
   // handle and await each eventFn in sequence
   for (const fn of on.before) {
-    await fn({ payload, actionName, storeName, abort, collectionPath, docId })
+    await fn({ payload, actionName, storeName, abort, collectionPath, docId, path: modulePath }) // prettier-ignore
   }
   // abort?
   if (abortExecution) {
@@ -62,7 +64,7 @@ export async function handleAction(args: {
   } catch (error) {
     // handle and await each eventFn in sequence
     for (const fn of on.error) {
-      await fn({ payload, actionName, storeName, abort, error, collectionPath, docId })
+      await fn({ payload, actionName, storeName, abort, error, collectionPath, docId, path: modulePath }) // prettier-ignore
     }
     // abort?
     if (abortExecution || onError === 'stop') {
@@ -77,7 +79,7 @@ export async function handleAction(args: {
   }
   // handle and await each eventFn in sequence
   for (const fn of on.success) {
-    await fn({ payload, result, actionName, storeName, abort, collectionPath, docId })
+    await fn({ payload, result, actionName, storeName, abort, collectionPath, docId, path: modulePath }) // prettier-ignore
   }
   // abort?
   if (abortExecution) {

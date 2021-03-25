@@ -53,6 +53,7 @@ export function handleActionPerStore(
     actionConfig: ActionConfig = {}
   ): Promise<DocInstance | CollectionInstance> {
     let docId = _docId
+    let modulePath = [collectionPath, docId].filter(Boolean).join('/')
     // get all the config needed to perform this action
     const onError = actionConfig.onError || moduleConfig.onError || globalConfig.onError
     const modifyPayloadFnsMap = getModifyPayloadFnsMap(
@@ -108,6 +109,7 @@ export function handleActionPerStore(
         : await handleAction({
             collectionPath,
             docId,
+            modulePath,
             pluginModuleConfig,
             pluginAction,
             payload, // should always use the payload as passed originally for clarity
@@ -134,14 +136,7 @@ export function handleActionPerStore(
           })
           // revert eventFns, handle and await each eventFn in sequence
           for (const fn of eventNameFnsMap.revert) {
-            await fn({
-              payload,
-              result: resultFromPlugin,
-              actionName,
-              storeName,
-              collectionPath,
-              docId,
-            })
+            await fn({ payload, result: resultFromPlugin, actionName, storeName, collectionPath, docId, path: modulePath }) // prettier-ignore
           }
         }
         // now we must throw the error
@@ -154,6 +149,7 @@ export function handleActionPerStore(
         // if this is the case the result will be a string - the randomly genererated ID
         if (!docId) {
           docId = resultFromPlugin
+          modulePath = [collectionPath, docId].filter(Boolean).join('/')
         }
       }
 
@@ -169,8 +165,6 @@ export function handleActionPerStore(
         }
       }
     }
-
-    const modulePath = [collectionPath, docId].filter(Boolean).join('/')
 
     // anything that's executed from a "collection" module:
     // 'insert' always returns a DocInstance, unless the "abort" action was called, then the modulePath might still be a collection:
