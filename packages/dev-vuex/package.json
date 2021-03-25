@@ -1,14 +1,14 @@
 {
   "name": "dev-vuex",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",
     "build--": "vue-cli-service build"
   },
   "dependencies": {
-    "@magnetarjs/core": "^0.0.10",
-    "@magnetarjs/plugin-vuex": "^0.0.6",
+    "@magnetarjs/core": "^0.0.11",
+    "@magnetarjs/plugin-vuex": "^0.0.7",
     "core-js": "^3.9.1",
     "vue": "^2.6.12",
     "vuex": "^3.6.2"
