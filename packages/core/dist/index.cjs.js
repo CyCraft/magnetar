@@ -55,7 +55,7 @@ function handleAction(args) {
         };
         // handle and await each eventFn in sequence
         for (const fn of on.before) {
-            yield fn({ payload, actionName, storeName, abort });
+            yield fn({ payload, actionName, storeName, abort, collectionPath, docId });
         }
         // abort?
         if (abortExecution) {
@@ -70,7 +70,7 @@ function handleAction(args) {
         catch (error) {
             // handle and await each eventFn in sequence
             for (const fn of on.error) {
-                yield fn({ payload, actionName, storeName, abort, error });
+                yield fn({ payload, actionName, storeName, abort, error, collectionPath, docId });
             }
             // abort?
             if (abortExecution || onError === 'stop') {
@@ -85,7 +85,7 @@ function handleAction(args) {
         }
         // handle and await each eventFn in sequence
         for (const fn of on.success) {
-            yield fn({ payload, result, actionName, storeName, abort });
+            yield fn({ payload, result, actionName, storeName, abort, collectionPath, docId });
         }
         // abort?
         if (abortExecution) {
@@ -398,7 +398,14 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                         });
                         // revert eventFns, handle and await each eventFn in sequence
                         for (const fn of eventNameFnsMap.revert) {
-                            yield fn({ payload, result: resultFromPlugin, actionName, storeName });
+                            yield fn({
+                                payload,
+                                result: resultFromPlugin,
+                                actionName,
+                                storeName,
+                                collectionPath,
+                                docId,
+                            });
                         }
                     }
                     // now we must throw the error
