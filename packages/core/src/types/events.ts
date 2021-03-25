@@ -6,6 +6,8 @@ import { FetchResponse, StreamResponse, DoOnStream, DoOnFetch } from './plugins'
 export type EventName = 'before' | 'success' | 'error' | 'revert'
 
 type EventSharedPayload = {
+  collectionPath: string
+  docId?: string | undefined
   /**
    * write actions: Record<string, any> | Record<string, any>[]
    * delete actions: Record<string, any> | Record<string, any>[] | string | string[]
