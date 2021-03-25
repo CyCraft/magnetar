@@ -7,7 +7,13 @@
       <label for="order" style="padding-left: 1rem">alphabetically</label>
       <input type="checkbox" name="" v-model="alphabetically" id="order" />
     </div>
-    <TodoApp @add="addItem" @edit="editItem" @delete="deleteItem" :items="items" :generateRandomId="generateRandomId" />
+    <TodoApp
+      @add="addItem"
+      @edit="editItem"
+      @delete="deleteItem"
+      :items="items"
+      :generateRandomId="generateRandomId"
+    />
   </div>
 </template>
 
@@ -26,7 +32,9 @@ const itemsModule = magnetar.collection<Item>('magnetarTests/dev-firestore/items
 export default defineComponent({
   components: { TodoApp },
   props: {},
-  created () { itemsModule.stream() },
+  created() {
+    itemsModule.stream()
+  },
   setup() {
     const showAll = ref(true)
     const alphabetically = ref(false)

@@ -73,7 +73,7 @@ export default defineComponent({
   name: 'TodoApp',
   props: {
     items: { type: Array as PropType<Item[]>, default: () => [] },
-    generateRandomId: { type: Function as PropType<() => string>, required: true }
+    generateRandomId: { type: Function as PropType<() => string>, required: true },
   },
   setup(props, { emit }) {
     const newItem = ref('')
