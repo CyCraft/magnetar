@@ -1,6 +1,6 @@
 import { O } from 'ts-toolbelt';
 import { ActionName } from './actions';
-import { FetchResponse, StreamResponse, DoOnStream, DoOnFetch } from './plugins';
+import { FetchResponse, StreamResponse, DoOnStream, DoOnFetch, PluginModuleConfig } from './plugins';
 export declare type EventName = 'before' | 'success' | 'error' | 'revert';
 declare type EventSharedPayload = {
     /**
@@ -21,13 +21,24 @@ declare type EventSharedPayload = {
      */
     path: string;
     /**
+     * The payload that was passed to the action
      * write actions: Record<string, any> | Record<string, any>[]
      * delete actions: Record<string, any> | Record<string, any>[] | string | string[]
      * read actions: Record<string, any> | void
      */
     payload: Record<string, any> | Record<string, any>[] | void | string | string[];
+    /**
+     * The action name for which the current event is being run
+     */
     actionName: ActionName;
+    /**
+     * The store name for which the current event is being run
+     */
     storeName: string;
+    /**
+     * The module config which is passed to the store plugin for which the current event is being run
+     */
+    pluginModuleConfig: PluginModuleConfig;
     /**
      * stream actions: void // streams cannot be aborted in an event
      * others: () => void

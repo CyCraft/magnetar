@@ -51,7 +51,7 @@ function handleAction(args) {
         };
         // handle and await each eventFn in sequence
         for (const fn of on.before) {
-            yield fn({ payload, actionName, storeName, abort, collectionPath, docId, path: modulePath }); // prettier-ignore
+            yield fn({ payload, actionName, storeName, abort, collectionPath, docId, path: modulePath, pluginModuleConfig }); // prettier-ignore
         }
         // abort?
         if (abortExecution) {
@@ -66,7 +66,7 @@ function handleAction(args) {
         catch (error) {
             // handle and await each eventFn in sequence
             for (const fn of on.error) {
-                yield fn({ payload, actionName, storeName, abort, error, collectionPath, docId, path: modulePath }); // prettier-ignore
+                yield fn({ payload, actionName, storeName, abort, error, collectionPath, docId, path: modulePath, pluginModuleConfig }); // prettier-ignore
             }
             // abort?
             if (abortExecution || onError === 'stop') {
@@ -81,7 +81,7 @@ function handleAction(args) {
         }
         // handle and await each eventFn in sequence
         for (const fn of on.success) {
-            yield fn({ payload, result, actionName, storeName, abort, collectionPath, docId, path: modulePath }); // prettier-ignore
+            yield fn({ payload, result, actionName, storeName, abort, collectionPath, docId, path: modulePath, pluginModuleConfig }); // prettier-ignore
         }
         // abort?
         if (abortExecution) {
@@ -396,7 +396,7 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                         });
                         // revert eventFns, handle and await each eventFn in sequence
                         for (const fn of eventNameFnsMap.revert) {
-                            yield fn({ payload, result: resultFromPlugin, actionName, storeName, collectionPath, docId, path: modulePath }); // prettier-ignore
+                            yield fn({ payload, result: resultFromPlugin, actionName, storeName, collectionPath, docId, path: modulePath, pluginModuleConfig }); // prettier-ignore
                         }
                     }
                     // now we must throw the error
@@ -451,7 +451,7 @@ function handleStream(args) {
         const path = [collectionPath, docId].filter(Boolean).join('/');
         // handle and await each eventFn in sequence
         for (const fn of on.before) {
-            yield fn({ payload, actionName, storeName, abort, collectionPath, docId, path });
+            yield fn({ payload, actionName, storeName, abort, collectionPath, docId, path, pluginModuleConfig }); // prettier-ignore
         }
         let result;
         try {
@@ -468,13 +468,13 @@ function handleStream(args) {
         catch (error) {
             // handle and await each eventFn in sequence
             for (const fn of on.error) {
-                yield fn({ payload, actionName, storeName, error, abort, collectionPath, docId, path });
+                yield fn({ payload, actionName, storeName, error, abort, collectionPath, docId, path, pluginModuleConfig }); // prettier-ignore
             }
             throw error;
         }
         // handle and await each eventFn in sequence
         for (const fn of on.success) {
-            yield fn({ payload, result, actionName, storeName, abort, collectionPath, docId, path });
+            yield fn({ payload, result, actionName, storeName, abort, collectionPath, docId, path, pluginModuleConfig }); // prettier-ignore
         }
         return result;
     });
