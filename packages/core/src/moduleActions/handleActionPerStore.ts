@@ -136,7 +136,7 @@ export function handleActionPerStore(
           })
           // revert eventFns, handle and await each eventFn in sequence
           for (const fn of eventNameFnsMap.revert) {
-            await fn({ payload, result: resultFromPlugin, actionName, storeName, collectionPath, docId, path: modulePath }) // prettier-ignore
+            await fn({ payload, result: resultFromPlugin, actionName, storeName, collectionPath, docId, path: modulePath, pluginModuleConfig }) // prettier-ignore
           }
         }
         // now we must throw the error

@@ -50,7 +50,7 @@ export async function handleAction(args: {
   }
   // handle and await each eventFn in sequence
   for (const fn of on.before) {
-    await fn({ payload, actionName, storeName, abort, collectionPath, docId, path: modulePath }) // prettier-ignore
+    await fn({ payload, actionName, storeName, abort, collectionPath, docId, path: modulePath, pluginModuleConfig }) // prettier-ignore
   }
   // abort?
   if (abortExecution) {
@@ -64,7 +64,7 @@ export async function handleAction(args: {
   } catch (error) {
     // handle and await each eventFn in sequence
     for (const fn of on.error) {
-      await fn({ payload, actionName, storeName, abort, error, collectionPath, docId, path: modulePath }) // prettier-ignore
+      await fn({ payload, actionName, storeName, abort, error, collectionPath, docId, path: modulePath, pluginModuleConfig }) // prettier-ignore
     }
     // abort?
     if (abortExecution || onError === 'stop') {
@@ -79,7 +79,7 @@ export async function handleAction(args: {
   }
   // handle and await each eventFn in sequence
   for (const fn of on.success) {
-    await fn({ payload, result, actionName, storeName, abort, collectionPath, docId, path: modulePath }) // prettier-ignore
+    await fn({ payload, result, actionName, storeName, abort, collectionPath, docId, path: modulePath, pluginModuleConfig }) // prettier-ignore
   }
   // abort?
   if (abortExecution) {
