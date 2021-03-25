@@ -10,6 +10,7 @@ import { OnAddedFn } from '../types/modifyReadResponse';
 export declare function handleAction(args: {
     collectionPath: string;
     docId: string | undefined;
+    modulePath: string;
     pluginModuleConfig: PluginModuleConfig;
     pluginAction: PluginFetchAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction;
     payload: void | Record<string, any> | Record<string, any>[] | string | string[];

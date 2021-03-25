@@ -3,8 +3,23 @@ import { ActionName } from './actions';
 import { FetchResponse, StreamResponse, DoOnStream, DoOnFetch } from './plugins';
 export declare type EventName = 'before' | 'success' | 'error' | 'revert';
 declare type EventSharedPayload = {
+    /**
+     * The path of just the collection
+     * @example 'pokedex/001/items'
+     * @example 'pokedex'
+     */
     collectionPath: string;
+    /**
+     * The id of the document. When this is a nested document, it will not include the full path, only the final part
+     * @example '001'
+     */
     docId?: string | undefined;
+    /**
+     * The full path of the document or collection
+     * @example 'pokedex/001'
+     * @example 'pokedex/001/items'
+     */
+    path: string;
     /**
      * write actions: Record<string, any> | Record<string, any>[]
      * delete actions: Record<string, any> | Record<string, any>[] | string | string[]

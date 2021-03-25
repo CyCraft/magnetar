@@ -43,7 +43,7 @@ function __awaiter(thisArg, _arguments, P, generator) {
  */
 function handleAction(args) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { collectionPath, docId, pluginModuleConfig, pluginAction, payload, eventNameFnsMap: on, onError, actionName, stopExecutionAfterAction, storeName, } = args;
+        const { collectionPath, docId, modulePath, pluginModuleConfig, pluginAction, payload, eventNameFnsMap: on, onError, actionName, stopExecutionAfterAction, storeName, } = args;
         // create abort mechanism for current scope
         let abortExecution = false;
         const abort = () => {
@@ -51,7 +51,7 @@ function handleAction(args) {
         };
         // handle and await each eventFn in sequence
         for (const fn of on.before) {
-            yield fn({ payload, actionName, storeName, abort, collectionPath, docId });
+            yield fn({ payload, actionName, storeName, abort, collectionPath, docId, path: modulePath }); // prettier-ignore
         }
         // abort?
         if (abortExecution) {
@@ -66,7 +66,7 @@ function handleAction(args) {
         catch (error) {
             // handle and await each eventFn in sequence
             for (const fn of on.error) {
-                yield fn({ payload, actionName, storeName, abort, error, collectionPath, docId });
+                yield fn({ payload, actionName, storeName, abort, error, collectionPath, docId, path: modulePath }); // prettier-ignore
             }
             // abort?
             if (abortExecution || onError === 'stop') {
@@ -81,7 +81,7 @@ function handleAction(args) {
         }
         // handle and await each eventFn in sequence
         for (const fn of on.success) {
-            yield fn({ payload, result, actionName, storeName, abort, collectionPath, docId });
+            yield fn({ payload, result, actionName, storeName, abort, collectionPath, docId, path: modulePath }); // prettier-ignore
         }
         // abort?
         if (abortExecution) {
@@ -326,6 +326,7 @@ collectionFn // actions executed on a "collection" will return `collection()` or
     return function (payload, actionConfig = {}) {
         return __awaiter(this, void 0, void 0, function* () {
             let docId = _docId;
+            let modulePath = [collectionPath, docId].filter(Boolean).join('/');
             // get all the config needed to perform this action
             const onError = actionConfig.onError || moduleConfig.onError || globalConfig.onError;
             const modifyPayloadFnsMap = getModifyPayloadFnsMap(globalConfig.modifyPayloadOn, moduleConfig.modifyPayloadOn, actionConfig.modifyPayloadOn);
@@ -368,6 +369,7 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                     : yield handleAction({
                         collectionPath,
                         docId,
+                        modulePath,
                         pluginModuleConfig,
                         pluginAction,
                         payload,
@@ -394,14 +396,7 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                         });
                         // revert eventFns, handle and await each eventFn in sequence
                         for (const fn of eventNameFnsMap.revert) {
-                            yield fn({
-                                payload,
-                                result: resultFromPlugin,
-                                actionName,
-                                storeName,
-                                collectionPath,
-                                docId,
-                            });
+                            yield fn({ payload, result: resultFromPlugin, actionName, storeName, collectionPath, docId, path: modulePath }); // prettier-ignore
                         }
                     }
                     // now we must throw the error
@@ -413,6 +408,7 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                     // if this is the case the result will be a string - the randomly genererated ID
                     if (!docId) {
                         docId = resultFromPlugin;
+                        modulePath = [collectionPath, docId].filter(Boolean).join('/');
                     }
                 }
                 // special handling for 'fetch' (resultFromPlugin will always be `FetchResponse | OnAddedFn`)
@@ -427,7 +423,6 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                     }
                 }
             }
-            const modulePath = [collectionPath, docId].filter(Boolean).join('/');
             // anything that's executed from a "collection" module:
             // 'insert' always returns a DocInstance, unless the "abort" action was called, then the modulePath might still be a collection:
             if (actionName === 'insert' && docId) {
@@ -453,9 +448,10 @@ function handleStream(args) {
         // no aborting possible in stream actions
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         const abort = () => { };
+        const path = [collectionPath, docId].filter(Boolean).join('/');
         // handle and await each eventFn in sequence
         for (const fn of on.before) {
-            yield fn({ payload, actionName, storeName, abort });
+            yield fn({ payload, actionName, storeName, abort, collectionPath, docId, path });
         }
         let result;
         try {
@@ -472,13 +468,13 @@ function handleStream(args) {
         catch (error) {
             // handle and await each eventFn in sequence
             for (const fn of on.error) {
-                yield fn({ payload, actionName, storeName, error, abort });
+                yield fn({ payload, actionName, storeName, error, abort, collectionPath, docId, path });
             }
             throw error;
         }
         // handle and await each eventFn in sequence
         for (const fn of on.success) {
-            yield fn({ payload, result, actionName, storeName, abort });
+            yield fn({ payload, result, actionName, storeName, abort, collectionPath, docId, path });
         }
         return result;
     });
