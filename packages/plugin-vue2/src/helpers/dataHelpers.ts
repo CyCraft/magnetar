@@ -91,15 +91,20 @@ type CustomMap<DocDataType = Record<string, any>> = {
    * Removes all key-value pairs from the Map object.
    */
   clear: () => void
+  /**
+   * Removes the value associated to the key from the Map object.
+   * @returns {boolean} `true` if an element in the Map object existed and has been removed, or `false` if the element does not exist.
+   */
+  delete: (key: string) => boolean
 
   /**
    * Returns the value associated to the key, or undefined if there is none.
    */
-  fetch: (id: string) => DocDataType
+  get: (key: string) => DocDataType
   /**
    * Returns a boolean asserting whether a value has been associated to the key in the Map object or not.
    */
-  has: (id: string) => boolean
+  has: (key: string) => boolean
 
   /**
    * Returns a new Iterator object that contains the keys for each element in the Map object in insertion order.
@@ -166,6 +171,11 @@ export function objectToMap(
       })
     }
   }
+  function _delete(id: string) {
+    const existed = id in dic
+    if (existed) delete dic[id]
+    return existed
+  }
   function forEach(
     callbackfn: (value: any, key: string, map: Map<string, any>, thisArg?: any) => void
   ) {
@@ -187,6 +197,7 @@ export function objectToMap(
     entries,
     forEach,
     clear,
+    delete: _delete,
     raw,
   } as any
   return customMap as any
