@@ -3,7 +3,6 @@
   "private": true,
   "scripts": {
     "dev": "cd packages/dev && npm run dev",
-    "dev:vue2": "cd packages/dev-vue2 && npm run dev",
     "dev:vue2-firestore": "cd packages/dev-vue2-firestore && npm run dev",
     "dev:vue3": "cd packages/dev-vue3 && npm run dev",
     "dev:vue3-firestore": "cd packages/dev-vue3-firestore && npm run dev",
