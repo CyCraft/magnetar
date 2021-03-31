@@ -570,6 +570,7 @@ function handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfi
             const closeStream = () => {
                 Object.values(streamInfoPerStore).forEach(({ stop }) => stop());
                 openStreams.delete(openStreamIdentifier);
+                openStreamPromises.delete(openStreamIdentifier);
             };
             openStreams.set(openStreamIdentifier, closeStream);
             // return the stream promise
