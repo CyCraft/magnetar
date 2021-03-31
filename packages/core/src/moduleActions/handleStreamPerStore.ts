@@ -126,6 +126,7 @@ export function handleStreamPerStore(
     const closeStream = (): void => {
       Object.values(streamInfoPerStore).forEach(({ stop }) => stop())
       openStreams.delete(openStreamIdentifier)
+      openStreamPromises.delete(openStreamIdentifier)
     }
     openStreams.set(openStreamIdentifier, closeStream)
     // return the stream promise
