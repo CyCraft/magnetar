@@ -8,14 +8,13 @@ type AnyFunction = (...args: any[]) => any
  * @param {any[]} args
  * @returns {void}
  */
-export function executeOnFns<Payload extends any> (
+export function executeOnFns<Payload extends any>(
   fns: AnyFunction[],
   payload: Payload,
   otherArgs: any[]
 ): Payload | void {
   for (const fn of fns) {
-    const result = fn(payload, ...otherArgs)
-    if (result) payload = result
+    payload = fn(payload, ...otherArgs)
   }
   return payload
 }
