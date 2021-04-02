@@ -18,6 +18,9 @@ export function fetchActionFactory(
     pluginModuleConfig,
   }: PluginFetchActionPayload<Vue2StoreModuleConfig>): FetchResponse | DoOnFetch {
     const doOnFetchAction: DoOnFetch = (payload, meta): void => {
+      // abort updating local state if the payload is undefined
+      if (payload === undefined) return
+
       insertActionFactory(
         data,
         vue2StoreOptions
