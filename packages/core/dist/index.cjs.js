@@ -168,9 +168,7 @@ function getModifyReadResponseFnsMap(...onMaps) {
  */
 function executeOnFns(fns, payload, otherArgs) {
     for (const fn of fns) {
-        const result = fn(payload, ...otherArgs);
-        if (result)
-            payload = result;
+        payload = fn(payload, ...otherArgs);
     }
     return payload;
 }
