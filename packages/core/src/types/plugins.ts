@@ -214,15 +214,24 @@ export type StreamResponse = { streaming: Promise<void>; stop: () => void }
  */
 export type DoOnStream = {
   /**
-   * 'added' is/should be triggered per document on 3 occasions: on 'fetch' when a document is read; on 'stream' when initial documents are read; on 'stream' when there are consequent insertions of documents on the end-point.
+   * 'added' will/should be triggered per document on 3 occasions: on 'fetch' when a document is read; on 'stream' when initial documents are read; on 'stream' when there are consequent insertions of documents on the end-point.
+   *
+   * As local store plugin this should be a function that covers the logic to save the payload to the local state.
+   * As remote store plugin this is what must be executed during the events.
    */
   added?: OnAddedFn
   /**
-   * 'modified' is/should be triggered per document on 1 occasion: on 'stream' when a document that was already read through that stream once before is modified on the end-point.
+   * 'modified' will/should be triggered per document on 1 occasion: on 'stream' when a document that was already read through that stream once before is modified on the end-point.
+   *
+   * As local store plugin this should be a function that covers the logic to update the payload in the local state.
+   * As remote store plugin this is what must be executed during the events.
    */
   modified?: OnModifiedFn
   /**
-   * 'removed' is/should be triggered per document on 2 occasions: on 'stream' when a document is "deleted" on the end-point; when a document doesn't adhere to the "stream clauses" any more.
+   * 'removed' will/should be triggered per document on 2 occasions: on 'stream' when a document is "deleted" on the end-point; when a document doesn't adhere to the "stream clauses" any more.
+   *
+   * As local store plugin this should be a function that covers the logic to remove the payload from the local state.
+   * As remote store plugin this is what must be executed during the events.
    */
   removed?: OnRemovedFn
 }
