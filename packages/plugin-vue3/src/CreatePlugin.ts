@@ -6,10 +6,8 @@ import {
   PluginInstance,
   MagnetarPlugin,
   Clauses,
-  WhereClause,
-  OrderByClause,
-  Limit,
   PluginActionPayloadBase,
+  ModuleConfig,
 } from '@magnetarjs/core'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { insertActionFactory } from './actions/insert'
@@ -19,6 +17,7 @@ import { fetchActionFactory } from './actions/fetch'
 import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
 import { filterDataPerClauses } from './helpers/dataHelpers'
+import { parsedCollectionPath } from './helpers/pathHelpers'
 
 // there are two interfaces to be defined & exported by each plugin: `StoreOptions` and `StoreModuleConfig`
 // for this plugin we use:
@@ -37,12 +36,9 @@ export interface Vue3StoreOptions {
   generateRandomId: () => string
 }
 
-export interface Vue3StoreModuleConfig {
+export interface Vue3StoreModuleConfig extends ModuleConfig {
   path?: string
   initialData?: Record<string, any> | [string, Record<string, any>][]
-  where?: WhereClause[]
-  orderBy?: OrderByClause[]
-  limit?: Limit
 }
 
 export type MakeRestoreBackup = (collectionPath: string, docId: string) => void
@@ -100,12 +96,13 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
     docId,
     pluginModuleConfig = {},
   }: PluginActionPayloadBase<Vue3StoreModuleConfig>): void => {
-    const modulePath = [collectionPath, docId].filter(Boolean).join('/')
+    const path = parsedCollectionPath(collectionPath, pluginModuleConfig)
+    const modulePath = [path, docId].filter(Boolean).join('/')
     if (modulesAlreadySetup.has(modulePath)) return
     // always set up a new Map for the **collection**, but only when it is still undefined!
     // the reason for this is that the module can be instantiated for multiple documents in the same collection
-    if (!(collectionPath in data)) data[collectionPath] = reactive(new Map())
-    const dataCollectionMap = data[collectionPath]
+    if (!(path in data)) data[path] = reactive(new Map())
+    const dataCollectionMap = data[path]
     modulesAlreadySetup.add(modulePath)
     // then do anything specific for your plugin, like setting initial data
     const { initialData } = pluginModuleConfig
@@ -127,7 +124,9 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
     docId,
     pluginModuleConfig = {},
   }: PluginActionPayloadBase<Vue3StoreModuleConfig>): any => {
-    const dataCollectionMap = data[collectionPath]
+    const path = parsedCollectionPath(collectionPath, pluginModuleConfig)
+
+    const dataCollectionMap = data[path]
     // if it's a doc, return the specific doc
     if (docId) return dataCollectionMap.get(docId)
     // if it's a collection, we must return the dataCollectionMap but with applied query clauses
@@ -164,6 +163,7 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
     },
     setupModule,
     getModuleData,
+    data,
   }
   return instance
 }

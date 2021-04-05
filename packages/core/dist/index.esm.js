@@ -255,9 +255,9 @@ function throwIfInvalidModulePath(modulePath, moduleType) {
  * @returns {PluginModuleConfig}
  */
 function getPluginModuleConfig(moduleConfig, storeName) {
-    const { where, orderBy, limit, configPerStore = {} } = moduleConfig;
+    const { where, orderBy, limit, queryBasedCache, configPerStore = {} } = moduleConfig;
     const extraStoreConfig = isPlainObject(configPerStore[storeName]) ? configPerStore[storeName] : {};
-    return Object.assign(Object.assign({}, extraStoreConfig), { where, orderBy, limit });
+    return Object.assign(Object.assign({}, extraStoreConfig), { where, orderBy, limit, queryBasedCache });
 }
 /**
  * Executes 'setupModule' function per store, when the collection or doc is instantiated.

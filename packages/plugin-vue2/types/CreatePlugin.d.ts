@@ -1,4 +1,4 @@
-import { MagnetarPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core';
+import { MagnetarPlugin, ModuleConfig } from '@magnetarjs/core';
 export interface Vue2StoreOptions {
     /**
      * This is required to make sure there are not two instances of Vue running which can cause issues.
@@ -10,12 +10,9 @@ export interface Vue2StoreOptions {
      */
     generateRandomId: () => string;
 }
-export interface Vue2StoreModuleConfig {
+export interface Vue2StoreModuleConfig extends ModuleConfig {
     path?: string;
     initialData?: Record<string, any> | [string, Record<string, any>][];
-    where?: WhereClause[];
-    orderBy?: OrderByClause[];
-    limit?: Limit;
 }
 export declare type MakeRestoreBackup = (collectionPath: string, docId: string) => void;
 /**

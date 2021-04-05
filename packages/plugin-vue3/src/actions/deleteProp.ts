@@ -2,6 +2,7 @@ import { isArray } from 'is-what'
 import { getProp } from 'path-to-prop'
 import { PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetarjs/core'
 import { Vue3StoreModuleConfig, Vue3StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { parsedCollectionPath } from '../helpers/pathHelpers'
 
 export function deletePropActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
@@ -17,12 +18,13 @@ export function deletePropActionFactory(
     // `deleteProp` action cannot be executed on collections
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 
-    const collectionMap = data[collectionPath]
+    const path = parsedCollectionPath(collectionPath, pluginModuleConfig)
+    const collectionMap = data[path]
     const docData = collectionMap.get(docId)
 
-    if (!docData) throw new Error(`Document data not found for id: ${collectionPath} ${docId}`)
+    if (!docData) throw new Error(`Document data not found for id: ${path} ${docId}`)
 
-    if (makeBackup) makeBackup(collectionPath, docId)
+    if (makeBackup) makeBackup(path, docId)
 
     const payloadArray = isArray(payload) ? payload : [payload]
     for (const propToDelete of payloadArray) {

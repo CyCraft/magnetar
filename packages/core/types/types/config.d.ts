@@ -50,5 +50,10 @@ export declare type ModuleConfig = O.PatchAll<Clauses, [
         configPerStore?: {
             [storeName: string]: Record<string, any>;
         };
+        /**
+         * Default: `false`
+         * Set to `true` if you need multiple streams open at the same time for the same collection but with different where-filters.
+         */
+        queryBasedCache?: boolean;
     }
 ]>;

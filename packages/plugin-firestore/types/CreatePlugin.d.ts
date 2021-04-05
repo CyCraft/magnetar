@@ -1,5 +1,5 @@
 import type firebase from 'firebase';
-import { MagnetarPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core';
+import { MagnetarPlugin, ModuleConfig } from '@magnetarjs/core';
 declare type Firestore = firebase.firestore.Firestore;
 export interface FirestorePluginOptions {
     /**
@@ -21,11 +21,8 @@ export interface FirestorePluginOptions {
      */
     debug?: boolean;
 }
-export interface FirestoreModuleConfig {
+export interface FirestoreModuleConfig extends ModuleConfig {
     firestorePath?: string;
-    where?: WhereClause[];
-    orderBy?: OrderByClause[];
-    limit?: Limit;
 }
 export declare const CreatePlugin: MagnetarPlugin<FirestorePluginOptions>;
 export {};

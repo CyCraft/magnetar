@@ -15,9 +15,9 @@ export function getPluginModuleConfig(
   moduleConfig: ModuleConfig,
   storeName: string
 ): PluginModuleConfig {
-  const { where, orderBy, limit, configPerStore = {} } = moduleConfig
+  const { where, orderBy, limit, queryBasedCache, configPerStore = {} } = moduleConfig
   const extraStoreConfig = isPlainObject(configPerStore[storeName]) ? configPerStore[storeName] : {}
-  return { ...extraStoreConfig, where, orderBy, limit }
+  return { ...extraStoreConfig, where, orderBy, limit, queryBasedCache }
 }
 
 /**

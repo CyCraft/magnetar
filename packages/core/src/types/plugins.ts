@@ -42,6 +42,10 @@ export interface PluginInstance {
   getModuleData?: (
     pluginActionPayload: PluginActionPayloadBase
   ) => Record<string, any> | Map<string, Record<string, any>>
+  /**
+   * The raw data of the plugin. You do not want to mess with this. Only relevant for Store Plugins that are used as local store.
+   */
+  data?: Record<string, any> | Map<string, Record<string, any>>
 }
 
 /**
