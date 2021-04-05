@@ -8,9 +8,7 @@
   "types": "types/index.d.ts",
   "scripts": {
     "build": "npm run rollup",
-    "test-and-build": "npm run test && npm run build",
-    "test": "ava --verbose",
-    "test--only": "ava --verbose --match='*only:*'",
+    "test": "",
     "rollup": "rimraf dist && rimraf types && rollup -c build.js"
   },
   "author": "Luca Ban - Mesqueeb",
