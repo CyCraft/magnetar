@@ -1,4 +1,5 @@
-import { mergeAndConcat, merge } from 'merge-anything';
+import { merge, mergeAndConcat } from 'merge-anything';
+import { omit } from 'filter-anything';
 import { isPlainObject, isFunction, isArray, isFullString, isPromise } from 'is-what';
 
 const actionNameTypeMap = {
@@ -578,7 +579,7 @@ function createCollectionWithContext([collectionPath, docId], moduleConfig, glob
     const id = collectionPath.split('/').slice(-1)[0];
     const path = collectionPath;
     const doc = (docId, _moduleConfig = {}) => {
-        return docFn(`${path}/${docId}`, _moduleConfig);
+        return docFn(`${path}/${docId}`, merge(omit(moduleConfig, ['configPerStore']), _moduleConfig));
     };
     const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, docFn, collectionFn); //prettier-ignore
     const _delete = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn, collectionFn); //prettier-ignore

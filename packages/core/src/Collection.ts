@@ -1,4 +1,6 @@
 import { O } from 'ts-toolbelt'
+import { merge, mergeAndConcat } from 'merge-anything'
+import { omit } from 'filter-anything'
 import {
   MagnetarFetchAction,
   MagnetarStreamAction,
@@ -16,7 +18,6 @@ import { ModuleConfig, GlobalConfig } from './types/config'
 import { DocFn, CollectionFn } from './Magnetar'
 import { executeSetupModulePerStore, getDataProxyHandler } from './helpers/moduleHelpers'
 import { WhereClause, WhereFilterOp, OrderByClause } from './types/clauses'
-import { mergeAndConcat } from 'merge-anything'
 
 export type CollectionInstance<DocDataType extends Record<string, any> = Record<string, any>> = {
   /**
@@ -74,7 +75,7 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
   const path = collectionPath
 
   const doc: DocFn<DocDataType> = (docId: string, _moduleConfig: ModuleConfig = {}) => {
-    return docFn(`${path}/${docId}`, _moduleConfig)
+    return docFn(`${path}/${docId}`, merge(omit(moduleConfig, ['configPerStore']), _moduleConfig))
   }
 
   const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, docFn, collectionFn) as MagnetarInsertAction<DocDataType> //prettier-ignore

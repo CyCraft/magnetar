@@ -1,4 +1,10 @@
-import { Magnetar, MagnetarInstance, CollectionInstance, DocInstance } from '../../src'
+import {
+  Magnetar,
+  MagnetarInstance,
+  CollectionInstance,
+  DocInstance,
+  GlobalConfig,
+} from '../../src'
 import {
   pokedex,
   PokedexEntry,
@@ -33,7 +39,9 @@ export type TrainerModuleData = {
   shouldFail?: string
 }
 
-export function createMagnetarInstance(): {
+export function createMagnetarInstance(
+  magnetarGlobalConfig: Partial<GlobalConfig> = {}
+): {
   pokedexModule: CollectionInstance<PokedexModuleData>
   trainerModule: DocInstance<TrainerModuleData>
   magnetar: MagnetarInstance
@@ -48,6 +56,7 @@ export function createMagnetarInstance(): {
       write: ['local', 'remote'],
       delete: ['local', 'remote'],
     },
+    ...magnetarGlobalConfig,
   })
   const pokedexModule = magnetar.collection<PokedexModuleData>('pokedex', {
     configPerStore: {

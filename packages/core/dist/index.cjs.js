@@ -3,6 +3,7 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var mergeAnything = require('merge-anything');
+var filterAnything = require('filter-anything');
 var isWhat = require('is-what');
 
 const actionNameTypeMap = {
@@ -582,7 +583,7 @@ function createCollectionWithContext([collectionPath, docId], moduleConfig, glob
     const id = collectionPath.split('/').slice(-1)[0];
     const path = collectionPath;
     const doc = (docId, _moduleConfig = {}) => {
-        return docFn(`${path}/${docId}`, _moduleConfig);
+        return docFn(`${path}/${docId}`, mergeAnything.merge(filterAnything.omit(moduleConfig, ['configPerStore']), _moduleConfig));
     };
     const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, docFn, collectionFn); //prettier-ignore
     const _delete = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn, collectionFn); //prettier-ignore
