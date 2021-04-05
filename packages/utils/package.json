@@ -1,8 +1,8 @@
 {
-  "name": "@magnetarjs/plugin-simple-store",
-  "version": "0.0.17",
+  "name": "@magnetarjs/utils",
+  "version": "0.0.1",
   "sideEffects": false,
-  "description": "Magnetar plugin simple store",
+  "description": "Magnetar utils like a logger for easier development",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "types": "types/index.d.ts",
@@ -18,43 +18,14 @@
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
     "@magnetarjs/core": "^0.0.17",
-    "copy-anything": "^2.0.3",
-    "fast-sort": "^2.2.0",
-    "filter-anything": "^2.2.1",
-    "is-what": "^3.14.1",
-    "merge-anything": "^4.0.1",
-    "path-to-prop": "1.0.0",
-    "ts-toolbelt": "^9.6.0"
+    "is-what": "^3.14.1"
   },
   "devDependencies": {
-    "@magnetarjs/test-utils": "^0.0.8",
-    "ava": "^3.15.0",
-    "browser-env": "^3.3.0"
+    "ava": "^3.15.0"
   },
   "keywords": [
-    "magnetar-plugin",
     "magnetar",
-    "magnetarjs",
-    "state-management",
-    "syncing-solution",
-    "db-sync",
-    "auto-sync",
-    "framework-agnostic",
-    "optimistic-ui",
-    "vuejs",
-    "vuex",
-    "vue-sync",
-    "vue-state",
-    "vue-db",
-    "vue-store",
-    "firestore",
-    "data-store",
-    "local-store",
-    "remote-store",
-    "global-store",
-    "database-sync",
-    "database-management",
-    "database"
+    "magnetarjs"
   ],
   "repository": {
     "type": "git",
@@ -71,6 +42,5 @@
       "ts-node/register"
     ],
     "timeout": "60s"
-  },
-  "gitHead": "07dcf42d161b8b81225544329eb0e39bff9e2d83"
+  }
 }
