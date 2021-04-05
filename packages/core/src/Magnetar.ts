@@ -9,7 +9,6 @@ import { getCollectionPathDocIdEntry } from './helpers/pathHelpers'
 import { findMapValueForKey } from './helpers/mapHelpers'
 
 export { isDocModule, isCollectionModule } from './helpers/pathHelpers'
-export type { GlobalConfig, ModuleConfig } from './types/config'
 
 function configWithDefaults(config: GlobalConfig): O.Compulsory<GlobalConfig> {
   const defaults: SharedConfig = {

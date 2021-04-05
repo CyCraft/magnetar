@@ -21,6 +21,9 @@ export function fetchActionFactory(
     pluginModuleConfig,
   }: PluginFetchActionPayload<VuexStorePluginModuleConfig>): FetchResponse | DoOnFetch {
     const doOnFetchAction: DoOnFetch = (payload, meta): void => {
+      // abort updating local state if the payload was set to undefined
+      if (payload === undefined) return
+
       insertActionFactory(
         store,
         vuexStorePluginOptions,

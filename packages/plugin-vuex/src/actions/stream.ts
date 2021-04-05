@@ -29,6 +29,9 @@ export function streamActionFactory(
     // hover over the prop names below to see more info on when they are triggered:
     const doOnStream: DoOnStream = {
       added: (payload, meta) => {
+        // abort updating local state if the payload was set to undefined
+        if (payload === undefined) return
+
         insertActionFactory(
           store,
           vuexStorePluginOptions,
@@ -41,6 +44,9 @@ export function streamActionFactory(
         })
       },
       modified: (payload, meta) => {
+        // abort updating local state if the payload was set to undefined
+        if (payload === undefined) return
+
         insertActionFactory(
           store,
           vuexStorePluginOptions,
@@ -53,6 +59,9 @@ export function streamActionFactory(
         })
       },
       removed: (payload, meta) => {
+        // abort updating local state if the payload was set to undefined
+        if (payload === undefined) return
+
         const collectionPathDocIdToDelete: [string, string] = docId
           ? [collectionPath, docId]
           : isString(payload)

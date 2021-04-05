@@ -3,7 +3,6 @@ import { CollectionInstance } from './Collection';
 import { GlobalConfig, ModuleConfig } from './types/config';
 import { DocInstance } from './Doc';
 export { isDocModule, isCollectionModule } from './helpers/pathHelpers';
-export type { GlobalConfig, ModuleConfig } from './types/config';
 /**
  * This is the global Magnetar instance that is returned when instantiating with Magnetar()
  */
