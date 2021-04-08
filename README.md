@@ -8,6 +8,10 @@ A framework-agnostic syncing solution that auto-connects any DB/API with your lo
 npm i magnetar
 ```
 
+## Documentation
+
+[magnetar.cycraft.co](https://magnetar.cycraft.co)
+
 ## Meet the family
 
 ![](media/familar-hero.png?raw=true)
