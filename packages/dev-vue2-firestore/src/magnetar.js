@@ -4,6 +4,7 @@
 import { Magnetar } from '@magnetarjs/core'
 import { CreatePlugin } from '@magnetarjs/plugin-vue2'
 import { CreatePlugin as CreatePluginFirestore } from '@magnetarjs/plugin-firestore'
+import { logger } from '@magnetarjs/utils'
 import Vue from 'vue'
 import { firestore } from './firestore'
 
@@ -30,4 +31,5 @@ export const magnetar = Magnetar({
     write: ['local', 'remote'],
     delete: ['local', 'remote'],
   },
+  on: { success: logger },
 })

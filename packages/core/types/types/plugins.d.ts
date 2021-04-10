@@ -33,6 +33,10 @@ export interface PluginInstance {
      * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
      */
     getModuleData?: (pluginActionPayload: PluginActionPayloadBase) => Record<string, any> | Map<string, Record<string, any>>;
+    /**
+     * The raw data of the plugin. You do not want to mess with this. Only relevant for Store Plugins that are used as local store.
+     */
+    data?: Record<string, any> | Map<string, Record<string, any>>;
 }
 /**
  * Where, orderBy, limit clauses or extra config a dev might pass when instanciates a module as second param (under `configPerStore`). Eg. `collection('pokedex', { configPerStore: { local: pluginModuleConfig } })`

@@ -1,6 +1,7 @@
 import { merge } from 'merge-anything'
 import { PluginWriteAction, PluginWriteActionPayload } from '@magnetarjs/core'
 import { Vue3StoreModuleConfig, Vue3StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { parsedCollectionPath } from '../helpers/pathHelpers'
 
 export function writeActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
@@ -17,16 +18,17 @@ export function writeActionFactory(
     // write actions cannot be executed on collections
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 
-    const collectionMap = data[collectionPath]
+    const path = parsedCollectionPath(collectionPath, pluginModuleConfig)
 
-    if (makeBackup) makeBackup(collectionPath, docId)
+    const collectionMap = data[path]
+
+    if (makeBackup) makeBackup(path, docId)
 
     // always start from an empty document on 'replace' or when the doc is non existent
     if (actionName === 'replace' || !collectionMap.get(docId)) collectionMap.set(docId, {})
     const docDataToMutate = collectionMap.get(docId)
 
-    if (!docDataToMutate)
-      throw new Error(`Document data not found for id: ${collectionPath} ${docId}`)
+    if (!docDataToMutate) throw new Error(`Document data not found for id: ${path} ${docId}`)
 
     if (actionName === 'merge') {
       Object.entries(payload).forEach(([key, value]) => {

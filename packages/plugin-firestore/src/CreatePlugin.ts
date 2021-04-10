@@ -1,5 +1,5 @@
 import type firebase from 'firebase'
-import { PluginInstance, MagnetarPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core'
+import { PluginInstance, MagnetarPlugin, ModuleConfig } from '@magnetarjs/core'
 import { insertActionFactory } from './actions/insert'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { deletePropActionFactory } from './actions/deleteProp'
@@ -36,11 +36,8 @@ export interface FirestorePluginOptions {
    */
   debug?: boolean
 }
-export interface FirestoreModuleConfig {
+export interface FirestoreModuleConfig extends ModuleConfig {
   firestorePath?: string
-  where?: WhereClause[]
-  orderBy?: OrderByClause[]
-  limit?: Limit
 }
 
 function firestorePluginOptionsWithDefaults(

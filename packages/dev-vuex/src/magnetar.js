@@ -3,6 +3,7 @@
 // ---------------------------------------
 import { Magnetar } from '@magnetarjs/core'
 import { CreatePlugin } from '@magnetarjs/plugin-vuex'
+import { logger } from '@magnetarjs/utils'
 // import Vue from 'vue'
 import store from './store'
 window.store = store
@@ -24,4 +25,5 @@ export const magnetar = Magnetar({
     write: ['local'],
     delete: ['local'],
   },
+  on: { success: logger },
 })

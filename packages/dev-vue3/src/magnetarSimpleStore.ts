@@ -3,6 +3,7 @@
 // ---------------------------------------
 import { Magnetar } from '@magnetarjs/core'
 import { CreatePlugin } from '@magnetarjs/plugin-simple-store'
+import { logger } from '@magnetarjs/utils'
 
 const generateRandomId = () => Math.random().toString()
 
@@ -20,4 +21,5 @@ export const magnetar = Magnetar({
     write: ['local'],
     delete: ['local'],
   },
+  on: { success: logger },
 })

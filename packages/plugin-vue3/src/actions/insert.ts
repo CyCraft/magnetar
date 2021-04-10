@@ -1,6 +1,7 @@
 import { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/core'
 import { Vue3StoreModuleConfig, Vue3StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'
+import { parsedCollectionPath } from '../helpers/pathHelpers'
 
 export function insertActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
@@ -13,7 +14,8 @@ export function insertActionFactory(
     docId,
     pluginModuleConfig,
   }: PluginInsertActionPayload<Vue3StoreModuleConfig>): string {
-    const collectionMap = data[collectionPath]
+    const path = parsedCollectionPath(collectionPath, pluginModuleConfig)
+    const collectionMap = data[path]
 
     const _docId =
       docId ||
@@ -21,14 +23,13 @@ export function insertActionFactory(
         ? String(payload.id)
         : Vue3StoreOptions.generateRandomId())
 
-    if (makeBackup) makeBackup(collectionPath, _docId)
+    if (makeBackup) makeBackup(path, _docId)
 
     // reset the doc to be able to overwrite
     collectionMap.set(_docId, {})
     const docDataToMutate = collectionMap.get(_docId)
 
-    if (!docDataToMutate)
-      throw new Error(`Document data not found for id: ${collectionPath} ${_docId}`)
+    if (!docDataToMutate) throw new Error(`Document data not found for id: ${path} ${_docId}`)
 
     Object.entries(payload).forEach(([key, value]) => {
       docDataToMutate[key] = value
