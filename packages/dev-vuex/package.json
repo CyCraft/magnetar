@@ -9,7 +9,7 @@
   "dependencies": {
     "@magnetarjs/core": "^0.0.17",
     "@magnetarjs/plugin-vuex": "^0.0.14",
-    "core-js": "^3.10.0",
+    "core-js": "^3.10.1",
     "vue": "^2.6.12",
     "vuex": "^3.6.2"
   },

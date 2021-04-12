@@ -9,8 +9,8 @@
   "scripts": {
     "build": "npm run rollup",
     "test-and-build": "npm run test && npm run build",
-    "test": "ava --verbose",
-    "test--only": "ava --verbose --match='*only:*'",
+    "test": "ava",
+    "test--only": "ava --match='*only:*'",
     "rollup": "rimraf dist && rimraf types && rollup -c build.js"
   },
   "author": "Luca Ban - Mesqueeb",

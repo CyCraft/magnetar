@@ -23,6 +23,9 @@ export function fetchActionFactory(
     // this is custom logic to be implemented by the plugin author
 
     const doOnFetchAction: DoOnFetch = (payload, meta): void => {
+      // abort updating local state if the payload was set to undefined
+      if (payload === undefined) return
+
       insertActionFactory(
         data,
         storePluginOptions

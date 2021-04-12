@@ -1,8 +1,7 @@
 import { Clauses } from '../../../../core/src'
 import { isNumber, isArray } from 'is-what'
 import { getProp } from 'path-to-prop'
-import sort from 'fast-sort'
-import { ISortByObjectSorter } from 'fast-sort'
+import { sort, ISortByObjectSorter } from 'fast-sort'
 
 /**
  * Filters a Collection module's data map `Map<string, DocData>` based on provided clauses.
@@ -74,9 +73,9 @@ export function filterDataPerClauses(
     carry.push(sorter)
     return carry
   }, [] as ISortByObjectSorter<[string, Record<string, any>]>[])
-  if (orderBy.length) sort(entries).by(by)
+  const entriesOrdered = orderBy.length ? sort(entries).by(by) : entries
   // limit
-  const entriesLimited = isNumber(limit) ? entries.slice(0, limit) : entries
+  const entriesLimited = isNumber(limit) ? entriesOrdered.slice(0, limit) : entriesOrdered
   // turn back into MAP
   const filteredDataMap: Map<string, Record<string, any>> = new Map(entriesLimited)
   return filteredDataMap

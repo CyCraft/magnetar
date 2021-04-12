@@ -1,7 +1,7 @@
 import { Clauses } from '@magnetarjs/core'
 import { isNumber, isArray } from 'is-what'
 import { getProp } from 'path-to-prop'
-import sort, { ISortByObjectSorter } from 'fast-sort'
+import { sort, ISortByObjectSorter } from 'fast-sort'
 
 /**
  * Filters a Collection module's data based on provided clauses.
@@ -75,9 +75,9 @@ export function filterDataPerClauses(
   }, [] as ISortByObjectSorter<[string, Record<string, any>]>[])
   const entriesOrdered = orderBy.length ? sort(entries).by(by) : entries
   // limit
-  const entriesOrderedAndLimited = isNumber(limit) ? entriesOrdered.slice(0, limit) : entriesOrdered
+  const entriesLimited = isNumber(limit) ? entriesOrdered.slice(0, limit) : entriesOrdered
 
-  return entriesOrderedAndLimited
+  return entriesLimited
 }
 
 type CustomMap<DocDataType = Record<string, any>> = {

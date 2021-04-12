@@ -10,8 +10,8 @@
     "@magnetarjs/core": "^0.0.17",
     "@magnetarjs/plugin-firestore": "^0.0.17",
     "@magnetarjs/plugin-vue2": "^0.0.18",
-    "core-js": "^3.10.0",
-    "firebase": "^8.3.2",
+    "core-js": "^3.10.1",
+    "firebase": "^8.3.3",
     "vue": "^2.6.12",
     "vuex": "^3.6.2"
   },

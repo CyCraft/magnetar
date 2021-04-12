@@ -1,7 +1,7 @@
 import { Clauses } from '../../../core/src'
 import { isNumber, isArray } from 'is-what'
 import { getProp } from 'path-to-prop'
-import sort, { ISortByObjectSorter } from 'fast-sort'
+import { sort, ISortByObjectSorter } from 'fast-sort'
 
 /**
  * Filters a Collection module's data map `Map<string, DocData>` based on provided clauses.
