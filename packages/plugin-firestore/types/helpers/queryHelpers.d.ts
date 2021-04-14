@@ -5,6 +5,6 @@ declare type Query = firebase.firestore.Query;
 declare type DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 declare type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot;
 declare type Firestore = firebase.firestore.Firestore;
-export declare function getQueryInstance(collectionPath: string, pluginModuleConfig: FirestoreModuleConfig, firestoreInstance: Firestore): Query;
+export declare function getQueryInstance(collectionPath: string, pluginModuleConfig: FirestoreModuleConfig, firestore: Firestore): Query;
 export declare function docSnapshotToDocMetadata(docSnapshot: DocumentSnapshot | QueryDocumentSnapshot): DocMetadata;
 export {};

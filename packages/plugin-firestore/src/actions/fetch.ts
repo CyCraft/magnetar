@@ -21,18 +21,22 @@ export function fetchActionFactory(
     docId,
     pluginModuleConfig,
   }: PluginFetchActionPayload<FirestoreModuleConfig>): Promise<FetchResponse> {
-    const { firestoreInstance } = firestorePluginOptions
+    const { firebaseInstance } = firestorePluginOptions
     // in case of a doc module
     let snapshots: (DocumentSnapshot | QueryDocumentSnapshot)[] | undefined
     if (docId) {
       const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
-      const docSnapshot = await firestoreInstance.doc(documentPath).get()
+      const docSnapshot = await firebaseInstance.firestore().doc(documentPath).get()
       snapshots = [docSnapshot]
     }
     // in case of a collection module
     else if (!docId) {
       const _collectionPath = getFirestoreCollectionPath(collectionPath, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
-      const queryInstance = getQueryInstance(_collectionPath, pluginModuleConfig, firestoreInstance)
+      const queryInstance = getQueryInstance(
+        _collectionPath,
+        pluginModuleConfig,
+        firebaseInstance.firestore()
+      )
       const querySnapshot = await queryInstance.get()
       snapshots = querySnapshot.docs
     }

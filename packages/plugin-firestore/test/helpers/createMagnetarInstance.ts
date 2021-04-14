@@ -2,7 +2,7 @@ import { Magnetar, MagnetarInstance, CollectionInstance, DocInstance } from '../
 import { CreatePlugin as CreatePluginRemote } from '../../src'
 import { pokedex, PokedexEntry, generateRandomId, PluginMockLocal } from '@magnetarjs/test-utils'
 import { O } from 'ts-toolbelt'
-import { firestore } from './firestore'
+import firebase from 'firebase/app'
 
 const CreatePluginLocal = PluginMockLocal.CreatePlugin
 
@@ -52,17 +52,17 @@ export async function createMagnetarInstance(
   // prepare the firestore side
   const deletePromises = deletePaths.map((path) => {
     const docPath = `magnetarTests/${testName}${path ? '/' + path : ''}`
-    return firestore.doc(docPath).delete()
+    return firebase.firestore().doc(docPath).delete()
   })
   const insertPromises = Object.entries(insertDocs).map(([path, data]) => {
     const docPath = `magnetarTests/${testName}${path ? '/' + path : ''}`
-    return firestore.doc(docPath).set(data)
+    return firebase.firestore().doc(docPath).set(data)
   })
   await Promise.all(deletePromises.concat(insertPromises))
 
   // create & prepare the modules
   const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
-  const remote = CreatePluginRemote({ firestoreInstance: firestore })
+  const remote = CreatePluginRemote({ firebaseInstance: firebase })
   const magnetar = Magnetar({
     localStoreName: 'local',
     stores: { local, remote },

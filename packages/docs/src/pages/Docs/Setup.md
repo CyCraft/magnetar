@@ -17,15 +17,23 @@ This is a complete setup example which uses:
 
 ```javascript
 // ---------------------------------------------
+// 0. Make sure firebase is instantialized BEFORE magnetar
+// ---------------------------------------------
+import firebase from 'firebase/app'
+import 'firebase/firestore'
+
+firebase.initializeApp({
+  // ...
+})
+
+// ---------------------------------------------
 // 1. the plugin firestore for remote data store
 // ---------------------------------------------
 import { CreatePlugin as PluginFirestore } from '@magnetarjs/plugin-firestore'
 import firebase from 'firebase/app'
 
-const firestoreInstance = firebase.firestore()
-
 // create the remote store plugin instance:
-const remote = PluginFirestore({ firestoreInstance })
+const remote = PluginFirestore({ firebase })
 
 // ---------------------------------------
 // 2. the plugin vue2 for local data store

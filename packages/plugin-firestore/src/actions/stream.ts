@@ -20,7 +20,7 @@ export function streamActionFactory(
     mustExecuteOnRead,
   }: PluginStreamActionPayload<FirestoreModuleConfig>): StreamResponse {
     const { added, modified, removed } = mustExecuteOnRead
-    const { firestoreInstance } = firestorePluginOptions
+    const { firebaseInstance } = firestorePluginOptions
     let resolveStream: (() => void) | undefined
     let rejectStream: (() => void) | undefined
     const streaming: Promise<void> = new Promise((resolve, reject) => {
@@ -31,7 +31,8 @@ export function streamActionFactory(
     // in case of a doc module
     if (docId) {
       const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
-      closeStreamStream = firestoreInstance
+      closeStreamStream = firebaseInstance
+        .firestore()
         .doc(documentPath)
         .onSnapshot((docSnapshot: DocumentSnapshot) => {
           const localChange = docSnapshot.metadata.hasPendingWrites
@@ -48,7 +49,11 @@ export function streamActionFactory(
     // in case of a collection module
     else if (!docId) {
       const _collectionPath = getFirestoreCollectionPath(collectionPath, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
-      const queryInstance = getQueryInstance(_collectionPath, pluginModuleConfig, firestoreInstance)
+      const queryInstance = getQueryInstance(
+        _collectionPath,
+        pluginModuleConfig,
+        firebaseInstance.firestore()
+      )
       closeStreamStream = queryInstance.onSnapshot((querySnapshot: QuerySnapshot) => {
         // do nothing for local changes
         const localChanges = querySnapshot.metadata.hasPendingWrites

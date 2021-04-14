@@ -1,6 +1,4 @@
 import { isArray } from 'is-what'
-import firebase from 'firebase/app'
-import 'firebase/firestore'
 import { PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { BatchSync } from '../helpers/batchSync'
@@ -17,13 +15,13 @@ export function deletePropActionFactory(
     pluginModuleConfig,
   }: PluginDeletePropActionPayload<FirestoreModuleConfig>): Promise<void> {
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
-
+    const { firebaseInstance } = firestorePluginOptions
     const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
     const payloadArray = isArray(payload) ? payload : [payload]
     const firestorePayload = payloadArray.reduce(
       (carry, propPath) => ({
         ...carry,
-        [propPath]: firebase.firestore.FieldValue.delete(),
+        [propPath]: firebaseInstance.firestore.FieldValue.delete(),
       }),
       {} as any
     )

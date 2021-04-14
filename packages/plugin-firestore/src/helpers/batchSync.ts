@@ -67,7 +67,7 @@ type State = {
 export function batchSyncFactory(
   firestorePluginOptions: Required<FirestorePluginOptions>
 ): BatchSync {
-  const { firestoreInstance, syncDebounceMs, debug } = firestorePluginOptions
+  const { firebaseInstance, syncDebounceMs, debug } = firestorePluginOptions
 
   const state: State = {
     queue: [],
@@ -76,7 +76,7 @@ export function batchSyncFactory(
 
   const newSyncStack = (): SyncStack => ({
     operationCount: 0,
-    batch: firestoreInstance.batch(),
+    batch: firebaseInstance.firestore().batch(),
     resolves: [],
     rejects: [],
     debugInfo: {},
@@ -90,7 +90,7 @@ export function batchSyncFactory(
   }
 
   function prepareRef(documentPath: string): DocumentReference {
-    return firestoreInstance.doc(documentPath)
+    return firebaseInstance.firestore().doc(documentPath)
   }
 
   function preparePayload(

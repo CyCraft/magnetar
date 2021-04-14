@@ -12,11 +12,11 @@ type Firestore = firebase.firestore.Firestore
 export function getQueryInstance(
   collectionPath: string,
   pluginModuleConfig: FirestoreModuleConfig,
-  firestoreInstance: Firestore
+  firestore: Firestore
 ): Query {
   const { where = [], orderBy = [], limit } = pluginModuleConfig
   let query: CollectionReference | Query
-  query = firestoreInstance.collection(collectionPath)
+  query = firestore.collection(collectionPath)
   for (const whereClause of where) {
     query = query.where(...whereClause)
   }

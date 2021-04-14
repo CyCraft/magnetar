@@ -1,4 +1,3 @@
-import type firebase from 'firebase'
 import { PluginInstance, MagnetarPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core'
 import { insertActionFactory } from './actions/insert'
 import { writeActionFactory } from './actions/mergeAssignReplace'
@@ -9,8 +8,6 @@ import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
 import { batchSyncFactory } from './helpers/batchSync'
 
-type Firestore = firebase.firestore.Firestore
-
 // there are two interfaces to be defined & exported by each plugin: `StoreOptions` and `StoreModuleConfig`
 // for this plugin we use:
 // - FirestorePluginOptions
@@ -18,9 +15,17 @@ type Firestore = firebase.firestore.Firestore
 
 export interface FirestorePluginOptions {
   /**
-   * This is required to make sure there are not two instances of Firestore running which can cause issues.
+   * It's required to pass the firebase instance to make sure there are not two separate instances running which can cause issues.
+   * As long as Firebase is initialized before you pass it, you can just import and pass it like so:
+   * @example
+   * ```js
+   * import { CreatePlugin as FirestorePlugin } from '@magnetarjs/firestore'
+   * import firebase from 'firebase/app'
+   *
+   * const remote = FirestorePlugin({ firebaseInstance: firebase })
+   * ```
    */
-  firestoreInstance: Firestore
+  firebaseInstance: any
   /**
    * When this is true, the "modulePath" will be used as firestorePath to sync the data to. Eg. `collection('todos')` will sync data to `todos` on firestore. When this is false (default) the firestorePath must be provided like so: `collection('todos', { firestorePath: 'myTodos' })`
    */

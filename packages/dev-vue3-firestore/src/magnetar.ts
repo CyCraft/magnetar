@@ -4,15 +4,15 @@
 import { Magnetar } from '@magnetarjs/core'
 import { CreatePlugin } from '@magnetarjs/plugin-vue3'
 import { CreatePlugin as CreatePluginFirestore } from '@magnetarjs/plugin-firestore'
-import { firestore } from './firestore'
+import firebase from 'firebase/app'
 
-export const generateRandomId = () => firestore.collection('random').doc().id
+export const generateRandomId = () => firebase.firestore().collection('random').doc().id
 
 // create the local store plugin instance:
 const local = CreatePlugin({ generateRandomId })
 
 const remote = CreatePluginFirestore({
-  firestoreInstance: firestore,
+  firebaseInstance: firebase,
   useModulePathsForFirestore: true,
   debug: true,
 })

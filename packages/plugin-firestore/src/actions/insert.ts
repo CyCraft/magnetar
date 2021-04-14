@@ -14,17 +14,17 @@ export function insertActionFactory(
     docId,
     pluginModuleConfig,
   }: PluginInsertActionPayload<FirestoreModuleConfig>): Promise<string> {
-    const { firestoreInstance } = firestorePluginOptions
+    const { firebaseInstance } = firestorePluginOptions
     let _docId = docId
     if (!_docId) {
       // we don't have a _docId, so we need to retrieve it from the payload or generate one
       _docId =
         isFullString(payload.id) || isNumber(payload.id)
           ? String(payload.id)
-          : firestoreInstance.collection('random').doc().id
+          : firebaseInstance.firestore().collection('random').doc().id
     }
-    const documentPath = getFirestoreDocPath(collectionPath, _docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
+    const documentPath = getFirestoreDocPath(collectionPath, _docId as string, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
     await batchSync.set(documentPath, payload, 'insert')
-    return _docId
+    return _docId as string
   }
 }
