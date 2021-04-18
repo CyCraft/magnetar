@@ -44,7 +44,7 @@ test('deleteProp: (document)', async (t) => {
   t.deepEqual(trainerModule.data.age, 10)
 
   // create references on beforehand
-  const magnetarDoc = magnetar.doc('data/trainer') // prettier-ignore
+  const magnetarDoc = magnetar.doc('app-data/trainer') // prettier-ignore
   const magnetarCollectionDoc = magnetar.collection('data').doc('trainer') // prettier-ignore
   const magnetarCollectionData = magnetar.collection('data').data // prettier-ignore
 
@@ -70,7 +70,7 @@ test('delete: (document)', async (t) => {
   // create references on beforehand
   const magnetarCollection = magnetar.collection('data')
   const magnetarCollectionDoc = magnetar.collection('data').doc('trainer')
-  const magnetarDoc = magnetar.doc('data/trainer')
+  const magnetarDoc = magnetar.doc('app-data/trainer')
 
   try {
     const result = await trainerModule.delete()
@@ -88,7 +88,7 @@ test('delete: (document)', async (t) => {
   t.deepEqual(trainerModule.data, undefined)
   // check data of new references
   t.deepEqual(magnetar.collection('data').doc('trainer').data, undefined)
-  t.deepEqual(magnetar.doc('data/trainer').data, undefined)
+  t.deepEqual(magnetar.doc('app-data/trainer').data, undefined)
   t.deepEqual(magnetar.collection('data').data.get('trainer'), undefined)
 })
 

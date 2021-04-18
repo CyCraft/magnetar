@@ -44,7 +44,7 @@ test('stream (doc)', async (t) => {
 
 test('stream (collection) where-filter', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
-  // the original state has 1 pokemon already
+  // the original state has 1 Pokemon already
   t.is(pokedexModule.data.size, 1)
   // let's get some more
   const streamId = {}
@@ -64,9 +64,9 @@ test('stream (collection) where-filter', async (t) => {
     .openStreams.get(streamId)
   // closeStream from the stream:
   if (closeStream) closeStream()
-  // the queried instance only has these 3 pokemon
+  // the queried instance only has these 3 Pokemon
   t.deepEqual([...pokedexModuleWithQuery.data.values()], [pokedex(6), pokedex(38), pokedex(78)])
-  // the main instance has one pokemon from the beginning
+  // the main instance has one Pokemon from the beginning
   t.is(pokedexModule.data.size, 4)
 })
 

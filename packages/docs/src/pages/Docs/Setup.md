@@ -1,6 +1,6 @@
 # Setup
 
-## Main setup
+## Main Setup
 
 To instantiate Magnetar, you need to first instantiate the store plugins you will use:
 
@@ -8,10 +8,12 @@ To instantiate Magnetar, you need to first instantiate the store plugins you wil
 2. instantiate a plugin for a _**local**_ data store
 3. _then_ instantiate the Magnetar instance with those plugins
 
+### Example
+
 This is a complete setup example which uses:
 
-- the **firestore** plugin for remote data store
-- the **vue2** plugin for local data store
+- the **Firestore** plugin for remote data store
+- the **Vue 2** plugin for local data store
 
 > Please note: in reality it's cleaner to have **all imports at the top**
 
@@ -33,19 +35,18 @@ import { CreatePlugin as PluginFirestore } from '@magnetarjs/plugin-firestore'
 import firebase from 'firebase/app'
 
 // create the remote store plugin instance:
-const remote = PluginFirestore({ firebase })
+const remote = PluginFirestore({ firebaseInstance: firebase })
 
 // ---------------------------------------
 // 2. the plugin vue2 for local data store
 // ---------------------------------------
 import { CreatePlugin as PluginVue } from '@magnetarjs/plugin-vue2'
-import Vue from 'vue'
+import vue from 'vue'
 
-const vueInstance = Vue
 const generateRandomId = () => firebase.firestore().collection('random').doc().id
 
 // create the local store plugin instance:
-const local = PluginVue({ vueInstance, generateRandomId })
+const local = PluginVue({ vueInstance: vue, generateRandomId })
 
 // -----------------------------------------------------
 // 3. instantiate the Magnetar instance with the store plugins
@@ -92,7 +93,7 @@ Ideally you want to create a separate file for the modules you intend to use (or
 import { magnetar } from 'magnetarSetup.js'
 
 export const pokedexModule = magnetar.collection('pokedex')
-export const trainerModule = magnetar.doc('data/trainer')
+export const trainerModule = magnetar.doc('app-data/trainer')
 ```
 
 ## Module Data & Methods
@@ -150,14 +151,14 @@ pokemonModule.fetch() // fetches the document from the remote store & adds it lo
 pokemonModule.stream() // opens a database stream & keeps the document up to date locally
 ```
 
-## Displaying data in the DOM
+## Displaying Data in the DOM
 
 - A Magnetar collection's `.data` is a _**Map**_ <small>[？](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)</small>
 - A document's `.data` is a _**plain object**_
 
 Here we show to how make sure your DOM is updated reactively whenever this data changes.
 
-### Vue example
+### Vue Example
 
 In Vue you must make sure you use the Vue 2 or Vue 3 plugin as local store which will enable reactivity.
 
@@ -181,14 +182,14 @@ export default {
 }
 ```
 
-### React example
+### React Example
 
 // todo
 
-### Svelte example
+### Svelte Example
 
 // todo
 
-### Vanilla JS example
+### Vanilla JS Example
 
 // todo

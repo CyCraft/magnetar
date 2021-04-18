@@ -5,13 +5,13 @@ There are two ways to retrieve data from your remote stores. Either of these met
 - Execute a function to fetch data once
 - Set up a "stream" to receive realtime updates
 
-## Fetch data once
+## Fetch Data Once
 
 When you get data by executing `fetch()`, the data will be fetched from a server by your "remote" store plugin and then added to your module's data by your "local" store plugin.
 
 For displaying fetched data in the DOM see the [Displaying data in the DOM](#displaying-data-in-the-dom).
 
-### Fetch a single document
+### Fetch a Single Document
 
 When you call `fetch()` on a document module, your remote store will go and fetch the document from your database and add it to your local store.
 
@@ -38,7 +38,7 @@ const bulbasaur = await magnetar.doc('pokedex/001').fetch()
 // bulbasaur.data ≈ { name: 'Bulbasaur' }
 ```
 
-### Fetch multiple documents
+### Fetch Multiple Documents
 
 ```javascript
 const pokedexModule = magnetar.collection('pokedex')
@@ -58,7 +58,7 @@ const allPokemon = pokedexModule.data.values()
 // allPokemon ≈ [{ name: 'Bulbasaur' }, /* etc...*/ ]
 ```
 
-## Stream realtime updates
+## Stream Realtime Updates
 
 When you set up a _**stream**_ for a document or collection, just like `fetch()`, your the data will be fetched from a server by your _remote_ store plugin and then added to your module's _local_ data.
 
@@ -68,7 +68,7 @@ Please note: a streaming promise will never resolve as long as your stream is op
 
 For displaying streamed data in the DOM see the [Displaying data in the DOM](#displaying-data-in-the-dom).
 
-### Stream a collection
+### Stream a Collection
 
 ```javascript
 const pokedexModule = magnetar.collection('pokedex')
@@ -87,7 +87,7 @@ pokedexModule.stream()
 // pokedexModule.data.values() ≈ [{ name: 'Bulbasaur' }, /* etc...*/ ]
 ```
 
-### Stream a single document
+### Stream a Single Document
 
 ```javascript
 const bulbasaur = pokedexModule.doc('001')
@@ -102,7 +102,7 @@ bulbasaur.stream()
 // bulbasaur.data ≈ { name: 'Bulbasaur' }
 ```
 
-### Closing a stream
+### Closing a Stream
 
 You can list all open streams like so:
 
@@ -150,9 +150,9 @@ closeStream()
 
 Since every module can have multiple streams open with different filters or options, there needs to be some sort of dictionary to save the functions that can close the streams again.
 
-In the case you have multiple streams, you would probably want to differanciate them by which options you passed any way. One way we can create _a stream ID_ could be to `JSON.stringify` the stream options. But because a Map can have an actual object as key, there is no need to `JSON.stringify`.
+In the case you have multiple streams, you would probably want to differentiate them by which options you passed any way. One way we can create _a stream ID_ could be to `JSON.stringify` the stream options. But because a Map can have an actual object as key, there is no need to `JSON.stringify`.
 
-## Query data (filter, order by, limit...)
+## Query Data (filter, order by, limit...)
 
 There are three methods to query more specific data in a collection:
 
@@ -278,11 +278,11 @@ Say your database looks like this:
 
 collection: `'pokedex'`<br />records:
 
-▪ '001': `{ name: 'Bulbasaur' }`<br />subcollection: `'pokedex/001/attacks'`<br />records:
+▪ '001': `{ name: 'Bulbasaur' }`<br />sub-collection: `'pokedex/001/attacks'`<br />records:
 
 - 'leaf-attack': `{ name: 'Leaf Attack', effectiveAgainst: { water: true } }`
 
-▪ '002': `{ name: 'Ivysaur' }`<br />subcollection: 'pokedex/002/attacks'<br />records:
+▪ '002': `{ name: 'Ivysaur' }`<br />sub-collection: `'pokedex/002/attacks'`<br />records:
 
 - 'leaf-attack': `{ name: 'Leaf Attack', effectiveAgainst: { water: true } }`
 

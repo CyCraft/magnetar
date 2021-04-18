@@ -8,4 +8,32 @@ Firestore has its own implementation of locally cached data. However, every time
 
 When you think about this, most devs end up saving the data in some sort of object or in a state management library Vue data or Vuex/Redux. This means that you then have to add write logic to write the data back to the database either way.
 
-Magnetar's goal is to replace all this logic you need to write yourself to read and write data, providing its own local store to prevent Firebase from charging you when reading docs you already fetched.
+Magnetar's goal is to replace all this logic you need to write yourself to read and write data, providing its own local store so you can more easily prevent Firebase from charging you when reading docs you already fetched.
+
+## Why did you think of building Magnetar?
+
+I'm the creator of [Vuex Easy Firestore](https://mesqueeb.github.io/vuex-easy-firestore/), a library that connected Firestore and Vuex with just 4 lines on configuration. However, I wanted to create a better solution that does not rely on Vuex at all and is compatible with more project types and databases.
+
+## Magnetar vs Vuex Easy Firestore architecture
+
+### Vuex Easy Firestore architecture
+
+<!-- ![](/architecture/vuex-easy-firestore.png) -->
+<img src="/architecture/vuex-easy-firestore.png" style="width: 100%" />
+
+### Magnetar architecture
+
+<!-- ![](/architecture/magnetar.png) -->
+<img src="/architecture/magnetar.png" style="width: 100%" />
+
+## Why a concept local/remote store plugins?
+
+I wanted Magnetar to be compatible with a wide variety of use cases and projects.
+
+When it comes to remote stores, I wanted to be able to use Firestore but competitors like Fauna and Supabase also looked interesting. I didn't want to limit the future to just Firestore.
+
+When it comes to local stores, there are different approaches again. A simple store that just works with a Map or Object is tricky to make reactive out of the box for Vue projects. Adding reactivity out of the box needed a different implementation for Vue 2 and Vue 3. Again, not to limit the future and prevent code bloat, using a similar plugin system for local stores was the way to go.
+
+Finally I also like the idea of having your own data caching options. I'm planning to also add store plugins that work with localStorage, indexedDB, etc. All of this meant that a store plugin system was the best choice!
+
+See the [Magnetar architecture](#magnetar-architecture) above for a better idea of how this works.

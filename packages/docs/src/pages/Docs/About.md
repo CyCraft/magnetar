@@ -2,18 +2,22 @@
 
 ## TLDR;
 
-- Magnetar is a **_state management_** library.<br />A library that brings a unified syntax for reading and writing data and allows you to easily work with this data in your app like a global store.
+- Magnetar is a **_state management_** library.<br />A library that brings a simple syntax for reading and writing data and allows you to easily work with this data in your app like a global store.
 
-- Magnetar has **_database integration_** for Google Firestore and others.<br />Whenever you modify data in your global store, Magnetar will keep this data automatically in sync with your database. It also keeps the local data up to date on server changes.
+- Magnetar has 2-way sync **_database integration_** for Google Firestore (and others coming). You do not need to learn to work with the database SDK.<br />— Whenever you modify data in your local store, Magnetar will update your database on the server.<br />— Whenever the server has changes, Magnetar will reflect those in your local store.
 
 - Magnetar's main focus is to be the **_local representation of your database_**.
 
-- Magnetar has **_built-in reactivity_** for Vue 2 & Vue 3.<br />Just like Vuex, displaying data in Vue just works as you would expect and is reactive on local/server changes. (Magnetar does not rely on Vuex)
+- Magnetar is framework-agnostic. It can be used with Vue/React/Angular/Vanilla JS projects.
+
+- Magnetar is modular. It works with plugins that provide capabilities so you can only include what you actually need.
+
+- Magnetar has plugins for Vue 2 & Vue 3 that offer **_built-in reactivity_**.<br />Just like Vuex, displaying data in Vue just works as you would expect and is reactive on local/server changes. (Magnetar does not rely on Vuex)
 
 <!-- ![](/Magnetar Value Proposition.jpg) -->
 <img src="/Magnetar Value Proposition.jpg" style="width: 100%" />
 
-## Learn by example
+## Learn by Example
 
 Here is a hypothetical example of a To Do list powered by Magnetar that uses the Vue 2 and Firestore plugins.
 
@@ -90,9 +94,9 @@ Vue.component('TodoList', {
 
 # Concepts
 
-## Store plugins
+## Store Plugins
 
-The idea of Magnetar is that you only need to learn how to work with one syntax to read/write data. Your store plugins are the ones that do the heavy lifting in the background to either cache the data locally or make API requests for you. The store plugins are set up in a config file, then can be forgotton about.
+The idea of Magnetar is that you only need to learn how to work with one syntax to read/write data. Your store plugins are the ones that do the heavy lifting in the background to either cache the data locally or make API requests for you. The store plugins are set up in a config file, then can be forgotten about.
 
 In most cases you use Magnetar with two store plugins installed:
 
@@ -103,19 +107,35 @@ In most cases you use Magnetar with two store plugins installed:
 
 **When writing data:** the _local_ store will save your changes in its cache; the _remote_ will then make an API call to your database. <small>(you can also flip this around, so the local store is only updated after the remote one)</small>
 
+### List of Plugins
+
+Available store plugins
+
+- Firestore (remote)
+- Simple Store (local)
+- Vue 2 (local)
+- Vue 3 (local)
+
+Planned store plugins (TBD)
+
+- Local Storage (for data caching)
+- IndexedDB (for data caching)
+- Fauna (remote)
+- Supabase (remote)
+
 ## Modules
 
-With Magnetar, the idea is that your data is organised and accessible through modules. A module could be a single object (a "document") or a map of objects (a "collection").
+With Magnetar, the idea is that your data is organized and accessible through modules. A module could be a single object (a "document") or multiple objects (a "collection").
 
 Modules are dynamically created and destroyed when you read/write data! JavaScript will automatically garbage-collect modules that are not referenced anymore.
 
 The concept of modules in Magnetar was inspired by [Google Firestore and the Firebase SDK](https://firebase.google.com/docs/firestore/data-model). If you are already familiar with this SDK, feel free to skip this section and go straight to [Setup](#setup)
 
-### Collection vs document modules
+### Collection vs Document Modules
 
 A "module" is something that points to a certain chunk of data in your database.
 
-A module instance provides you with these four things: (1) functions to read data; (2) functions to write data; (3) the data itself; (4) other meta data.
+A module instance provides you with these four things: (1) methods to read data; (2) methods to write data; (3) the data itself; (4) options to apply hooks, listen to events, etc.
 
 Every module can be one of two types:
 
@@ -132,3 +152,23 @@ As an example: `pokedex/001/moves/leafAttack`
 
 - `pokedex` & `moves` are "collections"
 - `001` & `leafAttack` are "documents"
+
+### Creating a Module
+
+Creating a module is also called _instantiating_ a module. Each module is instantiated just by calling either `collection()` or `doc()` on your Magnetar instance and passing a _path_ like so:
+
+```js
+const myCollection = magnetar.collection('some-collection')
+
+const myDoc = magnetar.doc('some-collection/some-doc')
+// OR
+const myDoc = magnetar.collection('some-collection').doc('some-doc')
+```
+
+> Please note: A path to a doc **must** always be nested under a collection name.
+
+### The Purpose of a Collection/Doc Path
+
+Each collection and doc need to have a _path_ that points to that collection. The purpose of this path is to become the identifier where your local store will save your documents.
+
+By default a _path_ is the same _path_ to the data in your remote store. Eg. a doc module with path `users/abc123` will represent the same document as in your database at that path.

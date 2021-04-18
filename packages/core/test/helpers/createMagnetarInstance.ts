@@ -64,7 +64,7 @@ export function createMagnetarInstance(
       remote: {}, // path for the plugin
     },
   })
-  const trainerModule = magnetar.doc<TrainerModuleData>('data/trainer', {
+  const trainerModule = magnetar.doc<TrainerModuleData>('app-data/trainer', {
     configPerStore: {
       local: { initialData: getInitialDataDocument() }, // path for the plugin
       remote: {}, // path for the plugin

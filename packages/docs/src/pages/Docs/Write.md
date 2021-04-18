@@ -54,11 +54,11 @@ Since your remote store will make an API call, insert will always returns a prom
 
 > If the insert promise only resolves **after** the remote store API call, how is this Optimistic UI?
 
-Awaiting an insert promise will never be _Optimistic_! However, when you insert a new document, your _local_ store is responsible for generating a new ID and saving the data in your module's cache. This part is done immidiately and is therefore _Optimistic_!
+Awaiting an insert promise will never be _Optimistic_! However, when you insert a new document, your _local_ store is responsible for generating a new ID and saving the data in your module's cache. This part is done immediately and is therefore _Optimistic_!
 
-> How can I achieve Optimistic UI then? (How can I display changes immidiately in the UI?)
+> How can I achieve Optimistic UI then? (How can I display changes immediately in the UI?)
 
-Instead of awaiting the insert promise, you need to display the **collection module's data** in your UI, because this is what is updated immidiately. Eg.
+Instead of awaiting the insert promise, you need to display the **collection module's data** in your UI, because this is what is updated immediately. Eg.
 
 ```js
 // this would wait for your remote store (NOT optimistic)
@@ -182,7 +182,7 @@ In the example above, Bulbasaur **lost** all of its data and it was replaced wit
 
 ## Batch Insert / Delete / Modify
 
-**Magnetar will automatically optimise** any write action so that the remote store only makes a single "batch" API call! Therefore, you can simply loop over multiple methods without performance dips. Eg.
+**Magnetar will automatically optimize** any write action so that the remote store only makes a single "batch" API call! Therefore, you can simply loop over multiple methods without performance dips. Eg.
 
 ```javascript
 const pokedexModule = magnetar.collection('pokedex')

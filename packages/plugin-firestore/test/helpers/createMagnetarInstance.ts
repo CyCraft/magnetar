@@ -79,7 +79,7 @@ export async function createMagnetarInstance(
     },
   })
 
-  const trainerModule = magnetar.doc<TrainerModuleData>('data/trainer', {
+  const trainerModule = magnetar.doc<TrainerModuleData>('app-data/trainer', {
     configPerStore: {
       local: { initialData: getInitialDataDocument() },
       remote: { firestorePath: `magnetarTests/${testName}` },

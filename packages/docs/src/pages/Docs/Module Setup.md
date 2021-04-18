@@ -8,7 +8,7 @@ It's always recommended at the very least to document your data structures! Othe
 
 The recommended way to document a data structure is by defining the default values that each document should inherit. This way you can also set up your modules so **whenever you insert a new record, you automatically merge that onto these default values.**
 
-### Example collection module setup
+### Example Collection Module Setup
 
 ```javascript
 import { magnetar } from 'magnetarSetup.js'
@@ -27,7 +27,7 @@ export const pokedexModule = magnetar.collection('pokedex', {
 })
 ```
 
-### Example doc module setup
+### Example Doc Module Setup
 
 ```javascript
 import { magnetar } from 'magnetarSetup.js'
@@ -40,13 +40,13 @@ function trainerDefaults(payload) {
   return { ...defaults, ...payload }
 }
 
-export const trainerModule = magnetar.doc('data/trainer', {
+export const trainerModule = magnetar.doc('app-data/trainer', {
   modifyPayloadOn: { insert: trainerDefaults },
   modifyReadResponseOn: { added: trainerDefaults },
 })
 ```
 
-Now you see it's very clear how a pokemon document in the 'pokedex' collection looks and how the 'trainer' document looks!
+Now you see it's very clear how a Pokemon document in the `'pokedex'` collection looks and how the 'trainer' document looks!
 
 It's also become clear that these modules might be better off each having their own separate file, but I leave that to you.
 
@@ -88,7 +88,7 @@ export const pokedexModule = magnetar.collection('pokedex', {
 ```
 <!-- prettier-ignore-end -->
 
-The above example will always have the query enabled whenever you import and use this pokedexModule
+The above example will always have the query enabled whenever you import and use this `pokedexModule`
 
 ```js
 import { pokedexModule } from 'pokedexModule.js'
@@ -125,7 +125,7 @@ export const userPokedexModule = (userId) => {
 ```
 <!-- prettier-ignore-end -->
 
-You will always need to pass a userId in order to use this userPokedexModule in the example above:
+You will always need to pass a userId in order to use this `userPokedexModule` in the example above:
 
 ```js
 import { userPokedexModule } from 'userPokedexModule.js'
@@ -143,7 +143,7 @@ However, if your database structure is set up that you don't need to filter on t
 
 ### Set up a Query Wherever you Read Data
 
-In some cases you might need to query on various things dependening on the user input for your app. In this case you will probably need to write the query wherever you are reading the data.
+In some cases you might need to query on various things depending on the user input for your app. In this case you will probably need to write the query wherever you are reading the data.
 
 Example use case: **Query documents based on search controls**
 
@@ -171,7 +171,7 @@ As you can see in the example, using a query in Magnetar is very powerful becaus
 
 You can find more information on reading data at [Read Data](#).
 
-## Dynamic module paths
+## Dynamic Module Paths
 
 If you need to retrieve documents at a path which includes the user ID, you will need to provide this ID as part of the module path.
 
@@ -182,7 +182,7 @@ const userId = 'abc123'
 const userPokedexModule = magnetar.collection(`users/${userId}/pokedex`)
 ```
 
-In your app you probably need to encapsule this in a function which you can trigger once you have the user ID:
+In your app you probably need to encapsulate this in a function which you can trigger once you have the user ID:
 
 ```js
 import { magnetar } from 'magnetarSetup.js'
@@ -195,7 +195,7 @@ export const userPokedexModule = (userId) => {
 }
 ```
 
-You will always need to pass a userId in order to use this userPokedexModule in the example above:
+You will always need to pass a userId in order to use this `userPokedexModule` in the example above:
 
 ```js
 import { userPokedexModule } from 'userPokedexModule.js'
@@ -215,7 +215,7 @@ However, if your database structure is set up that the user ID is not a part of 
 
 Magnetar has extremely good TypeScript support. You only need to pass the type of your document once and all actions the collection or document instance will be enforce that type.
 
-This example sets up the 'pokedex' module which we pass the `Pokemon` type:
+This example sets up the `pokedexModule` which we pass the `Pokemon` type:
 
 <!-- prettier-ignore-start -->
 ```js
