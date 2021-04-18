@@ -2,12 +2,6 @@
 
 Be sure to first read the [Setup chapter](#) to have a basic understanding.
 
-In the following examples we use this collection instance:
-
-```javascript
-export const pokedexModule = magnetar.collection('pokedex')
-```
-
 ## Insert a Document
 
 ### Insert with Random ID
@@ -32,7 +26,7 @@ Your document is passed to both your store plugins. The local store plugin is re
 You can access the new document's data like so:
 
 ```js
-const newDocModule = await pokedexModule.insert(data) // needs await!
+const newDocModule = await magnetar.collection('pokedex').insert(data) // needs await!
 
 newDocModule.id // the randomly generated id
 newDocModule.data // the data you have inserted
@@ -61,12 +55,16 @@ Awaiting an insert promise will never be _Optimistic_! However, when you insert 
 Instead of awaiting the insert promise, you need to display the **collection module's data** in your UI, because this is what is updated immediately. Eg.
 
 ```js
+const pokedexModule = magnetar.collection('pokedex')
+
 // this would wait for your remote store (NOT optimistic)
 const newDocModule = await pokedexModule.insert(data)
 
-// instead use the collection data:
-pokedexModule.insert(data) // do NOT await
-pokedexModule.data.values() // the collection will already have the new doc here
+// instead do NOT await
+pokedexModule.insert(data)
+// you can immidiately access the inserted data
+pokedexModule.data.values()
+// the collection data will already have the new doc
 ```
 
 ### Insert with Custom ID
@@ -74,6 +72,8 @@ pokedexModule.data.values() // the collection will already have the new doc here
 If you want to provide a custom ID yourself, you can do so by first creating the doc module with `doc(id)`, then calling `insert`. Eg.
 
 ```javascript
+const pokedexModule = magnetar.collection('pokedex')
+
 const newId = generateId() // you have to implement this yourself
 
 pokedexModule.doc(newId).insert(data)

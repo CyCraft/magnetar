@@ -52,6 +52,7 @@ const local = PluginVue({ vueInstance: vue, generateRandomId })
 // 3. instantiate the Magnetar instance with the store plugins
 // -----------------------------------------------------
 import { Magnetar } from 'magnetar'
+import { logger } from '@magnetarjs/utils'
 
 const magnetar = Magnetar({
   stores: { local, remote },
@@ -61,6 +62,7 @@ const magnetar = Magnetar({
     write: ['local', 'remote'],
     delete: ['local', 'remote'],
   },
+  on: { success: logger }, // disable this on production builds
 })
 ```
 
@@ -69,6 +71,7 @@ Some info on the main Magnetar instance props:
 - `stores` ⸺ an object with as key the store name and value the store plugin instance
 - `localStoreName` ⸺ the name of the store that saves data locally
 - `executionOrder` ⸺ the execution order of your stores, this order is required for optimistic UI (but can be flipped)
+- `on` ⸺ event listeners for anything that happens in Magnetar, see the [Events chapter](#events) for more info
 
 ## Working with Modules
 

@@ -10,7 +10,7 @@ When you think about this, most devs end up saving the data in some sort of obje
 
 Magnetar's goal is to replace all this logic you need to write yourself to read and write data, providing its own local store so you can more easily prevent Firebase from charging you when reading docs you already fetched.
 
-## Why did you think of building Magnetar?
+## Why did you build Magnetar?
 
 I'm the creator of [Vuex Easy Firestore](https://mesqueeb.github.io/vuex-easy-firestore/), a library that connected Firestore and Vuex with just 4 lines on configuration. However, I wanted to create a better solution that does not rely on Vuex at all and is compatible with more project types and databases.
 
@@ -18,15 +18,15 @@ I'm the creator of [Vuex Easy Firestore](https://mesqueeb.github.io/vuex-easy-fi
 
 ### Vuex Easy Firestore architecture
 
-<!-- ![](/architecture/vuex-easy-firestore.png) -->
-<img src="/architecture/vuex-easy-firestore.png" style="width: 100%" />
+<!-- ![](/architecture/vuex-easy-firestore-architecture.png) -->
+<img src="/architecture/vuex-easy-firestore-architecture.png" style="width: 100%" />
 
 ### Magnetar architecture
 
-<!-- ![](/architecture/magnetar.png) -->
-<img src="/architecture/magnetar.png" style="width: 100%" />
+<!-- ![](/architecture/magnetar-architecture.png) -->
+<img src="/architecture/magnetar-architecture.png" style="width: 100%" />
 
-## Why a concept local/remote store plugins?
+## Why the concept of local/remote store plugins?
 
 I wanted Magnetar to be compatible with a wide variety of use cases and projects.
 

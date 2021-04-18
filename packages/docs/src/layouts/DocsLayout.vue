@@ -11,7 +11,7 @@
       />
       <div class="text-h6 cursor-pointer flex items-center" @click="$router.push('/')">
         <q-img src="media/magnetar-logo-white.svg" style="width: 20px" class="mr-xs gt-xs" />
-        <div class="ml-lg">{{ routeName }} Docs</div>
+        <div class="ml-lg">{{ routeName }}</div>
       </div>
       <div class="ml-auto flex q-gutter-md">
         <AnchorLink href="https://github.com/cycraft/magnetar/releases" text="Changelog" external />

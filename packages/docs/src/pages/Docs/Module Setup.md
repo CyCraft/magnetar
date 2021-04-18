@@ -22,8 +22,8 @@ function pokemonDefaults(payload) {
 }
 
 export const pokedexModule = magnetar.collection('pokedex', {
-  modifyPayloadOn: { insert: pokemonDefaults },
-  modifyReadResponseOn: { added: pokemonDefaults },
+  modifyPayloadOn: { insert: (payload) => pokemonDefaults(payload) },
+  modifyReadResponseOn: { added: (payload) => pokemonDefaults(payload) },
 })
 ```
 
@@ -41,8 +41,8 @@ function trainerDefaults(payload) {
 }
 
 export const trainerModule = magnetar.doc('app-data/trainer', {
-  modifyPayloadOn: { insert: trainerDefaults },
-  modifyReadResponseOn: { added: trainerDefaults },
+  modifyPayloadOn: { insert: (payload) => trainerDefaults(payload) },
+  modifyReadResponseOn: { added: (payload) => trainerDefaults(payload) },
 })
 ```
 
@@ -55,7 +55,7 @@ It's also become clear that these modules might be better off each having their 
 - `modifyPayloadOn.insert` — is triggered every time you write data locally (which is then synced to the server with those default values)
 - `modifyReadResponseOn.added` — is triggered every time data comes in from your remote store (the server)
 
-To learn more about these functions and other possibilities read [Hooks before Writing](#) and [Hooks after Reading](#).
+To learn more about these functions and other possibilities read [Hooks and Events](#hooks-and-events).
 
 ## Filtering Data with Queries
 

@@ -90,7 +90,7 @@ pokedexModule.stream()
 ### Stream a Single Document
 
 ```javascript
-const bulbasaur = pokedexModule.doc('001')
+const bulbasaur = magnetar.doc('pokedex/001')
 // open the stream
 bulbasaur.stream()
 
@@ -168,11 +168,13 @@ When you apply a query it affects both the remote and local stores:
 - If you access module data with a _queried module_, the local store will also make sure that your query is applied to whatever data it returns.
 
 ```js
-const queriedModule = pokedexModule.where('type', '==', 'fire')
-await queriedModule.fetch()
+const pokedexModule = magnetar.collection('pokedex')
+const fireTypePokemon = pokedexModule.where('type', '==', 'fire')
 
-queriedModule.data.values() // returns just the queried docs that were fetched
-pokedexModule.data.values() // returns all docs fetched so far
+await fireTypePokemon.fetch()
+
+fireTypePokemon.data.values() // returns just the queried docs that were fetched
+pokedexModule.data.values() // returns all docs fetched so far, including those fire types you just fetched
 ```
 
 ### Where
@@ -198,9 +200,14 @@ The possible operators include:
 
 Eg. "all Fire Pokemon above level 16"
 
+<!-- prettier-ignore-start -->
 ```js
-pokedexModule.where('type', '==', 'fire').where('level', '>', 16)
+magnetar
+  .collection('pokedex')
+  .where('type', '==', 'fire')
+  .where('level', '>', 16)
 ```
+<!-- prettier-ignore-end -->
 
 For now read the Firestore documentation on [Simple and Compound Queries](https://firebase.google.com/docs/firestore/query-data/queries#array_membership). The concept is inspired by Firestore, but with Magnetar _every_ local and remote store plugin implements the proper logic to work with these kind of queries!
 
@@ -215,9 +222,13 @@ You can order docs coming in by a specific field, ascending or descending. `orde
 
 Eg. "all Pokemon sorted alphabetically"
 
+<!-- prettier-ignore-start -->
 ```js
-pokedexModule.orderBy('name', 'asc')
+magnetar
+  .collection('pokedex')
+  .orderBy('name', 'asc')
 ```
+<!-- prettier-ignore-end -->
 
 ### Limit
 
@@ -227,26 +238,42 @@ Limit is mainly for the remote store to limit the amount of records fetched at a
 
 Eg. "get the first 10 Pokemon sorted alphabetically"
 
+<!-- prettier-ignore-start -->
 ```js
-pokedexModule.orderBy('name', 'asc').limit(10)
+magnetar
+  .collection('pokedex')
+  .orderBy('name', 'asc')
+  .limit(10)
 ```
+<!-- prettier-ignore-end -->
 
 ### More Examples
 
 You can combine `where` with `orderBy`:
 
+<!-- prettier-ignore-start -->
 ```js
-pokedexModule.where('type', '==', type).orderBy('name', 'asc')
+magnetar
+  .collection('pokedex')
+  .where('type', '==', 'fire')
+  .orderBy('name', 'asc')
 ```
+<!-- prettier-ignore-end -->
 
 You can either `stream` or `fetch` a queried module:
 
+<!-- prettier-ignore-start -->
 ```js
-const queriedModule = pokedexModule.where('type', '==', type).orderBy('name', 'asc')
-queriedModule.fetch()
+const fireTypePokemon = magnetar
+  .collection('pokedex')
+  .where('type', '==', 'fire')
+  .orderBy('name', 'asc')
+
+fireTypePokemon.fetch()
 // or
-queriedModule.stream()
+fireTypePokemon.stream()
 ```
+<!-- prettier-ignore-end -->
 
 Here is a complete example for a search function:
 
@@ -270,11 +297,19 @@ async function searchPokemon(type) {
 }
 ```
 
-### Query Groups
+### Query Limitations
+
+Based on your remote store plugin there might be limitations to what/how you can query data.
+
+For Cloud Firestore be sure check the [Query Limitations](https://firebase.google.com/docs/firestore/query-data/queries#query_limitations) in their official documentation.
+
+## Collection Groups (WIP)
+
+> This chapter is still being written
 
 If you need to query data from multiple sub modules you can do so by using a _Collection Group_.
 
-Say your database looks like this:
+<!-- Say your database looks like this:
 
 collection: `'pokedex'`<br />records:
 
@@ -284,18 +319,12 @@ collection: `'pokedex'`<br />records:
 
 ▪ '002': `{ name: 'Ivysaur' }`<br />sub-collection: `'pokedex/002/attacks'`<br />records:
 
-- 'leaf-attack': `{ name: 'Leaf Attack', effectiveAgainst: { water: true } }`
+- 'leaf-attack': `{ name: 'Leaf Attack', effectiveAgainst: { water: true } }` -->
 
 ```js
-const queriedModule = magnetar
-  .collectionGroup(`pokedex/*/attacks`)
-  .where('effectiveAgainst.water', '==', true)
+const waterAttacks = magnetar.collectionGroup(`pokedex/*/attacks`).where('type', '==', 'water')
 
-queriedModule.fetch()
+waterAttacks.fetch()
 ```
 
-### Query Limitations
-
-Based on your remote store plugin there might be limitations to what/how you can query data.
-
-For Cloud Firestore be sure check the [Query Limitations](https://firebase.google.com/docs/firestore/query-data/queries#query_limitations) in their official documentation.
+> This syntax is not fully implemented yet!
