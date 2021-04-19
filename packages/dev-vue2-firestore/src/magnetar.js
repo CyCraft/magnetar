@@ -1,6 +1,7 @@
 // ---------------------------------------
 // plugin vue2 for local data store
 // ---------------------------------------
+import './firebase'
 import { Magnetar } from '@magnetarjs/core'
 import { CreatePlugin } from '@magnetarjs/plugin-vue2'
 import { CreatePlugin as CreatePluginFirestore } from '@magnetarjs/plugin-firestore'

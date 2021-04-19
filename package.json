@@ -1,6 +1,9 @@
 {
   "name": "magnetar-monorepo",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "cd packages/dev && npm run dev",
     "dev:vue2-firestore": "cd packages/dev-vue2-firestore && npm run dev",
@@ -19,7 +22,7 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "release": "npm run test && npm run build && lerna publish",
     "deploy:docs": "npm run build:favicon && lerna run build:docs && firebase deploy --only hosting && git add -A && git commit -m \"chore: deploy\"",
-    "dep:i": "npm i && lerna bootstrap",
+    "dep:i": "npm i --legacy-bundling",
     "dep:update-all": "ncu --target minor -u && lerna exec 'ncu --target minor -u' && npm run dep:i",
     "dep:check-for-updates": "ncu --target minor && lerna exec 'ncu --target minor'",
     "dep:reinstall-all": "lerna clean -y && rimraf node_modules && npm run dep:i"
@@ -52,5 +55,8 @@
     "type": "git",
     "url": "git+https://github.com/cycraft/magnetar.git"
   },
-  "version": "0.0.0"
+  "engines": {
+    "node": ">= 14.0.0",
+    "npm": ">= 7.8.0"
+  }
 }

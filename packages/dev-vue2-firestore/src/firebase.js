@@ -1,4 +1,4 @@
-import Firebase from 'firebase/app'
+import firebase from 'firebase/app'
 import 'firebase/firestore'
 
 const config = {
@@ -9,6 +9,4 @@ const config = {
   // storageBucket: 'tests-firestore.appspot.com',
   // messagingSenderId: '743555674736'
 }
-Firebase.initializeApp(config)
-export const firebase = Firebase
-export const firestore = Firebase.firestore()
+firebase.initializeApp(config)
