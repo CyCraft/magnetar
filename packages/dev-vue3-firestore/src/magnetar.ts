@@ -1,12 +1,13 @@
 // ---------------------------------------
 // plugin vue2 for local data store
 // ---------------------------------------
+import './firebase'
 import { Magnetar } from '@magnetarjs/core'
 import { CreatePlugin } from '@magnetarjs/plugin-vue3'
 import { CreatePlugin as CreatePluginFirestore } from '@magnetarjs/plugin-firestore'
 import firebase from 'firebase/app'
 
-export const generateRandomId = () => firebase.firestore().collection('random').doc().id
+export const generateRandomId = (): string => firebase.firestore().collection('random').doc().id
 
 // create the local store plugin instance:
 const local = CreatePlugin({ generateRandomId })
