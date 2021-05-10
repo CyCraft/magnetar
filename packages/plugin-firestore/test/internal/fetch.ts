@@ -9,8 +9,8 @@ import { DocMetadata } from '../../../core/src'
     const { trainerModule } = await createMagnetarInstance(testName)
     try {
       const result = await trainerModule
-        .collection('unexistent')
-        .doc('doc', { configPerStore: { remote: { firestorePath: 'bli/blu' } } })
+        .collection('inexistent')
+        .doc('inexistent-doc', { configPerStore: { remote: { firestorePath: 'bli/blu' } } })
         .fetch(undefined, {
           modifyReadResponseOn: {
             added: (docData: any, docMetadata: DocMetadata) => {
