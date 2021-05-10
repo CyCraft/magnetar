@@ -9,7 +9,6 @@ dist
 /packages/dev-vue2-firestore
 /packages/dev-vue3
 /packages/dev-vue3-firestore
-/packages/dev-vuex
 /packages/docs
 
 coverage

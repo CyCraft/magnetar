@@ -12,8 +12,7 @@
     "@magnetarjs/plugin-vue2": "^0.0.19",
     "core-js": "^3.10.1",
     "firebase": "^8.3.3",
-    "vue": "^2.6.12",
-    "vuex": "^3.6.2"
+    "vue": "^2.6.12"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.12",
