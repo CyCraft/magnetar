@@ -1,15 +1,15 @@
 {
   "name": "dev-vue3-firestore",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "private": true,
   "scripts": {
     "dev": "vite",
     "build--": "vuedx-typecheck . && vite build"
   },
   "dependencies": {
-    "@magnetarjs/core": "^0.0.18",
-    "@magnetarjs/plugin-firestore": "^0.1.0",
-    "@magnetarjs/plugin-vue3": "^0.0.15",
+    "@magnetarjs/core": "^0.0.19",
+    "@magnetarjs/plugin-firestore": "^0.1.1",
+    "@magnetarjs/plugin-vue3": "^0.0.16",
     "firebase": "^8.3.3",
     "vue": "3.0.11"
   },
