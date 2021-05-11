@@ -54,7 +54,7 @@ function firestorePluginOptionsWithDefaults(
 ): Required<FirestorePluginOptions> {
   return {
     syncDebounceMs: 1000,
-    useModulePathsForFirestore: false,
+    useModulePathsForFirestore: true,
     debug: false,
     ...firestorePluginOptions,
   }
