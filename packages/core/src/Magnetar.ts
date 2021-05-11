@@ -3,7 +3,13 @@ import { merge } from 'merge-anything'
 import { createCollectionWithContext, CollectionInstance } from './Collection'
 import { SharedConfig, GlobalConfig, ModuleConfig } from './types/config'
 import { createDocWithContext, DocInstance } from './Doc'
-import { OpenStreams, OpenStreamPromises, FindStream, FindStreamPromise } from './types/actions'
+import {
+  OpenStreams,
+  OpenStreamPromises,
+  FindStream,
+  FindStreamPromise,
+  FetchPromises,
+} from './types/actions'
 import { throwIfInvalidModulePath } from './helpers/throwFns'
 import { getCollectionPathDocIdEntry } from './helpers/pathHelpers'
 import { findMapValueForKey } from './helpers/mapHelpers'
@@ -72,6 +78,10 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
    * the global storage for open stream promises
    */
   const streamPromiseMap: Map<string, OpenStreamPromises> = new Map() // apply type upon get/set
+  /**
+   * the global storage for fetch promises
+   */
+  const fetchPromiseMap: Map<string, FetchPromises> = new Map() // apply type upon get/set
 
   function getModuleInstance(
     modulePath: string,
@@ -88,20 +98,37 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     const cachedInstance = _moduleMap.get(moduleIdentifier)
     if (cachedInstance) return cachedInstance
     // else create and cache a new instance
-    // first create the streamCloseFnMap and streamPromiseMap for this module
+
+    // create the streamCloseFnMap and streamPromiseMap for this module
     if (!streamCloseFnMap.has(modulePath)) {
       streamCloseFnMap.set(modulePath, new Map())
     }
     if (!streamPromiseMap.has(modulePath)) {
       streamPromiseMap.set(modulePath, new Map())
     }
+    // create the fetchPromiseMap for this module
+    if (!fetchPromiseMap.has(modulePath)) {
+      fetchPromiseMap.set(modulePath, new Map())
+    }
+
+    // grab the open stream utils
     const openStreams = streamCloseFnMap.get(modulePath) as OpenStreams
     const findStream: FindStream = (streamPayload: any) =>
       findMapValueForKey(openStreams, streamPayload)
+    // grab the fetch promise utils
+    const fetchPromises = fetchPromiseMap.get(modulePath) as FetchPromises
+
     const openStreamPromises = streamPromiseMap.get(modulePath) as OpenStreamPromises
     const findStreamPromise: FindStreamPromise = (streamPayload: any) =>
       findMapValueForKey(openStreamPromises, streamPayload)
-    const streams = { openStreams, findStream, openStreamPromises, findStreamPromise }
+
+    const streamAndFetchPromises = {
+      openStreams,
+      findStream,
+      openStreamPromises,
+      findStreamPromise,
+      fetchPromises,
+    }
     // then create the module instance
     const createInstanceWithContext =
       moduleType === 'doc' ? createDocWithContext : createCollectionWithContext
@@ -112,7 +139,7 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
       globalConfig,
       docFn,
       collectionFn,
-      streams
+      streamAndFetchPromises
     )
     moduleMap.set(moduleIdentifier, moduleInstance)
     return moduleInstance

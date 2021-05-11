@@ -10,6 +10,7 @@ import {
   OpenStreamPromises,
   FindStreamPromise,
   MagnetarDeleteAction,
+  FetchPromises,
 } from './types/actions'
 import { actionNameTypeMap } from './types/actionsInternal'
 import { handleActionPerStore } from './moduleActions/handleActionPerStore'
@@ -63,14 +64,16 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
   globalConfig: O.Compulsory<GlobalConfig>,
   docFn: DocFn<DocDataType>,
   collectionFn: CollectionFn<DocDataType>,
-  streams: {
+  streamAndFetchPromises: {
     openStreams: OpenStreams
     findStream: FindStream
     openStreamPromises: OpenStreamPromises
     findStreamPromise: FindStreamPromise
+    fetchPromises: FetchPromises
   }
 ): CollectionInstance<DocDataType> {
-  const { openStreams, findStream, openStreamPromises, findStreamPromise } = streams
+  const { openStreams, findStream, openStreamPromises, findStreamPromise, fetchPromises } = streamAndFetchPromises // prettier-ignore
+  const streamPromiseInfo = { openStreams, findStream, openStreamPromises, findStreamPromise }
   const id = collectionPath.split('/').slice(-1)[0]
   const path = collectionPath
 
@@ -78,10 +81,10 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
     return docFn(`${path}/${docId}`, merge(omit(moduleConfig, ['configPerStore']), _moduleConfig))
   }
 
-  const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, docFn, collectionFn) as MagnetarInsertAction<DocDataType> //prettier-ignore
-  const _delete = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn, collectionFn) as MagnetarDeleteAction<DocDataType> //prettier-ignore
-  const fetch = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, docFn, collectionFn) as MagnetarFetchAction<DocDataType, 'collection'> //prettier-ignore
-  const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streams) // prettier-ignore
+  const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, fetchPromises, docFn, collectionFn) as MagnetarInsertAction<DocDataType> //prettier-ignore
+  const _delete = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, fetchPromises, docFn, collectionFn) as MagnetarDeleteAction<DocDataType> //prettier-ignore
+  const fetch = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, fetchPromises, docFn, collectionFn) as MagnetarFetchAction<DocDataType, 'collection'> //prettier-ignore
+  const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streamPromiseInfo) // prettier-ignore
 
   const actions = { stream, fetch, insert, delete: _delete }
 

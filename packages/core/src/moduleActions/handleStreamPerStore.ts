@@ -24,7 +24,7 @@ export function handleStreamPerStore(
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
   actionType: ActionType,
-  streams: {
+  streamPromiseInfo: {
     openStreams: OpenStreams
     findStream: FindStream
     openStreamPromises: OpenStreamPromises
@@ -33,7 +33,7 @@ export function handleStreamPerStore(
 ): MagnetarStreamAction {
   // returns the action the dev can call with myModule.insert() etc.
   return async function (payload?: any, actionConfig: ActionConfig = {}): Promise<void> {
-    const { openStreams, openStreamPromises, findStreamPromise } = streams
+    const { openStreams, openStreamPromises, findStreamPromise } = streamPromiseInfo
     const foundStreamPromise = findStreamPromise(payload)
     if (isPromise(foundStreamPromise)) return foundStreamPromise
     // get all the config needed to perform this action

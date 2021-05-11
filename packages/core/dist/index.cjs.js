@@ -322,123 +322,146 @@ function getDataProxyHandler([collectionPath, docId], moduleConfig, globalConfig
     return dataHandler;
 }
 
-function handleActionPerStore([collectionPath, _docId], moduleConfig, globalConfig, actionName, actionType, docFn, // actions executed on a "doc" will always return `doc()`
+function handleActionPerStore([collectionPath, _docId], moduleConfig, globalConfig, actionName, actionType, fetchPromises, docFn, // actions executed on a "doc" will always return `doc()`
 collectionFn // actions executed on a "collection" will return `collection()` or `doc()`
 ) {
     // returns the action the dev can call with myModule.insert() etc.
     return function (payload, actionConfig = {}) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let docId = _docId;
-            let modulePath = [collectionPath, docId].filter(Boolean).join('/');
-            // get all the config needed to perform this action
-            const onError = actionConfig.onError || moduleConfig.onError || globalConfig.onError;
-            const modifyPayloadFnsMap = getModifyPayloadFnsMap(globalConfig.modifyPayloadOn, moduleConfig.modifyPayloadOn, actionConfig.modifyPayloadOn);
-            const modifyReadResponseMap = getModifyReadResponseFnsMap(globalConfig.modifyReadResponseOn, moduleConfig.modifyReadResponseOn, actionConfig.modifyReadResponseOn);
-            const eventNameFnsMap = getEventNameFnsMap(globalConfig.on, moduleConfig.on, actionConfig.on);
-            const storesToExecute = actionConfig.executionOrder ||
-                (moduleConfig.executionOrder || {})[actionName] ||
-                (moduleConfig.executionOrder || {})[actionType] ||
-                (globalConfig.executionOrder || {})[actionName] ||
-                (globalConfig.executionOrder || {})[actionType] ||
-                [];
-            throwIfNoFnsToExecute(storesToExecute);
-            // update the payload
-            for (const modifyFn of modifyPayloadFnsMap[actionName]) {
-                payload = modifyFn(payload, docId);
-            }
-            let stopExecution = false;
-            /**
-             * The abort mechanism for the entire store chain. When executed in handleAction() it won't go to the next store in executionOrder.
-             */
-            function stopExecutionAfterAction(trueOrRevert = true) {
-                stopExecution = trueOrRevert;
-            }
-            /**
-             * each each time a store returns a `FetchResponse` then all `doOnFetchFns` need to be executed
-             */
-            const doOnFetchFns = modifyReadResponseMap.added;
-            // handle and await each action in sequence
-            let resultFromPlugin;
-            for (const [i, storeName] of storesToExecute.entries()) {
-                // a previous iteration stopped the execution:
-                if (stopExecution === true)
-                    break;
-                // find the action on the plugin
-                const pluginAction = globalConfig.stores[storeName].actions[actionName];
-                const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeName);
-                // the plugin action
-                resultFromPlugin = !pluginAction
-                    ? resultFromPlugin
-                    : yield handleAction({
-                        collectionPath,
-                        docId,
-                        modulePath,
-                        pluginModuleConfig,
-                        pluginAction,
-                        payload,
-                        eventNameFnsMap,
-                        onError,
-                        actionName,
-                        stopExecutionAfterAction,
-                        storeName,
-                    });
-                // handle reverting. stopExecution might have been modified by `handleAction`
-                if (stopExecution === 'revert') {
-                    const storesToRevert = storesToExecute.slice(0, i);
-                    storesToRevert.reverse();
-                    for (const storeToRevert of storesToRevert) {
-                        const pluginRevertAction = globalConfig.stores[storeToRevert].revert;
-                        const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeToRevert);
-                        yield pluginRevertAction({
-                            payload,
+        const fetchPromiseKey = JSON.stringify(payload);
+        const foundFetchPromise = fetchPromises.get(fetchPromiseKey);
+        if (actionName === 'fetch' && isWhat.isPromise(foundFetchPromise))
+            return foundFetchPromise;
+        // eslint-disable-next-line no-async-promise-executor
+        const actionPromise = new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                let docId = _docId;
+                let modulePath = [collectionPath, docId].filter(Boolean).join('/');
+                // get all the config needed to perform this action
+                const onError = actionConfig.onError || moduleConfig.onError || globalConfig.onError;
+                const modifyPayloadFnsMap = getModifyPayloadFnsMap(globalConfig.modifyPayloadOn, moduleConfig.modifyPayloadOn, actionConfig.modifyPayloadOn);
+                const modifyReadResponseMap = getModifyReadResponseFnsMap(globalConfig.modifyReadResponseOn, moduleConfig.modifyReadResponseOn, actionConfig.modifyReadResponseOn);
+                const eventNameFnsMap = getEventNameFnsMap(globalConfig.on, moduleConfig.on, actionConfig.on);
+                const storesToExecute = actionConfig.executionOrder ||
+                    (moduleConfig.executionOrder || {})[actionName] ||
+                    (moduleConfig.executionOrder || {})[actionType] ||
+                    (globalConfig.executionOrder || {})[actionName] ||
+                    (globalConfig.executionOrder || {})[actionType] ||
+                    [];
+                throwIfNoFnsToExecute(storesToExecute);
+                // update the payload
+                for (const modifyFn of modifyPayloadFnsMap[actionName]) {
+                    payload = modifyFn(payload, docId);
+                }
+                let stopExecution = false;
+                /**
+                 * The abort mechanism for the entire store chain. When executed in handleAction() it won't go to the next store in executionOrder.
+                 */
+                function stopExecutionAfterAction(trueOrRevert = true) {
+                    stopExecution = trueOrRevert;
+                }
+                /**
+                 * each each time a store returns a `FetchResponse` then all `doOnFetchFns` need to be executed
+                 */
+                const doOnFetchFns = modifyReadResponseMap.added;
+                // handle and await each action in sequence
+                let resultFromPlugin;
+                for (const [i, storeName] of storesToExecute.entries()) {
+                    // a previous iteration stopped the execution:
+                    if (stopExecution === true)
+                        break;
+                    // find the action on the plugin
+                    const pluginAction = globalConfig.stores[storeName].actions[actionName];
+                    const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeName);
+                    // the plugin action
+                    resultFromPlugin = !pluginAction
+                        ? resultFromPlugin
+                        : yield handleAction({
                             collectionPath,
                             docId,
+                            modulePath,
                             pluginModuleConfig,
+                            pluginAction,
+                            payload,
+                            eventNameFnsMap,
+                            onError,
                             actionName,
-                            error: resultFromPlugin, // in this case the result is the error
+                            stopExecutionAfterAction,
+                            storeName,
                         });
-                        // revert eventFns, handle and await each eventFn in sequence
-                        for (const fn of eventNameFnsMap.revert) {
-                            yield fn({ payload, result: resultFromPlugin, actionName, storeName, collectionPath, docId, path: modulePath, pluginModuleConfig }); // prettier-ignore
+                    // handle reverting. stopExecution might have been modified by `handleAction`
+                    if (stopExecution === 'revert') {
+                        const storesToRevert = storesToExecute.slice(0, i);
+                        storesToRevert.reverse();
+                        for (const storeToRevert of storesToRevert) {
+                            const pluginRevertAction = globalConfig.stores[storeToRevert].revert;
+                            const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeToRevert);
+                            yield pluginRevertAction({
+                                payload,
+                                collectionPath,
+                                docId,
+                                pluginModuleConfig,
+                                actionName,
+                                error: resultFromPlugin, // in this case the result is the error
+                            });
+                            // revert eventFns, handle and await each eventFn in sequence
+                            for (const fn of eventNameFnsMap.revert) {
+                                yield fn({ payload, result: resultFromPlugin, actionName, storeName, collectionPath, docId, path: modulePath, pluginModuleConfig }); // prettier-ignore
+                            }
+                        }
+                        // now we must throw the error
+                        throw resultFromPlugin;
+                    }
+                    // special handling for 'insert' (resultFromPlugin will always be `string`)
+                    if (actionName === 'insert' && isWhat.isFullString(resultFromPlugin)) {
+                        // update the modulePath if a doc with random ID was inserted in a collection
+                        // if this is the case the result will be a string - the randomly genererated ID
+                        if (!docId) {
+                            docId = resultFromPlugin;
+                            modulePath = [collectionPath, docId].filter(Boolean).join('/');
                         }
                     }
-                    // now we must throw the error
-                    throw resultFromPlugin;
-                }
-                // special handling for 'insert' (resultFromPlugin will always be `string`)
-                if (actionName === 'insert' && isWhat.isFullString(resultFromPlugin)) {
-                    // update the modulePath if a doc with random ID was inserted in a collection
-                    // if this is the case the result will be a string - the randomly genererated ID
-                    if (!docId) {
-                        docId = resultFromPlugin;
-                        modulePath = [collectionPath, docId].filter(Boolean).join('/');
-                    }
-                }
-                // special handling for 'fetch' (resultFromPlugin will always be `FetchResponse | OnAddedFn`)
-                if (actionName === 'fetch') {
-                    if (isDoOnFetch(resultFromPlugin)) {
-                        doOnFetchFns.push(resultFromPlugin);
-                    }
-                    if (isFetchResponse(resultFromPlugin)) {
-                        for (const docRetrieved of resultFromPlugin.docs) {
-                            executeOnFns(doOnFetchFns, docRetrieved.data, [docRetrieved]);
+                    // special handling for 'fetch' (resultFromPlugin will always be `FetchResponse | OnAddedFn`)
+                    if (actionName === 'fetch') {
+                        if (isDoOnFetch(resultFromPlugin)) {
+                            doOnFetchFns.push(resultFromPlugin);
+                        }
+                        if (isFetchResponse(resultFromPlugin)) {
+                            for (const docRetrieved of resultFromPlugin.docs) {
+                                executeOnFns(doOnFetchFns, docRetrieved.data, [docRetrieved]);
+                            }
                         }
                     }
                 }
+                // anything that's executed from a "collection" module:
+                // 'insert' always returns a DocInstance, unless the "abort" action was called, then the modulePath might still be a collection:
+                if (actionName === 'insert' && docId) {
+                    // we do not pass the `moduleConfig`, because it's the moduleConfig of the "collection" in this case
+                    resolve(docFn(modulePath));
+                    return;
+                }
+                // anything that's executed from a "doc" module:
+                if (docId || !collectionFn) {
+                    resolve(docFn(modulePath, moduleConfig));
+                    if (actionName === 'fetch')
+                        fetchPromises.delete(fetchPromiseKey);
+                    return;
+                }
+                // all other actions triggered on collections ('fetch' is the only possibility left)
+                // should return the collection:
+                resolve(collectionFn(modulePath, moduleConfig));
+                if (actionName === 'fetch')
+                    fetchPromises.delete(fetchPromiseKey);
             }
-            // anything that's executed from a "collection" module:
-            // 'insert' always returns a DocInstance, unless the "abort" action was called, then the modulePath might still be a collection:
-            if (actionName === 'insert' && docId) {
-                // we do not pass the `moduleConfig`, because it's the moduleConfig of the "collection" in this case
-                return docFn(modulePath);
+            catch (error) {
+                reject(error);
+                if (actionName === 'fetch')
+                    fetchPromises.delete(fetchPromiseKey);
             }
-            // anything that's executed from a "doc" module:
-            if (docId || !collectionFn)
-                return docFn(modulePath, moduleConfig);
-            // all other actions triggered on collections ('fetch' is the only possibility left)
-            // should return the collection:
-            return collectionFn(modulePath, moduleConfig);
-        });
+        }));
+        if (actionName === 'fetch') {
+            fetchPromises.set(fetchPromiseKey, actionPromise);
+        }
+        return actionPromise;
     };
 }
 
@@ -483,11 +506,11 @@ function handleStream(args) {
     });
 }
 
-function handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionType, streams) {
+function handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionType, streamPromiseInfo) {
     // returns the action the dev can call with myModule.insert() etc.
     return function (payload, actionConfig = {}) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { openStreams, openStreamPromises, findStreamPromise } = streams;
+            const { openStreams, openStreamPromises, findStreamPromise } = streamPromiseInfo;
             const foundStreamPromise = findStreamPromise(payload);
             if (isWhat.isPromise(foundStreamPromise))
                 return foundStreamPromise;
@@ -578,17 +601,18 @@ function handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfi
     };
 }
 
-function createCollectionWithContext([collectionPath, docId], moduleConfig, globalConfig, docFn, collectionFn, streams) {
-    const { openStreams, findStream, openStreamPromises, findStreamPromise } = streams;
+function createCollectionWithContext([collectionPath, docId], moduleConfig, globalConfig, docFn, collectionFn, streamAndFetchPromises) {
+    const { openStreams, findStream, openStreamPromises, findStreamPromise, fetchPromises } = streamAndFetchPromises; // prettier-ignore
+    const streamPromiseInfo = { openStreams, findStream, openStreamPromises, findStreamPromise };
     const id = collectionPath.split('/').slice(-1)[0];
     const path = collectionPath;
     const doc = (docId, _moduleConfig = {}) => {
         return docFn(`${path}/${docId}`, mergeAnything.merge(filterAnything.omit(moduleConfig, ['configPerStore']), _moduleConfig));
     };
-    const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, docFn, collectionFn); //prettier-ignore
-    const _delete = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn, collectionFn); //prettier-ignore
-    const fetch = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, docFn, collectionFn); //prettier-ignore
-    const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streams); // prettier-ignore
+    const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, fetchPromises, docFn, collectionFn); //prettier-ignore
+    const _delete = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, fetchPromises, docFn, collectionFn); //prettier-ignore
+    const fetch = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, fetchPromises, docFn, collectionFn); //prettier-ignore
+    const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streamPromiseInfo); // prettier-ignore
     const actions = { stream, fetch, insert, delete: _delete };
     // Every store will have its 'setupModule' function executed
     executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig);
@@ -620,22 +644,23 @@ function createCollectionWithContext([collectionPath, docId], moduleConfig, glob
     return new Proxy(moduleInstance, dataProxyHandler);
 }
 
-function createDocWithContext([collectionPath, docId], moduleConfig, globalConfig, docFn, collectionFn, streams) {
-    const { openStreams, findStream, openStreamPromises, findStreamPromise } = streams;
+function createDocWithContext([collectionPath, docId], moduleConfig, globalConfig, docFn, collectionFn, streamAndFetchPromises) {
+    const { openStreams, findStream, openStreamPromises, findStreamPromise, fetchPromises } = streamAndFetchPromises; // prettier-ignore
+    const streamPromiseInfo = { openStreams, findStream, openStreamPromises, findStreamPromise };
     const id = docId;
     const path = [collectionPath, docId].join('/');
     const collection = (collectionId, _moduleConfig = {}) => {
         return collectionFn(`${path}/${collectionId}`, _moduleConfig);
     };
     const actions = {
-        insert: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, docFn),
-        merge: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'merge', actionNameTypeMap.merge, docFn),
-        assign: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'assign', actionNameTypeMap.assign, docFn),
-        replace: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'replace', actionNameTypeMap.replace, docFn),
-        deleteProp: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'deleteProp', actionNameTypeMap.deleteProp, docFn),
-        delete: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn),
-        fetch: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, docFn),
-        stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streams), // prettier-ignore
+        insert: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, fetchPromises, docFn),
+        merge: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'merge', actionNameTypeMap.merge, fetchPromises, docFn),
+        assign: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'assign', actionNameTypeMap.assign, fetchPromises, docFn),
+        replace: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'replace', actionNameTypeMap.replace, fetchPromises, docFn),
+        deleteProp: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'deleteProp', actionNameTypeMap.deleteProp, fetchPromises, docFn),
+        delete: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, fetchPromises, docFn),
+        fetch: handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, fetchPromises, docFn),
+        stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streamPromiseInfo), // prettier-ignore
     };
     // Every store will have its 'setupModule' function executed
     executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig);
@@ -696,6 +721,10 @@ function Magnetar(magnetarConfig) {
      * the global storage for open stream promises
      */
     const streamPromiseMap = new Map(); // apply type upon get/set
+    /**
+     * the global storage for fetch promises
+     */
+    const fetchPromiseMap = new Map(); // apply type upon get/set
     function getModuleInstance(modulePath, moduleConfig = {}, moduleType, docFn, collectionFn) {
         throwIfInvalidModulePath(modulePath, moduleType);
         const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath);
@@ -706,22 +735,35 @@ function Magnetar(magnetarConfig) {
         if (cachedInstance)
             return cachedInstance;
         // else create and cache a new instance
-        // first create the streamCloseFnMap and streamPromiseMap for this module
+        // create the streamCloseFnMap and streamPromiseMap for this module
         if (!streamCloseFnMap.has(modulePath)) {
             streamCloseFnMap.set(modulePath, new Map());
         }
         if (!streamPromiseMap.has(modulePath)) {
             streamPromiseMap.set(modulePath, new Map());
         }
+        // create the fetchPromiseMap for this module
+        if (!fetchPromiseMap.has(modulePath)) {
+            fetchPromiseMap.set(modulePath, new Map());
+        }
+        // grab the open stream utils
         const openStreams = streamCloseFnMap.get(modulePath);
         const findStream = (streamPayload) => findMapValueForKey(openStreams, streamPayload);
+        // grab the fetch promise utils
+        const fetchPromises = fetchPromiseMap.get(modulePath);
         const openStreamPromises = streamPromiseMap.get(modulePath);
         const findStreamPromise = (streamPayload) => findMapValueForKey(openStreamPromises, streamPayload);
-        const streams = { openStreams, findStream, openStreamPromises, findStreamPromise };
+        const streamAndFetchPromises = {
+            openStreams,
+            findStream,
+            openStreamPromises,
+            findStreamPromise,
+            fetchPromises,
+        };
         // then create the module instance
         const createInstanceWithContext = moduleType === 'doc' ? createDocWithContext : createCollectionWithContext;
         // @ts-ignore
-        const moduleInstance = createInstanceWithContext([collectionPath, docId], moduleConfig, globalConfig, docFn, collectionFn, streams);
+        const moduleInstance = createInstanceWithContext([collectionPath, docId], moduleConfig, globalConfig, docFn, collectionFn, streamAndFetchPromises);
         moduleMap.set(moduleIdentifier, moduleInstance);
         return moduleInstance;
     }

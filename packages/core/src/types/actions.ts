@@ -101,3 +101,8 @@ export type OpenStreamPromises = Map<any, Promise<void>>
  * const closeStream = collection('myDocs').findStream({ some: 'payload' })
  */
 export type FindStreamPromise = (streamPayload?: any) => Promise<void> | undefined
+
+/**
+ * All fetch promises with the payload passed to `fetch(payload)` as key (JSON.stringify) and the "fetch promise" as value. In case `fetch()` had no payload, use `undefined`
+ */
+export type FetchPromises = Map<string, Promise<any>>

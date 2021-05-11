@@ -10,6 +10,7 @@ import {
   FindStream,
   OpenStreamPromises,
   FindStreamPromise,
+  FetchPromises,
 } from './types/actions'
 import { actionNameTypeMap } from './types/actionsInternal'
 import { handleActionPerStore } from './moduleActions/handleActionPerStore'
@@ -65,14 +66,16 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
   globalConfig: O.Compulsory<GlobalConfig>,
   docFn: DocFn<DocDataType>,
   collectionFn: CollectionFn,
-  streams: {
+  streamAndFetchPromises: {
     openStreams: OpenStreams
     findStream: FindStream
     openStreamPromises: OpenStreamPromises
     findStreamPromise: FindStreamPromise
+    fetchPromises: FetchPromises
   }
 ): DocInstance<DocDataType> {
-  const { openStreams, findStream, openStreamPromises, findStreamPromise } = streams
+  const { openStreams, findStream, openStreamPromises, findStreamPromise, fetchPromises } = streamAndFetchPromises // prettier-ignore
+  const streamPromiseInfo = { openStreams, findStream, openStreamPromises, findStreamPromise }
   const id = docId
   const path = [collectionPath, docId].join('/')
 
@@ -81,14 +84,14 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
   }
 
   const actions = {
-    insert: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert,  docFn) as MagnetarInsertAction<DocDataType>), // prettier-ignore
-    merge: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'merge', actionNameTypeMap.merge, docFn) as MagnetarWriteAction<DocDataType>), // prettier-ignore
-    assign: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'assign', actionNameTypeMap.assign, docFn) as MagnetarWriteAction<DocDataType>), // prettier-ignore
-    replace: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'replace', actionNameTypeMap.replace, docFn) as MagnetarWriteAction<DocDataType>), // prettier-ignore
-    deleteProp: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'deleteProp', actionNameTypeMap.deleteProp, docFn) as MagnetarDeletePropAction<DocDataType>), // prettier-ignore
-    delete: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, docFn) as MagnetarDeleteAction<DocDataType>), // prettier-ignore
-    fetch: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, docFn) as MagnetarFetchAction<DocDataType, 'doc'>), // prettier-ignore
-    stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streams), // prettier-ignore
+    insert: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, fetchPromises, docFn) as MagnetarInsertAction<DocDataType>), // prettier-ignore
+    merge: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'merge', actionNameTypeMap.merge, fetchPromises, docFn) as MagnetarWriteAction<DocDataType>), // prettier-ignore
+    assign: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'assign', actionNameTypeMap.assign, fetchPromises, docFn) as MagnetarWriteAction<DocDataType>), // prettier-ignore
+    replace: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'replace', actionNameTypeMap.replace, fetchPromises, docFn) as MagnetarWriteAction<DocDataType>), // prettier-ignore
+    deleteProp: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'deleteProp', actionNameTypeMap.deleteProp, fetchPromises, docFn) as MagnetarDeletePropAction<DocDataType>), // prettier-ignore
+    delete: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, fetchPromises, docFn) as MagnetarDeleteAction<DocDataType>), // prettier-ignore
+    fetch: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, fetchPromises, docFn) as MagnetarFetchAction<DocDataType, 'doc'>), // prettier-ignore
+    stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streamPromiseInfo), // prettier-ignore
   }
 
   // Every store will have its 'setupModule' function executed

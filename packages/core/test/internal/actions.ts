@@ -104,7 +104,7 @@ test('write: merge (document)', async (t) => {
   t.deepEqual(doc.data, mergedResult)
 })
 
-test('read: get (collection)', async (t) => {
+test('read: fetch (collection)', async (t) => {
   // 'fetch' resolves once all stores have given a response with data
   const { pokedexModule } = createMagnetarInstance()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
@@ -121,7 +121,7 @@ test('read: get (collection)', async (t) => {
   t.is(pokedexModule.data.size, 151)
 })
 
-test('read: get (document)', async (t) => {
+test('read: fetch (document)', async (t) => {
   // get resolves once all stores have given a response with data
   const { trainerModule } = createMagnetarInstance()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
