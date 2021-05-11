@@ -33,7 +33,7 @@ export function docSnapshotToDocMetadata(
   docSnapshot: DocumentSnapshot | QueryDocumentSnapshot
 ): DocMetadata {
   const docMetaData: DocMetadata = {
-    data: (docSnapshot.data() ?? {}) as any,
+    data: docSnapshot.data() as Record<string, any> | undefined,
     metadata: docSnapshot as any,
     id: docSnapshot.id,
     exists: docSnapshot.exists,

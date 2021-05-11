@@ -1,7 +1,7 @@
 export type StoreName = string
 
 export type DocMetadata = {
-  data: Record<string, any>
+  data: Record<string, any> | undefined
   id: string
   /**
    * In case the doc was pulled from cache with `fetch({ ifUnfetched: true })` then `exists` will be `'unknown'`
