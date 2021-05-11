@@ -36,7 +36,7 @@ export type MagnetarFetchAction<
   DocDataType extends Record<string, any> = Record<string, any>,
   calledFrom extends 'collection' | 'doc' = 'collection' | 'doc'
 > = (
-  payload?: Record<string, any> | void,
+  payload?: { ifUnfetched?: boolean } | Record<string, any> | void,
   actionConfig?: ActionConfig
 ) => Promise<
   calledFrom extends 'collection' ? CollectionInstance<DocDataType> : DocInstance<DocDataType>

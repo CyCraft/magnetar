@@ -22,7 +22,9 @@ export declare type ActionConfig = O.Patch<{
     executionOrder?: StoreName[];
 }, Partial<O.Omit<SharedConfig, 'localStoreName' | 'executionOrder'>>>;
 export declare type MagnetarStreamAction = (payload?: any | void, actionConfig?: ActionConfig) => Promise<void>;
-export declare type MagnetarFetchAction<DocDataType extends Record<string, any> = Record<string, any>, calledFrom extends 'collection' | 'doc' = 'collection' | 'doc'> = (payload?: Record<string, any> | void, actionConfig?: ActionConfig) => Promise<calledFrom extends 'collection' ? CollectionInstance<DocDataType> : DocInstance<DocDataType>>;
+export declare type MagnetarFetchAction<DocDataType extends Record<string, any> = Record<string, any>, calledFrom extends 'collection' | 'doc' = 'collection' | 'doc'> = (payload?: {
+    ifUnfetched?: boolean;
+} | Record<string, any> | void, actionConfig?: ActionConfig) => Promise<calledFrom extends 'collection' ? CollectionInstance<DocDataType> : DocInstance<DocDataType>>;
 export declare type MagnetarInsertAction<DocDataType extends Record<string, any> = Record<string, any>> = (payload: DocDataType, actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
 export declare type MagnetarWriteAction<DocDataType extends Record<string, any> = Record<string, any>> = (payload: O.Optional<DocDataType, keyof DocDataType, 'deep'>, actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;
 export declare type MagnetarDeletePropAction<DocDataType extends Record<string, any> = Record<string, any>> = (payload: keyof DocDataType | string | (keyof DocDataType | string)[], actionConfig?: ActionConfig) => Promise<DocInstance<DocDataType>>;

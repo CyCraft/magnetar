@@ -21,7 +21,7 @@ const bulbasaur = magnetar.doc('pokedex/001')
 // bulbasaur's data is not yet in local data
 // bulbasaur.data ≈ {}
 
-await pokedexModule.fetch()
+await bulbasaur.fetch()
 
 // now it is available locally:
 
@@ -36,6 +36,14 @@ The `fetch` action will also return a doc or collection module you can use:
 const bulbasaur = await magnetar.doc('pokedex/001').fetch()
 
 // bulbasaur.data ≈ { name: 'Bulbasaur' }
+```
+
+You can also immediately grab the data after fetching like so:
+
+```js
+const bulbasaurData = (await magnetar.doc('pokedex/001').fetch()).data
+
+// bulbasaurData ≈ { name: 'Bulbasaur' }
 ```
 
 ### Fetch Multiple Documents
@@ -56,6 +64,34 @@ await pokedexModule.fetch()
 
 const allPokemon = pokedexModule.data.values()
 // allPokemon ≈ [{ name: 'Bulbasaur' }, /* etc...*/ ]
+```
+
+### Fetch only once per session
+
+You can make sure Magnetar only fetches a document once but prevents from fetching again if the data was already fetched locally.
+
+```js
+await bulbasaur.fetch({ ifUnfetched: true }) // makes the fetch call once
+
+// bulbasaur.data ≈ { name: 'Bulbasaur' }
+
+// ... some time later
+await bulbasaur.fetch({ ifUnfetched: true })
+// `bulbasaur.data` is already available, so NO fetch call is made
+
+// bulbasaur.data ≈ { name: 'Bulbasaur' }
+```
+
+### Fetch and get document data
+
+You can fetch and immediately return a document's data. If this is executed multiple times you can add the `ifUnfetched` option to prevent multiple fetch calls.
+
+```js
+// every time this is executed, it will fetch and return the data:
+const bulbasaurData = (await magnetar.doc('pokedex/001').fetch()).data
+
+// this will only fetch the data once, and from there on always return the same data:
+const bulbasaurData = (await magnetar.doc('pokedex/001').fetch({ ifUnfetched: true })).data
 ```
 
 ## Stream Realtime Updates

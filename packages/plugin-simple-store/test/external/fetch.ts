@@ -31,6 +31,18 @@ test('fetch (document)', async (t) => {
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })
 
+test('fetch (document) if unfetched', async (t) => {
+  /// get resolves once all stores have given a response with data
+  const { trainerModule } = createMagnetarInstance()
+  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
+  try {
+    await trainerModule.fetch({ ifUnfetched: true })
+  } catch (error) {
+    t.fail(error)
+  }
+  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
+})
+
 test('fetch (collection) where-filter: ==', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {

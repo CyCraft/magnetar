@@ -22,15 +22,15 @@ export function fetchActionFactory(
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
 
-    const doOnFetchAction: DoOnFetch = (payload, meta): void => {
+    const doOnFetchAction: DoOnFetch = (_payload, meta): void => {
       // abort updating local state if the payload was set to undefined
-      if (payload === undefined) return
+      if (_payload === undefined) return
 
       insertActionFactory(
         data,
         storePluginOptions
       )({
-        payload,
+        payload: _payload,
         collectionPath,
         docId,
         pluginModuleConfig,

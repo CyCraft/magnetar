@@ -73,7 +73,9 @@ export declare type PluginFetchActionPayload<SpecificPluginModuleConfig = Plugin
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: Record<string, any> | void;
+    payload: {
+        ifUnfetched?: boolean;
+    } | Record<string, any> | void;
 }>;
 /**
  * Should handle 'fetch' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc). Should return `FetchResponse` when acting as a "remote" Store Plugin, and `DoOnFetch` when acting as "local" Store Plugin.

@@ -94,7 +94,7 @@ export type PluginFetchActionPayload<SpecificPluginModuleConfig = PluginModuleCo
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: Record<string, any> | void
+    payload: { ifUnfetched?: boolean } | Record<string, any> | void
   }
 >
 /**
