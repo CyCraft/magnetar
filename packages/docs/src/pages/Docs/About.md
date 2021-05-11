@@ -72,21 +72,21 @@ Vue.component('TodoList', {
      * UI is reflected automatically
      */
     addItem(newData) {
-      itemsModule.insert(newData)
+      todoItemsModule.insert(newData)
     },
     /**
      * Edits an item in the local data & makes API call to Firestore
      * UI is reflected automatically
      */
     editItem(id, newData) {
-      itemsModule.doc(id).merge(newData)
+      todoItemsModule.doc(id).merge(newData)
     },
     /**
      * Deletes an item from the local data & makes API call to Firestore
      * UI is reflected automatically
      */
     deleteItem(id) {
-      itemsModule.delete(id)
+      todoItemsModule.delete(id)
     },
   },
 })
