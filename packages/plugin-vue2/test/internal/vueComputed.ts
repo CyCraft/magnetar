@@ -144,7 +144,7 @@ test('reactivity: document - directly', async (t) => {
       dataComputed() {
         ranFns.push('ran')
         const data = trainerModule.data
-        return { ...data, name: data.name + '!' }
+        return { ...data, name: data?.name + '!' }
       },
     },
   })

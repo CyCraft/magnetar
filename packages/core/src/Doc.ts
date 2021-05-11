@@ -23,7 +23,7 @@ export type DocInstance<DocDataType extends Record<string, any> = Record<string,
   /**
    * The cached data that was written or read so far
    */
-  data: DocDataType
+  data: DocDataType | undefined
   /**
    * `collection` is available on every document for chaining
    * @example doc('001').collection('items')

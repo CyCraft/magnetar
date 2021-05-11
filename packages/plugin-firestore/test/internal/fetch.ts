@@ -8,7 +8,7 @@ import { DocMetadata } from '../../../core/src'
     /// get resolves once all stores have given a response with data
     const { trainerModule } = await createMagnetarInstance(testName)
     try {
-      t.deepEqual(trainerModule.collection('inexistent').doc('inexistent-doc').data, {})
+      t.deepEqual(trainerModule.collection('inexistent').doc('inexistent-doc').data, undefined)
       const result = await trainerModule
         .collection('inexistent')
         .doc('inexistent-doc')
@@ -21,7 +21,7 @@ import { DocMetadata } from '../../../core/src'
           },
         })
       t.is(result.id, 'inexistent-doc')
-      t.deepEqual(result.data, {})
+      t.deepEqual(result.data, undefined)
     } catch (error) {
       t.fail(error)
     }

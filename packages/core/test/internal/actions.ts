@@ -41,13 +41,12 @@ test('write: insert (collection) → random ID', async (t) => {
 test('deleteProp: (document)', async (t) => {
   const { trainerModule, magnetar } = createMagnetarInstance()
   const prop = 'age'
-  t.deepEqual(trainerModule.data.age, 10)
+  t.deepEqual(trainerModule.data?.age, 10)
 
   // create references on beforehand
   const magnetarDoc = magnetar.doc('app-data/trainer') // prettier-ignore
   const magnetarCollectionDoc = magnetar.collection('app-data').doc('trainer') // prettier-ignore
   const magnetarCollectionData = magnetar.collection('app-data').data // prettier-ignore
-  console.log(`magnetarCollectionData → `, magnetarCollectionData)
 
   try {
     const result = await trainerModule.deleteProp(prop)
@@ -57,11 +56,11 @@ test('deleteProp: (document)', async (t) => {
     t.fail(error)
   }
   // check data of references created on beforehand
-  t.deepEqual(magnetarDoc.data[prop], undefined)
-  t.deepEqual(magnetarCollectionDoc.data[prop], undefined)
+  t.deepEqual(magnetarDoc.data?.[prop], undefined)
+  t.deepEqual(magnetarCollectionDoc.data?.[prop], undefined)
   t.deepEqual(magnetarCollectionData.get('trainer')?.[prop], undefined)
   // check data of references executed on
-  t.deepEqual(trainerModule.data[prop], undefined)
+  t.deepEqual(trainerModule.data?.[prop], undefined)
 })
 
 test('delete: (document)', async (t) => {

@@ -111,10 +111,12 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
     const { initialData } = pluginModuleConfig
     if (!initialData) return
     if (!docId && isArray(initialData)) {
+      if (Object.keys(dataCollectionDic).length > 0) return
       for (const [_docId, _docData] of initialData) {
         vue.set(dataCollectionDic, _docId, _docData)
       }
     } else if (docId) {
+      if (docId in dataCollectionDic) return
       vue.set(dataCollectionDic, docId, initialData as Record<string, any>)
     }
   }
