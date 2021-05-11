@@ -40,27 +40,28 @@ test('write: insert (collection) → random ID', async (t) => {
 
 test('deleteProp: (document)', async (t) => {
   const { trainerModule, magnetar } = createMagnetarInstance()
-  const payload = 'age'
+  const prop = 'age'
   t.deepEqual(trainerModule.data.age, 10)
 
   // create references on beforehand
   const magnetarDoc = magnetar.doc('app-data/trainer') // prettier-ignore
-  const magnetarCollectionDoc = magnetar.collection('data').doc('trainer') // prettier-ignore
-  const magnetarCollectionData = magnetar.collection('data').data // prettier-ignore
+  const magnetarCollectionDoc = magnetar.collection('app-data').doc('trainer') // prettier-ignore
+  const magnetarCollectionData = magnetar.collection('app-data').data // prettier-ignore
+  console.log(`magnetarCollectionData → `, magnetarCollectionData)
 
   try {
-    const result = await trainerModule.deleteProp(payload)
+    const result = await trainerModule.deleteProp(prop)
     // check data of reference returned
     t.deepEqual(result.data, trainerModule.data)
   } catch (error) {
     t.fail(error)
   }
   // check data of references created on beforehand
-  t.deepEqual(magnetarDoc.data.age, undefined)
-  t.deepEqual(magnetarCollectionDoc.data.age, undefined)
-  t.deepEqual(magnetarCollectionData.get('trainer')?.age, undefined)
+  t.deepEqual(magnetarDoc.data[prop], undefined)
+  t.deepEqual(magnetarCollectionDoc.data[prop], undefined)
+  t.deepEqual(magnetarCollectionData.get('trainer')?.[prop], undefined)
   // check data of references executed on
-  t.deepEqual(trainerModule.data.age, undefined)
+  t.deepEqual(trainerModule.data[prop], undefined)
 })
 
 test('delete: (document)', async (t) => {
@@ -68,8 +69,8 @@ test('delete: (document)', async (t) => {
   t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
   // create references on beforehand
-  const magnetarCollection = magnetar.collection('data')
-  const magnetarCollectionDoc = magnetar.collection('data').doc('trainer')
+  const magnetarCollection = magnetar.collection('app-data')
+  const magnetarCollectionDoc = magnetar.collection('app-data').doc('trainer')
   const magnetarDoc = magnetar.doc('app-data/trainer')
 
   try {
@@ -87,9 +88,9 @@ test('delete: (document)', async (t) => {
   // check data of references executed on
   t.deepEqual(trainerModule.data, undefined)
   // check data of new references
-  t.deepEqual(magnetar.collection('data').doc('trainer').data, undefined)
+  t.deepEqual(magnetar.collection('app-data').doc('trainer').data, undefined)
   t.deepEqual(magnetar.doc('app-data/trainer').data, undefined)
-  t.deepEqual(magnetar.collection('data').data.get('trainer'), undefined)
+  t.deepEqual(magnetar.collection('app-data').data.get('trainer'), undefined)
 })
 
 test('write: merge (document)', async (t) => {
