@@ -4,7 +4,7 @@
   "description": "State-management done right with automatic sync to remote databases and services. Framework-agnostic & optimistic-UI built-in 🌟",
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "types": "types/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "author": "Luca Ban - Mesqueeb",
   "scripts": {
     "build": "npm run rollup",

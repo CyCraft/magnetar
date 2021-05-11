@@ -5,7 +5,7 @@
   "description": "Magnetar plugin vue2",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
-  "types": "types/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "scripts": {
     "build": "npm run rollup",
     "test-and-build": "npm run test && npm run build",
