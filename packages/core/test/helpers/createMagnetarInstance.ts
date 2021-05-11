@@ -40,7 +40,8 @@ export type TrainerModuleData = {
 }
 
 export function createMagnetarInstance(
-  magnetarGlobalConfig: Partial<GlobalConfig> = {}
+  magnetarGlobalConfig: Partial<GlobalConfig> = {},
+  startEmpty = false
 ): {
   pokedexModule: CollectionInstance<PokedexModuleData>
   trainerModule: DocInstance<TrainerModuleData>
@@ -58,17 +59,21 @@ export function createMagnetarInstance(
     },
     ...magnetarGlobalConfig,
   })
-  const pokedexModule = magnetar.collection<PokedexModuleData>('pokedex', {
-    configPerStore: {
-      local: { initialData: getInitialDataCollection() }, // path for the plugin
-      remote: {}, // path for the plugin
-    },
-  })
-  const trainerModule = magnetar.doc<TrainerModuleData>('app-data/trainer', {
-    configPerStore: {
-      local: { initialData: getInitialDataDocument() }, // path for the plugin
-      remote: {}, // path for the plugin
-    },
-  })
+  const pokedexModule = startEmpty
+    ? magnetar.collection<PokedexModuleData>('pokedex')
+    : magnetar.collection<PokedexModuleData>('pokedex', {
+        configPerStore: {
+          local: { initialData: getInitialDataCollection() }, // path for the plugin
+          remote: {}, // path for the plugin
+        },
+      })
+  const trainerModule = startEmpty
+    ? magnetar.doc<TrainerModuleData>('app-data/trainer')
+    : magnetar.doc<TrainerModuleData>('app-data/trainer', {
+        configPerStore: {
+          local: { initialData: getInitialDataDocument() }, // path for the plugin
+          remote: {}, // path for the plugin
+        },
+      })
   return { pokedexModule, trainerModule, magnetar }
 }
