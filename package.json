@@ -58,5 +58,40 @@
   "engines": {
     "node": ">= 14.0.0",
     "npm": ">= 7.8.0"
+  },
+  "eslintConfig": {
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint",
+      "tree-shaking"
+    ],
+    "ignorePatterns": [
+      "node_modules",
+      "dist",
+      "/packages/dev-firestore",
+      "/packages/dev-vue2",
+      "/packages/dev-vue2-firestore",
+      "/packages/dev-vue3",
+      "/packages/dev-vue3-firestore",
+      "/packages/docs",
+      "test"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended",
+      "prettier"
+    ],
+    "rules": {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/ban-ts-ignore": "off",
+      "tree-shaking/no-side-effects-in-initialization": "error",
+      "comma-dangle": [
+        "warn",
+        "always-multiline"
+      ],
+      "@typescript-eslint/ban-ts-comment": "warn"
+    }
   }
 }
