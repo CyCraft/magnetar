@@ -98,13 +98,12 @@ export const CreatePlugin: MagnetarPlugin<StorePluginOptions> = (
     modulesAlreadySetup.add(modulePath)
     // then do anything specific for your plugin, like setting initial data
     const { initialData } = pluginModuleConfig
-    if (!initialData) return
     if (!docId && isArray(initialData)) {
       for (const [_docId, _docData] of initialData) {
         dataCollectionMap.set(_docId, _docData)
       }
     } else if (docId) {
-      dataCollectionMap.set(docId, initialData as Record<string, any>)
+      dataCollectionMap.set(docId, initialData || {})
     }
   }
 

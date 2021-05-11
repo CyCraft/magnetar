@@ -8,13 +8,14 @@ import { DocMetadata } from '../../../core/src'
     /// get resolves once all stores have given a response with data
     const { trainerModule } = await createMagnetarInstance(testName)
     try {
+      t.deepEqual(trainerModule.collection('inexistent').doc('inexistent-doc').data, {})
       const result = await trainerModule
         .collection('inexistent')
-        .doc('inexistent-doc', { configPerStore: { remote: { firestorePath: 'bli/blu' } } })
+        .doc('inexistent-doc')
         .fetch(undefined, {
           modifyReadResponseOn: {
             added: (docData: any, docMetadata: DocMetadata) => {
-              t.deepEqual(docData, {})
+              t.deepEqual(docData, undefined)
               t.is(docMetadata.exists, false)
             },
           },
