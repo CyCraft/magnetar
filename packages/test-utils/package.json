@@ -8,8 +8,13 @@
   "types": "dist/types/index.d.ts",
   "author": "Luca Ban - Mesqueeb",
   "scripts": {
-    "build--see-issue-#19": "npm run rollup",
+    "build": "npm run rollup && npm run fix-issue-#19",
+    "fix-issue-#19": "copyfiles --up=4 \"dist/types/test-utils/src/**/*\" \"dist/types/\" && rimraf dist/types/test-utils",
     "rollup": "rimraf dist && rollup -c build.js"
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1",
+    "rimraf": "^3.0.2"
   },
   "dependencies": {
     "copy-anything": "^2.0.3",
