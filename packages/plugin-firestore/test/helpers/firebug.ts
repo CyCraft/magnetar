@@ -1,5 +1,5 @@
 import test from 'ava'
-import { firestore } from '../helpers/firestore'
+import { firestore } from './initFirebase'
 import { waitMs } from '@magnetarjs/test-utils'
 
 test('firebase sdk', async (t) => {

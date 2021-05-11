@@ -19,7 +19,7 @@ import { DocMetadata } from '../../../core/src'
             },
           },
         })
-      t.is(result.id, 'doc')
+      t.is(result.id, 'inexistent-doc')
       t.deepEqual(result.data, {})
     } catch (error) {
       t.fail(error)

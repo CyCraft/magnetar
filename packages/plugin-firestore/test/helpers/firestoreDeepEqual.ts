@@ -1,4 +1,4 @@
-import { firestore } from './firestore'
+import { firestore } from './initFirebase'
 import { ExecutionContext } from 'ava'
 
 export async function firestoreDeepEqual(

@@ -1,4 +1,4 @@
-import { firebase } from './firestore'
+import { firebase } from './initFirebase'
 
 // todo: if only I could use this, I could delete the `deletePaths` mechanism.
 // corrently this CF gives an "internal error"
@@ -7,7 +7,7 @@ import { firebase } from './firestore'
  * Call the 'recursiveDelete' callable function with a path to initiate
  * a server-side delete.
  */
-export async function deleteAtPath (path = '') {
+export async function deleteAtPath(path = '') {
   const deleteFn = firebase.functions().httpsCallable('recursiveDelete')
   try {
     const result = await deleteFn({ path: path })

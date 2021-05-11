@@ -2,7 +2,7 @@ import { Magnetar, MagnetarInstance, CollectionInstance, DocInstance } from '../
 import { CreatePlugin as CreatePluginRemote } from '../../src'
 import { pokedex, PokedexEntry, generateRandomId, PluginMockLocal } from '@magnetarjs/test-utils'
 import { O } from 'ts-toolbelt'
-import firebase from 'firebase/app'
+import { firebase } from './initFirebase'
 
 const CreatePluginLocal = PluginMockLocal.CreatePlugin
 
