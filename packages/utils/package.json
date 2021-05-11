@@ -9,7 +9,7 @@
   "scripts": {
     "build": "npm run rollup",
     "test": "",
-    "rollup": "rimraf dist && rimraf types && rollup -c build.js"
+    "rollup": "rimraf dist && rollup -c build.js"
   },
   "author": "Luca Ban - Mesqueeb",
   "license": "TBD",

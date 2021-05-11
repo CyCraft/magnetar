@@ -11,7 +11,7 @@
     "test-and-build": "npm run test && npm run build",
     "test": "ava",
     "test--only": "ava --match='*only:*'",
-    "rollup": "rimraf dist && rimraf types && rollup -c build.js"
+    "rollup": "rimraf dist && rollup -c build.js"
   },
   "author": "Luca Ban - Mesqueeb",
   "license": "TBD",
