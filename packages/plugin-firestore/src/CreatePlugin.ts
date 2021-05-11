@@ -1,3 +1,4 @@
+import type firebase from 'firebase'
 import { PluginInstance, MagnetarPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core'
 import { insertActionFactory } from './actions/insert'
 import { writeActionFactory } from './actions/mergeAssignReplace'
@@ -25,7 +26,7 @@ export interface FirestorePluginOptions {
    * const remote = FirestorePlugin({ firebaseInstance: firebase })
    * ```
    */
-  firebaseInstance: any
+  firebaseInstance: typeof firebase
   /**
    * When this is true, the "modulePath" will be used as firestorePath to sync the data to. Eg. `collection('todos')` will sync data to `todos` on firestore. When this is false (default) the firestorePath must be provided like so: `collection('todos', { firestorePath: 'myTodos' })`
    */
