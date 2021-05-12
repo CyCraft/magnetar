@@ -50,7 +50,7 @@ export type CollectionInstance<DocDataType extends Record<string, any> = Record<
   fetch: MagnetarFetchAction<DocDataType, 'collection'>
   stream: MagnetarStreamAction
   insert: MagnetarInsertAction<DocDataType>
-  delete: MagnetarDeleteAction<DocDataType>
+  delete: MagnetarDeleteAction
 
   // filters
   where: (fieldPath: string, operator: WhereFilterOp, value: any) => CollectionInstance<DocDataType>
@@ -82,7 +82,7 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
   }
 
   const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, fetchPromises, docFn, collectionFn) as MagnetarInsertAction<DocDataType> //prettier-ignore
-  const _delete = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, fetchPromises, docFn, collectionFn) as MagnetarDeleteAction<DocDataType> //prettier-ignore
+  const _delete = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, fetchPromises, docFn, collectionFn) as MagnetarDeleteAction //prettier-ignore
   const fetch = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, fetchPromises, docFn, collectionFn) as MagnetarFetchAction<DocDataType, 'collection'> //prettier-ignore
   const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streamPromiseInfo) // prettier-ignore
 

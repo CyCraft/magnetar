@@ -9,8 +9,8 @@ import { pokedex } from '@magnetarjs/test-utils'
 //   t.is(pokedexModule.data.size, 1)
 //   try {
 //     const result = await pokedexModule.fetch()
-//     t.deepEqual(result.data.get('1'), pokedex(1))
-//     t.deepEqual(result.data.get('136'), pokedex(136))
+//     t.deepEqual(result.get('1'), pokedex(1))
+//     t.deepEqual(result.get('136'), pokedex(136))
 //   } catch (error) {
 //     t.fail(error)
 //   }

@@ -20,8 +20,6 @@ import { OnAddedFn, getModifyReadResponseFnsMap } from '../types/modifyReadRespo
 import { executeOnFns } from '../helpers/executeOnFns'
 import { throwIfNoFnsToExecute } from '../helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from '../types/config'
-import { CollectionInstance } from '../Collection'
-import { DocInstance } from '../Doc'
 import { CollectionFn, DocFn } from '../Magnetar'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers'
 
@@ -49,19 +47,16 @@ export function handleActionPerStore(
   | MagnetarFetchAction<any>
   | MagnetarWriteAction<any>
   | MagnetarInsertAction<any>
-  | MagnetarDeleteAction<any>
+  | MagnetarDeleteAction
   | MagnetarDeletePropAction<any> {
   // returns the action the dev can call with myModule.insert() etc.
-  return function (
-    payload?: any,
-    actionConfig: ActionConfig = {}
-  ): Promise<DocInstance | CollectionInstance> {
+  return function (payload?: any, actionConfig: ActionConfig = {}): Promise<any> {
     const fetchPromiseKey = JSON.stringify(payload)
     const foundFetchPromise = fetchPromises.get(fetchPromiseKey)
     if (actionName === 'fetch' && isPromise(foundFetchPromise)) return foundFetchPromise
 
     // eslint-disable-next-line no-async-promise-executor
-    const actionPromise = new Promise<DocInstance | CollectionInstance>(async (resolve, reject) => {
+    const actionPromise = new Promise<any>(async (resolve, reject) => {
       try {
         let docId = _docId
         let modulePath = [collectionPath, docId].filter(Boolean).join('/')
@@ -191,21 +186,20 @@ export function handleActionPerStore(
         // anything that's executed from a "collection" module:
         // 'insert' always returns a DocInstance, unless the "abort" action was called, then the modulePath might still be a collection:
         if (actionName === 'insert' && docId) {
-          // we do not pass the `moduleConfig`, because it's the moduleConfig of the "collection" in this case
-          resolve(docFn(modulePath))
+          resolve(docFn(modulePath, moduleConfig))
           return
         }
 
         // anything that's executed from a "doc" module:
         if (docId || !collectionFn) {
-          resolve(docFn(modulePath, moduleConfig))
+          resolve(docFn(modulePath, moduleConfig).data)
           if (actionName === 'fetch') fetchPromises.delete(fetchPromiseKey)
           return
         }
 
         // all other actions triggered on collections ('fetch' is the only possibility left)
-        // should return the collection:
-        resolve(collectionFn(modulePath, moduleConfig))
+        // 'fetch' should return `Map<string, DocDataType>` or `DocDataType`
+        resolve(collectionFn(modulePath, moduleConfig).data)
         if (actionName === 'fetch') fetchPromises.delete(fetchPromiseKey)
       } catch (error) {
         reject(error)

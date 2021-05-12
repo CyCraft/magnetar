@@ -57,7 +57,7 @@ export type DocInstance<DocDataType extends Record<string, any> = Record<string,
    * @param {*} [payload] The delete action doesn't need any payload. In some cases, a Store Plugin you use might accept a payload.
    * @param {ActionConfig} [actionConfig]
    */
-  delete: MagnetarDeleteAction<DocDataType>
+  delete: MagnetarDeleteAction
 }
 
 export function createDocWithContext<DocDataType extends Record<string, any>>(
@@ -89,7 +89,7 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
     assign: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'assign', actionNameTypeMap.assign, fetchPromises, docFn) as MagnetarWriteAction<DocDataType>), // prettier-ignore
     replace: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'replace', actionNameTypeMap.replace, fetchPromises, docFn) as MagnetarWriteAction<DocDataType>), // prettier-ignore
     deleteProp: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'deleteProp', actionNameTypeMap.deleteProp, fetchPromises, docFn) as MagnetarDeletePropAction<DocDataType>), // prettier-ignore
-    delete: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, fetchPromises, docFn) as MagnetarDeleteAction<DocDataType>), // prettier-ignore
+    delete: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, fetchPromises, docFn) as MagnetarDeleteAction), // prettier-ignore
     fetch: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, fetchPromises, docFn) as MagnetarFetchAction<DocDataType, 'doc'>), // prettier-ignore
     stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streamPromiseInfo), // prettier-ignore
   }

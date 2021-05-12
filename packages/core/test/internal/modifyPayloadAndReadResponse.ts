@@ -25,7 +25,7 @@ test('fetch: can mutate payload & read response (config in global magnetar insta
     })
     // the remote result SHOULD HAVE the applied defaults
     t.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123' })
-    t.deepEqual(result.data.get('136'), { ...pokedex(136), seen: true })
+    t.deepEqual(result.get('136'), { ...pokedex(136), seen: true })
   } catch (error) {
     t.fail(error)
   }
@@ -110,7 +110,7 @@ test('fetch: can mutate payload & read response (config in module)', async (t) =
     })
     // the remote result SHOULD HAVE the applied defaults
     t.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123' })
-    t.deepEqual(result.data.get('136'), { ...pokedex(136), seen: true })
+    t.deepEqual(result.get('136'), { ...pokedex(136), seen: true })
   } catch (error) {
     t.fail(error)
   }
@@ -193,8 +193,8 @@ test('fetch: can mutate payload & read response (config in action)', async (t) =
       }
     )
     // the remote result SHOULD HAVE the applied defaults
-    t.deepEqual(result.data.get('1'), { ...pokedex(1), seen: true })
-    t.deepEqual(result.data.get('136'), { ...pokedex(136), seen: true })
+    t.deepEqual(result.get('1'), { ...pokedex(1), seen: true })
+    t.deepEqual(result.get('136'), { ...pokedex(136), seen: true })
     t.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123' })
   } catch (error) {
     t.fail(error)

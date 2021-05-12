@@ -2,7 +2,6 @@ import { O } from 'ts-toolbelt'
 import { SharedConfig } from './config'
 import { StoreName } from './atoms'
 import { DocInstance } from '../Doc'
-import { CollectionInstance } from '../Collection'
 
 /**
  * these are all the actions that Magnetar streamlines, whichever plugin is used
@@ -27,37 +26,56 @@ export type ActionConfig = O.Patch<
 
 // these are the action types exposed to the dev via a MagnetarModule, it's what the dev will end up calling.
 
+/**
+ * Opens a continuous stream to a document or collection.
+ * @returns the open stream promise. This will never resolve as long as the stream is open.
+ */
 export type MagnetarStreamAction = (
   payload?: any | void,
   actionConfig?: ActionConfig
 ) => Promise<void>
 
+/**
+ * Fetches document(s) and adds the data to your local store's state.
+ * @returns the document(s) data that was fetched. If you need to access other metadata that was retrieved during fetching, you can use `modifyReadResponse.added`.
+ */
 export type MagnetarFetchAction<
   DocDataType extends Record<string, any> = Record<string, any>,
   calledFrom extends 'collection' | 'doc' = 'collection' | 'doc'
 > = (
   payload?: { ifUnfetched?: boolean } | Record<string, any> | void,
   actionConfig?: ActionConfig
-) => Promise<
-  calledFrom extends 'collection' ? CollectionInstance<DocDataType> : DocInstance<DocDataType>
->
+) => Promise<calledFrom extends 'collection' ? Map<string, DocDataType> : DocDataType>
 
+/**
+ * @returns The new `doc()` instance after inserting. You can access the inserted `id` by checking this returned instance.
+ * @example
+ * const newDoc = collection('myDocs').insert({ some: 'payload' })
+ * newDoc.id // the generated id
+ * newDoc.data // { some: 'payload' }
+ */
 export type MagnetarInsertAction<DocDataType extends Record<string, any> = Record<string, any>> = (
   payload: DocDataType,
   actionConfig?: ActionConfig
 ) => Promise<DocInstance<DocDataType>>
 
+/**
+ * @returns the new document data after applying the changes to the local document (including any modifications from modifyPayloadOn)
+ */
 export type MagnetarWriteAction<DocDataType extends Record<string, any> = Record<string, any>> = (
   payload: O.Optional<DocDataType, keyof DocDataType, 'deep'>,
   actionConfig?: ActionConfig
-) => Promise<DocInstance<DocDataType>>
+) => Promise<DocDataType>
 
+/**
+ * @returns the new document data after applying the changes to the local document (including any modifications from modifyPayloadOn)
+ */
 export type MagnetarDeletePropAction<
   DocDataType extends Record<string, any> = Record<string, any>
 > = (
   payload: keyof DocDataType | string | (keyof DocDataType | string)[],
   actionConfig?: ActionConfig
-) => Promise<DocInstance<DocDataType>>
+) => Promise<Partial<DocDataType>>
 
 /**
  * @param {*} [payload] When executing on a doc: no payload needed. When executing on a collection: you need to pass the document ID you want to delete.
@@ -65,10 +83,7 @@ export type MagnetarDeletePropAction<
  * @example collection('pokedex').delete('001')
  * @example doc('pokedex/001').delete()
  */
-export type MagnetarDeleteAction<DocDataType extends Record<string, any> = Record<string, any>> = (
-  payload?: any,
-  actionConfig?: ActionConfig
-) => Promise<DocInstance<DocDataType>>
+export type MagnetarDeleteAction = (payload?: any, actionConfig?: ActionConfig) => Promise<void>
 
 /**
  * All open streams with the payload passed to `stream(payload)` as key and the "closeStream" function as value. In case `stream()` had no payload, use `undefined`

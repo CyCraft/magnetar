@@ -442,20 +442,19 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                 // anything that's executed from a "collection" module:
                 // 'insert' always returns a DocInstance, unless the "abort" action was called, then the modulePath might still be a collection:
                 if (actionName === 'insert' && docId) {
-                    // we do not pass the `moduleConfig`, because it's the moduleConfig of the "collection" in this case
-                    resolve(docFn(modulePath));
+                    resolve(docFn(modulePath, moduleConfig));
                     return;
                 }
                 // anything that's executed from a "doc" module:
                 if (docId || !collectionFn) {
-                    resolve(docFn(modulePath, moduleConfig));
+                    resolve(docFn(modulePath, moduleConfig).data);
                     if (actionName === 'fetch')
                         fetchPromises.delete(fetchPromiseKey);
                     return;
                 }
                 // all other actions triggered on collections ('fetch' is the only possibility left)
-                // should return the collection:
-                resolve(collectionFn(modulePath, moduleConfig));
+                // 'fetch' should return `Map<string, DocDataType>` or `DocDataType`
+                resolve(collectionFn(modulePath, moduleConfig).data);
                 if (actionName === 'fetch')
                     fetchPromises.delete(fetchPromiseKey);
             }

@@ -29,19 +29,11 @@ const data = bulbasaur.data
 // bulbasaur.data ≈ { name: 'Bulbasaur' }
 ```
 
-The `fetch` action will also return a doc or collection module you can use:
+The `fetch` action returns whatever data was fetched. When fetching a single document, the data will be an object.
 
 ```js
-// create the module and immidiately await the fetch()
-const bulbasaur = await magnetar.doc('pokedex/001').fetch()
-
-// bulbasaur.data ≈ { name: 'Bulbasaur' }
-```
-
-You can also immediately grab the data after fetching like so:
-
-```js
-const bulbasaurData = (await magnetar.doc('pokedex/001').fetch()).data
+// create the module and immidiately use the fetched data
+const bulbasaurData = await magnetar.doc('pokedex/001').fetch()
 
 // bulbasaurData ≈ { name: 'Bulbasaur' }
 ```
@@ -66,9 +58,21 @@ const allPokemon = pokedexModule.data.values()
 // allPokemon ≈ [{ name: 'Bulbasaur' }, /* etc...*/ ]
 ```
 
+The `fetch` action returns whatever data was fetched. When fetching a collection, the data will be a Map <small>[？](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)</small>.
+
+```js
+// create the module and immidiately use the fetched data
+const pokedexData = await magnetar.collection('pokedex').fetch()
+
+// pokedexData ≈ Map<
+//   '001': { name: 'Bulbasaur' },
+//   /* etc...*/
+// >
+```
+
 ### Fetch only once per session
 
-You can make sure Magnetar only fetches a document once but prevents from fetching again if the data was already fetched locally.
+You can make sure Magnetar only fetches a document once but prevents from fetching again if the data was already fetched locally. This is handy when you want to fetch data each time a page is opened, but prevent multiple fetches during the same session.
 
 ```js
 await bulbasaur.fetch({ ifUnfetched: true }) // makes the fetch call once
@@ -88,10 +92,10 @@ You can fetch and immediately return a document's data. If this is executed mult
 
 ```js
 // every time this is executed, it will fetch and return the data:
-const bulbasaurData = (await magnetar.doc('pokedex/001').fetch()).data
+const bulbasaurData = await magnetar.doc('pokedex/001').fetch()
 
 // this will only fetch the data once, and from there on always return the same data:
-const bulbasaurData = (await magnetar.doc('pokedex/001').fetch({ ifUnfetched: true })).data
+const bulbasaurData = await magnetar.doc('pokedex/001').fetch({ ifUnfetched: true })
 ```
 
 ## Stream Realtime Updates
@@ -318,6 +322,7 @@ const pokedexModule = magnetar.collection('pokedex')
 
 /**
  * @param {string} type - the Pokemon Type that's being searched
+ * @returns {Record<string, any>[]}
  */
 async function searchPokemon(type) {
   const queriedPokedex = pokedexModule.where('type', '==', type).orderBy('name', 'asc')

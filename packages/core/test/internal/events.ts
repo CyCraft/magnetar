@@ -69,7 +69,7 @@ test('insert: can abort in before events', async (t) => {
         },
       },
     })
-    t.is(result.id, pokedexModule.id)
+    t.deepEqual(result.data, pokedexModule.data.get('7'))
   } catch (error) {
     t.fail(error)
   }

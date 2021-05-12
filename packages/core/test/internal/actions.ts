@@ -51,7 +51,7 @@ test('deleteProp: (document)', async (t) => {
   try {
     const result = await trainerModule.deleteProp(prop)
     // check data of reference returned
-    t.deepEqual(result.data, trainerModule.data)
+    t.deepEqual(result, trainerModule.data)
   } catch (error) {
     t.fail(error)
   }
@@ -75,8 +75,7 @@ test('delete: (document)', async (t) => {
   try {
     const result = await trainerModule.delete()
     // check data of reference returned
-    t.deepEqual(result.data, undefined)
-    t.deepEqual(result.id, trainerModule.id)
+    t.deepEqual(result, undefined)
   } catch (error) {
     t.fail(error)
   }
@@ -110,8 +109,8 @@ test('read: fetch (collection)', async (t) => {
   t.is(pokedexModule.data.size, 1)
   try {
     const result = await pokedexModule.fetch()
-    t.deepEqual(result.data.get('1'), pokedex(1))
-    t.deepEqual(result.data.get('136'), pokedex(136))
+    t.deepEqual(result.get('1'), pokedex(1))
+    t.deepEqual(result.get('136'), pokedex(136))
   } catch (error) {
     t.fail(error)
   }
@@ -126,7 +125,7 @@ test('read: fetch (document)', async (t) => {
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
   try {
     const result = await trainerModule.fetch()
-    t.deepEqual(result.data, { name: 'Luca', age: 10, dream: 'job' })
+    t.deepEqual(result, { name: 'Luca', age: 10, dream: 'job' })
   } catch (error) {
     t.fail(error)
   }
@@ -138,7 +137,8 @@ test('fetch (collection) where-filter: ==', async (t) => {
 
   const pokedexModuleWithQuery = pokedexModule.where('name', '==', 'Flareon')
   try {
-    const queryModuleRef = await pokedexModuleWithQuery.fetch()
+    const queryModuleRef = pokedexModuleWithQuery
+    await queryModuleRef.fetch()
     t.deepEqual([...queryModuleRef.data.values()], [pokedex(136)])
   } catch (error) {
     t.fail(error)

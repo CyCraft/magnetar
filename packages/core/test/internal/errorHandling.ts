@@ -201,8 +201,8 @@ test('fetch + onError: continue', async (t) => {
         },
       },
     })
-    t.deepEqual(result.data.get('1'), pokedex(1))
-    t.deepEqual(result.data.get('136'), undefined)
+    t.deepEqual(result.get('1'), pokedex(1))
+    t.deepEqual(result.get('136'), undefined)
   } catch (error) {
     t.fail(error)
   }
