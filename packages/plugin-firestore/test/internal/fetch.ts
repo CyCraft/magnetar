@@ -10,14 +10,17 @@ import { DocMetadata } from '../../../core/src'
     const inexistentDoc = trainerModule.collection('inexistent').doc('inexistent-doc')
     try {
       t.deepEqual(inexistentDoc.data, undefined)
-      const result = await inexistentDoc.fetch(undefined, {
-        modifyReadResponseOn: {
-          added: (docData: any, docMetadata: DocMetadata) => {
-            t.deepEqual(docData, undefined)
-            t.is(docMetadata.exists, false)
+      const result = await inexistentDoc.fetch(
+        { force: true },
+        {
+          modifyReadResponseOn: {
+            added: (docData: any, docMetadata: DocMetadata) => {
+              t.deepEqual(docData, undefined)
+              t.is(docMetadata.exists, false)
+            },
           },
-        },
-      })
+        }
+      )
       t.deepEqual(result, undefined)
       t.deepEqual(inexistentDoc.data, undefined)
     } catch (error) {

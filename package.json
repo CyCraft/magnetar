@@ -21,7 +21,7 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "release": "npm run test && npm run build && lerna publish",
     "deploy:docs": "npm run build:favicon && lerna run build:docs && firebase deploy --only hosting && git add -A && git commit -m \"chore: deploy\"",
-    "dep:i": "npm i",
+    "dep:i": "yarn",
     "dep:update-all": "ncu --target minor -u && lerna exec 'ncu --target minor -u' && npm run dep:i",
     "dep:check-for-updates": "ncu --target minor && lerna exec 'ncu --target minor'",
     "dep:reinstall-all": "lerna clean -y && rimraf node_modules && npm run dep:i"

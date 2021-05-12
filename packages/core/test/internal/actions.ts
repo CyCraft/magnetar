@@ -108,7 +108,7 @@ test('read: fetch (collection)', async (t) => {
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.is(pokedexModule.data.size, 1)
   try {
-    const result = await pokedexModule.fetch()
+    const result = await pokedexModule.fetch({ force: true })
     t.deepEqual(result.get('1'), pokedex(1))
     t.deepEqual(result.get('136'), pokedex(136))
   } catch (error) {
@@ -124,7 +124,7 @@ test('read: fetch (document)', async (t) => {
   const { trainerModule } = createMagnetarInstance()
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
   try {
-    const result = await trainerModule.fetch()
+    const result = await trainerModule.fetch({ force: true })
     t.deepEqual(result, { name: 'Luca', age: 10, dream: 'job' })
   } catch (error) {
     t.fail(error)
@@ -138,7 +138,7 @@ test('fetch (collection) where-filter: ==', async (t) => {
   const pokedexModuleWithQuery = pokedexModule.where('name', '==', 'Flareon')
   try {
     const queryModuleRef = pokedexModuleWithQuery
-    await queryModuleRef.fetch()
+    await queryModuleRef.fetch({ force: true })
     t.deepEqual([...queryModuleRef.data.values()], [pokedex(136)])
   } catch (error) {
     t.fail(error)

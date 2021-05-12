@@ -16,15 +16,18 @@ test('fetch: can mutate payload & read response (config in global magnetar insta
   })
   try {
     let payloadInSuccessEvent: any
-    const result = await magnetar.collection('pokedex').fetch(undefined, {
-      on: {
-        success: ({ payload }) => {
-          payloadInSuccessEvent = payload
+    const result = await magnetar.collection('pokedex').fetch(
+      { force: true },
+      {
+        on: {
+          success: ({ payload }) => {
+            payloadInSuccessEvent = payload
+          },
         },
-      },
-    })
+      }
+    )
     // the remote result SHOULD HAVE the applied defaults
-    t.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123' })
+    t.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123', force: true })
     t.deepEqual(result.get('136'), { ...pokedex(136), seen: true })
   } catch (error) {
     t.fail(error)
@@ -101,15 +104,18 @@ test('fetch: can mutate payload & read response (config in module)', async (t) =
   })
   try {
     let payloadInSuccessEvent: any
-    const result = await pokedexModule.fetch(undefined, {
-      on: {
-        success: ({ payload }) => {
-          payloadInSuccessEvent = payload
+    const result = await pokedexModule.fetch(
+      { force: true },
+      {
+        on: {
+          success: ({ payload }) => {
+            payloadInSuccessEvent = payload
+          },
         },
-      },
-    })
+      }
+    )
     // the remote result SHOULD HAVE the applied defaults
-    t.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123' })
+    t.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123', force: true })
     t.deepEqual(result.get('136'), { ...pokedex(136), seen: true })
   } catch (error) {
     t.fail(error)
@@ -181,7 +187,7 @@ test('fetch: can mutate payload & read response (config in action)', async (t) =
   try {
     let payloadInSuccessEvent: any
     const result = await pokedexModule.fetch(
-      {},
+      { force: true },
       {
         modifyPayloadOn: { read: addToken },
         modifyReadResponseOn: { added: addSeen },
@@ -195,7 +201,7 @@ test('fetch: can mutate payload & read response (config in action)', async (t) =
     // the remote result SHOULD HAVE the applied defaults
     t.deepEqual(result.get('1'), { ...pokedex(1), seen: true })
     t.deepEqual(result.get('136'), { ...pokedex(136), seen: true })
-    t.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123' })
+    t.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123', force: true })
   } catch (error) {
     t.fail(error)
   }

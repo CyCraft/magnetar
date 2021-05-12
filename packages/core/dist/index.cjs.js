@@ -422,7 +422,10 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                     }
                     // special handling for 'fetch' (resultFromPlugin will always be `FetchResponse | OnAddedFn`)
                     if (actionName === 'fetch') {
-                        if (payload && payload.ifUnfetched === true) {
+                        const optimisticFetch = !payload ||
+                            !Object.hasOwnProperty.call(payload || {}, 'force') ||
+                            (payload === null || payload === void 0 ? void 0 : payload.force) === false;
+                        if (optimisticFetch) {
                             const localStoreName = moduleConfig.localStoreName || globalConfig.localStoreName;
                             // the local store successfully returned a fetch response based on already fetched data
                             if (storeName === localStoreName && isFetchResponse(resultFromPlugin)) {

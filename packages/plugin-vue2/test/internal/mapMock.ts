@@ -5,7 +5,7 @@ import { pokedex, pokedexGetAll } from '@magnetarjs/test-utils'
 test('map mock', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
-    await pokedexModule.fetch()
+    await pokedexModule.fetch({ force: true })
   } catch (error) {
     t.fail(error)
   }

@@ -8,7 +8,7 @@ test('fetch (collectionGroup)', async (t) => {
   //   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 
   //   try {
-  //     await trainerModule.fetch()
+  //     await trainerModule.fetch({ force: true })
   //   } catch (error) {
   //     t.fail(error)
   //   }
@@ -22,7 +22,7 @@ test('fetch (collectionGroup)', async (t) => {
 //   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 
 //   try {
-//     await trainerModule.fetch()
+//     await trainerModule.fetch({ force: true })
 //   } catch (error) {
 //     t.fail(error)
 //   }

@@ -18,20 +18,21 @@ export function fetchActionFactory(
     docId,
     pluginModuleConfig,
   }: PluginFetchActionPayload<SimpleStoreModuleConfig>): FetchResponse | DoOnFetch {
-    if (payload && payload.ifUnfetched === true) {
-      if (!docId) {
-        const localDocs: DocMetadata[] = [...data[collectionPath].entries()].map(
-          ([_docId, data]) => ({
-            data,
-            exists: 'unknown',
-            id: _docId,
-          })
-        )
+    const optimisticFetch =
+      !payload || !Object.hasOwnProperty.call(payload || {}, 'force') || payload?.force === false
+    if (optimisticFetch) {
+      const collectionData = data[collectionPath]
+      if (!docId && collectionData.size > 0) {
+        const localDocs: DocMetadata[] = [...collectionData.entries()].map(([_docId, data]) => ({
+          data,
+          exists: 'unknown',
+          id: _docId,
+        }))
         const fetchResponse: FetchResponse = { docs: localDocs }
         return fetchResponse
       }
       if (docId) {
-        const localDoc = data[collectionPath].get(docId)
+        const localDoc = collectionData.get(docId)
         // if already fetched
         if (localDoc) {
           const fetchResponse: FetchResponse = {

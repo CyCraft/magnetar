@@ -12,7 +12,7 @@ import { pokedex } from '@magnetarjs/test-utils'
     t.is(pokedexModule.data.size, 1)
 
     try {
-      await pokedexModule.fetch()
+      await pokedexModule.fetch({ force: true })
     } catch (error) {
       t.fail(error)
     }
@@ -28,7 +28,7 @@ import { pokedex } from '@magnetarjs/test-utils'
     const { trainerModule } = await createMagnetarInstance('read')
     t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
     try {
-      await trainerModule.fetch()
+      await trainerModule.fetch({ force: true })
     } catch (error) {
       t.fail(error)
     }
@@ -41,7 +41,7 @@ import { pokedex } from '@magnetarjs/test-utils'
     const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = pokedexModule.where('name', '==', 'Flareon')
-      await queryModuleRef.fetch()
+      await queryModuleRef.fetch({ force: true })
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(136)]
       t.deepEqual(actual, expected as any)
@@ -60,7 +60,7 @@ import { pokedex } from '@magnetarjs/test-utils'
     const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = pokedexModule.orderBy('name').where('name', '!=', 'Abra').limit(1)
-      await queryModuleRef.fetch()
+      await queryModuleRef.fetch({ force: true })
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(142)]
       t.deepEqual(actual, expected as any)
@@ -79,7 +79,7 @@ import { pokedex } from '@magnetarjs/test-utils'
     const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = pokedexModule.where('base.HP', '==', 10)
-      await queryModuleRef.fetch()
+      await queryModuleRef.fetch({ force: true })
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(50)]
       t.deepEqual(actual, expected as any)
@@ -98,7 +98,7 @@ import { pokedex } from '@magnetarjs/test-utils'
     const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = pokedexModule.where('base.HP', '<', 11)
-      await queryModuleRef.fetch()
+      await queryModuleRef.fetch({ force: true })
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(50)]
       t.deepEqual(actual, expected as any)
@@ -117,7 +117,7 @@ import { pokedex } from '@magnetarjs/test-utils'
     const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = pokedexModule.where('base.HP', '<=', 10)
-      await queryModuleRef.fetch()
+      await queryModuleRef.fetch({ force: true })
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(50)]
       t.deepEqual(actual, expected as any)
@@ -136,7 +136,7 @@ import { pokedex } from '@magnetarjs/test-utils'
     const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = pokedexModule.where('base.HP', '>', 249)
-      await queryModuleRef.fetch()
+      await queryModuleRef.fetch({ force: true })
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(113)]
       t.deepEqual(actual, expected as any)
@@ -155,7 +155,7 @@ import { pokedex } from '@magnetarjs/test-utils'
     const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = pokedexModule.where('base.HP', '>=', 250)
-      await queryModuleRef.fetch()
+      await queryModuleRef.fetch({ force: true })
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(113)]
       t.deepEqual(actual, expected as any)
@@ -174,7 +174,7 @@ import { pokedex } from '@magnetarjs/test-utils'
     const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = pokedexModule.where('type', 'array-contains', 'Steel')
-      await queryModuleRef.fetch()
+      await queryModuleRef.fetch({ force: true })
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(81), pokedex(82)]
       t.deepEqual(actual, expected as any)
@@ -193,7 +193,7 @@ import { pokedex } from '@magnetarjs/test-utils'
     const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = pokedexModule.where('name', 'in', ['Vaporeon', 'Jolteon', 'Flareon'])
-      await queryModuleRef.fetch()
+      await queryModuleRef.fetch({ force: true })
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(134), pokedex(135), pokedex(136)]
       t.deepEqual(actual, expected as any)
@@ -215,7 +215,7 @@ import { pokedex } from '@magnetarjs/test-utils'
         .orderBy('name')
         .where('name', 'not-in', ['Abra', 'Alakazam', 'Arcanine'])
         .limit(3)
-      await queryModuleRef.fetch()
+      await queryModuleRef.fetch({ force: true })
       const actual = [...queryModuleRef.data.values()]
       const expected = [pokedex(142), pokedex(24), pokedex(144)]
       t.deepEqual(actual, expected as any)
@@ -236,7 +236,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       const queryModuleRef = pokedexModule
         .where('type', 'array-contains-any', ['Steel', 'Ice'])
         .orderBy('id', 'asc')
-      await queryModuleRef.fetch(undefined, { onError: 'stop' })
+      await queryModuleRef.fetch({ force: true }, { onError: 'stop' })
       const actual = [...queryModuleRef.data.values()]
       const expected = [
         pokedex(81),
@@ -266,7 +266,7 @@ import { pokedex } from '@magnetarjs/test-utils'
         .where('type', 'array-contains', 'Fire')
         .where('base.Speed', '>=', 100)
         .orderBy('base.Speed', 'asc')
-      await queryModuleRef.fetch(undefined, { onError: 'stop' })
+      await queryModuleRef.fetch({ force: true }, { onError: 'stop' })
       const actual = [...queryModuleRef.data.values()].map((p) => p.base.Speed)
       const expected = [pokedex(6), pokedex(38), pokedex(78)].map((p) => p.base.Speed)
       t.deepEqual(actual, expected as any)
@@ -285,7 +285,7 @@ import { pokedex } from '@magnetarjs/test-utils'
     const { pokedexModule } = await createMagnetarInstance('read')
     try {
       const queryModuleRef = pokedexModule.where('id', '<', 10).orderBy('id', 'desc').limit(10)
-      await queryModuleRef.fetch(undefined, { onError: 'stop' })
+      await queryModuleRef.fetch({ force: true }, { onError: 'stop' })
       const actual = [...queryModuleRef.data.values()].map((p) => p.id)
       const expected = [
         pokedex(9),
@@ -314,7 +314,7 @@ import { pokedex } from '@magnetarjs/test-utils'
     const { pokedexModule } = await createMagnetarInstance('read-no-access')
     let error
     try {
-      const a = await pokedexModule.fetch()
+      const a = await pokedexModule.fetch({ force: true })
     } catch (_error) {
       error = _error
     }

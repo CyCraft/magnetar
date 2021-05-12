@@ -94,7 +94,7 @@ export type PluginFetchActionPayload<SpecificPluginModuleConfig = PluginModuleCo
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: { ifUnfetched?: boolean } | Record<string, any> | void
+    payload: { force?: boolean } | Record<string, any> | void
   }
 >
 /**
@@ -132,21 +132,20 @@ export type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleC
  */
 export type PluginInsertAction = (payload: PluginInsertActionPayload) => string | Promise<string>
 
-export type PluginDeletePropActionPayload<
-  SpecificPluginModuleConfig = PluginModuleConfig
-> = O.Patch<
-  PluginActionPayloadBase<SpecificPluginModuleConfig>,
-  {
-    /**
-     * Whatever payload was passed to the action that was triggered
-     */
-    payload: string | string[]
-    /**
-     * docId must be provided
-     */
-    docId: string
-  }
->
+export type PluginDeletePropActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> =
+  O.Patch<
+    PluginActionPayloadBase<SpecificPluginModuleConfig>,
+    {
+      /**
+       * Whatever payload was passed to the action that was triggered
+       */
+      payload: string | string[]
+      /**
+       * docId must be provided
+       */
+      docId: string
+    }
+  >
 /**
  * Should handle 'deleteProp' for docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
  */

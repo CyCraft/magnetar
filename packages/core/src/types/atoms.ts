@@ -4,11 +4,11 @@ export type DocMetadata = {
   data: Record<string, any> | undefined
   id: string
   /**
-   * In case the doc was pulled from cache with `fetch({ ifUnfetched: true })` then `exists` will be `'unknown'`
+   * In case the doc was returned optimisticly (from the local store data) then `exists` will be `'unknown'`
    */
   exists: boolean | 'unknown'
   /**
-   * In case the doc was pulled from cache with `fetch({ ifUnfetched: true })` then `metadata` will be absent
+   * In case the doc was returned optimisticly (from the local store data) then `metadata` will be absent
    */
   metadata?: Record<string, any>
 }

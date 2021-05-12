@@ -37,13 +37,27 @@ export type MagnetarStreamAction = (
 
 /**
  * Fetches document(s) and adds the data to your local store's state.
+ * Fetch is optimistic by default — if it can find the doc's data in your local state, it will return that and prevent any remote fetches.
+ * You can force a re-fetch by passing `{ force: true }`
  * @returns the document(s) data that was fetched. If you need to access other metadata that was retrieved during fetching, you can use `modifyReadResponse.added`.
+ * @example
+ * const bulbasaur = magnetar.collection('pokedex').doc('001')
+ * bulbasaur.fetch() // does nothing if already fetched once
+ * @example
+ * const bulbasaur = magnetar.collection('pokedex').doc('001')
+ * bulbasaur.fetch({ force: true }) // makes API call to remote store
+ * @example
+ * const pokedex = magnetar.collection('pokedex')
+ * pokedex.fetch() // does nothing if already fetched once
+ * @example
+ * const pokedex = magnetar.collection('pokedex')
+ * pokedex.fetch({ force: true }) // makes API call to remote store
  */
 export type MagnetarFetchAction<
   DocDataType extends Record<string, any> = Record<string, any>,
   calledFrom extends 'collection' | 'doc' = 'collection' | 'doc'
 > = (
-  payload?: { ifUnfetched?: boolean } | Record<string, any> | void,
+  payload?: { force?: boolean } | Record<string, any> | void,
   actionConfig?: ActionConfig
 ) => Promise<calledFrom extends 'collection' ? Map<string, DocDataType> : DocDataType>
 

@@ -8,7 +8,7 @@ import { pokedex } from '@magnetarjs/test-utils'
 //   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
 //   t.is(pokedexModule.data.size, 1)
 //   try {
-//     const result = await pokedexModule.fetch()
+//     const result = await pokedexModule.fetch({ force: true })
 //     t.deepEqual(result.get('1'), pokedex(1))
 //     t.deepEqual(result.get('136'), pokedex(136))
 //   } catch (error) {
@@ -31,7 +31,7 @@ test('read: fetch (document) - prevent multiple fetch requests at the same time'
   })
   try {
     // fetch twice at the same time
-    await Promise.all([trainerModule.fetch(), trainerModule.fetch()])
+    await Promise.all([trainerModule.fetch({ force: true }), trainerModule.fetch({ force: true })])
   } catch (error) {
     t.fail(error)
   }
@@ -41,7 +41,7 @@ test('read: fetch (document) - prevent multiple fetch requests at the same time'
 
   try {
     // fetch twice again the same time
-    await Promise.all([trainerModule.fetch(), trainerModule.fetch()])
+    await Promise.all([trainerModule.fetch({ force: true }), trainerModule.fetch({ force: true })])
   } catch (error) {
     t.fail(error)
   }
@@ -52,7 +52,7 @@ test('read: fetch (document) - prevent multiple fetch requests at the same time'
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })
 
-test('read: fetch (document) - ifUnfetched', async (t) => {
+test('read: fetch (document) - optimistic fetch by default', async (t) => {
   // get resolves once all stores have given a response with data
   const storeNames: string[] = []
   const startEmpty = true
@@ -68,10 +68,7 @@ test('read: fetch (document) - ifUnfetched', async (t) => {
   )
   try {
     // fetch twice at the same time
-    await Promise.all([
-      trainerModule.fetch({ ifUnfetched: true }),
-      trainerModule.fetch({ ifUnfetched: true }),
-    ])
+    await Promise.all([trainerModule.fetch({ force: true }), trainerModule.fetch({ force: true })])
   } catch (error) {
     t.fail(error)
   }
@@ -81,10 +78,7 @@ test('read: fetch (document) - ifUnfetched', async (t) => {
 
   try {
     // fetch twice again the same time
-    await Promise.all([
-      trainerModule.fetch({ ifUnfetched: true }),
-      trainerModule.fetch({ ifUnfetched: true }),
-    ])
+    await Promise.all([trainerModule.fetch(), trainerModule.fetch()])
   } catch (error) {
     t.fail(error)
   }
