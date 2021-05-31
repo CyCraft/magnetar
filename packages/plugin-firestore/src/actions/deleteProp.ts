@@ -25,6 +25,6 @@ export function deletePropActionFactory(
       }),
       {} as any
     )
-    await batchSync.update(documentPath, firestorePayload)
+    await batchSync.update(documentPath, firestorePayload, pluginModuleConfig.syncDebounceMs)
   }
 }

@@ -47,6 +47,7 @@ export interface FirestoreModuleConfig {
   where?: WhereClause[]
   orderBy?: OrderByClause[]
   limit?: Limit
+  syncDebounceMs?: number
 }
 
 function firestorePluginOptionsWithDefaults(

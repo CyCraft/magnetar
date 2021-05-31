@@ -24,7 +24,7 @@ export function insertActionFactory(
           : firebaseInstance.firestore().collection('random').doc().id
     }
     const documentPath = getFirestoreDocPath(collectionPath, _docId as string, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
-    await batchSync.set(documentPath, payload, 'insert')
+    await batchSync.set(documentPath, payload, 'insert', pluginModuleConfig.syncDebounceMs)
     return _docId as string
   }
 }

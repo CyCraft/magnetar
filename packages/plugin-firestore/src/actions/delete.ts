@@ -18,6 +18,6 @@ export function deleteActionFactory(
     if (!isFullString(_docId)) throw new Error('No ID passed to delete action.')
 
     const documentPath = getFirestoreDocPath(collectionPath, _docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
-    await batchSync.delete(documentPath)
+    await batchSync.delete(documentPath, pluginModuleConfig.syncDebounceMs)
   }
 }

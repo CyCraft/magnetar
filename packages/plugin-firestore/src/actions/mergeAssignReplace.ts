@@ -17,6 +17,6 @@ export function writeActionFactory(
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 
     const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
-    await batchSync.set(documentPath, payload, actionName)
+    await batchSync.set(documentPath, payload, actionName, pluginModuleConfig.syncDebounceMs)
   }
 }

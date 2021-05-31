@@ -2,6 +2,7 @@ import { FirestorePluginOptions } from '../CreatePlugin'
 import { Countdown, CountdownInstance } from './Countdown'
 // just for types:
 import type firebase from 'firebase'
+import { isNumber } from 'is-what'
 
 type SetOptions = firebase.firestore.SetOptions
 type WriteBatch = firebase.firestore.WriteBatch
@@ -28,10 +29,15 @@ export type BatchSync = {
   set: (
     documentPath: string,
     payload: Record<string, any>,
-    actionName: 'insert' | 'merge' | 'assign' | 'replace'
+    actionName: 'insert' | 'merge' | 'assign' | 'replace',
+    syncDebounceMsOverwrite?: number
   ) => Promise<void>
-  update: (documentPath: string, payload: Record<string, any>) => Promise<void>
-  delete: (documentPath: string) => Promise<void>
+  update: (
+    documentPath: string,
+    payload: Record<string, any>,
+    syncDebounceMsOverwrite?: number
+  ) => Promise<void>
+  delete: (documentPath: string, syncDebounceMsOverwrite?: number) => Promise<void>
 }
 
 type DebugInfo = {
@@ -93,9 +99,10 @@ export function batchSyncFactory(
     return firebaseInstance.firestore().doc(documentPath)
   }
 
-  function preparePayload(
-    _payload: Record<string, any>
-  ): { payload: Record<string, any>; operationCount: number } {
+  function preparePayload(_payload: Record<string, any>): {
+    payload: Record<string, any>
+    operationCount: number
+  } {
     // todo: properly handle any serverTimestamp, arrayUnion and increment in here
     const payload = _payload
     const operationCount = countOperations(_payload)
@@ -141,11 +148,13 @@ export function batchSyncFactory(
   /**
    * Sets a new countdown if it doesn't exist yet, and makes sure that the countdown will executeSync
    *
+   * @param {number} [syncDebounceMsOverwrite] Pass a number to set the batch sync countdown. If not set, it will use the globally set `syncDebounceMs`.
    * @returns {CountdownInstance}
    */
-  function prepareCountdown(): CountdownInstance {
+  function prepareCountdown(syncDebounceMsOverwrite?: number): CountdownInstance {
     if (!state.countdown) {
-      state.countdown = Countdown(syncDebounceMs)
+      const ms = isNumber(syncDebounceMsOverwrite) ? syncDebounceMsOverwrite : syncDebounceMs
+      state.countdown = Countdown(ms)
       state.countdown.done.then(() => {
         executeSync()
         state.countdown = null
@@ -154,15 +163,16 @@ export function batchSyncFactory(
     return state.countdown
   }
 
-  function triggerSync(): void {
-    const countdown = prepareCountdown()
+  function triggerSync(syncDebounceMsOverwrite?: number): void {
+    const countdown = prepareCountdown(syncDebounceMsOverwrite)
     countdown.restart()
   }
 
   function set(
     documentPath: string,
     _payload: Record<string, any>,
-    actionName: 'insert' | 'merge' | 'assign' | 'replace'
+    actionName: 'insert' | 'merge' | 'assign' | 'replace',
+    syncDebounceMsOverwrite?: number
   ): Promise<void> {
     const options: SetOptions =
       actionName === 'merge'
@@ -181,11 +191,15 @@ export function batchSyncFactory(
       resolves.push(resolve)
       rejects.push(reject)
     })
-    triggerSync()
+    triggerSync(syncDebounceMsOverwrite)
     return promise
   }
 
-  function update(documentPath: string, _payload: Record<string, any>): Promise<void> {
+  function update(
+    documentPath: string,
+    _payload: Record<string, any>,
+    syncDebounceMsOverwrite?: number
+  ): Promise<void> {
     const { payload, operationCount } = preparePayload(_payload)
     const { batch, resolves, rejects, debugInfo } = prepareSyncStack(operationCount)
 
@@ -197,11 +211,11 @@ export function batchSyncFactory(
       resolves.push(resolve)
       rejects.push(reject)
     })
-    triggerSync()
+    triggerSync(syncDebounceMsOverwrite)
     return promise
   }
 
-  function _delete(documentPath: string): Promise<void> {
+  function _delete(documentPath: string, syncDebounceMsOverwrite?: number): Promise<void> {
     const operationCount = 1
     const { batch, resolves, rejects, debugInfo } = prepareSyncStack(operationCount)
 
@@ -213,7 +227,7 @@ export function batchSyncFactory(
       resolves.push(resolve)
       rejects.push(reject)
     })
-    triggerSync()
+    triggerSync(syncDebounceMsOverwrite)
     return promise
   }
 
