@@ -1,6 +1,6 @@
 {
   "name": "magnetar",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "State-management done right with automatic sync to remote databases and services. Framework-agnostic & optimistic-UI built-in 🌟",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@magnetarjs/core": "^0.1.0",
-    "@magnetarjs/plugin-firestore": "^0.2.0",
+    "@magnetarjs/plugin-firestore": "^0.2.1",
     "@magnetarjs/plugin-simple-store": "^0.1.0",
     "@magnetarjs/plugin-vue2": "^0.1.0"
   },
