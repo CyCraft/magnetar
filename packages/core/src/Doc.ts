@@ -39,23 +39,54 @@ export type DocInstance<DocDataType extends Record<string, any> = Record<string,
    * @example 'pokedex/001'
    */
   path: string
+  /**
+   * @see {@link OpenStreams}
+   */
   openStreams: OpenStreams
+  /**
+   * @see {@link FindStream}
+   */
   findStream: FindStream
+  /**
+   * @see {@link OpenStreamPromises}
+   */
   openStreamPromises: OpenStreamPromises
+  /**
+   * @see {@link FindStreamPromise}
+   */
   findStreamPromise: FindStreamPromise
 
   // actions
+  /**
+   * @see {@link MagnetarFetchAction}
+   */
   fetch: MagnetarFetchAction<DocDataType, 'doc'>
+  /**
+   * @see {@link MagnetarStreamAction}
+   */
   stream: MagnetarStreamAction
+  /**
+   * @see {@link MagnetarInsertAction}
+   */
   insert: MagnetarInsertAction<DocDataType>
+  /**
+   * @see {@link MagnetarWriteAction}
+   */
   merge: MagnetarWriteAction<DocDataType>
+  /**
+   * @see {@link MagnetarWriteAction}
+   */
   assign: MagnetarWriteAction<DocDataType>
+  /**
+   * @see {@link MagnetarWriteAction}
+   */
   replace: MagnetarWriteAction<DocDataType>
+  /**
+   * @see {@link MagnetarDeletePropAction}
+   */
   deleteProp: MagnetarDeletePropAction<DocDataType>
   /**
-   * @type {MagnetarDeleteAction} Documentation copied from `MagnetarDeleteAction`
-   * @param {*} [payload] The delete action doesn't need any payload. In some cases, a Store Plugin you use might accept a payload.
-   * @param {ActionConfig} [actionConfig]
+   * @see {@link MagnetarDeleteAction}
    */
   delete: MagnetarDeleteAction
 }

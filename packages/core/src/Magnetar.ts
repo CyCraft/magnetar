@@ -37,12 +37,19 @@ function configWithDefaults(config: GlobalConfig): O.Compulsory<GlobalConfig> {
  */
 export interface MagnetarInstance {
   globalConfig: O.Compulsory<GlobalConfig>
+  /**
+   * @see {@link CollectionFn}
+   */
   collection: CollectionFn
+  /**
+   * @see {@link DocFn}
+   */
   doc: DocFn
 }
 
 /**
- * This is the type for calling `collection()`
+ * This is the `collection()` method type.
+ * @see {@link CollectionInstance}
  */
 export type CollectionFn<DocDataTypeInherited extends Record<string, any> = Record<string, any>> = <
   DocDataType extends Record<string, any> = DocDataTypeInherited
@@ -52,7 +59,8 @@ export type CollectionFn<DocDataTypeInherited extends Record<string, any> = Reco
 ) => CollectionInstance<DocDataType>
 
 /**
- * This is the type for calling `doc()`
+ * This is the `doc()` method type.
+ * @see {@link DocInstance}
  */
 export type DocFn<DocDataTypeInherited extends Record<string, any> = Record<string, any>> = <
   DocDataType extends Record<string, any> = DocDataTypeInherited
@@ -61,6 +69,11 @@ export type DocFn<DocDataTypeInherited extends Record<string, any> = Record<stri
   moduleConfig?: ModuleConfig
 ) => DocInstance<DocDataType>
 
+/**
+ * Creates a magnetar instance.
+ * @see {@link GlobalConfig}
+ * @see {@link MagnetarInstance}
+ */
 export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
   // the passed GlobalConfig is merged onto defaults
   const globalConfig = configWithDefaults(magnetarConfig)

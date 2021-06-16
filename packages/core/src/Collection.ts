@@ -27,6 +27,7 @@ export type CollectionInstance<DocDataType extends Record<string, any> = Record<
   data: Map<string, DocDataType>
   /**
    * `doc` is available on every collection for chaining
+   * @see {@link DocFn}
    * @example collection('pokedex').doc('001')
    */
   doc: DocFn<DocDataType>
@@ -41,20 +42,53 @@ export type CollectionInstance<DocDataType extends Record<string, any> = Record<
    * @example 'pokedex'
    */
   path: string
+  /**
+   * @see {@link OpenStreams}
+   */
   openStreams: OpenStreams
+  /**
+   * @see {@link FindStream}
+   */
   findStream: FindStream
+  /**
+   * @see {@link OpenStreamPromises}
+   */
   openStreamPromises: OpenStreamPromises
+  /**
+   * @see {@link FindStreamPromise}
+   */
   findStreamPromise: FindStreamPromise
 
   // actions
+  /**
+   * @see {@link MagnetarFetchAction}
+   */
   fetch: MagnetarFetchAction<DocDataType, 'collection'>
+  /**
+   * @see {@link MagnetarStreamAction}
+   */
   stream: MagnetarStreamAction
+  /**
+   * @see {@link MagnetarInsertAction}
+   */
   insert: MagnetarInsertAction<DocDataType>
+  /**
+   * @see {@link MagnetarDeleteAction}
+   */
   delete: MagnetarDeleteAction
 
   // filters
+  /**
+   * Chainable filter. Returns {@link CollectionInstance} with filter applied.
+   */
   where: (fieldPath: string, operator: WhereFilterOp, value: any) => CollectionInstance<DocDataType>
+  /**
+   * Chainable filter. Returns {@link CollectionInstance} with filter applied.
+   */
   orderBy: (fieldPath: string, direction?: 'asc' | 'desc') => CollectionInstance<DocDataType>
+  /**
+   * Chainable filter. Returns {@link CollectionInstance} with filter applied.
+   */
   limit: (limitCount: number) => CollectionInstance<DocDataType>
 }
 
