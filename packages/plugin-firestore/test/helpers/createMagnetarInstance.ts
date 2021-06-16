@@ -36,7 +36,12 @@ export async function createMagnetarInstance(
   {
     insertDocs = {},
     deletePaths = [],
-  }: { insertDocs?: { [path: string]: Record<string, any> }; deletePaths?: string[] } = {}
+    remoteConfig = {},
+  }: {
+    insertDocs?: { [path: string]: Record<string, any> }
+    deletePaths?: string[]
+    remoteConfig?: Record<string, any>
+  } = {}
 ): Promise<{
   pokedexModule: CollectionInstance<PokedexModuleData>
   trainerModule: DocInstance<TrainerModuleData>
@@ -75,14 +80,14 @@ export async function createMagnetarInstance(
   const pokedexModule = magnetar.collection<PokedexModuleData>('pokedex', {
     configPerStore: {
       local: { initialData: getInitialDataCollection() },
-      remote: { firestorePath: `magnetarTests/${testName}/pokedex` },
+      remote: { firestorePath: `magnetarTests/${testName}/pokedex`, ...remoteConfig },
     },
   })
 
   const trainerModule = magnetar.doc<TrainerModuleData>('app-data/trainer', {
     configPerStore: {
       local: { initialData: getInitialDataDocument() },
-      remote: { firestorePath: `magnetarTests/${testName}` },
+      remote: { firestorePath: `magnetarTests/${testName}`, ...remoteConfig },
     },
   })
   return { pokedexModule, trainerModule, magnetar }
