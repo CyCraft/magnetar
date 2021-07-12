@@ -715,6 +715,11 @@ function configWithDefaults(config) {
     const merged = mergeAnything.merge(defaults, config);
     return merged;
 }
+/**
+ * Creates a magnetar instance.
+ * @see {@link GlobalConfig}
+ * @see {@link MagnetarInstance}
+ */
 function Magnetar(magnetarConfig) {
     // the passed GlobalConfig is merged onto defaults
     const globalConfig = configWithDefaults(magnetarConfig);
