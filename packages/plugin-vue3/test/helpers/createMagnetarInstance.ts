@@ -3,7 +3,7 @@ import { CreatePlugin as CreatePluginLocal } from '../../src'
 import { pokedex, PokedexEntry, generateRandomId, PluginMockRemote } from '@magnetarjs/test-utils'
 import { O } from 'ts-toolbelt'
 // @ts-ignore
-import Vue from 'vue/dist/vue.cjs.js'
+// import Vue from 'vue/dist/vue.cjs.js'
 
 const CreatePluginRemote = PluginMockRemote.CreatePlugin
 
@@ -29,9 +29,7 @@ export type TrainerModuleData = {
   shouldFail?: string
 }
 
-export function createMagnetarInstance(
-  vueInstance: any = Vue
-): {
+export function createMagnetarInstance(): {
   pokedexModule: CollectionInstance<PokedexModuleData>
   trainerModule: DocInstance<TrainerModuleData>
   magnetar: MagnetarInstance

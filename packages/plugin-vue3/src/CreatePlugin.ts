@@ -27,10 +27,6 @@ import { filterDataPerClauses } from './helpers/dataHelpers'
 
 export interface Vue3StoreOptions {
   /**
-   * This is required to make sure there are not two instances of Vue running which can cause issues.
-   */
-  // vueInstance: any
-  /**
    * To support optimistic UI you need to provide a function that can generate unique IDs.
    * @example () => firestore.collection('random').doc().id
    */

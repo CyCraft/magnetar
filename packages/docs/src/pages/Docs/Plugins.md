@@ -28,10 +28,11 @@ Use the Vue 2 plugin for Vue 2 projects.
 Example setup:
 
 ```js
-import { CreatePlugin as PluginVue } from '@magnetarjs/plugin-vue3'
+import { CreatePlugin as PluginVue } from '@magnetarjs/plugin-vue2'
 import vue from 'vue'
 
 function generateRandomId() {
+  return [Math.random(), Math.random(), Math.random()].join('-')
   // you need to provide your own logic
   // this function is used when you execute `insert` without specifying an ID
 }
@@ -48,15 +49,15 @@ Use the Vue 3 plugin for Vue 3 projects.
 Example setup:
 
 ```js
-import { CreatePlugin as PluginVue } from '@magnetarjs/plugin-vue2'
-import vue from 'vue'
+import { CreatePlugin as PluginVue } from '@magnetarjs/plugin-vue3'
 
 function generateRandomId() {
+  return [Math.random(), Math.random(), Math.random()].join('-')
   // you need to provide your own logic
   // this function is used when you execute `insert` without specifying an ID
 }
 
-const local = PluginVue({ vueInstance: vue, generateRandomId })
+const local = PluginVue({ generateRandomId })
 ```
 
 ## Simple Store
@@ -71,6 +72,7 @@ Example setup:
 import { CreatePlugin as PluginSimpleStore } from '@magnetarjs/plugin-simple-store'
 
 function generateRandomId() {
+  return [Math.random(), Math.random(), Math.random()].join('-')
   // you need to provide your own logic
   // this function is used when you execute `insert` without specifying an ID
 }
