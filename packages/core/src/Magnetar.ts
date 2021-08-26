@@ -1,7 +1,6 @@
 import { O } from 'ts-toolbelt'
-import { merge } from 'merge-anything'
 import { createCollectionWithContext, CollectionInstance } from './Collection'
-import { SharedConfig, GlobalConfig, ModuleConfig } from './types/config'
+import { GlobalConfig, ModuleConfig, defaultsGlobalConfig } from './types/config'
 import { createDocWithContext, DocInstance } from './Doc'
 import {
   OpenStreams,
@@ -15,22 +14,6 @@ import { getCollectionPathDocIdEntry } from './helpers/pathHelpers'
 import { findMapValueForKey } from './helpers/mapHelpers'
 
 export { isDocModule, isCollectionModule } from './helpers/pathHelpers'
-
-function configWithDefaults(config: GlobalConfig): O.Compulsory<GlobalConfig> {
-  const defaults: SharedConfig = {
-    executionOrder: {
-      read: [],
-      write: [],
-    },
-    onError: 'revert',
-    on: {},
-    modifyPayloadOn: {},
-    modifyReadResponseOn: {},
-    localStoreName: '',
-  }
-  const merged = merge(defaults, config)
-  return merged as any
-}
 
 /**
  * This is the global Magnetar instance that is returned when instantiating with Magnetar()
@@ -76,7 +59,7 @@ export type DocFn<DocDataTypeInherited extends Record<string, any> = Record<stri
  */
 export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
   // the passed GlobalConfig is merged onto defaults
-  const globalConfig = configWithDefaults(magnetarConfig)
+  const globalConfig = defaultsGlobalConfig(magnetarConfig)
 
   type ModuleIdentifier = { modulePath: string; moduleConfig: ModuleConfig }
   /**

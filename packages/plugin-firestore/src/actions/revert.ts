@@ -9,6 +9,7 @@ export function revertActionFactory(
     payload,
     collectionPath,
     docId,
+    actionConfig,
     pluginModuleConfig,
     actionName,
     error,
@@ -20,7 +21,13 @@ export function revertActionFactory(
     if (docId) {
       if (actionName === 'insert') {
         if (actions.delete)
-          await actions.delete({ payload: undefined, collectionPath, docId, pluginModuleConfig })
+          await actions.delete({
+            payload: undefined,
+            collectionPath,
+            docId,
+            actionConfig,
+            pluginModuleConfig,
+          })
         return
       }
     }

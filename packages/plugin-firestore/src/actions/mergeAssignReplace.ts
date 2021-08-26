@@ -1,3 +1,4 @@
+import { isNumber } from 'is-what'
 import { PluginWriteAction, PluginWriteActionPayload } from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { BatchSync } from '../helpers/batchSync'
@@ -12,11 +13,16 @@ export function writeActionFactory(
     payload,
     collectionPath,
     docId,
+    actionConfig,
     pluginModuleConfig,
   }: PluginWriteActionPayload<FirestoreModuleConfig>): Promise<void> {
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 
     const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
-    await batchSync.set(documentPath, payload, actionName, pluginModuleConfig.syncDebounceMs)
+    const syncDebounceMs = isNumber(actionConfig.syncDebounceMs)
+      ? actionConfig.syncDebounceMs
+      : pluginModuleConfig.syncDebounceMs
+
+    await batchSync.set(documentPath, payload, actionName, syncDebounceMs)
   }
 }

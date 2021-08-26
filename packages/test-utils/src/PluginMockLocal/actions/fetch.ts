@@ -15,6 +15,7 @@ export function fetchActionFactory(
 ): PluginFetchAction {
   return function ({
     payload,
+    actionConfig,
     collectionPath,
     docId,
     pluginModuleConfig,
@@ -66,6 +67,7 @@ export function fetchActionFactory(
         storePluginOptions
       )({
         payload: _payload,
+        actionConfig,
         collectionPath,
         docId,
         pluginModuleConfig,

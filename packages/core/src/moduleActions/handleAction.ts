@@ -1,5 +1,4 @@
-import { ActionName } from '../types/actions'
-import { SharedConfig } from '../types/config'
+import { ActionConfig, ActionName } from '../types/actions'
 
 import { EventNameFnsMap } from '../types/events'
 import {
@@ -24,8 +23,9 @@ export async function handleAction(args: {
   pluginModuleConfig: PluginModuleConfig
   pluginAction: PluginFetchAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction // prettier-ignore
   payload: void | Record<string, any> | Record<string, any>[] | string | string[]
+  actionConfig: ActionConfig
   eventNameFnsMap: EventNameFnsMap
-  onError: SharedConfig['onError']
+  onError: 'revert' | 'continue' | 'stop'
   actionName: Exclude<ActionName, 'stream'>
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
   storeName: string
@@ -37,6 +37,7 @@ export async function handleAction(args: {
     pluginModuleConfig,
     pluginAction,
     payload,
+    actionConfig = {},
     eventNameFnsMap: on,
     onError,
     actionName,
@@ -60,7 +61,13 @@ export async function handleAction(args: {
   let result: void | string | FetchResponse | OnAddedFn
   try {
     // triggering the action provided by the plugin
-    result = await pluginAction({ payload, collectionPath, docId, pluginModuleConfig } as any)
+    result = await pluginAction({
+      payload,
+      actionConfig,
+      collectionPath,
+      docId,
+      pluginModuleConfig,
+    } as any)
   } catch (error) {
     // handle and await each eventFn in sequence
     for (const fn of on.error) {

@@ -12,6 +12,7 @@ export function insertActionFactory(
     payload,
     collectionPath,
     docId,
+    actionConfig,
     pluginModuleConfig,
   }: PluginInsertActionPayload<FirestoreModuleConfig>): Promise<string> {
     const { firebaseInstance } = firestorePluginOptions
@@ -24,7 +25,11 @@ export function insertActionFactory(
           : firebaseInstance.firestore().collection('random').doc().id
     }
     const documentPath = getFirestoreDocPath(collectionPath, _docId as string, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
-    await batchSync.set(documentPath, payload, 'insert', pluginModuleConfig.syncDebounceMs)
+    const syncDebounceMs = isNumber(actionConfig.syncDebounceMs)
+      ? actionConfig.syncDebounceMs
+      : pluginModuleConfig.syncDebounceMs
+
+    await batchSync.set(documentPath, payload, 'insert', syncDebounceMs)
     return _docId as string
   }
 }

@@ -8,7 +8,7 @@ import {
   WhereClause,
   OrderByClause,
   Limit,
-  PluginActionPayloadBase,
+  PluginModuleSetupPayload,
 } from '@magnetarjs/core'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { insertActionFactory } from './actions/insert'
@@ -87,7 +87,7 @@ export const CreatePlugin: MagnetarPlugin<SimpleStoreOptions> = (
     collectionPath,
     docId,
     pluginModuleConfig = {},
-  }: PluginActionPayloadBase<SimpleStoreModuleConfig>): void => {
+  }: PluginModuleSetupPayload<SimpleStoreModuleConfig>): void => {
     const modulePath = [collectionPath, docId].filter(Boolean).join('/')
     if (modulesAlreadySetup.has(modulePath)) return
     // always set up a new Map for the **collection**, but only when it is still undefined!
@@ -116,7 +116,7 @@ export const CreatePlugin: MagnetarPlugin<SimpleStoreOptions> = (
     collectionPath,
     docId,
     pluginModuleConfig = {},
-  }: PluginActionPayloadBase<SimpleStoreModuleConfig>): any => {
+  }: PluginModuleSetupPayload<SimpleStoreModuleConfig>): any => {
     const collectionDB = data[collectionPath]
     // if it's a doc, return the specific doc
     if (docId) return collectionDB.get(docId)

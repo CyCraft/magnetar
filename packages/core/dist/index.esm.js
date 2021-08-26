@@ -44,7 +44,7 @@ function __awaiter(thisArg, _arguments, P, generator) {
  */
 function handleAction(args) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { collectionPath, docId, modulePath, pluginModuleConfig, pluginAction, payload, eventNameFnsMap: on, onError, actionName, stopExecutionAfterAction, storeName, } = args;
+        const { collectionPath, docId, modulePath, pluginModuleConfig, pluginAction, payload, actionConfig = {}, eventNameFnsMap: on, onError, actionName, stopExecutionAfterAction, storeName, } = args;
         // create abort mechanism for current scope
         let abortExecution = false;
         const abort = () => {
@@ -62,7 +62,13 @@ function handleAction(args) {
         let result;
         try {
             // triggering the action provided by the plugin
-            result = yield pluginAction({ payload, collectionPath, docId, pluginModuleConfig });
+            result = yield pluginAction({
+                payload,
+                actionConfig,
+                collectionPath,
+                docId,
+                pluginModuleConfig,
+            });
         }
         catch (error) {
             // handle and await each eventFn in sequence
@@ -286,7 +292,7 @@ function executeSetupModulePerStore(globalConfigStores, [collectionPath, docId],
  * @returns {(collectionPath: string, docId: string | undefined) => (Map<string, DocDataType> | DocDataType)}
  */
 function getDataFnFromDataStore(moduleConfig, globalConfig) {
-    const localStoreName = moduleConfig.localStoreName || globalConfig.localStoreName;
+    const localStoreName = globalConfig.localStoreName;
     throwIfNolocalStoreName(localStoreName);
     const getModuleData = globalConfig.stores[localStoreName].getModuleData;
     if (!getModuleData) {
@@ -378,6 +384,7 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                             pluginModuleConfig,
                             pluginAction,
                             payload,
+                            actionConfig,
                             eventNameFnsMap,
                             onError,
                             actionName,
@@ -393,6 +400,7 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                             const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeToRevert);
                             yield pluginRevertAction({
                                 payload,
+                                actionConfig,
                                 collectionPath,
                                 docId,
                                 pluginModuleConfig,
@@ -422,9 +430,8 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                             !Object.hasOwnProperty.call(payload || {}, 'force') ||
                             (payload === null || payload === void 0 ? void 0 : payload.force) === false;
                         if (optimisticFetch) {
-                            const localStoreName = moduleConfig.localStoreName || globalConfig.localStoreName;
                             // the local store successfully returned a fetch response based on already fetched data
-                            if (storeName === localStoreName && isFetchResponse(resultFromPlugin)) {
+                            if (storeName === globalConfig.localStoreName && isFetchResponse(resultFromPlugin)) {
                                 stopExecutionAfterAction(true);
                             }
                         }
@@ -475,7 +482,7 @@ collectionFn // actions executed on a "collection" will return `collection()` or
  */
 function handleStream(args) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { collectionPath, docId, pluginModuleConfig, pluginAction, payload, eventNameFnsMap: on, actionName, storeName, mustExecuteOnRead, } = args;
+        const { collectionPath, docId, pluginModuleConfig, pluginAction, payload, actionConfig = {}, eventNameFnsMap: on, actionName, storeName, mustExecuteOnRead, } = args;
         // no aborting possible in stream actions
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         const abort = () => { };
@@ -490,6 +497,7 @@ function handleStream(args) {
             const pluginStreamAction = pluginAction;
             result = yield pluginStreamAction({
                 payload,
+                actionConfig,
                 collectionPath,
                 docId,
                 pluginModuleConfig,
@@ -560,6 +568,7 @@ function handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfi
                         docId,
                         pluginModuleConfig,
                         pluginAction,
+                        actionConfig,
                         payload,
                         eventNameFnsMap,
                         actionName: 'stream',
@@ -649,6 +658,23 @@ function createCollectionWithContext([collectionPath, docId], moduleConfig, glob
     return new Proxy(moduleInstance, dataProxyHandler);
 }
 
+function defaultsGlobalConfig(config) {
+    const defaults = {
+        localStoreName: '',
+        stores: {},
+        executionOrder: {
+            read: [],
+            write: [],
+        },
+        onError: 'revert',
+        on: {},
+        modifyPayloadOn: {},
+        modifyReadResponseOn: {},
+    };
+    const merged = merge(defaults, config);
+    return merged;
+}
+
 function createDocWithContext([collectionPath, docId], moduleConfig, globalConfig, docFn, collectionFn, streamAndFetchPromises) {
     const { openStreams, findStream, openStreamPromises, findStreamPromise, fetchPromises } = streamAndFetchPromises; // prettier-ignore
     const streamPromiseInfo = { openStreams, findStream, openStreamPromises, findStreamPromise };
@@ -696,21 +722,6 @@ function findMapValueForKey(map, mapKey) {
     return map.get(originalPayload);
 }
 
-function configWithDefaults(config) {
-    const defaults = {
-        executionOrder: {
-            read: [],
-            write: [],
-        },
-        onError: 'revert',
-        on: {},
-        modifyPayloadOn: {},
-        modifyReadResponseOn: {},
-        localStoreName: '',
-    };
-    const merged = merge(defaults, config);
-    return merged;
-}
 /**
  * Creates a magnetar instance.
  * @see {@link GlobalConfig}
@@ -718,7 +729,7 @@ function configWithDefaults(config) {
  */
 function Magnetar(magnetarConfig) {
     // the passed GlobalConfig is merged onto defaults
-    const globalConfig = configWithDefaults(magnetarConfig);
+    const globalConfig = defaultsGlobalConfig(magnetarConfig);
     /**
      * takes care of the caching instances of modules. Todo: double check memory leaks for when an instance isn't referenced anymore.
      */

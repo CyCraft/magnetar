@@ -1,4 +1,4 @@
-import { isArray } from 'is-what'
+import { isArray, isNumber } from 'is-what'
 import { PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { BatchSync } from '../helpers/batchSync'
@@ -12,6 +12,7 @@ export function deletePropActionFactory(
     payload,
     collectionPath,
     docId,
+    actionConfig,
     pluginModuleConfig,
   }: PluginDeletePropActionPayload<FirestoreModuleConfig>): Promise<void> {
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
@@ -25,6 +26,10 @@ export function deletePropActionFactory(
       }),
       {} as any
     )
-    await batchSync.update(documentPath, firestorePayload, pluginModuleConfig.syncDebounceMs)
+    const syncDebounceMs = isNumber(actionConfig.syncDebounceMs)
+      ? actionConfig.syncDebounceMs
+      : pluginModuleConfig.syncDebounceMs
+
+    await batchSync.update(documentPath, firestorePayload, syncDebounceMs)
   }
 }

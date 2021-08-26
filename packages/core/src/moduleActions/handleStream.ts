@@ -1,4 +1,5 @@
 import { O } from 'ts-toolbelt'
+import { ActionConfig } from '../types/actions'
 
 import { EventNameFnsMap } from '../types/events'
 import {
@@ -17,6 +18,7 @@ export async function handleStream(args: {
   pluginModuleConfig: PluginModuleConfig
   pluginAction: PluginStreamAction
   payload: Record<string, any> | void
+  actionConfig: ActionConfig
   eventNameFnsMap: EventNameFnsMap
   actionName: 'stream'
   storeName: string
@@ -28,6 +30,7 @@ export async function handleStream(args: {
     pluginModuleConfig,
     pluginAction,
     payload,
+    actionConfig = {},
     eventNameFnsMap: on,
     actionName,
     storeName,
@@ -50,6 +53,7 @@ export async function handleStream(args: {
     const pluginStreamAction = pluginAction
     result = await pluginStreamAction({
       payload,
+      actionConfig,
       collectionPath,
       docId,
       pluginModuleConfig,

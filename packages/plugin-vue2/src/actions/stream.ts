@@ -17,6 +17,7 @@ export function streamActionFactory(
     payload,
     collectionPath,
     docId,
+    actionConfig,
     pluginModuleConfig,
     mustExecuteOnRead,
   }: PluginStreamActionPayload<Vue2StoreModuleConfig>):
@@ -37,6 +38,7 @@ export function streamActionFactory(
           payload,
           collectionPath,
           docId: _docId,
+          actionConfig,
           pluginModuleConfig,
         })
       },
@@ -52,6 +54,7 @@ export function streamActionFactory(
           payload,
           collectionPath,
           docId: _docId,
+          actionConfig,
           pluginModuleConfig,
         })
       },
@@ -72,6 +75,7 @@ export function streamActionFactory(
           payload: undefined,
           collectionPath: _cPath,
           docId: _dId,
+          actionConfig,
           pluginModuleConfig,
         })
       },

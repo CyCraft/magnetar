@@ -1,7 +1,9 @@
 import { O } from 'ts-toolbelt'
-import { SharedConfig } from './config'
 import { StoreName } from './atoms'
 import { DocInstance } from '../Doc'
+import { EventNameFnMap } from './events'
+import { ModifyPayloadFnMap } from './modifyPayload'
+import { ModifyReadResponseFnMap } from './modifyReadResponse'
 
 /**
  * these are all the actions that Magnetar streamlines, whichever plugin is used
@@ -19,10 +21,17 @@ export type ActionName = 'fetch' | 'stream' | 'insert' | 'merge' | 'assign' | 'r
  * // don't throw errors for this action, wherever it might fail
  * { onError: 'continue' }
  */
-export type ActionConfig = O.Patch<
-  { executionOrder?: StoreName[] },
-  Partial<O.Omit<SharedConfig, 'localStoreName' | 'executionOrder'>>
->
+export type ActionConfig = {
+  executionOrder?: StoreName[]
+  onError?: 'revert' | 'continue' | 'stop'
+  modifyPayloadOn?: ModifyPayloadFnMap
+  modifyReadResponseOn?: ModifyReadResponseFnMap
+  on?: EventNameFnMap
+  /**
+   * An option for remote stores like Firestore to delay a sync to the server and batch any additional actions made during the `syncDebounceMs`.
+   */
+  syncDebounceMs?: number
+}
 
 // these are the action types exposed to the dev via a MagnetarModule, it's what the dev will end up calling.
 

@@ -123,6 +123,7 @@ export function handleActionPerStore(
                 pluginModuleConfig,
                 pluginAction,
                 payload, // should always use the payload as passed originally for clarity
+                actionConfig,
                 eventNameFnsMap,
                 onError,
                 actionName,
@@ -138,6 +139,7 @@ export function handleActionPerStore(
               const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeToRevert)
               await pluginRevertAction({
                 payload,
+                actionConfig,
                 collectionPath,
                 docId,
                 pluginModuleConfig,
@@ -170,9 +172,8 @@ export function handleActionPerStore(
               !Object.hasOwnProperty.call(payload || {}, 'force') ||
               payload?.force === false
             if (optimisticFetch) {
-              const localStoreName = moduleConfig.localStoreName || globalConfig.localStoreName
               // the local store successfully returned a fetch response based on already fetched data
-              if (storeName === localStoreName && isFetchResponse(resultFromPlugin)) {
+              if (storeName === globalConfig.localStoreName && isFetchResponse(resultFromPlugin)) {
                 stopExecutionAfterAction(true)
               }
             }

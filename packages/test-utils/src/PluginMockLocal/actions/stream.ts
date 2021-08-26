@@ -18,6 +18,7 @@ export function streamActionFactory(
     payload,
     collectionPath,
     docId,
+    actionConfig,
     pluginModuleConfig,
     mustExecuteOnRead,
   }: PluginStreamActionPayload<StorePluginModuleConfig>):
@@ -41,6 +42,7 @@ export function streamActionFactory(
           payload,
           collectionPath,
           docId,
+          actionConfig,
           pluginModuleConfig,
         })
       },
@@ -55,6 +57,7 @@ export function streamActionFactory(
           payload,
           collectionPath,
           docId,
+          actionConfig,
           pluginModuleConfig,
         })
       },
@@ -75,6 +78,7 @@ export function streamActionFactory(
           payload: undefined,
           collectionPath: _cPath,
           docId: _dId,
+          actionConfig,
           pluginModuleConfig,
         })
       },

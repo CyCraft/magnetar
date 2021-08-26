@@ -55,7 +55,7 @@ export function getDataFnFromDataStore<DocDataType>(
   moduleConfig: ModuleConfig,
   globalConfig: GlobalConfig
 ): (collectionPath: string, docId: string | undefined) => Map<string, DocDataType> | DocDataType {
-  const localStoreName = moduleConfig.localStoreName || globalConfig.localStoreName
+  const localStoreName = globalConfig.localStoreName
   throwIfNolocalStoreName(localStoreName)
   const getModuleData = globalConfig.stores[localStoreName].getModuleData
   if (!getModuleData) {

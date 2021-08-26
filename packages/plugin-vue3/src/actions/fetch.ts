@@ -16,6 +16,7 @@ export function fetchActionFactory(
     payload,
     collectionPath,
     docId,
+    actionConfig,
     pluginModuleConfig,
   }: PluginFetchActionPayload<Vue3StoreModuleConfig>): FetchResponse | DoOnFetch {
     const optimisticFetch =
@@ -63,6 +64,7 @@ export function fetchActionFactory(
         payload: _payload,
         collectionPath,
         docId,
+        actionConfig,
         pluginModuleConfig,
       })
     }

@@ -9,7 +9,6 @@ import { DocInstance } from '../../../core/src'
   test(testName, async (t) => {
     const { pokedexModule } = await createMagnetarInstance(testName, {
       deletePaths: ['pokedex/7', 'pokedex/8'],
-      remoteConfig: { syncDebounceMs: 0 },
     })
     const payloadNg = { ...pokedex(7), failBecauseOf: undefined }
     const payloadOk = pokedex(8)
@@ -19,8 +18,8 @@ import { DocInstance } from '../../../core/src'
     let moduleOk: DocInstance<PokedexEntry> | undefined
     let error: any
     const result = await Promise.allSettled([
-      pokedexModule.insert(payloadNg),
-      pokedexModule.insert(payloadOk),
+      pokedexModule.insert(payloadNg, { syncDebounceMs: 0 }),
+      pokedexModule.insert(payloadOk, { syncDebounceMs: 0 }),
     ])
     result.forEach((settled) => {
       if (settled.status === 'fulfilled') moduleOk = settled.value

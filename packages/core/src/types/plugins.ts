@@ -1,6 +1,6 @@
 import { O } from 'ts-toolbelt'
 import { isPlainObject, isFunction, isArray } from 'is-what'
-import { ActionName } from './actions'
+import { ActionConfig, ActionName } from './actions'
 import { DocMetadata } from './atoms'
 import { OnAddedFn, OnModifiedFn, OnRemovedFn } from './modifyReadResponse'
 import { Clauses } from './clauses'
@@ -35,23 +35,24 @@ export interface PluginInstance {
   /**
    * This must be provided by Store Plugins that have "local" data. It is triggered ONCE when the module (doc or collection) is instantiated. In any case, an empty Map for the collectionPath (to be derived from the modulePath) must be set up.
    */
-  setupModule?: (pluginActionPayload: PluginActionPayloadBase) => void
+  setupModule?: (pluginModuleSetupPayload: PluginModuleSetupPayload) => void
   /**
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
    */
   getModuleData?: (
-    pluginActionPayload: PluginActionPayloadBase
+    pluginModuleSetupPayload: PluginModuleSetupPayload
   ) => Record<string, any> | Map<string, Record<string, any>>
 }
 
 /**
  * Where, orderBy, limit clauses or extra config a dev might pass when instanciates a module as second param (under `configPerStore`). Eg. `collection('pokedex', { configPerStore: { local: pluginModuleConfig } })`
  */
-export type PluginModuleConfig = O.Patch<Clauses, { [key: string]: any }>
+export type PluginModuleConfig = O.Patch<Clauses, { [key in string]: any }>
 
-// each of the following actions must be implemented by the plugin!
-
-export type PluginActionPayloadBase<SpecificPluginModuleConfig = PluginModuleConfig> = {
+/**
+ * The payload the core lib will pass when executing plugin's `setupModule` and `getModuleData` functions.
+ */
+export type PluginModuleSetupPayload<SpecificPluginModuleConfig = PluginModuleConfig> = {
   /**
    * The collection path the action was called on.
    */
@@ -65,6 +66,30 @@ export type PluginActionPayloadBase<SpecificPluginModuleConfig = PluginModuleCon
    */
   pluginModuleConfig: SpecificPluginModuleConfig
 }
+
+/**
+ * The base payload passed to a plugin on the execution of any action.
+ */
+export type PluginActionPayloadBase<SpecificPluginModuleConfig = PluginModuleConfig> = {
+  /**
+   * The collection path the action was called on.
+   */
+  collectionPath: string
+  /**
+   * The doc id the action was called on. If `undefined` it means the action is being triggered on a collection.
+   */
+  docId: string | undefined
+  /**
+   * Represents the pluginModuleConfig on which the action is triggered. The developer that uses the plugin will pass the `pluginModuleConfig` like so: `collection('myCollection', { configPerStore: { storeName: pluginModuleConfig } })`
+   */
+  pluginModuleConfig: SpecificPluginModuleConfig
+  /**
+   * Any extra config the dev might pass
+   */
+  actionConfig: ActionConfig
+}
+
+// each of the following actions must be implemented by the plugin!
 
 export type PluginStreamActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,

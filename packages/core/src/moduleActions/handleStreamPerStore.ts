@@ -90,6 +90,7 @@ export function handleStreamPerStore(
           docId,
           pluginModuleConfig,
           pluginAction,
+          actionConfig,
           payload, // should always use the payload as passed originally for clarity
           eventNameFnsMap,
           actionName: 'stream',
