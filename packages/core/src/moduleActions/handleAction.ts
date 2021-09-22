@@ -29,7 +29,7 @@ export async function handleAction(args: {
   actionName: Exclude<ActionName, 'stream'>
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
   storeName: string
-}): Promise<void | string | FetchResponse | OnAddedFn> {
+}): Promise<void | string | FetchResponse | OnAddedFn | unknown> {
   const {
     collectionPath,
     docId,
