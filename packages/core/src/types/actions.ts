@@ -109,38 +109,6 @@ export type MagnetarDeletePropAction<
 export type MagnetarDeleteAction = (payload?: any, actionConfig?: ActionConfig) => Promise<void>
 
 /**
- * All open streams with the payload passed to `stream(payload)` as key and the "closeStream" function as value. In case `stream()` had no payload, use `undefined`
- * @example
- * collection('myDocs').stream()
- * const closeStream = collection('myDocs').openStreams.get(undefined)
- */
-export type OpenStreams = Map<any, () => void>
-
-/**
- * A function that retrieves a stream's "closeStream" function based on a payload given
- * @example
- * collection('myDocs').stream({ some: 'payload' })
- * const closeStream = collection('myDocs').findStream({ some: 'payload' })
- */
-export type FindStream = (streamPayload?: any) => (() => void) | undefined
-
-/**
- * All open stream promises with the payload passed to `stream(payload)` as key and the "streaming promise" as value. In case `stream()` had no payload, use `undefined`
- * @example
- * collection('myDocs').stream()
- * const closeStream = collection('myDocs').openStreams.get(undefined)
- */
-export type OpenStreamPromises = Map<any, Promise<void>>
-
-/**
- * A function that retrieves a stream's "streaming promise" based on a payload given
- * @example
- * collection('myDocs').stream({ some: 'payload' })
- * const closeStream = collection('myDocs').findStream({ some: 'payload' })
- */
-export type FindStreamPromise = (streamPayload?: any) => Promise<void> | undefined
-
-/**
  * All fetch promises with the payload passed to `fetch(payload)` as key (JSON.stringify) and the "fetch promise" as value. In case `fetch()` had no payload, use `undefined`
  */
 export type FetchPromises = Map<string, Promise<any>>

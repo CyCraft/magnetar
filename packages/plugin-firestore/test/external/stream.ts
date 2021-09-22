@@ -10,14 +10,12 @@ import { pokedex, waitMs } from '@magnetarjs/test-utils'
     t.deepEqual(pokedexModule.doc('136').data, undefined)
     t.is(pokedexModule.data.size, 1)
 
-    const payload = {}
     // do not await, because it only resolves when the stream is closed
-    pokedexModule.stream(payload).catch((e: any) => t.fail(e.message)) // prettier-ignore
+    pokedexModule.stream().catch((e: any) => t.fail(e.message)) // prettier-ignore
     await waitMs(3500)
 
     // close the stream:
-    const closeStream = pokedexModule.openStreams.get(payload)
-    if (closeStream) closeStream()
+    pokedexModule.closeStream()
 
     t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
     t.deepEqual(pokedexModule.data.get('2'), pokedex(2))
@@ -31,14 +29,12 @@ import { pokedex, waitMs } from '@magnetarjs/test-utils'
     const { trainerModule } = await createMagnetarInstance('read')
     t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 
-    const payload = {}
     // do not await, because it only resolves when the stream is closed
-    trainerModule.stream(payload).catch((e: any) => t.fail(e.message)) // prettier-ignore
+    trainerModule.stream().catch((e: any) => t.fail(e.message)) // prettier-ignore
     await waitMs(3500)
 
     // close the stream:
-    const closeStream = trainerModule.openStreams.get(payload)
-    if (closeStream) closeStream()
+    trainerModule.closeStream()
 
     t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
   })
@@ -50,7 +46,6 @@ import { pokedex, waitMs } from '@magnetarjs/test-utils'
     // the original state has 1 Pokemon already
     t.is(pokedexModule.data.size, 1)
     // let's get some more
-    const payload = {}
     const pokedexModuleWithQuery = pokedexModule
       .where('type', 'array-contains', 'Fire')
       .where('base.Speed', '>=', 100)
@@ -59,18 +54,17 @@ import { pokedex, waitMs } from '@magnetarjs/test-utils'
     // → Charizard 6, Ninetales 38, Rapidash 78
 
     // do not await, because it only resolves when the stream is closed
-    pokedexModuleWithQuery.stream(payload).catch((e: any) => t.fail(e.message))
+    pokedexModuleWithQuery.stream().catch((e: any) => t.fail(e.message))
 
     await waitMs(3500)
-    // the closeStream function to close the stream can be retrieved from the openStreams map with the "payload" as key
-    const closeStream = pokedexModule
+
+    pokedexModule
       .where('type', 'array-contains', 'Fire')
       .where('base.Speed', '>=', 100)
       .orderBy('base.Speed', 'asc')
       .orderBy('name', 'asc')
-      .openStreams.get(payload)
-    // closeStream from the stream:
-    if (closeStream) closeStream()
+      .closeStream()
+
     // the queried instance only has these 3 Pokemon
     t.deepEqual([...pokedexModuleWithQuery.data.values()], [pokedex(6), pokedex(38), pokedex(78)])
     // the main instance has one Pokemon from the beginning

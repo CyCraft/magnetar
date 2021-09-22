@@ -1,13 +1,6 @@
 import { O } from 'ts-toolbelt'
 import { handleStream } from './handleStream'
-import {
-  ActionConfig,
-  MagnetarStreamAction,
-  OpenStreams,
-  FindStream,
-  OpenStreamPromises,
-  FindStreamPromise,
-} from '../types/actions'
+import { ActionConfig, MagnetarStreamAction } from '../types/actions'
 import { ActionType } from '../types/actionsInternal'
 import { StreamResponse, DoOnStreamFns, isDoOnStream, DoOnStream } from '../types/plugins'
 import { getEventNameFnsMap } from '../types/events'
@@ -24,18 +17,14 @@ export function handleStreamPerStore(
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
   actionType: ActionType,
-  streamPromiseInfo: {
-    openStreams: OpenStreams
-    findStream: FindStream
-    openStreamPromises: OpenStreamPromises
-    findStreamPromise: FindStreamPromise
-  }
+  streaming: () => Promise<void> | null,
+  cacheStream: (closeStreamFn: () => void, streamingPromise: Promise<void> | null) => void
 ): MagnetarStreamAction {
   // returns the action the dev can call with myModule.insert() etc.
   return async function (payload?: any, actionConfig: ActionConfig = {}): Promise<void> {
-    const { openStreams, openStreamPromises, findStreamPromise } = streamPromiseInfo
-    const foundStreamPromise = findStreamPromise(payload)
-    if (isPromise(foundStreamPromise)) return foundStreamPromise
+    const foundStream = streaming()
+    if (isPromise(foundStream)) return foundStream
+
     // get all the config needed to perform this action
     const eventNameFnsMap = getEventNameFnsMap(globalConfig.on, moduleConfig.on, actionConfig.on)
     const modifyPayloadFnsMap = getModifyPayloadFnsMap(
@@ -111,9 +100,9 @@ export function handleStreamPerStore(
       }
     }
     throwOnIncompleteStreamResponses(streamInfoPerStore, doOnStreamFns)
-    // handle saving the returned promises
-    const openStreamIdentifier = payload ?? undefined
-    const streamPromises = Object.values(streamInfoPerStore).map(({ streaming }) => streaming)
+
+    // handle caching the returned promises
+    const streamPromises = Object.values(streamInfoPerStore).map((res) => res.streaming)
     // create a single stream promise from multiple stream promises the store plugins return
     const streamPromise: Promise<void> = new Promise((resolve, reject) => {
       Promise.all(streamPromises)
@@ -121,15 +110,12 @@ export function handleStreamPerStore(
         .then(() => resolve())
         .catch(reject)
     })
-    // set the streamPromise in the openStreamPromises
-    openStreamPromises.set(openStreamIdentifier, streamPromise)
     // create a function to closeStream from the stream of each store
     const closeStream = (): void => {
       Object.values(streamInfoPerStore).forEach(({ stop }) => stop())
-      openStreams.delete(openStreamIdentifier)
-      openStreamPromises.delete(openStreamIdentifier)
+      cacheStream(() => {}, null)
     }
-    openStreams.set(openStreamIdentifier, closeStream)
+    cacheStream(closeStream, streamPromise)
     // return the stream promise
     return streamPromise
   }

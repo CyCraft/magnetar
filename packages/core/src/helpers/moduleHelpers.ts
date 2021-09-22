@@ -3,6 +3,29 @@ import { GlobalConfig, ModuleConfig } from '../types/config'
 import { throwIfNolocalStoreName } from './throwFns'
 import { PluginModuleConfig } from '../types/plugins'
 
+export const MODULE_IDENTIFIER_SPLIT = ' /// '
+
+/**
+ * Saved as enum, just to enforce usage of `getModuleIdentifier()`
+ */
+export enum ModuleIdentifier {
+  'KEY' = 'modulePath + JSON.stringify({limit, orderBy, where})',
+}
+
+/**
+ * Creates the `key` for the Maps used to cache certain values throughout the lifecycle of an instance.
+ * @returns `JSON.stringify({ modulePath, modulePath, limit, orderBy, where })`
+ */
+export function getModuleIdentifier(
+  modulePath: string,
+  moduleConfig: ModuleConfig
+): ModuleIdentifier {
+  const { limit, orderBy, where } = moduleConfig
+  const config = JSON.stringify({ limit, orderBy, where })
+
+  return `${modulePath}${MODULE_IDENTIFIER_SPLIT}${config}` as ModuleIdentifier.KEY
+}
+
 /**
  * Extracts the PluginModuleConfig from the ModuleConfig
  *

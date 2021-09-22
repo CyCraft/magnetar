@@ -5,10 +5,6 @@ import {
   MagnetarFetchAction,
   MagnetarStreamAction,
   MagnetarInsertAction,
-  OpenStreams,
-  FindStream,
-  OpenStreamPromises,
-  FindStreamPromise,
   MagnetarDeleteAction,
   FetchPromises,
 } from './types/actions'
@@ -43,21 +39,25 @@ export type CollectionInstance<DocDataType extends Record<string, any> = Record<
    */
   path: string
   /**
-   * @see {@link OpenStreams}
+   * Returns the open stream promise of this collection, dependant on which `where`/`limit`/`orderBy` filters was used.
+   *
+   * Returns `null` when there is no open stream.
+   *
+   * This promise will resolve when `collection().closeStream()` is called, or when the stream closed because of an error.
    */
-  openStreams: OpenStreams
+  streaming: () => Promise<void> | null
   /**
-   * @see {@link FindStream}
+   * Close the stream of this collection, dependant on which `where`/`limit`/`orderBy` filters was used.
+   *
+   * Does nothing if there is no open stream.
    */
-  findStream: FindStream
+  closeStream: () => void
   /**
-   * @see {@link OpenStreamPromises}
+   * Close all streams of this collection, no matter which `where`/`limit`/`orderBy` filters were used.
+   *
+   * Does nothing if there are no open streams.
    */
-  openStreamPromises: OpenStreamPromises
-  /**
-   * @see {@link FindStreamPromise}
-   */
-  findStreamPromise: FindStreamPromise
+  closeAllStreams: () => void
 
   // actions
   /**
@@ -99,15 +99,15 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
   docFn: DocFn<DocDataType>,
   collectionFn: CollectionFn<DocDataType>,
   streamAndFetchPromises: {
-    openStreams: OpenStreams
-    findStream: FindStream
-    openStreamPromises: OpenStreamPromises
-    findStreamPromise: FindStreamPromise
+    cacheStream: (closeStreamFn: () => void, streamingPromise: Promise<void> | null) => void
+    streaming: () => Promise<void> | null
+    closeStream: () => void
+    closeAllStreams: () => void
     fetchPromises: FetchPromises
   }
 ): CollectionInstance<DocDataType> {
-  const { openStreams, findStream, openStreamPromises, findStreamPromise, fetchPromises } = streamAndFetchPromises // prettier-ignore
-  const streamPromiseInfo = { openStreams, findStream, openStreamPromises, findStreamPromise }
+  const { cacheStream, streaming, closeStream, closeAllStreams, fetchPromises } = streamAndFetchPromises // prettier-ignore
+
   const id = collectionPath.split('/').slice(-1)[0]
   const path = collectionPath
 
@@ -118,7 +118,7 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
   const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, fetchPromises, docFn, collectionFn) as MagnetarInsertAction<DocDataType> //prettier-ignore
   const _delete = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, fetchPromises, docFn, collectionFn) as MagnetarDeleteAction //prettier-ignore
   const fetch = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, fetchPromises, docFn, collectionFn) as MagnetarFetchAction<DocDataType, 'collection'> //prettier-ignore
-  const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streamPromiseInfo) // prettier-ignore
+  const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streaming, cacheStream) // prettier-ignore
 
   const actions = { stream, fetch, insert, delete: _delete }
 
@@ -154,10 +154,9 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
     doc,
     id,
     path,
-    openStreams,
-    findStream,
-    openStreamPromises,
-    findStreamPromise,
+    streaming,
+    closeStream,
+    closeAllStreams,
     ...actions,
     ...queryFns,
   }

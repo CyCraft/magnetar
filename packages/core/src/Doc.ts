@@ -6,10 +6,6 @@ import {
   MagnetarDeleteAction,
   MagnetarDeletePropAction,
   MagnetarInsertAction,
-  OpenStreams,
-  FindStream,
-  OpenStreamPromises,
-  FindStreamPromise,
   FetchPromises,
 } from './types/actions'
 import { actionNameTypeMap } from './types/actionsInternal'
@@ -40,21 +36,19 @@ export type DocInstance<DocDataType extends Record<string, any> = Record<string,
    */
   path: string
   /**
-   * @see {@link OpenStreams}
+   * Returns the open stream promise of this doc.
+   *
+   * Returns `null` when there is no open stream.
+   *
+   * This promise will resolve when `doc().closeStream()` is called, or when the stream closed because of an error.
    */
-  openStreams: OpenStreams
+  streaming: () => Promise<void> | null
   /**
-   * @see {@link FindStream}
+   * Close the stream of this doc.
+   *
+   * Does nothing if there is no open stream.
    */
-  findStream: FindStream
-  /**
-   * @see {@link OpenStreamPromises}
-   */
-  openStreamPromises: OpenStreamPromises
-  /**
-   * @see {@link FindStreamPromise}
-   */
-  findStreamPromise: FindStreamPromise
+  closeStream: () => void
 
   // actions
   /**
@@ -98,15 +92,14 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
   docFn: DocFn<DocDataType>,
   collectionFn: CollectionFn,
   streamAndFetchPromises: {
-    openStreams: OpenStreams
-    findStream: FindStream
-    openStreamPromises: OpenStreamPromises
-    findStreamPromise: FindStreamPromise
+    cacheStream: (closeStreamFn: () => void, streamingPromise: Promise<void> | null) => void
+    streaming: () => Promise<void> | null
+    closeStream: () => void
     fetchPromises: FetchPromises
   }
 ): DocInstance<DocDataType> {
-  const { openStreams, findStream, openStreamPromises, findStreamPromise, fetchPromises } = streamAndFetchPromises // prettier-ignore
-  const streamPromiseInfo = { openStreams, findStream, openStreamPromises, findStreamPromise }
+  const { cacheStream, streaming, closeStream, fetchPromises } = streamAndFetchPromises // prettier-ignore
+
   const id = docId
   const path = [collectionPath, docId].join('/')
 
@@ -122,7 +115,7 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
     deleteProp: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'deleteProp', actionNameTypeMap.deleteProp, fetchPromises, docFn) as MagnetarDeletePropAction<DocDataType>), // prettier-ignore
     delete: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, fetchPromises, docFn) as MagnetarDeleteAction), // prettier-ignore
     fetch: (handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, fetchPromises, docFn) as MagnetarFetchAction<DocDataType, 'doc'>), // prettier-ignore
-    stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streamPromiseInfo), // prettier-ignore
+    stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streaming, cacheStream), // prettier-ignore
   }
 
   // Every store will have its 'setupModule' function executed
@@ -132,10 +125,8 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
     collection,
     id: id as string,
     path,
-    openStreams,
-    findStream,
-    openStreamPromises,
-    findStreamPromise,
+    streaming,
+    closeStream,
     ...actions,
   }
 

@@ -2,16 +2,14 @@ import { O } from 'ts-toolbelt'
 import { createCollectionWithContext, CollectionInstance } from './Collection'
 import { GlobalConfig, ModuleConfig, defaultsGlobalConfig } from './types/config'
 import { createDocWithContext, DocInstance } from './Doc'
-import {
-  OpenStreams,
-  OpenStreamPromises,
-  FindStream,
-  FindStreamPromise,
-  FetchPromises,
-} from './types/actions'
+import { FetchPromises } from './types/actions'
 import { throwIfInvalidModulePath } from './helpers/throwFns'
 import { getCollectionPathDocIdEntry } from './helpers/pathHelpers'
-import { findMapValueForKey } from './helpers/mapHelpers'
+import {
+  getModuleIdentifier,
+  ModuleIdentifier,
+  MODULE_IDENTIFIER_SPLIT,
+} from './helpers/moduleHelpers'
 
 export { isDocModule, isCollectionModule } from './helpers/pathHelpers'
 
@@ -61,23 +59,18 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
   // the passed GlobalConfig is merged onto defaults
   const globalConfig = defaultsGlobalConfig(magnetarConfig)
 
-  type ModuleIdentifier = { modulePath: string; moduleConfig: ModuleConfig }
-  /**
-   * takes care of the caching instances of modules. Todo: double check memory leaks for when an instance isn't referenced anymore.
-   */
-  const moduleMap: WeakMap<ModuleIdentifier, any> = new WeakMap() // apply type upon get/set
   /**
    * the global storage for closeStream functions
    */
-  const streamCloseFnMap: Map<string, OpenStreams> = new Map() // apply type upon get/set
+  const closeStreamFnMap: Map<ModuleIdentifier, () => void> = new Map() // apply type upon get/set
   /**
    * the global storage for open stream promises
    */
-  const streamPromiseMap: Map<string, OpenStreamPromises> = new Map() // apply type upon get/set
+  const streamingPromiseMap: Map<ModuleIdentifier, Promise<void> | null> = new Map() // apply type upon get/set
   /**
    * the global storage for fetch promises
    */
-  const fetchPromiseMap: Map<string, FetchPromises> = new Map() // apply type upon get/set
+  const fetchPromiseMap: Map<ModuleIdentifier, FetchPromises> = new Map() // apply type upon get/set
 
   function getModuleInstance(
     modulePath: string,
@@ -87,49 +80,65 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     collectionFn: CollectionFn
   ): CollectionInstance | DocInstance {
     throwIfInvalidModulePath(modulePath, moduleType)
-    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
-    // retrieved the cached instance
-    const moduleIdentifier = { modulePath, moduleConfig }
-    const _moduleMap: WeakMap<ModuleIdentifier, CollectionInstance | DocInstance> = moduleMap
-    const cachedInstance = _moduleMap.get(moduleIdentifier)
-    if (cachedInstance) return cachedInstance
-    // else create and cache a new instance
 
-    // create the streamCloseFnMap and streamPromiseMap for this module
-    if (!streamCloseFnMap.has(modulePath)) {
-      streamCloseFnMap.set(modulePath, new Map())
+    const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
+    const moduleIdentifier = getModuleIdentifier(modulePath, moduleConfig)
+
+    // create the closeStreamFnMap and streamingPromiseMap for this module
+    if (!closeStreamFnMap.has(moduleIdentifier)) {
+      closeStreamFnMap.set(moduleIdentifier, () => {/** No stream open yet... */}) // prettier-ignore
     }
-    if (!streamPromiseMap.has(modulePath)) {
-      streamPromiseMap.set(modulePath, new Map())
+    if (!streamingPromiseMap.has(moduleIdentifier)) {
+      streamingPromiseMap.set(moduleIdentifier, null)
     }
     // create the fetchPromiseMap for this module
-    if (!fetchPromiseMap.has(modulePath)) {
-      fetchPromiseMap.set(modulePath, new Map())
+    if (!fetchPromiseMap.has(moduleIdentifier)) {
+      fetchPromiseMap.set(moduleIdentifier, new Map())
     }
 
-    // grab the open stream utils
-    const openStreams = streamCloseFnMap.get(modulePath) as OpenStreams
-    const findStream: FindStream = (streamPayload: any) =>
-      findMapValueForKey(openStreams, streamPayload)
-    // grab the fetch promise utils
-    const fetchPromises = fetchPromiseMap.get(modulePath) as FetchPromises
+    function cacheStream(closeStreamFn: () => void, streamingPromise: Promise<void> | null): void {
+      closeStreamFnMap.set(moduleIdentifier, closeStreamFn)
+      streamingPromiseMap.set(moduleIdentifier, streamingPromise)
+    }
 
-    const openStreamPromises = streamPromiseMap.get(modulePath) as OpenStreamPromises
-    const findStreamPromise: FindStreamPromise = (streamPayload: any) =>
-      findMapValueForKey(openStreamPromises, streamPayload)
+    function streaming(): Promise<void> | null {
+      return streamingPromiseMap.get(moduleIdentifier) || null
+    }
+
+    function closeStream(): void {
+      const closeStreamFn = closeStreamFnMap.get(moduleIdentifier)
+      if (closeStreamFn) closeStreamFn()
+    }
+
+    function closeAllStreams(): void {
+      for (const [identifier, closeStreamFn] of closeStreamFnMap) {
+        const _modulePath = identifier.split(MODULE_IDENTIFIER_SPLIT)[0]
+        if (_modulePath === modulePath) closeStreamFn()
+      }
+    }
+
+    // grab the fetch promise utils
+    const fetchPromises = fetchPromiseMap.get(moduleIdentifier) as FetchPromises
 
     const streamAndFetchPromises = {
-      openStreams,
-      findStream,
-      openStreamPromises,
-      findStreamPromise,
+      cacheStream,
+      streaming,
+      closeStream,
+      closeAllStreams,
       fetchPromises,
     }
     // then create the module instance
-    const createInstanceWithContext =
-      moduleType === 'doc' ? createDocWithContext : createCollectionWithContext
-    // @ts-ignore
-    const moduleInstance = createInstanceWithContext(
+    if (moduleType === 'doc') {
+      return createDocWithContext(
+        [collectionPath, docId],
+        moduleConfig,
+        globalConfig,
+        docFn,
+        collectionFn,
+        streamAndFetchPromises
+      )
+    }
+    return createCollectionWithContext(
       [collectionPath, docId],
       moduleConfig,
       globalConfig,
@@ -137,8 +146,6 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
       collectionFn,
       streamAndFetchPromises
     )
-    moduleMap.set(moduleIdentifier, moduleInstance)
-    return moduleInstance
   }
 
   function collection(modulePath: string, moduleConfig: ModuleConfig = {}): CollectionInstance {
