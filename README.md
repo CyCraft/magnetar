@@ -10,7 +10,7 @@ npm i magnetar
 
 ## TLDR
 
-![TLDR overview](media/Magnetar Value Proposition.jpg?raw=true)
+![TLDR overview](media/magnetar-value-proposition.jpg?raw=true)
 
 ## Documentation
 
