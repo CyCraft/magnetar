@@ -116,12 +116,31 @@ Please note: a streaming promise will never resolve as long as your stream is op
 
 For displaying streamed data in the DOM see the [Displaying data in the DOM](#displaying-data-in-the-dom).
 
+### Firestore vs Magnetar
+
+The Firestore JS SDK has a [built-in feature for realtime updates](https://firebase.google.com/docs/firestore/query-data/listen) via a method called `onSnapshot`. The main pain points are:
+
+- The syntax you have to use is very convoluted and complex
+- If your not careful, you can open the same stream twice and they both will use memory
+- You need to write a lot of code to capture the documents that comes in and save them in local cache
+- You need to organise where and how to temporarily save the function you get back to stop the stream
+
+Magnetar's Firestore Plugin uses `onSnapshot` [under the hood](https://github.com/CyCraft/magnetar/blob/production/packages/plugin-firestore/src/actions/stream.ts) but does these things for you:
+
+- The syntax is super clean. It's just `.stream()`
+- A stream cannot be opened twice on accident, the already open stream will be returned in case you open it again
+- No need to write any extra code, Magnetar captures the documents that comes in and saves them in local cache for you
+- No need to keep around the function to stop the stream, Magnetar does this for you
+
 ### Stream a Collection
 
 ```javascript
 const pokedexModule = magnetar.collection('pokedex')
 // open the stream
 pokedexModule.stream()
+  .catch((error) => {
+    // the stream was closed because of an error    
+  })
 
 // ... some time later
 
@@ -135,12 +154,17 @@ pokedexModule.stream()
 // pokedexModule.data.values() ≈ [{ name: 'Bulbasaur' }, /* etc...*/ ]
 ```
 
+That's it! You don't need any other logic!!
+
 ### Stream a Single Document
 
 ```javascript
 const bulbasaur = magnetar.doc('pokedex/001')
 // open the stream
 bulbasaur.stream()
+  .catch((error) => {
+    // the stream was closed because of an error    
+  })
 
 // ... some time later
 
@@ -150,55 +174,50 @@ bulbasaur.stream()
 // bulbasaur.data ≈ { name: 'Bulbasaur' }
 ```
 
+That's it! You don't need any other logic!!
+
 ### Closing a Stream
 
-You can list all open streams like so:
+You can close a stream again simply by executing `closeStream` on the same module:
 
 ```javascript
 const pokedexModule = magnetar.collection('pokedex')
 
-// collections:
-pokedexModule.openStreams.entries()
+// close the collection stream:
+pokedexModule.closeStream()
 
-// docs:
-pokedexModule.doc('001').openStreams.entries()
+// close the doc stream:
+pokedexModule.doc('001').closeStream()
 ```
 
-`openStreams` is a Map <small>[？](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)</small> with the payload you passed to start the stream as key, and the function to _close the stream_ as value.
+### The Streaming Promise
 
-Here is a full example of opening and closing a stream:
-
-```javascript
-const pokedexModule = magnetar.collection('pokedex')
-
-// open the stream:
-const streamOptions = {}
-pokedexModule.stream(streamOptions)
-
-// to close the stream, you need to use the `streamOptions` reference
-const closeStream = pokedexModule.openStreams.get(streamOptions)
-closeStream()
-
-// be careful, this won't work
-const closeStream = pokedexModule.openStreams.get({})
-// closeStream === undefined
-```
-
-Because openStreams is a Map <small>[？](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)</small>, you need to use the same options variable to retrieve your _close stream function_. This is how a Map works natively.
-
-One caveat is when you want to retrieve an open stream when you did not pass any options. In this case you can access the _close stream function_ via the key `undefined`.
+You don't need to `await` a stream, because the promise won't resolve as long as its open!
 
 ```js
-pokedexModule.stream()
-const closeStream = pokedexModule.openStreams.get(undefined)
-closeStream()
+// open the stream
+await magnetar.collection('pokedex').stream()
+
+// The code here will only get executed after the stream was closed!
+console.log('closed!')
 ```
 
-> Why this weird mechanic to close streams?
+Instead, for a stream, it might be better to just use `.then()` and `.catch()`
 
-Since every module can have multiple streams open with different filters or options, there needs to be some sort of dictionary to save the functions that can close the streams again.
+```js
+// open the stream
+magnetar.collection('pokedex')
+  .stream()
+  .then(() => {
+    // the stream was closed via `closeStream()` !
+  })
+  .catch(() => {
+    // the stream was closed because of an error! !
+  })
 
-In the case you have multiple streams, you would probably want to differentiate them by which options you passed any way. One way we can create _a stream ID_ could be to `JSON.stringify` the stream options. But because a Map can have an actual object as key, there is no need to `JSON.stringify`.
+// The code here will get executed immidiately
+console.log('The stream was opened!')
+```
 
 ## Query Data (filter, order by, limit...)
 
@@ -351,6 +370,32 @@ async function searchPokemon(type) {
 Based on your remote store plugin there might be limitations to what/how you can query data.
 
 For Cloud Firestore be sure check the [Query Limitations](https://firebase.google.com/docs/firestore/query-data/queries#query_limitations) in their official documentation.
+
+### Opening & Closing Multiple Streams
+
+You can have multiple streams open with different queries.
+
+```js
+const pokedexModule = magnetar.collection('pokedex')
+
+// open two streams with different filters:
+pokedexModule.where('type', '==', 'fire').stream()
+pokedexModule.where('type', '==', 'water').stream()
+
+// access the documents from the two streams separately:
+pokedexModule.where('type', '==', 'fire').data.values()
+pokedexModule.where('type', '==', 'water').data.values()
+
+// access all the documents at once:
+pokedexModule.data.values()
+
+// close the streams once by one:
+pokedexModule.where('type', '==', 'fire').closeStream()
+pokedexModule.where('type', '==', 'water').closeStream()
+
+// close all streams at once:
+pokedexModule.closeAllStreams()
+```
 
 ## Collection Groups (WIP)
 
