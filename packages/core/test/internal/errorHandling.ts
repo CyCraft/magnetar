@@ -68,7 +68,7 @@ test('write + onError: continue', async (t) => {
       },
     })
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
   t.is(pokedexModule.data.get('testid'), undefined)
 })
@@ -204,7 +204,7 @@ test('fetch + onError: continue', async (t) => {
     t.deepEqual(result.get('1'), pokedex(1))
     t.deepEqual(result.get('136'), undefined)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
   // the local store didn't succeed in applying its 'inserted' event, so its local data will be empty:
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))

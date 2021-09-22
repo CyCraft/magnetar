@@ -25,7 +25,7 @@ test('write: insert (collection) → random ID', async (t) => {
   try {
     moduleFromResult = await pokedexModule.insert(payload)
   } catch (error) {
-    return t.fail(error)
+    return t.fail(JSON.stringify(error))
   }
   const newId = moduleFromResult.id
   // check data of reference returned
@@ -53,7 +53,7 @@ test('deleteProp: (document)', async (t) => {
     // check data of reference returned
     t.deepEqual(result, trainerModule.data)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
   // check data of references created on beforehand
   t.deepEqual(magnetarDoc.data?.[prop], undefined)
@@ -77,7 +77,7 @@ test('delete: (document)', async (t) => {
     // check data of reference returned
     t.deepEqual(result, undefined)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
   // check data of references created on beforehand
   t.deepEqual(magnetarCollection.data.get('trainer'), undefined)
@@ -112,7 +112,7 @@ test('read: fetch (collection)', async (t) => {
     t.deepEqual(result.get('1'), pokedex(1))
     t.deepEqual(result.get('136'), pokedex(136))
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.deepEqual(pokedexModule.data.get('136'), pokedex(136))
@@ -127,7 +127,7 @@ test('read: fetch (document)', async (t) => {
     const result = await trainerModule.fetch({ force: true })
     t.deepEqual(result, { name: 'Luca', age: 10, dream: 'job' })
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })
@@ -141,7 +141,7 @@ test('fetch (collection) where-filter: ==', async (t) => {
     await queryModuleRef.fetch({ force: true })
     t.deepEqual([...queryModuleRef.data.values()], [pokedex(136)])
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
   // try take the query again and see if it's the same result
   const queryModuleRef = pokedexModule.where('name', '==', 'Flareon')

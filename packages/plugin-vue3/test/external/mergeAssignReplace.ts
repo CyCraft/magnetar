@@ -10,7 +10,7 @@ test('merge', async (t) => {
   try {
     await pokedexModule.doc('1').merge(payload)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 
   const expected = {
@@ -37,7 +37,7 @@ test('assign', async (t) => {
   try {
     await pokedexModule.doc('1').assign(payload)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 
   const expected = {
@@ -59,7 +59,7 @@ test('replace', async (t) => {
   try {
     await pokedexModule.doc('1').replace(payload)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 
   const expected = { base: { HP: 9000 } }

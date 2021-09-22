@@ -14,7 +14,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     try {
       await trainerModule.delete()
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
 
     const expected = undefined
@@ -33,7 +33,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     try {
       await pokedexModule.delete('1')
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
 
     const expected = undefined

@@ -24,7 +24,7 @@ import { DocInstance } from '../../../core/src'
     try {
       await squirtle.insert(payload)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
 
     const expected = payload
@@ -42,7 +42,7 @@ import { DocInstance } from '../../../core/src'
     try {
       moduleFromResult = await pokedexModule.insert(payload)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
       return
     }
 
@@ -63,7 +63,7 @@ import { DocInstance } from '../../../core/src'
     try {
       moduleFromResult = await pokedexModule.insert(payload)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
       return
     }
 

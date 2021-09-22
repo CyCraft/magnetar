@@ -24,7 +24,7 @@ import { DocMetadata } from '../../../core/src'
       t.deepEqual(result, undefined)
       t.deepEqual(inexistentDoc.data, undefined)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
   })
 }

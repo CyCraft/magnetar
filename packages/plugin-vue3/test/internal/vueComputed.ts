@@ -120,7 +120,7 @@ import test from 'ava'
 //   // now it should have re-run
 //   t.deepEqual(ranFns, ['ran', 'ran'])
 //   // get data from server
-//   try { await trainerModule.fetch({ force: true }) } catch (error) { t.fail(error) } // prettier-ignore
+//   try { await trainerModule.fetch({ force: true }) } catch (error) { t.fail(JSON.stringify(error)) } // prettier-ignore
 //   // the server mock doesn't really update the server data
 //   // so a fetch() call should reset the name back to 'Luca'
 //   t.deepEqual(trainerModule.data, { name: 'Luca', dream: 'job', age: 10 })
@@ -165,7 +165,7 @@ import test from 'ava'
 //   // // now it should have re-run
 //   t.deepEqual(ranFns, ['ran', 'ran'])
 //   // // get data from server
-//   try { await trainerModule.fetch({ force: true }) } catch (error) { t.fail(error) } // prettier-ignore
+//   try { await trainerModule.fetch({ force: true }) } catch (error) { t.fail(JSON.stringify(error)) } // prettier-ignore
 //   // the server mock doesn't really update the server data
 //   // so a fetch() call should reset the name back to 'Luca'
 //   t.deepEqual(trainerModule.data, { name: 'Luca', dream: 'job', age: 10 })

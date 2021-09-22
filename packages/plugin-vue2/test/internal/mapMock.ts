@@ -7,7 +7,7 @@ test('map mock', async (t) => {
   try {
     await pokedexModule.fetch({ force: true })
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
   t.deepEqual(pokedexModule.data.get('136'), pokedex(136))
   t.is(pokedexModule.data.has('136'), true)

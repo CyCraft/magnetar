@@ -71,7 +71,7 @@ test('insert: can abort in before events', async (t) => {
     })
     t.deepEqual(result.data, pokedexModule.data.get('7'))
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 })
 
@@ -98,7 +98,7 @@ test('insert: can abort in success events', async (t) => {
     })
     t.deepEqual(result.data, insertPayload)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
   t.is(ranAllEvents.length, 2)
 })

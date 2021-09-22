@@ -12,7 +12,7 @@ import { pokedex } from '@magnetarjs/test-utils'
 //     t.deepEqual(result.get('1'), pokedex(1))
 //     t.deepEqual(result.get('136'), pokedex(136))
 //   } catch (error) {
-//     t.fail(error)
+//     t.fail(JSON.stringify(error))
 //   }
 //   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
 //   t.deepEqual(pokedexModule.data.get('136'), pokedex(136))
@@ -33,7 +33,7 @@ test('read: fetch (document) - prevent multiple fetch requests at the same time'
     // fetch twice at the same time
     await Promise.all([trainerModule.fetch({ force: true }), trainerModule.fetch({ force: true })])
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 
   // make sure the remote store was only triggered once
@@ -43,7 +43,7 @@ test('read: fetch (document) - prevent multiple fetch requests at the same time'
     // fetch twice again the same time
     await Promise.all([trainerModule.fetch({ force: true }), trainerModule.fetch({ force: true })])
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 
   // make sure the remote store was only triggered once more
@@ -70,7 +70,7 @@ test('read: fetch (document) - optimistic fetch by default', async (t) => {
     // fetch twice at the same time
     await Promise.all([trainerModule.fetch({ force: true }), trainerModule.fetch({ force: true })])
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 
   // make sure the remote store was only triggered once
@@ -80,7 +80,7 @@ test('read: fetch (document) - optimistic fetch by default', async (t) => {
     // fetch twice again the same time
     await Promise.all([trainerModule.fetch(), trainerModule.fetch()])
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 
   // make sure the remote store was not triggered again

@@ -10,7 +10,7 @@ test('fetch (collectionGroup)', async (t) => {
   //   try {
   //     await trainerModule.fetch({ force: true })
   //   } catch (error) {
-  //     t.fail(error)
+  //     t.fail(JSON.stringify(error))
   //   }
   //   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
   //   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
@@ -24,7 +24,7 @@ test('fetch (collectionGroup)', async (t) => {
 //   try {
 //     await trainerModule.fetch({ force: true })
 //   } catch (error) {
-//     t.fail(error)
+//     t.fail(JSON.stringify(error))
 //   }
 //   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
 //   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })

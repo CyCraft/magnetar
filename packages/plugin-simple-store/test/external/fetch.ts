@@ -12,7 +12,7 @@ test('fetch (collection)', async (t) => {
   try {
     await pokedexModule.fetch({ force: true })
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
   t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
   t.deepEqual(pokedexModule.doc('136').data, pokedex(136))
@@ -26,7 +26,7 @@ test('fetch (document)', async (t) => {
   try {
     await trainerModule.fetch({ force: true })
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })
@@ -38,7 +38,7 @@ test('fetch (document) if unfetched', async (t) => {
   try {
     await trainerModule.fetch()
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
 })
@@ -52,7 +52,7 @@ test('fetch (collection) where-filter: ==', async (t) => {
     const expected = [pokedex(136)]
     t.deepEqual(actual, expected as any)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 })
 
@@ -65,7 +65,7 @@ test('fetch (collection) where-filter: !=', async (t) => {
     const expected = [pokedex(2)]
     t.deepEqual(actual, expected as any)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 })
 
@@ -78,7 +78,7 @@ test('fetch (collection) where-filter: == nested', async (t) => {
     const expected = [pokedex(50)]
     t.deepEqual(actual, expected as any)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 })
 
@@ -91,7 +91,7 @@ test('fetch (collection) where-filter: <', async (t) => {
     const expected = [pokedex(50)]
     t.deepEqual(actual, expected as any)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 })
 
@@ -104,7 +104,7 @@ test('fetch (collection) where-filter: <=', async (t) => {
     const expected = [pokedex(50)]
     t.deepEqual(actual, expected as any)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 })
 
@@ -117,7 +117,7 @@ test('fetch (collection) where-filter: >', async (t) => {
     const expected = [pokedex(113)]
     t.deepEqual(actual, expected as any)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 })
 
@@ -130,7 +130,7 @@ test('fetch (collection) where-filter: >=', async (t) => {
     const expected = [pokedex(113)]
     t.deepEqual(actual, expected as any)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 })
 
@@ -143,7 +143,7 @@ test('fetch (collection) where-filter: array-contains', async (t) => {
     const expected = [pokedex(81), pokedex(82)]
     t.deepEqual(actual, expected as any)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 })
 
@@ -156,7 +156,7 @@ test('fetch (collection) where-filter: in', async (t) => {
     const expected = [pokedex(134), pokedex(135), pokedex(136)]
     t.deepEqual(actual, expected as any)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 })
 
@@ -171,7 +171,7 @@ test('fetch (collection) where-filter: not-in', async (t) => {
     const expected = [pokedex(87), pokedex(124), pokedex(131), pokedex(144)]
     t.deepEqual(actual, expected as any)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 })
 
@@ -192,7 +192,7 @@ test('fetch (collection) where-filter: array-contains-any', async (t) => {
     ]
     t.deepEqual(actual, expected as any)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 })
 
@@ -207,7 +207,7 @@ test('fetch (collection) compound queries', async (t) => {
     const expected = [pokedex(6), pokedex(38), pokedex(78)]
     t.deepEqual(actual, expected as any)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 })
 
@@ -226,7 +226,7 @@ test('fetch (collection) orderBy', async (t) => {
     const expected = [pokedex(78), pokedex(38), pokedex(6)]
     t.deepEqual(actual, expected as any)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 })
 
@@ -250,6 +250,6 @@ test('fetch (collection) limit', async (t) => {
     ]
     t.deepEqual(actual, expected as any)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 })

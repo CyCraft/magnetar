@@ -14,7 +14,7 @@ import { pokedex } from '@magnetarjs/test-utils'
     try {
       await pokedexModule.fetch({ force: true })
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
     t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
     t.deepEqual(pokedexModule.doc('136').data, pokedex(136))
@@ -30,7 +30,7 @@ import { pokedex } from '@magnetarjs/test-utils'
     try {
       await trainerModule.fetch({ force: true })
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
     t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
   })
@@ -50,7 +50,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       const expectedDocCountWithoutQuery = expected.length + 1
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
   })
 }
@@ -69,7 +69,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       const expectedDocCountWithoutQuery = expected.length + 1
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
   })
 }
@@ -88,7 +88,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       const expectedDocCountWithoutQuery = expected.length + 1
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
   })
 }
@@ -107,7 +107,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       const expectedDocCountWithoutQuery = expected.length + 1
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
   })
 }
@@ -126,7 +126,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       const expectedDocCountWithoutQuery = expected.length + 1
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
   })
 }
@@ -145,7 +145,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       const expectedDocCountWithoutQuery = expected.length + 1
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
   })
 }
@@ -164,7 +164,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       const expectedDocCountWithoutQuery = expected.length + 1
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
   })
 }
@@ -183,7 +183,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       const expectedDocCountWithoutQuery = expected.length + 1
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
   })
 }
@@ -202,7 +202,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       const expectedDocCountWithoutQuery = expected.length + 1
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
   })
 }
@@ -224,7 +224,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       const expectedDocCountWithoutQuery = expected.length + 1
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
   })
 }
@@ -253,7 +253,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       const expectedDocCountWithoutQuery = expected.length + 1
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
   })
 }
@@ -275,7 +275,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       const expectedDocCountWithoutQuery = expected.length + 1
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
   })
 }
@@ -304,7 +304,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       const expectedDocCountWithoutQuery = expected.length
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
   })
 }

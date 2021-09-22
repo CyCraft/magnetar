@@ -26,7 +26,7 @@ const conf = (testName: string): any => ({
     try {
       await pokedexModule.doc('1', conf(testName)).merge(payload)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
 
     const expected = {
@@ -59,7 +59,7 @@ const conf = (testName: string): any => ({
     try {
       await pokedexModule.doc('1', conf(testName)).assign(payload)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
 
     const expected = {
@@ -87,7 +87,7 @@ const conf = (testName: string): any => ({
     try {
       await pokedexModule.doc('1', conf(testName)).replace(payload)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
 
     const expected = { base: { HP: 9000 } }

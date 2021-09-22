@@ -10,7 +10,7 @@ test('deleteProp', async (t) => {
   try {
     await trainerModule.deleteProp(deletePayload)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 
   t.deepEqual(trainerModule.data, { name: 'Luca' })
@@ -24,7 +24,7 @@ test('deleteProp nested', async (t) => {
   try {
     await pokedexModule.doc('1').deleteProp(deletePayload)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
   const expected = {
     id: 1,
@@ -49,7 +49,7 @@ test('deleteProp multiple', async (t) => {
   try {
     await pokedexModule.doc('1').deleteProp(deletePayload)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 
   const expected = {

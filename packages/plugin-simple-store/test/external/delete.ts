@@ -9,7 +9,7 @@ test('delete (document)', async (t) => {
   try {
     await trainerModule.delete()
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 
   t.deepEqual(trainerModule.data, undefined)
@@ -23,7 +23,7 @@ test('delete (collection)', async (t) => {
   try {
     await pokedexModule.delete('1')
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
   t.is(pokedexModule.data.size, 0)
   t.deepEqual(pokedexModule.data.get('1'), undefined)

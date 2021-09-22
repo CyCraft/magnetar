@@ -11,7 +11,7 @@ test('insert (document)', async (t) => {
   try {
     await pokedexModule.doc('7').insert(payload)
   } catch (error) {
-    t.fail(error)
+    t.fail(JSON.stringify(error))
   }
 
   t.deepEqual(pokedexModule.doc('7').data, payload)
@@ -25,7 +25,7 @@ test('insert (collection) → random ID', async (t) => {
   try {
     moduleFromResult = await pokedexModule.insert(payload)
   } catch (error) {
-    return t.fail(error)
+    return t.fail(JSON.stringify(error))
   }
   const newId = moduleFromResult.id
   t.deepEqual(pokedexModule.doc(newId).data, payload)

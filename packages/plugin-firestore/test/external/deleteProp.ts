@@ -25,7 +25,7 @@ const conf = (testName: string): any => ({
     try {
       await trainerModule.deleteProp(deletePayload)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
 
     const expected = { name: 'Luca' }
@@ -45,7 +45,7 @@ const conf = (testName: string): any => ({
     try {
       await pokedexModule.doc('1', conf(testName)).deleteProp(deletePayload)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
     const expected = {
       id: 1,
@@ -75,7 +75,7 @@ const conf = (testName: string): any => ({
     try {
       await pokedexModule.doc('1', conf(testName)).deleteProp(deletePayload)
     } catch (error) {
-      t.fail(error)
+      t.fail(JSON.stringify(error))
     }
 
     const expected = {
