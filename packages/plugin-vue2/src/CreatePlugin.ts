@@ -1,6 +1,6 @@
 import { copy } from 'copy-anything'
 import { pick } from 'filter-anything'
-import { isArray } from 'is-what'
+import { isArray, isPlainObject } from 'is-what'
 import {
   PluginInstance,
   MagnetarPlugin,
@@ -115,7 +115,7 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
       for (const [_docId, _docData] of initialData) {
         vue.set(dataCollectionDic, _docId, _docData)
       }
-    } else if (docId) {
+    } else if (docId && isPlainObject(initialData)) {
       if (docId in dataCollectionDic) return
       vue.set(dataCollectionDic, docId, initialData as Record<string, any>)
     }
