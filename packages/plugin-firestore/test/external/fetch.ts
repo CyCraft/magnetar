@@ -7,9 +7,9 @@ import { pokedex } from '@magnetarjs/test-utils'
   test(testName, async (t) => {
     /// 'fetch' resolves once all stores have given a response with data
     const { pokedexModule } = await createMagnetarInstance('read')
-    t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
+    t.deepEqual(pokedexModule.doc('1').data, undefined)
     t.deepEqual(pokedexModule.doc('136').data, undefined)
-    t.is(pokedexModule.data.size, 1)
+    t.is(pokedexModule.data.size, 0)
 
     try {
       await pokedexModule.fetch({ force: true })
@@ -47,7 +47,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
-      const expectedDocCountWithoutQuery = expected.length + 1
+      const expectedDocCountWithoutQuery = expected.length
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(JSON.stringify(error))
@@ -66,7 +66,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
-      const expectedDocCountWithoutQuery = expected.length + 1
+      const expectedDocCountWithoutQuery = expected.length
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(JSON.stringify(error))
@@ -85,7 +85,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
-      const expectedDocCountWithoutQuery = expected.length + 1
+      const expectedDocCountWithoutQuery = expected.length
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(JSON.stringify(error))
@@ -104,7 +104,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
-      const expectedDocCountWithoutQuery = expected.length + 1
+      const expectedDocCountWithoutQuery = expected.length
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(JSON.stringify(error))
@@ -123,7 +123,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
-      const expectedDocCountWithoutQuery = expected.length + 1
+      const expectedDocCountWithoutQuery = expected.length
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(JSON.stringify(error))
@@ -142,7 +142,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
-      const expectedDocCountWithoutQuery = expected.length + 1
+      const expectedDocCountWithoutQuery = expected.length
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(JSON.stringify(error))
@@ -161,7 +161,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
-      const expectedDocCountWithoutQuery = expected.length + 1
+      const expectedDocCountWithoutQuery = expected.length
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(JSON.stringify(error))
@@ -180,7 +180,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
-      const expectedDocCountWithoutQuery = expected.length + 1
+      const expectedDocCountWithoutQuery = expected.length
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(JSON.stringify(error))
@@ -199,7 +199,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
-      const expectedDocCountWithoutQuery = expected.length + 1
+      const expectedDocCountWithoutQuery = expected.length
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(JSON.stringify(error))
@@ -221,7 +221,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
-      const expectedDocCountWithoutQuery = expected.length + 1
+      const expectedDocCountWithoutQuery = expected.length
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(JSON.stringify(error))
@@ -250,7 +250,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
-      const expectedDocCountWithoutQuery = expected.length + 1
+      const expectedDocCountWithoutQuery = expected.length
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(JSON.stringify(error))
@@ -272,7 +272,7 @@ import { pokedex } from '@magnetarjs/test-utils'
       t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
-      const expectedDocCountWithoutQuery = expected.length + 1
+      const expectedDocCountWithoutQuery = expected.length
       t.is(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
     } catch (error) {
       t.fail(JSON.stringify(error))

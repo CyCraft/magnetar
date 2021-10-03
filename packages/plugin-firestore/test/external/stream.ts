@@ -6,9 +6,8 @@ import { pokedex, waitMs } from '@magnetarjs/test-utils'
   const testName = 'stream (collection)'
   test(testName, async (t) => {
     const { pokedexModule } = await createMagnetarInstance('read')
-    t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
     t.deepEqual(pokedexModule.doc('136').data, undefined)
-    t.is(pokedexModule.data.size, 1)
+    t.is(pokedexModule.data.size, 0)
 
     // do not await, because it only resolves when the stream is closed
     pokedexModule.stream().catch((e: any) => t.fail(e.message)) // prettier-ignore
@@ -43,8 +42,7 @@ import { pokedex, waitMs } from '@magnetarjs/test-utils'
   const testName = 'stream (collection) where-filter'
   test(testName, async (t) => {
     const { pokedexModule } = await createMagnetarInstance('read')
-    // the original state has 1 Pokemon already
-    t.is(pokedexModule.data.size, 1)
+    t.is(pokedexModule.data.size, 0)
     // let's get some more
     const pokedexModuleWithQuery = pokedexModule
       .where('type', 'array-contains', 'Fire')
@@ -67,8 +65,7 @@ import { pokedex, waitMs } from '@magnetarjs/test-utils'
 
     // the queried instance only has these 3 Pokemon
     t.deepEqual([...pokedexModuleWithQuery.data.values()], [pokedex(6), pokedex(38), pokedex(78)])
-    // the main instance has one Pokemon from the beginning
-    t.is(pokedexModule.data.size, 4)
+    t.is(pokedexModule.data.size, 3)
   })
 }
 {

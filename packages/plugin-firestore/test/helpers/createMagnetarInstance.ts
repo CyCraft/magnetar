@@ -6,10 +6,6 @@ import { firebase } from './initFirebase'
 
 const CreatePluginLocal = PluginMockLocal.CreatePlugin
 
-const getInitialDataCollection = () => [
-  // doc entries
-  ['1', pokedex(1)],
-]
 const getInitialDataDocument = () => ({ name: 'Luca', age: 10 })
 
 export type PokedexModuleData = O.Patch<
@@ -59,8 +55,12 @@ export async function createMagnetarInstance(
     const docPath = `magnetarTests/${testName}${path ? '/' + path : ''}`
     return firebase.firestore().doc(docPath).delete()
   })
+  const initialEntriesPokedex: ([string, Record<string, any>])[] = []
   const insertPromises = Object.entries(insertDocs).map(([path, data]) => {
     const docPath = `magnetarTests/${testName}${path ? '/' + path : ''}`
+    if (path.startsWith('pokedex/')) {
+      initialEntriesPokedex.push([path.split('/').pop() || '', data])
+    }
     return firebase.firestore().doc(docPath).set(data)
   })
   await Promise.all(deletePromises.concat(insertPromises))
@@ -79,7 +79,7 @@ export async function createMagnetarInstance(
   })
   const pokedexModule = magnetar.collection<PokedexModuleData>('pokedex', {
     configPerStore: {
-      local: { initialData: getInitialDataCollection() },
+      local: { initialData: initialEntriesPokedex },
       remote: { firestorePath: `magnetarTests/${testName}/pokedex`, ...remoteConfig },
     },
   })
