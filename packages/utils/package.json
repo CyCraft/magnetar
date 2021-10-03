@@ -40,5 +40,6 @@
       "ts-node/register"
     ],
     "timeout": "60s"
-  }
+  },
+  "gitHead": "f08f2f5de9ea2ddef8d64a7c6529ded8b5bccf0f"
 }

@@ -17,12 +17,12 @@
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "peerDependencies": {
-    "vue": "^3.2.13"
+    "vue": "^3.2.19"
   },
   "dependencies": {
     "@magnetarjs/core": "^0.2.1",
     "copy-anything": "^2.0.3",
-    "fast-sort": "^3.0.2",
+    "fast-sort": "^3.0.3",
     "filter-anything": "^2.2.1",
     "is-what": "^3.14.1",
     "merge-anything": "^4.0.1",
@@ -32,7 +32,7 @@
   "devDependencies": {
     "@magnetarjs/test-utils": "^0.1.2",
     "ava": "^3.15.0",
-    "vue": "^3.2.13"
+    "vue": "^3.2.19"
   },
   "keywords": [
     "reactive-store",
@@ -77,5 +77,5 @@
     ],
     "timeout": "60s"
   },
-  "gitHead": "07dcf42d161b8b81225544329eb0e39bff9e2d83"
+  "gitHead": "f08f2f5de9ea2ddef8d64a7c6529ded8b5bccf0f"
 }
