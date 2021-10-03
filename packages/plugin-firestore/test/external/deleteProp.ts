@@ -3,16 +3,6 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex } from '@magnetarjs/test-utils'
 import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 
-/**
- * This is to overwrite the default firestorePath of this test.
- * The defaults are:
- * collection: `{ firestorePath: `magnetarTests/${testName}/pokedex` }`
- * doc: `{ firestorePath: `magnetarTests/${testName}` }`
- */
-const conf = (testName: string): any => ({
-  configPerStore: { remote: { firestorePath: `magnetarTests/${testName}/pokedex/1` } },
-})
-
 {
   const testName = 'deleteProp'
   test(testName, async (t) => {
@@ -40,10 +30,10 @@ const conf = (testName: string): any => ({
       insertDocs: { 'pokedex/1': pokedex(1) },
     })
     const deletePayload = 'base.HP'
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, pokedex(1))
+    t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
     try {
-      await pokedexModule.doc('1', conf(testName)).deleteProp(deletePayload)
+      await pokedexModule.doc('1').deleteProp(deletePayload)
     } catch (error) {
       t.fail(JSON.stringify(error))
     }
@@ -59,7 +49,7 @@ const conf = (testName: string): any => ({
         'Speed': 45,
       },
     }
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected as any)
+    t.deepEqual(pokedexModule.doc('1').data, expected as any)
     await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
   })
 }
@@ -70,10 +60,10 @@ const conf = (testName: string): any => ({
       insertDocs: { 'pokedex/1': pokedex(1) },
     })
     const deletePayload = ['base.HP', 'name']
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, pokedex(1))
+    t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
     try {
-      await pokedexModule.doc('1', conf(testName)).deleteProp(deletePayload)
+      await pokedexModule.doc('1').deleteProp(deletePayload)
     } catch (error) {
       t.fail(JSON.stringify(error))
     }
@@ -89,7 +79,7 @@ const conf = (testName: string): any => ({
         'Speed': 45,
       },
     }
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected as any)
+    t.deepEqual(pokedexModule.doc('1').data, expected as any)
     await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
   })
 }

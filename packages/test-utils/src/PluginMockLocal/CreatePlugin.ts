@@ -1,6 +1,6 @@
 import { copy } from 'copy-anything'
 import { pick } from 'filter-anything'
-import { isArray } from 'is-what'
+import { isArray, isPlainObject } from 'is-what'
 import {
   PluginInstance,
   MagnetarPlugin,
@@ -104,7 +104,7 @@ export const CreatePlugin: MagnetarPlugin<StorePluginOptions> = (
       for (const [_docId, _docData] of initialData) {
         dataCollectionMap.set(_docId, _docData)
       }
-    } else if (docId) {
+    } else if (docId && isPlainObject(initialData)) {
       if (dataCollectionMap.has(docId)) return
       dataCollectionMap.set(docId, initialData)
     }

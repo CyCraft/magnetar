@@ -15,11 +15,7 @@ import { DocInstance } from '../../../core/src'
     pokedexGetAll().forEach((_p) => p.insert(_p))
     await waitMs(3000)
 
-    // in this case `useModulePathsForFirestore` is `false` in the plugin settings
-    // so when creating a new doc reference we need to pass the `firestorePath`
-    const squirtle = pokedexModule.doc('7', {
-      configPerStore: { remote: { firestorePath: 'magnetarTests/insert (document)/pokedex/7' } },
-    })
+    const squirtle = pokedexModule.doc('7')
 
     try {
       await squirtle.insert(payload)
@@ -80,13 +76,7 @@ import { DocInstance } from '../../../core/src'
     const payload = { ...pokedex(7), shouldFail: undefined }
     t.deepEqual(pokedexModule.doc('7').data, undefined)
 
-    // in this case `useModulePathsForFirestore` is `false` in the plugin settings
-    // so when creating a new doc reference we need to pass the `firestorePath`
-    const squirtle = pokedexModule.doc('7', {
-      configPerStore: {
-        remote: { firestorePath: `magnetarTests/${testName}/pokedex/7` },
-      },
-    })
+    const squirtle = pokedexModule.doc('7')
 
     try {
       await squirtle.insert(payload, { onError: 'revert' })

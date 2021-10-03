@@ -17,7 +17,6 @@
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
-    "filter-anything": "^2.2.1",
     "is-what": "^3.14.1",
     "merge-anything": "^4.0.1",
     "ts-toolbelt": "^9.6.0"

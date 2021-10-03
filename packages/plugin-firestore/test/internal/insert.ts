@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { pokedex, PokedexEntry, pokedexGetAll, waitMs } from '@magnetarjs/test-utils'
+import { pokedex, PokedexEntry } from '@magnetarjs/test-utils'
 import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 import { DocInstance } from '../../../core/src'
 
@@ -28,11 +28,11 @@ import { DocInstance } from '../../../core/src'
     // check if definitely the error occured
     t.is(error?.code, 'invalid-argument')
 
-    if (!moduleOk) return t.fail()
-    t.is(moduleOk.id, '8')
+    // none should have succeeded
+    // one bad payload and the entire batch fails!
+    if (moduleOk) return t.fail()
 
-    t.deepEqual(moduleOk.data, payloadOk)
     await firestoreDeepEqual(t, testName, `pokedex/7`, undefined as any)
-    await firestoreDeepEqual(t, testName, `pokedex/8`, payloadOk as any)
+    await firestoreDeepEqual(t, testName, `pokedex/8`, undefined as any)
   })
 }

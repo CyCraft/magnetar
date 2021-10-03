@@ -31,11 +31,6 @@ export function revertActionFactory(
         return
       }
     }
-    // reverting other actions are tricky...
-    // insert on collection (no id)
-    if (!docId && actionName === 'insert') actionName = 'insert on collections' as any
-    console.error(
-      `[@magnetarjs/plugin-firestore] revert not yet implemented for ${actionName}. See https://github.com/cycraft/core/issues/2`
-    )
+    // other actions don't need revert
   }
 }

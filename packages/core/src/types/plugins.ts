@@ -8,6 +8,15 @@ import { Clauses } from './clauses'
 // stores / plugins
 
 // these are the interfaces that plugins need to use and implement
+type DocumentPath = string
+export type SyncBatch = {
+  insert: Map<DocumentPath, Record<string, any>>
+  assign: Map<DocumentPath, Record<string, any>>
+  merge: Map<DocumentPath, Record<string, any>>
+  replace: Map<DocumentPath, Record<string, any>>
+  deleteProp: Map<DocumentPath, Set<string>>
+  delete: Set<string>
+}
 
 /**
  * A Plugin is a single function that returns a plugin instance. The pluginOptions can be anything the plugin might need to instantiate.
@@ -140,8 +149,13 @@ export type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleCo
 >
 /**
  * Should handle 'merge' 'assign' 'replace' for docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
+ * @returns
+ *   - `void` if the plugin writes one by one
+ *   - `SyncBatch` If the plugin batches multiple write actions together, it will return the sync batch information
  */
-export type PluginWriteAction = (payload: PluginWriteActionPayload) => void | Promise<void>
+export type PluginWriteAction = (
+  payload: PluginWriteActionPayload
+) => void | Promise<void | SyncBatch>
 
 export type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
@@ -154,8 +168,13 @@ export type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleC
 >
 /**
  * Should handle 'insert' for collections & docs. Must return the new document's ID! When executed on a collection, the plugin must provide a newly generated ID. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc)
+ * @returns
+ *   - `string` if the plugin writes one by one — the new document's ID
+ *   - `[string, SyncBatch]` if the plugin batches multiple write actions together — (1) the new document's ID (2) the sync batch information
  */
-export type PluginInsertAction = (payload: PluginInsertActionPayload) => string | Promise<string>
+export type PluginInsertAction = (
+  payload: PluginInsertActionPayload
+) => string | Promise<string | [string, SyncBatch]>
 
 export type PluginDeletePropActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> =
   O.Patch<
@@ -173,10 +192,13 @@ export type PluginDeletePropActionPayload<SpecificPluginModuleConfig = PluginMod
   >
 /**
  * Should handle 'deleteProp' for docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
+ * @returns
+ *   - `void` if the plugin writes one by one
+ *   - `SyncBatch` If the plugin batches multiple write actions together, it will return the sync batch information
  */
 export type PluginDeletePropAction = (
   payload: PluginDeletePropActionPayload
-) => void | Promise<void>
+) => void | Promise<void | SyncBatch>
 
 export type PluginDeleteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
@@ -189,8 +211,13 @@ export type PluginDeleteActionPayload<SpecificPluginModuleConfig = PluginModuleC
 >
 /**
  * Should handle 'delete' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
+ * @returns
+ *   - `void` if the plugin writes one by one
+ *   - `SyncBatch` If the plugin batches multiple write actions together, it will return the sync batch information
  */
-export type PluginDeleteAction = (payload: PluginDeleteActionPayload) => void | Promise<void>
+export type PluginDeleteAction = (
+  payload: PluginDeleteActionPayload
+) => void | Promise<void | SyncBatch>
 
 export type PluginRevertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,

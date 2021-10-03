@@ -1,4 +1,4 @@
-import { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/core'
+import { PluginInsertAction, PluginInsertActionPayload, SyncBatch } from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'
 import { BatchSync } from '../helpers/batchSync'
@@ -14,7 +14,7 @@ export function insertActionFactory(
     docId,
     actionConfig,
     pluginModuleConfig,
-  }: PluginInsertActionPayload<FirestoreModuleConfig>): Promise<string> {
+  }: PluginInsertActionPayload<FirestoreModuleConfig>): Promise<[string, SyncBatch]> {
     const { firebaseInstance } = firestorePluginOptions
     let _docId = docId
     if (!_docId) {
@@ -29,7 +29,7 @@ export function insertActionFactory(
       ? actionConfig.syncDebounceMs
       : pluginModuleConfig.syncDebounceMs
 
-    await batchSync.set(documentPath, payload, 'insert', syncDebounceMs)
-    return _docId as string
+    const result = await batchSync.insert(documentPath, payload, syncDebounceMs)
+    return [_docId as string, result]
   }
 }

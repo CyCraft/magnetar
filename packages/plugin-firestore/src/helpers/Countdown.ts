@@ -1,6 +1,10 @@
+/**
+ * A countdown which can be restarted and resolves when the provided milliseconds have passed.
+ */
 export type CountdownInstance = {
   done: Promise<void>
   restart: () => void
+  forceFinish: () => void
 }
 
 /**
@@ -17,18 +21,31 @@ export type CountdownInstance = {
  * @author Adam Dorling
  * @contact https://codepen.io/naito
  */
-export function Countdown (ms: number): CountdownInstance {
+export function Countdown(ms: number): CountdownInstance {
   let startTime = Date.now()
-  const done: Promise<void> = new Promise(resolve => {
-    const interval = setInterval(() => {
-      const now = Date.now()
-      const deltaT = now - startTime
-      if (deltaT >= ms) {
-        clearInterval(interval)
-        resolve()
-      }
-    }, 10)
-  })
-  const restart = (): void => { startTime = Date.now() } // prettier-ignore
-  return { done, restart }
+  let interval: any = null
+  let resolveTrigger: any = null
+  const done: Promise<void> = new Promise((resolve) => (resolveTrigger = resolve))
+
+  function finish() {
+    clearInterval(interval)
+    interval = null
+    if (resolveTrigger) {
+      resolveTrigger()
+      resolveTrigger = null
+    }
+  }
+
+  function restart(): void {
+    startTime = Date.now()
+  }
+
+  interval = setInterval(() => {
+    const now = Date.now()
+    const deltaT = now - startTime
+
+    if (deltaT >= ms) finish()
+  }, 10)
+
+  return { done, restart, forceFinish: finish }
 }

@@ -3,7 +3,6 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var mergeAnything = require('merge-anything');
-var filterAnything = require('filter-anything');
 var isWhat = require('is-what');
 
 const actionNameTypeMap = {
@@ -45,6 +44,7 @@ function __awaiter(thisArg, _arguments, P, generator) {
 /**
  * handleAction is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success (4) optional: onNextStoresSuccess.
  * in any event/hook it's possible for the dev to modify the result & also abort the execution chain, which prevents calling handleAction on the next store as well
+ * @returns unknown is returned in case of an error
  */
 function handleAction(args) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -386,8 +386,12 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                  * each each time a store returns a `FetchResponse` then all `doOnFetchFns` need to be executed
                  */
                 const doOnFetchFns = modifyReadResponseMap.added;
-                // handle and await each action in sequence
+                /**
+                 * All possible results from the plugins.
+                 * `unknown` in case an error was thrown
+                 */
                 let resultFromPlugin;
+                // handle and await each action in sequence
                 for (const [i, storeName] of storesToExecute.entries()) {
                     // a previous iteration stopped the execution:
                     if (stopExecution === true)
@@ -436,12 +440,17 @@ collectionFn // actions executed on a "collection" will return `collection()` or
                         // now we must throw the error
                         throw resultFromPlugin;
                     }
-                    // special handling for 'insert' (resultFromPlugin will always be `string`)
-                    if (actionName === 'insert' && isWhat.isFullString(resultFromPlugin)) {
+                    // special handling for 'insert' (resultFromPlugin will always be `string | [string, SyncBatch]`)
+                    if (actionName === 'insert') {
                         // update the modulePath if a doc with random ID was inserted in a collection
                         // if this is the case the result will be a string - the randomly genererated ID
                         if (!docId) {
-                            docId = resultFromPlugin;
+                            if (isWhat.isFullString(resultFromPlugin)) {
+                                docId = resultFromPlugin;
+                            }
+                            if (isWhat.isFullArray(resultFromPlugin) && isWhat.isFullString(resultFromPlugin[0])) {
+                                docId = resultFromPlugin[0];
+                            }
                             modulePath = [collectionPath, docId].filter(Boolean).join('/');
                         }
                     }
@@ -636,7 +645,7 @@ function createCollectionWithContext([collectionPath, docId], moduleConfig, glob
     const id = collectionPath.split('/').slice(-1)[0];
     const path = collectionPath;
     const doc = (docId, _moduleConfig = {}) => {
-        return docFn(`${path}/${docId}`, mergeAnything.merge(filterAnything.omit(moduleConfig, ['configPerStore']), _moduleConfig));
+        return docFn(`${path}/${docId}`, mergeAnything.merge(moduleConfig, _moduleConfig));
     };
     const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, fetchPromises, docFn, collectionFn); //prettier-ignore
     const _delete = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, fetchPromises, docFn, collectionFn); //prettier-ignore

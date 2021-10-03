@@ -10,13 +10,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     const payload = { ...pokedex(7), shouldFail: 'local' }
     t.deepEqual(pokedexModule.doc('7').data, undefined)
 
-    // in this case `useModulePathsForFirestore` is `false` in the plugin settings
-    // so when creating a new doc reference we need to pass the `firestorePath`
-    const squirtle = pokedexModule.doc('7', {
-      configPerStore: {
-        remote: { firestorePath: `magnetarTests/${testName}/pokedex/7` },
-      },
-    })
+    const squirtle = pokedexModule.doc('7')
 
     try {
       await squirtle.insert(payload, {
@@ -78,9 +72,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 
 //     try {
 //       await pokedexModule
-//         .doc('7', {
-//           configPerStore: { remote: { firestorePath: `magnetarTests/${testName}/pokedex/7` } },
-//         })
+//         .doc('7')
 //         .delete(undefined, {
 //           onError: 'revert',
 //           executionOrder: ['remote', 'local'],
@@ -106,9 +98,6 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 //   })
 // }
 
-const conf = (testName: string): any => ({
-  configPerStore: { remote: { firestorePath: `magnetarTests/${testName}/pokedex/1` } },
-})
 {
   // this tests is _not really_ testing reverting the remote store, they test if the local store is reverted and if the remote store stays untouched on an error
   const testName = 'revert: merge (with extra checks)'
@@ -118,10 +107,10 @@ const conf = (testName: string): any => ({
     })
     await firestoreDeepEqual(t, testName, 'pokedex/1', pokedex(1))
     const payload = { base: { HP: undefined } }
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, pokedex(1))
+    t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
     try {
-      await pokedexModule.doc('1', conf(testName)).merge(payload, {
+      await pokedexModule.doc('1').merge(payload, {
         onError: 'revert',
         on: {
           success: ({ storeName }) => {
@@ -139,7 +128,7 @@ const conf = (testName: string): any => ({
                 'Speed': 45,
               },
             }
-            t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expectedMidway as any)
+            t.deepEqual(pokedexModule.doc('1').data, expectedMidway as any)
           },
         },
       })
@@ -148,7 +137,7 @@ const conf = (testName: string): any => ({
     }
 
     const expected = pokedex(1)
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected as any)
+    t.deepEqual(pokedexModule.doc('1').data, expected as any)
     await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
   })
 }
@@ -161,10 +150,10 @@ const conf = (testName: string): any => ({
     })
     await firestoreDeepEqual(t, testName, 'pokedex/1', pokedex(1))
     const payload = { base: { HP: undefined } }
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, pokedex(1))
+    t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
     try {
-      await pokedexModule.doc('1', conf(testName)).assign(payload, {
+      await pokedexModule.doc('1').assign(payload, {
         onError: 'revert',
         on: {
           success: ({ storeName }) => {
@@ -177,7 +166,7 @@ const conf = (testName: string): any => ({
                 HP: undefined,
               },
             }
-            t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expectedMidway as any)
+            t.deepEqual(pokedexModule.doc('1').data, expectedMidway as any)
           },
         },
       })
@@ -186,7 +175,7 @@ const conf = (testName: string): any => ({
     }
 
     const expected = pokedex(1)
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected as any)
+    t.deepEqual(pokedexModule.doc('1').data, expected as any)
     await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
   })
 }
@@ -199,16 +188,16 @@ const conf = (testName: string): any => ({
     })
     await firestoreDeepEqual(t, testName, 'pokedex/1', pokedex(1))
     const payload = { base: { HP: undefined } }
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, pokedex(1))
+    t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
     try {
-      await pokedexModule.doc('1', conf(testName)).replace(payload, {
+      await pokedexModule.doc('1').replace(payload, {
         onError: 'revert',
         on: {
           success: ({ storeName }) => {
             if (storeName !== 'local') return
             const expectedMidway = { base: { HP: undefined } }
-            t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expectedMidway as any)
+            t.deepEqual(pokedexModule.doc('1').data, expectedMidway as any)
           },
         },
       })
@@ -217,7 +206,7 @@ const conf = (testName: string): any => ({
     }
 
     const expected = pokedex(1)
-    t.deepEqual(pokedexModule.doc('1', conf(testName)).data, expected as any)
+    t.deepEqual(pokedexModule.doc('1').data, expected as any)
     await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
   })
 }

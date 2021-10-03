@@ -1,6 +1,6 @@
 /* eslint-disable no-inner-declarations */
 import { O } from 'ts-toolbelt'
-import { isFullString, isPromise } from 'is-what'
+import { isFullArray, isFullString, isPromise } from 'is-what'
 import { handleAction } from './handleAction'
 import { getEventNameFnsMap } from '../types/events'
 import {
@@ -14,7 +14,7 @@ import {
   FetchPromises,
 } from '../types/actions'
 import { ActionType, ActionTernary } from '../types/actionsInternal'
-import { FetchResponse, isDoOnFetch, isFetchResponse, DoOnFetch } from '../types/plugins'
+import { FetchResponse, isDoOnFetch, isFetchResponse, DoOnFetch, SyncBatch } from '../types/plugins'
 import { getModifyPayloadFnsMap } from '../types/modifyPayload'
 import { OnAddedFn, getModifyReadResponseFnsMap } from '../types/modifyReadResponse'
 import { executeOnFns } from '../helpers/executeOnFns'
@@ -105,8 +105,12 @@ export function handleActionPerStore(
          */
         const doOnFetchFns: DoOnFetch[] = modifyReadResponseMap.added
 
+        /**
+         * All possible results from the plugins.
+         * `unknown` in case an error was thrown
+         */
+        let resultFromPlugin: void | string | unknown | FetchResponse | OnAddedFn | SyncBatch | [string, SyncBatch]
         // handle and await each action in sequence
-        let resultFromPlugin: void | string | FetchResponse | OnAddedFn | any
         for (const [i, storeName] of storesToExecute.entries()) {
           // a previous iteration stopped the execution:
           if (stopExecution === true) break
@@ -155,12 +159,17 @@ export function handleActionPerStore(
             throw resultFromPlugin
           }
 
-          // special handling for 'insert' (resultFromPlugin will always be `string`)
-          if (actionName === 'insert' && isFullString(resultFromPlugin)) {
+          // special handling for 'insert' (resultFromPlugin will always be `string | [string, SyncBatch]`)
+          if (actionName === 'insert') {
             // update the modulePath if a doc with random ID was inserted in a collection
             // if this is the case the result will be a string - the randomly genererated ID
             if (!docId) {
-              docId = resultFromPlugin
+              if (isFullString(resultFromPlugin)) {
+                docId = resultFromPlugin
+              }
+              if (isFullArray(resultFromPlugin) && isFullString(resultFromPlugin[0])) {
+                docId = resultFromPlugin[0]
+              }
               modulePath = [collectionPath, docId].filter(Boolean).join('/')
             }
           }

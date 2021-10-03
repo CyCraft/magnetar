@@ -1,4 +1,5 @@
 import { ActionConfig, ActionName } from '../types/actions'
+import { SyncBatch } from '../types/plugins'
 
 import { EventNameFnsMap } from '../types/events'
 import {
@@ -15,6 +16,7 @@ import { OnAddedFn } from '../types/modifyReadResponse'
 /**
  * handleAction is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success (4) optional: onNextStoresSuccess.
  * in any event/hook it's possible for the dev to modify the result & also abort the execution chain, which prevents calling handleAction on the next store as well
+ * @returns unknown is returned in case of an error
  */
 export async function handleAction(args: {
   collectionPath: string
@@ -29,7 +31,7 @@ export async function handleAction(args: {
   actionName: Exclude<ActionName, 'stream'>
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
   storeName: string
-}): Promise<void | string | FetchResponse | OnAddedFn | unknown> {
+}): Promise<void | string | FetchResponse | OnAddedFn | SyncBatch | [string, SyncBatch] | unknown> {
   const {
     collectionPath,
     docId,
@@ -58,7 +60,7 @@ export async function handleAction(args: {
     stopExecutionAfterAction()
     return
   }
-  let result: void | string | FetchResponse | OnAddedFn
+  let result: void | string | FetchResponse | OnAddedFn | SyncBatch | [string, SyncBatch]
   try {
     // triggering the action provided by the plugin
     result = await pluginAction({
