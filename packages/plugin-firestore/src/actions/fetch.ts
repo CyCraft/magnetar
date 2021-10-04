@@ -1,4 +1,5 @@
-import type firebase from 'firebase'
+// TODO: update to v9 modular
+// import type firebase from 'firebase'
 import {
   PluginFetchAction,
   FetchResponse,
@@ -9,8 +10,11 @@ import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { getFirestoreDocPath, getFirestoreCollectionPath } from '../helpers/pathHelpers'
 import { getQueryInstance, docSnapshotToDocMetadata } from '../helpers/queryHelpers'
 
-type DocumentSnapshot = firebase.firestore.DocumentSnapshot
-type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot
+// TODO: update to v9 modular
+// type DocumentSnapshot = firebase.firestore.DocumentSnapshot
+// type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot
+type DocumentSnapshot = any
+type QueryDocumentSnapshot = any
 
 export function fetchActionFactory(
   firestorePluginOptions: Required<FirestorePluginOptions>

@@ -1,13 +1,18 @@
-import type firebase from 'firebase'
+// import type firebase from 'firebase'
 import { StreamResponse, PluginStreamAction, PluginStreamActionPayload } from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { getFirestoreDocPath, getFirestoreCollectionPath } from '../helpers/pathHelpers'
 import { getQueryInstance, docSnapshotToDocMetadata } from '../helpers/queryHelpers'
 
-type DocumentSnapshot = firebase.firestore.DocumentSnapshot
-type QuerySnapshot = firebase.firestore.QuerySnapshot
-type DocumentChange = firebase.firestore.DocumentChange
-type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot
+// TODO: update to v9 modular
+// type DocumentSnapshot = firebase.firestore.DocumentSnapshot
+// type QuerySnapshot = firebase.firestore.QuerySnapshot
+// type DocumentChange = firebase.firestore.DocumentChange
+// type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot
+type DocumentSnapshot = any
+type QuerySnapshot = any
+type DocumentChange = any
+type QueryDocumentSnapshot = any
 
 export function streamActionFactory(
   firestorePluginOptions: Required<FirestorePluginOptions>

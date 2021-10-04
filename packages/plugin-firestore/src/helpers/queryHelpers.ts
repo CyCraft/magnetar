@@ -1,13 +1,19 @@
-import type firebase from 'firebase'
+// import type firebase from 'firebase'
 import { isNumber } from 'is-what'
 import { FirestoreModuleConfig } from '../CreatePlugin'
 import { DocMetadata } from '@magnetarjs/core'
 
-type Query = firebase.firestore.Query
-type CollectionReference = firebase.firestore.CollectionReference
-type DocumentSnapshot = firebase.firestore.DocumentSnapshot
-type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot
-type Firestore = firebase.firestore.Firestore
+// TODO: update to v9 modular
+// type Query = firebase.firestore.Query
+// type CollectionReference = firebase.firestore.CollectionReference
+// type DocumentSnapshot = firebase.firestore.DocumentSnapshot
+// type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot
+// type Firestore = firebase.firestore.Firestore
+type Query = any
+type CollectionReference = any
+type DocumentSnapshot = any
+type QueryDocumentSnapshot = any
+type Firestore = any
 
 export function getQueryInstance(
   collectionPath: string,

@@ -1,4 +1,5 @@
-import type firebase from 'firebase'
+// TODO: update to v9 modular
+// import type { FirebaseApp } from 'firebase/app'
 import { PluginInstance, MagnetarPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core'
 import { insertActionFactory } from './actions/insert'
 import { writeActionFactory } from './actions/mergeAssignReplace'
@@ -16,6 +17,11 @@ import { batchSyncFactory } from './helpers/batchSync'
 
 export interface FirestorePluginOptions {
   /**
+   * :::IMPORTANT
+   * - currently **only compatible with Firebase v8 & v9 compat!**
+   * - a new version compatible with v9 modular will be released in the near future.
+   * :::
+   *
    * It's required to pass the firebase instance to make sure there are not two separate instances running which can cause issues.
    * As long as Firebase is initialized before you pass it, you can just import and pass it like so:
    * @example
@@ -26,7 +32,7 @@ export interface FirestorePluginOptions {
    * const remote = FirestorePlugin({ firebaseInstance: firebase })
    * ```
    */
-  firebaseInstance: typeof firebase
+  firebaseInstance: any
   /**
    * When this is true, the "modulePath" will be used as firestorePath to sync the data to. Eg. `collection('todos')` will sync data to `todos` on firestore. When this is false (default) the firestorePath must be provided like so: `collection('todos', { firestorePath: 'myTodos' })`
    */
@@ -64,6 +70,13 @@ function firestorePluginOptionsWithDefaults(
 // a Magnetar plugin is a single function that returns a `PluginInstance`
 // the plugin implements the logic for all actions that a can be called from a Magnetar module instance
 // each action must have the proper for both collection and doc type modules
+
+/**
+ * :::IMPORTANT
+ * - currently **only compatible with Firebase v8 & v9 compat!**
+ * - a new version compatible with v9 modular will be released in the near future.
+ * :::
+ */
 export const CreatePlugin: MagnetarPlugin<FirestorePluginOptions> = (
   firestorePluginOptions: FirestorePluginOptions
 ): PluginInstance => {

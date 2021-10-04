@@ -2,7 +2,8 @@ import { FirestorePluginOptions } from '../CreatePlugin'
 import { Countdown, CountdownInstance } from './Countdown'
 import { SyncBatch } from '@magnetarjs/core'
 // just for types:
-import type firebase from 'firebase'
+// TODO: update to v9 modular
+// import type firebase from 'firebase'
 import { isNumber } from 'is-what'
 import { merge as mergeObjects } from 'merge-anything'
 
@@ -83,7 +84,7 @@ export function batchSyncFactory(
    * A function that applies everything in the `SyncBatch` to a Firestore's `firebase.firestore.WriteBatch`.
    * It mutates the passed `batch`.
    */
-  function applySyncBatch(fireBatch: firebase.firestore.WriteBatch, batch: SyncBatch): void {
+  function applySyncBatch(fireBatch: any, batch: SyncBatch): void {
     batch.insert.forEach((payload, documentPath) => {
       const ref = firebaseInstance.firestore().doc(documentPath)
       fireBatch.set(ref, payload)
@@ -125,7 +126,7 @@ export function batchSyncFactory(
   async function prepareStack(operationCount: number, queueIndex = 0): Promise<Stack> {
     if (!state.queue[queueIndex]) state.queue[queueIndex] = newStack()
     const stack = state.queue[queueIndex]
-    if ((stack.operationCount + operationCount) >= MAX_OPERATION_COUNT) {
+    if (stack.operationCount + operationCount >= MAX_OPERATION_COUNT) {
       return prepareStack(operationCount, queueIndex + 1)
     }
     stack.operationCount += operationCount
@@ -159,7 +160,7 @@ export function batchSyncFactory(
     fireBatch
       .commit()
       .then(() => stack.resolves.forEach((res) => res()))
-      .catch((error) => stack.rejects.forEach((rej) => rej(error)))
+      .catch((error: unknown) => stack.rejects.forEach((rej) => rej(error)))
       .finally(() => {
         if (state.queue.length) {
           triggerSync(0)
