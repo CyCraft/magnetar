@@ -7,7 +7,11 @@
       </div>
       <div class="pa-md q-gutter-xl flex">
         <RouteLink text="Docs" to="/docs" />
-        <AnchorLink href="https://github.com/cycraft/magnetar/releases" text="Changelog" external />
+        <AnchorLink
+          href="https://github.com/CyCraft/magnetar/blob/production/CHANGELOG.md"
+          text="Changelog"
+          external
+        />
         <AnchorLink href="https://github.com/cycraft/magnetar" text="Github" external />
       </div>
     </div>
