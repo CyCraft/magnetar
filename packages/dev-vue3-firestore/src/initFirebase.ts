@@ -1,6 +1,5 @@
-// v9 compat packages are API compatible with v8 code
-import firebase from 'firebase/compat/app'
-import 'firebase/compat/firestore'
+import { initializeApp } from 'firebase/app'
+import { getFirestore } from 'firebase/firestore'
 
 const config = {
   apiKey: 'AIzaSyDivMlXIuHqDFsTCCqBDTVL0h29xbltcL8',
@@ -10,5 +9,5 @@ const config = {
   // storageBucket: 'tests-firestore.appspot.com',
   // messagingSenderId: '743555674736'
 }
-firebase.initializeApp(config)
-export { firebase }
+const firebaseApp = initializeApp(config)
+export const db = getFirestore(firebaseApp)
