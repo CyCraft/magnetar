@@ -1,12 +1,11 @@
 // ---------------------------------------
 // plugin vue2 for local data store
 // ---------------------------------------
-import './firebase'
 import { Magnetar } from '@magnetarjs/core'
 import { CreatePlugin } from '@magnetarjs/plugin-vue2'
 import { CreatePlugin as CreatePluginFirestore } from '@magnetarjs/plugin-firestore'
 import Vue from 'vue'
-import firebase from 'firebase/app'
+import { db } from './initFirebase'
 
 const vueInstance = Vue
 const generateRandomId = () => Math.random().toString()
@@ -15,7 +14,7 @@ const generateRandomId = () => Math.random().toString()
 const local = CreatePlugin({ vueInstance, generateRandomId })
 
 const remote = CreatePluginFirestore({
-  firebaseInstance: firebase,
+  db,
   useModulePathsForFirestore: true,
   debug: true,
 })

@@ -13,40 +13,40 @@ To instantiate Magnetar, you need to first instantiate the store plugins you wil
 This is a complete setup example which uses:
 
 - the **Firestore** plugin for remote data store
-- the **Vue 2** plugin for local data store
+- the **Vue 3** plugin for local data store
 
 > Please note: in reality it's cleaner to have **all imports at the top**
 
+<!-- prettier-ignore-start -->
 ```javascript
 // ---------------------------------------------
-// 0. Make sure firebase is instantialized BEFORE magnetar
+// 0. Initialise firebase
 // ---------------------------------------------
-import firebase from 'firebase/app'
-import 'firebase/firestore'
+import { initializeApp } from 'firebase/app'
+import { getFirestore, collection, doc } from 'firebase/firestore'
 
-firebase.initializeApp({
-  // ...
-})
+const firebaseApp = initializeApp({ /* pass your config... */ })
+const db = getFirestore(firebaseApp)
+/**
+ * A helper function that generates a random Firestore ID
+ */
+function generateRandomId () { return doc(collection(db, 'random')).id }
 
 // ---------------------------------------------
 // 1. the plugin firestore for remote data store
 // ---------------------------------------------
 import { CreatePlugin as PluginFirestore } from '@magnetarjs/plugin-firestore'
-import firebase from 'firebase/app'
 
-// create the remote store plugin instance:
-const remote = PluginFirestore({ firebaseInstance: firebase })
+// create the remote store plugin instance & pass your `db`:
+const remote = PluginFirestore({ db })
 
 // ---------------------------------------
 // 2. the plugin vue2 for local data store
 // ---------------------------------------
 import { CreatePlugin as PluginVue } from '@magnetarjs/plugin-vue2'
-import vue from 'vue'
 
-const generateRandomId = () => firebase.firestore().collection('random').doc().id
-
-// create the local store plugin instance:
-const local = PluginVue({ vueInstance: vue, generateRandomId })
+// create the local store plugin instance & pass your `generateRandomId`:
+const local = PluginVue({ generateRandomId })
 
 // -----------------------------------------------------
 // 3. instantiate the Magnetar instance with the store plugins
@@ -65,6 +65,7 @@ export const magnetar = Magnetar({
   on: { success: logger }, // disable this on production builds
 })
 ```
+<!-- prettier-ignore-end -->
 
 Some info on the main Magnetar instance props:
 

@@ -16,13 +16,6 @@ npm i magnetar
 
 [magnetar.cycraft.co](https://magnetar.cycraft.co)
 
-### Caveats
-
-`@magnetarjs/plugin-firestore`:
-
-- currently **only compatible with v8 & v9 compat!**
-- a new version compatible with v9 modular will be released in the near future.
-
 ## Meet the family
 
 ![](media/familar-hero.png?raw=true)

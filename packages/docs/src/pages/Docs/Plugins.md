@@ -12,11 +12,37 @@ Use the Firestore plugin if you use Cloud Firestore.
 
 Example setup:
 
+<!-- prettier-ignore-start -->
 ```js
 import { CreatePlugin as PluginFirestore } from '@magnetarjs/plugin-firestore'
-import firebase from 'firebase/app'
+import { initializeApp } from 'firebase/app'
+import { getFirestore } from 'firebase/firestore'
 
-const remote = PluginFirestore({ firebaseInstance: firebase })
+const firebaseApp = initializeApp({ /* pass your config... */ })
+const db = getFirestore(firebaseApp)
+
+const remote = PluginFirestore({ db })
+```
+<!-- prettier-ignore-end -->
+
+## Vue 3
+
+> documentation WIP
+
+Use the Vue 3 plugin for Vue 3 projects.
+
+Example setup:
+
+```js
+import { CreatePlugin as PluginVue } from '@magnetarjs/plugin-vue3'
+
+function generateRandomId() {
+  return [Math.random(), Math.random(), Math.random()].join('-')
+  // you need to provide your own logic
+  // this function is used when you execute `insert` without specifying an ID
+}
+
+const local = PluginVue({ generateRandomId })
 ```
 
 ## Vue 2
@@ -38,26 +64,6 @@ function generateRandomId() {
 }
 
 const local = PluginVue({ vueInstance: vue, generateRandomId })
-```
-
-## Vue 3
-
-> documentation WIP
-
-Use the Vue 3 plugin for Vue 3 projects.
-
-Example setup:
-
-```js
-import { CreatePlugin as PluginVue } from '@magnetarjs/plugin-vue3'
-
-function generateRandomId() {
-  return [Math.random(), Math.random(), Math.random()].join('-')
-  // you need to provide your own logic
-  // this function is used when you execute `insert` without specifying an ID
-}
-
-const local = PluginVue({ generateRandomId })
 ```
 
 ## Simple Store
