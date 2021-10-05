@@ -1173,7 +1173,7 @@
     tslib "^2.1.0"
     xmlhttprequest "1.8.0"
 
-"@firebase/app@0.7.2":
+"@firebase/app@0.7.2", "@firebase/app@^0.7.2":
   version "0.7.2"
   resolved "https://registry.yarnpkg.com/@firebase/app/-/app-0.7.2.tgz#0df26d6e9861d5ebe038d4e1f10b63111a28a1f7"
   integrity sha512-xKO3KWxVqCLijJToaBGvBnXCaVGvIw+rT2Dtd9B2iyOFJieQQ+xx8/zRWgoSqbMBIZ2crQVr0KdsoyP9D2nQfg==
@@ -1335,7 +1335,7 @@
     node-fetch "2.6.1"
     tslib "^2.1.0"
 
-"@firebase/firestore@3.1.0":
+"@firebase/firestore@3.1.0", "@firebase/firestore@^3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@firebase/firestore/-/firestore-3.1.0.tgz#0a59e41f164b28116aca1a264acef0dbc8e5a585"
   integrity sha512-vOXueHNRjlgBlKVCWuUDhr3dQW2hJwbcqcJaFiIV9V+PamfyhOHzX8pEQkrPort4YQQvoRmY9uiFhfOGj2hbeA==

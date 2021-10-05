@@ -1,8 +1,9 @@
+import { doc, setDoc, deleteDoc } from '@firebase/firestore'
+import { O } from 'ts-toolbelt'
+import { PokedexEntry, generateRandomId, PluginMockLocal } from '@magnetarjs/test-utils'
 import { Magnetar, MagnetarInstance, CollectionInstance, DocInstance } from '../../../core/src'
 import { CreatePlugin as CreatePluginRemote } from '../../src'
-import { pokedex, PokedexEntry, generateRandomId, PluginMockLocal } from '@magnetarjs/test-utils'
-import { O } from 'ts-toolbelt'
-import { firebase } from './initFirebase'
+import { db } from './initFirebase'
 
 const CreatePluginLocal = PluginMockLocal.CreatePlugin
 
@@ -53,21 +54,21 @@ export async function createMagnetarInstance(
   // prepare the firestore side
   const deletePromises = deletePaths.map((path) => {
     const docPath = `magnetarTests/${testName}${path ? '/' + path : ''}`
-    return firebase.firestore().doc(docPath).delete()
+    return deleteDoc(doc(db, docPath))
   })
-  const initialEntriesPokedex: ([string, Record<string, any>])[] = []
+  const initialEntriesPokedex: [string, Record<string, any>][] = []
   const insertPromises = Object.entries(insertDocs).map(([path, data]) => {
     const docPath = `magnetarTests/${testName}${path ? '/' + path : ''}`
     if (path.startsWith('pokedex/')) {
       initialEntriesPokedex.push([path.split('/').pop() || '', data])
     }
-    return firebase.firestore().doc(docPath).set(data)
+    return setDoc(doc(db, docPath), data)
   })
   await Promise.all(deletePromises.concat(insertPromises))
 
   // create & prepare the modules
   const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
-  const remote = CreatePluginRemote({ firebaseInstance: firebase })
+  const remote = CreatePluginRemote({ db })
   const magnetar = Magnetar({
     localStoreName: 'local',
     stores: { local, remote },

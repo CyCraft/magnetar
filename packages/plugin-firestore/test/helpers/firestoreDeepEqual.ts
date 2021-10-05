@@ -1,5 +1,6 @@
-import { firestore } from './initFirebase'
+import { doc, getDoc } from '@firebase/firestore'
 import { ExecutionContext } from 'ava'
+import { db } from './initFirebase'
 
 export async function firestoreDeepEqual(
   t: ExecutionContext,
@@ -8,8 +9,8 @@ export async function firestoreDeepEqual(
   expected: any,
   message?: string
 ) {
-  const docRef = firestore.doc(`magnetarTests/${testName}/${documentPath}`)
-  const docSnapshot = await docRef.get()
+  const docRef = doc(db, `magnetarTests/${testName}/${documentPath}`)
+  const docSnapshot = await getDoc(docRef)
   const docData = docSnapshot.data()
   t.deepEqual(expected, docData, message)
 }

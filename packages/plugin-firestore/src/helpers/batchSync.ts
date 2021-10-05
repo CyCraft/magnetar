@@ -1,9 +1,8 @@
 import { FirestorePluginOptions } from '../CreatePlugin'
 import { Countdown, CountdownInstance } from './Countdown'
 import { SyncBatch } from '@magnetarjs/core'
-// just for types:
-// TODO: update to v9 modular
-// import type firebase from 'firebase'
+import type { WriteBatch } from '@firebase/firestore'
+import { doc, writeBatch as createWriteBatch, deleteField } from '@firebase/firestore'
 import { isNumber } from 'is-what'
 import { merge as mergeObjects } from 'merge-anything'
 
@@ -78,43 +77,43 @@ function prepareReturnPromise(stack: Stack): Promise<SyncBatch> {
 export function batchSyncFactory(
   firestorePluginOptions: Required<FirestorePluginOptions>
 ): BatchSync {
-  const { firebaseInstance, syncDebounceMs, debug } = firestorePluginOptions
+  const { db, syncDebounceMs, debug } = firestorePluginOptions
 
   /**
-   * A function that applies everything in the `SyncBatch` to a Firestore's `firebase.firestore.WriteBatch`.
+   * A function that applies everything in the `SyncBatch` to a Firestore's `WriteBatch`.
    * It mutates the passed `batch`.
    */
-  function applySyncBatch(fireBatch: any, batch: SyncBatch): void {
+  function applySyncBatch(writeBatch: WriteBatch, batch: SyncBatch): void {
     batch.insert.forEach((payload, documentPath) => {
-      const ref = firebaseInstance.firestore().doc(documentPath)
-      fireBatch.set(ref, payload)
+      const ref = doc(db, documentPath)
+      writeBatch.set(ref, payload)
     })
     batch.assign.forEach((payload, documentPath) => {
-      const ref = firebaseInstance.firestore().doc(documentPath)
-      fireBatch.set(ref, payload, { mergeFields: Object.keys(payload) })
+      const ref = doc(db, documentPath)
+      writeBatch.set(ref, payload, { mergeFields: Object.keys(payload) })
     })
     batch.merge.forEach((payload, documentPath) => {
-      const ref = firebaseInstance.firestore().doc(documentPath)
-      fireBatch.set(ref, payload, { merge: true })
+      const ref = doc(db, documentPath)
+      writeBatch.set(ref, payload, { merge: true })
     })
     batch.replace.forEach((payload, documentPath) => {
-      const ref = firebaseInstance.firestore().doc(documentPath)
-      fireBatch.set(ref, payload)
+      const ref = doc(db, documentPath)
+      writeBatch.set(ref, payload)
     })
     batch.deleteProp.forEach((payload, documentPath) => {
-      const ref = firebaseInstance.firestore().doc(documentPath)
+      const ref = doc(db, documentPath)
       const _payload = [...payload].reduce(
         (carry, propPath) => ({
           ...carry,
-          [propPath]: firebaseInstance.firestore.FieldValue.delete(),
+          [propPath]: deleteField(),
         }),
         {} as any
       )
-      fireBatch.update(ref, _payload)
+      writeBatch.update(ref, _payload)
     })
     batch.delete.forEach((documentPath) => {
-      const ref = firebaseInstance.firestore().doc(documentPath)
-      fireBatch.delete(ref)
+      const ref = doc(db, documentPath)
+      writeBatch.delete(ref)
     })
   }
 
@@ -142,9 +141,9 @@ export function batchSyncFactory(
     if (!stack) {
       throw new Error('executeSync executed before it was instantiated')
     }
-    const fireBatch = firebaseInstance.firestore().batch()
+    const writeBatch = createWriteBatch(db)
     try {
-      applySyncBatch(fireBatch, stack.batch)
+      applySyncBatch(writeBatch, stack.batch)
     } catch (error) {
       stack.rejects.forEach((rej) => rej(error))
       if (state.queue.length) {
@@ -157,7 +156,7 @@ export function batchSyncFactory(
       console.log('[magnetar] Syncing to firestore...', stack.batch)
     }
 
-    fireBatch
+    writeBatch
       .commit()
       .then(() => stack.resolves.forEach((res) => res()))
       .catch((error: unknown) => stack.rejects.forEach((rej) => rej(error)))

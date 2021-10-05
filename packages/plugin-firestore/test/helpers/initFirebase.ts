@@ -1,6 +1,5 @@
-import Firebase from 'firebase/compat/app'
-import 'firebase/compat/firestore'
-import 'firebase/compat/functions'
+import { initializeApp } from '@firebase/app'
+import { getFirestore } from '@firebase/firestore'
 
 const config = {
   apiKey: 'AIzaSyDivMlXIuHqDFsTCCqBDTVL0h29xbltcL8',
@@ -10,6 +9,5 @@ const config = {
   // storageBucket: 'tests-firestore.appspot.com',
   // messagingSenderId: '743555674736'
 }
-Firebase.initializeApp(config)
-export const firebase = Firebase
-export const firestore = Firebase.firestore()
+const firebaseApp = initializeApp(config)
+export const db = getFirestore(firebaseApp)

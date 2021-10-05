@@ -1,38 +1,32 @@
-// import type firebase from 'firebase'
+import type {
+  Firestore,
+  Query,
+  CollectionReference,
+  DocumentSnapshot,
+  QueryDocumentSnapshot,
+} from '@firebase/firestore'
+import { collection, query, where, orderBy, limit } from '@firebase/firestore'
 import { isNumber } from 'is-what'
 import { FirestoreModuleConfig } from '../CreatePlugin'
 import { DocMetadata } from '@magnetarjs/core'
 
-// TODO: update to v9 modular
-// type Query = firebase.firestore.Query
-// type CollectionReference = firebase.firestore.CollectionReference
-// type DocumentSnapshot = firebase.firestore.DocumentSnapshot
-// type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot
-// type Firestore = firebase.firestore.Firestore
-type Query = any
-type CollectionReference = any
-type DocumentSnapshot = any
-type QueryDocumentSnapshot = any
-type Firestore = any
-
 export function getQueryInstance(
   collectionPath: string,
-  pluginModuleConfig: FirestoreModuleConfig,
-  firestore: Firestore
+  config: FirestoreModuleConfig,
+  db: Firestore
 ): Query {
-  const { where = [], orderBy = [], limit } = pluginModuleConfig
-  let query: CollectionReference | Query
-  query = firestore.collection(collectionPath)
-  for (const whereClause of where) {
-    query = query.where(...whereClause)
+  let q: CollectionReference | Query
+  q = collection(db, collectionPath)
+  for (const whereClause of config.where || []) {
+    q = query(q, where(...whereClause))
   }
-  for (const orderByClause of orderBy) {
-    query = query.orderBy(...orderByClause)
+  for (const orderByClause of config.orderBy || []) {
+    q = query(q, orderBy(...orderByClause))
   }
-  if (isNumber(limit)) {
-    query = query.limit(limit)
+  if (isNumber(config.limit)) {
+    q = query(q, limit(config.limit))
   }
-  return query
+  return q
 }
 
 export function docSnapshotToDocMetadata(
@@ -42,7 +36,7 @@ export function docSnapshotToDocMetadata(
     data: docSnapshot.data() as Record<string, any> | undefined,
     metadata: docSnapshot as any,
     id: docSnapshot.id,
-    exists: docSnapshot.exists,
+    exists: docSnapshot.exists(),
   }
   return docMetaData
 }

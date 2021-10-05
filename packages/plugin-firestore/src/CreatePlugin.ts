@@ -1,5 +1,4 @@
-// TODO: update to v9 modular
-// import type { FirebaseApp } from 'firebase/app'
+import type { Firestore } from '@firebase/firestore'
 import { PluginInstance, MagnetarPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core'
 import { insertActionFactory } from './actions/insert'
 import { writeActionFactory } from './actions/mergeAssignReplace'
@@ -17,22 +16,22 @@ import { batchSyncFactory } from './helpers/batchSync'
 
 export interface FirestorePluginOptions {
   /**
-   * :::IMPORTANT
-   * - currently **only compatible with Firebase v8 & v9 compat!**
-   * - a new version compatible with v9 modular will be released in the near future.
-   * :::
-   *
-   * It's required to pass the firebase instance to make sure there are not two separate instances running which can cause issues.
+   * It's required to pass the Firestore instance to make sure there are not two separate instances running which can cause issues.
    * As long as Firebase is initialized before you pass it, you can just import and pass it like so:
    * @example
    * ```js
+   * import { initializeApp } from 'firebase/app'
+   * import { getFirestore } from 'firebase/firestore'
    * import { CreatePlugin as FirestorePlugin } from '@magnetarjs/firestore'
-   * import firebase from 'firebase/app'
    *
-   * const remote = FirestorePlugin({ firebaseInstance: firebase })
+   * const firebaseApp = initializeApp({  }) // pass config
+   * const db = getFirestore(firebaseApp)
+   *
+   * // initialise plugin
+   * const remote = FirestorePlugin({ db })
    * ```
    */
-  firebaseInstance: any
+  db: Firestore
   /**
    * When this is true, the "modulePath" will be used as firestorePath to sync the data to. Eg. `collection('todos')` will sync data to `todos` on firestore. When this is false (default) the firestorePath must be provided like so: `collection('todos', { firestorePath: 'myTodos' })`
    */
@@ -72,10 +71,20 @@ function firestorePluginOptionsWithDefaults(
 // each action must have the proper for both collection and doc type modules
 
 /**
- * :::IMPORTANT
- * - currently **only compatible with Firebase v8 & v9 compat!**
- * - a new version compatible with v9 modular will be released in the near future.
- * :::
+ * It's required to pass the Firestore instance to make sure there are not two separate instances running which can cause issues.
+ * As long as Firebase is initialized before you pass it, you can just import and pass it like so:
+ * @example
+ * ```js
+ * import { initializeApp } from 'firebase/app'
+ * import { getFirestore } from 'firebase/firestore'
+ * import { CreatePlugin as FirestorePlugin } from '@magnetarjs/firestore'
+ *
+ * const firebaseApp = initializeApp({  }) // pass config
+ * const db = getFirestore(firebaseApp)
+ *
+ * // initialise plugin
+ * const remote = FirestorePlugin({ db })
+ * ```
  */
 export const CreatePlugin: MagnetarPlugin<FirestorePluginOptions> = (
   firestorePluginOptions: FirestorePluginOptions

@@ -1,3 +1,4 @@
+import { doc, collection } from '@firebase/firestore'
 import { PluginInsertAction, PluginInsertActionPayload, SyncBatch } from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'
@@ -15,14 +16,14 @@ export function insertActionFactory(
     actionConfig,
     pluginModuleConfig,
   }: PluginInsertActionPayload<FirestoreModuleConfig>): Promise<[string, SyncBatch]> {
-    const { firebaseInstance } = firestorePluginOptions
+    const { db } = firestorePluginOptions
     let _docId = docId
     if (!_docId) {
       // we don't have a _docId, so we need to retrieve it from the payload or generate one
       _docId =
         isFullString(payload.id) || isNumber(payload.id)
           ? String(payload.id)
-          : firebaseInstance.firestore().collection('random').doc().id
+          : doc(collection(db, 'random')).id
     }
     const documentPath = getFirestoreDocPath(collectionPath, _docId as string, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
     const syncDebounceMs = isNumber(actionConfig.syncDebounceMs)
