@@ -14,7 +14,8 @@
     "@magnetarjs/core": "^0.2.3",
     "@magnetarjs/plugin-firestore": "^0.3.1",
     "@magnetarjs/plugin-simple-store": "^0.1.6",
-    "@magnetarjs/plugin-vue2": "^0.1.6"
+    "@magnetarjs/plugin-vue2": "^0.1.6",
+    "@magnetarjs/plugin-vue3": "^0.1.7"
   },
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "keywords": [
