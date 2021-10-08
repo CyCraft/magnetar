@@ -1,8 +1,8 @@
 import { FirestorePluginOptions } from '../CreatePlugin'
 import { Countdown, CountdownInstance } from './Countdown'
 import { SyncBatch } from '@magnetarjs/core'
-import type { WriteBatch } from '@firebase/firestore'
-import { doc, writeBatch as createWriteBatch, deleteField } from '@firebase/firestore'
+import type { WriteBatch } from 'firebase/firestore'
+import { doc, writeBatch as createWriteBatch, deleteField } from 'firebase/firestore'
 import { isNumber } from 'is-what'
 import { merge as mergeObjects } from 'merge-anything'
 

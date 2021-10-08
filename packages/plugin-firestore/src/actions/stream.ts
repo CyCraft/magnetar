@@ -3,8 +3,8 @@ import type {
   QuerySnapshot,
   DocumentChange,
   QueryDocumentSnapshot,
-} from '@firebase/firestore'
-import { doc, onSnapshot } from '@firebase/firestore'
+} from 'firebase/firestore'
+import { doc, onSnapshot } from 'firebase/firestore'
 import { StreamResponse, PluginStreamAction, PluginStreamActionPayload } from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { getFirestoreDocPath, getFirestoreCollectionPath } from '../helpers/pathHelpers'

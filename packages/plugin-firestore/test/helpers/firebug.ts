@@ -1,5 +1,5 @@
 import test from 'ava'
-import { doc, collection, onSnapshot } from '@firebase/firestore'
+import { doc, collection, onSnapshot } from 'firebase/firestore'
 import { db } from './initFirebase'
 import { waitMs } from '@magnetarjs/test-utils'
 

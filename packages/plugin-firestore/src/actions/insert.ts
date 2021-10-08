@@ -1,4 +1,4 @@
-import { doc, collection } from '@firebase/firestore'
+import { doc, collection } from 'firebase/firestore'
 import { PluginInsertAction, PluginInsertActionPayload, SyncBatch } from '@magnetarjs/core'
 import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'

@@ -1,4 +1,4 @@
-import { doc, setDoc, deleteDoc } from '@firebase/firestore'
+import { doc, setDoc, deleteDoc } from 'firebase/firestore'
 import { O } from 'ts-toolbelt'
 import { PokedexEntry, generateRandomId, PluginMockLocal } from '@magnetarjs/test-utils'
 import { Magnetar, MagnetarInstance, CollectionInstance, DocInstance } from '../../../core/src'

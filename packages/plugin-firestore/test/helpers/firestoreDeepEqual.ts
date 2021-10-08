@@ -1,4 +1,4 @@
-import { doc, getDoc } from '@firebase/firestore'
+import { doc, getDoc } from 'firebase/firestore'
 import { ExecutionContext } from 'ava'
 import { db } from './initFirebase'
 

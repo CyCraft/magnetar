@@ -1,4 +1,4 @@
-import type { Firestore } from '@firebase/firestore'
+import type { Firestore } from 'firebase/firestore'
 import { PluginInstance, MagnetarPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core'
 import { insertActionFactory } from './actions/insert'
 import { writeActionFactory } from './actions/mergeAssignReplace'

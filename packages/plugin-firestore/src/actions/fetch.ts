@@ -1,5 +1,5 @@
-import type { DocumentSnapshot, QueryDocumentSnapshot } from '@firebase/firestore'
-import { doc, getDoc, getDocs } from '@firebase/firestore'
+import type { DocumentSnapshot, QueryDocumentSnapshot } from 'firebase/firestore'
+import { doc, getDoc, getDocs } from 'firebase/firestore'
 import {
   PluginFetchAction,
   FetchResponse,

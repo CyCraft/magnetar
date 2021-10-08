@@ -4,8 +4,8 @@ import type {
   CollectionReference,
   DocumentSnapshot,
   QueryDocumentSnapshot,
-} from '@firebase/firestore'
-import { collection, query, where, orderBy, limit } from '@firebase/firestore'
+} from 'firebase/firestore'
+import { collection, query, where, orderBy, limit } from 'firebase/firestore'
 import { isNumber } from 'is-what'
 import { FirestoreModuleConfig } from '../CreatePlugin'
 import { DocMetadata } from '@magnetarjs/core'
