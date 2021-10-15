@@ -36,21 +36,30 @@ export default defineComponent({
     itemsModule.stream()
   },
   setup() {
+    /** Item count */
+    const size = computed(() => itemsModule.data.size)
+
+    /** Options to filter items */
     const showAll = ref(true)
     const alphabetically = ref(false)
 
-    const size = computed(() => itemsModule.data.size)
+    /** The items shown based on the filter */
     const items = computed(() => {
       const _showAll = showAll.value
       const _alphabetically = alphabetically.value
-      const _module =
-        _showAll && _alphabetically
-          ? itemsModule.orderBy('title')
-          : _showAll && !_alphabetically
-          ? itemsModule
-          : !_showAll && _alphabetically
-          ? itemsModule.where('isDone', '==', false).orderBy('title')
-          : itemsModule.where('isDone', '==', false)
+
+      let _module: typeof itemsModule = itemsModule
+
+      if (_showAll && _alphabetically) {
+        _module = itemsModule.orderBy('title')
+      }
+      if (!_showAll && _alphabetically) {
+        _module = itemsModule.where('isDone', '==', false).orderBy('title')
+      }
+      if (!_showAll && !_alphabetically) {
+        _module = itemsModule.where('isDone', '==', false)
+      }
+
       return [..._module.data.values()]
     })
 
