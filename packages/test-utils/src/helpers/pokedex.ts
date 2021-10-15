@@ -10,12 +10,12 @@ export function pokedexEntryDefaults(values: { [key in string]: any }): PokedexE
     name: '',
     type: [],
     base: {
-      'HP': 0,
-      'Attack': 0,
-      'Defense': 0,
-      'Sp. Attack': 0,
-      'Sp. Defense': 0,
-      'Speed': 0,
+      HP: 0,
+      Attack: 0,
+      Defense: 0,
+      SpAttack: 0,
+      SpDefense: 0,
+      Speed: 0,
     },
   }
   return merge(defaults, values)

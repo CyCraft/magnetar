@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { O } from 'ts-toolbelt'
 import { isPlainObject, isFunction, isArray } from 'is-what'
 import { ActionConfig, ActionName } from './actions'

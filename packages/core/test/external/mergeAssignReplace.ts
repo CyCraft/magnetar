@@ -21,8 +21,8 @@ test('merge', async (t) => {
       'HP': 9000,
       'Attack': 49,
       'Defense': 49,
-      'Sp. Attack': 65,
-      'Sp. Defense': 65,
+      'SpAttack': 65,
+      'SpDefense': 65,
       'Speed': 45,
     },
   }

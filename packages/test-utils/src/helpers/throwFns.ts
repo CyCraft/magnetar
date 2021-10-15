@@ -2,7 +2,7 @@ import { isArray, isPlainObject } from 'is-what'
 
 export function throwIfEmulatedError(
   payload: Record<string, any> | Record<string, any>[] | string | string[] | void,
-  storePluginOptions: any
+  storePluginOptions: { storeName: string } & { [key in string]: any }
 ): void {
   const { storeName } = storePluginOptions
   if (!payload) return

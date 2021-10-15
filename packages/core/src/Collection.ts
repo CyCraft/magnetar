@@ -14,6 +14,7 @@ import { ModuleConfig, GlobalConfig } from './types/config'
 import { DocFn, CollectionFn } from './Magnetar'
 import { executeSetupModulePerStore, getDataProxyHandler } from './helpers/moduleHelpers'
 import { WhereClause, WhereFilterOp, OrderByClause } from './types/clauses'
+import { OPaths } from './types/helpers'
 
 export type CollectionInstance<DocDataType extends Record<string, any> = Record<string, any>> = {
   /**
@@ -80,15 +81,15 @@ export type CollectionInstance<DocDataType extends Record<string, any> = Record<
   /**
    * Chainable filter. Returns {@link CollectionInstance} with filter applied.
    */
-  where: (fieldPath: string, operator: WhereFilterOp, value: any) => CollectionInstance<DocDataType>
-  /**
-   * Chainable filter. Returns {@link CollectionInstance} with filter applied.
-   */
-  orderBy: (fieldPath: string, direction?: 'asc' | 'desc') => CollectionInstance<DocDataType>
+  orderBy: (fieldPath: OPaths<DocDataType, 4>, direction?: 'asc' | 'desc') => CollectionInstance<DocDataType>
   /**
    * Chainable filter. Returns {@link CollectionInstance} with filter applied.
    */
   limit: (limitCount: number) => CollectionInstance<DocDataType>
+  /**
+   * Chainable filter. Returns {@link CollectionInstance} with filter applied.
+   */
+  where: (fieldPath: OPaths<DocDataType, 4>, operator: WhereFilterOp, value: any) => CollectionInstance<DocDataType>
 }
 
 export function createCollectionWithContext<DocDataType extends Record<string, any>>(
@@ -125,7 +126,7 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
   executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig)
 
   function where(
-    fieldPath: string,
+    fieldPath: OPaths<DocDataType, 4>,
     operator: WhereFilterOp,
     value: any
   ): CollectionInstance<DocDataType> {
@@ -135,7 +136,7 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
   }
 
   function orderBy(
-    fieldPath: string,
+    fieldPath: OPaths<DocDataType, 4>,
     direction: 'asc' | 'desc' = 'asc'
   ): CollectionInstance<DocDataType> {
     const orderByClause: OrderByClause = [fieldPath, direction]
