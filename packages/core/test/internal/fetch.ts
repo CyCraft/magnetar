@@ -2,25 +2,44 @@ import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex } from '@magnetarjs/test-utils'
 
-// test('read: fetch (collection)', async (t) => {
-//   // 'fetch' resolves once all stores have given a response with data
-//   const { pokedexModule } = createMagnetarInstance()
-//   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-//   t.is(pokedexModule.data.size, 1)
-//   try {
-//     const result = await pokedexModule.fetch({ force: true })
-//     t.deepEqual(result.get('1'), pokedex(1))
-//     t.deepEqual(result.get('136'), pokedex(136))
-//   } catch (error) {
-//     t.fail(JSON.stringify(error))
-//   }
-//   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-//   t.deepEqual(pokedexModule.data.get('136'), pokedex(136))
-//   t.is(pokedexModule.data.size, 151)
-// })
+test('read: fetch (collection)', async (t) => {
+  // 'fetch' resolves once all stores have given a response with data
+  const { pokedexModule } = createMagnetarInstance()
+  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  t.is(pokedexModule.data.size, 1)
+  try {
+    const result = await pokedexModule.fetch({ force: true })
+    t.deepEqual(result.get('1'), pokedex(1))
+    t.deepEqual(result.get('136'), pokedex(136))
+  } catch (error) {
+    t.fail(JSON.stringify(error))
+  }
+  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  t.deepEqual(pokedexModule.data.get('136'), pokedex(136))
+  t.is(pokedexModule.data.size, 151)
+})
+
+test('read: fetch (collection) — should fetch other docs when one throws errors', async (t) => {
+  const { pokedexModule } = createMagnetarInstance()
+  t.deepEqual(pokedexModule.data.get('135'), undefined)
+  t.deepEqual(pokedexModule.data.get('136'), undefined)
+  t.deepEqual(pokedexModule.data.get('137'), undefined)
+  try {
+    await Promise.allSettled([
+      pokedexModule.doc('135').fetch(),
+      pokedexModule.doc('136').fetch({ shouldFail: 'remote' }),
+      pokedexModule.doc('137').fetch(),
+    ])
+  } catch (error) {
+    t.is(!!error, true)
+  }
+  t.deepEqual(pokedexModule.data.get('135'), pokedex(135))
+  t.deepEqual(pokedexModule.data.get('136'), undefined)
+  t.deepEqual(pokedexModule.data.get('137'), pokedex(137))
+})
 
 test('read: fetch (document) - prevent multiple fetch requests at the same time', async (t) => {
-  // get resolves once all stores have given a response with data
+  // fetch resolves once all stores have given a response with data
   const storeNames: string[] = []
   const { trainerModule } = createMagnetarInstance({
     on: {
@@ -53,7 +72,7 @@ test('read: fetch (document) - prevent multiple fetch requests at the same time'
 })
 
 test('read: fetch (document) - optimistic fetch by default', async (t) => {
-  // get resolves once all stores have given a response with data
+  // fetch resolves once all stores have given a response with data
   const storeNames: string[] = []
   const startEmpty = true
   const { trainerModule } = createMagnetarInstance(

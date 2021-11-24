@@ -99,14 +99,25 @@ export function deleteActionFactory(storePluginOptions: RemoteStoreOptions): Plu
 }
 
 function mockDataRetrieval(
-  moduleType: 'collection' | 'doc',
+  collectionPath: string | undefined,
+  docId: string | undefined,
   pluginModuleConfig: StorePluginModuleConfig
 ): Record<string, any>[] {
-  if (moduleType === 'doc') return [{ name: 'Luca', age: 10, dream: 'job' }]
-  const _pokedexMap = pokedexMap()
-  const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
-  const filteredMap = filterDataPerClauses(_pokedexMap, clauses)
-  return [...filteredMap.values()]
+  if (docId === 'trainer') return [{ name: 'Luca', age: 10, dream: 'job' }]
+  
+  if (collectionPath === 'pokedex') {
+    const _pokedexMap = pokedexMap()
+    
+    if (docId) {
+      const result = _pokedexMap.get(docId)
+      return (result) ? [result] : []
+    }
+
+    const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
+    const filteredMap = filterDataPerClauses(_pokedexMap, clauses)
+    return [...filteredMap.values()]
+  }
+  return []
 }
 
 export function fetchActionFactory(storePluginOptions: RemoteStoreOptions): PluginFetchAction {
@@ -124,7 +135,7 @@ export function fetchActionFactory(storePluginOptions: RemoteStoreOptions): Plug
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         // this mocks an error during execution
-        const dataRetrieved = mockDataRetrieval(docId ? 'doc' : 'collection', pluginModuleConfig)
+        const dataRetrieved = mockDataRetrieval(collectionPath, docId, pluginModuleConfig)
         // we must trigger `mustExecuteOnGet.added` for each document that was retrieved and return whatever that returns
         const results = dataRetrieved.map((_data) => {
           const _metaData = { data: _data, exists: true, id: _data.id || docId }
@@ -148,7 +159,7 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
     // we'll mock opening a stream
 
     const dataRetrieved = !docId
-      ? mockDataRetrieval('collection', pluginModuleConfig)
+      ? mockDataRetrieval(collectionPath, docId, pluginModuleConfig)
       : [
           { name: 'Luca', age: 10 },
           { name: 'Luca', age: 10 },
