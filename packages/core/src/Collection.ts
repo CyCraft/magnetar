@@ -8,10 +8,13 @@ import {
   FetchPromises,
 } from './types/actions'
 import { actionNameTypeMap } from './types/actionsInternal'
-import { handleActionPerStore } from './moduleActions/handleActionPerStore'
+import {
+  handleActionPerStore,
+  HandleActionSharedParams,
+} from './moduleActions/handleActionPerStore'
 import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
 import { ModuleConfig, GlobalConfig } from './types/config'
-import { DocFn, CollectionFn } from './Magnetar'
+import { DocFn, CollectionFn, WriteLock } from './Magnetar'
 import { executeSetupModulePerStore, getDataProxyHandler } from './helpers/moduleHelpers'
 import { WhereClause, WhereFilterOp, OrderByClause } from './types/clauses'
 import { OPaths } from './types/helpers'
@@ -81,7 +84,10 @@ export type CollectionInstance<DocDataType extends Record<string, any> = Record<
   /**
    * Chainable filter. Returns {@link CollectionInstance} with filter applied.
    */
-  orderBy: (fieldPath: OPaths<DocDataType, 4>, direction?: 'asc' | 'desc') => CollectionInstance<DocDataType>
+  orderBy: (
+    fieldPath: OPaths<DocDataType, 4>,
+    direction?: 'asc' | 'desc'
+  ) => CollectionInstance<DocDataType>
   /**
    * Chainable filter. Returns {@link CollectionInstance} with filter applied.
    */
@@ -89,7 +95,11 @@ export type CollectionInstance<DocDataType extends Record<string, any> = Record<
   /**
    * Chainable filter. Returns {@link CollectionInstance} with filter applied.
    */
-  where: (fieldPath: OPaths<DocDataType, 4>, operator: WhereFilterOp, value: any) => CollectionInstance<DocDataType>
+  where: (
+    fieldPath: OPaths<DocDataType, 4>,
+    operator: WhereFilterOp,
+    value: any
+  ) => CollectionInstance<DocDataType>
 }
 
 export function createCollectionWithContext<DocDataType extends Record<string, any>>(
@@ -99,14 +109,15 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
   docFn: DocFn<DocDataType>,
   collectionFn: CollectionFn<DocDataType>,
   streamAndFetchPromises: {
+    writeLock: WriteLock
+    fetchPromises: FetchPromises
     cacheStream: (closeStreamFn: () => void, streamingPromise: Promise<void> | null) => void
     streaming: () => Promise<void> | null
     closeStream: () => void
     closeAllStreams: () => void
-    fetchPromises: FetchPromises
   }
 ): CollectionInstance<DocDataType> {
-  const { cacheStream, streaming, closeStream, closeAllStreams, fetchPromises } = streamAndFetchPromises // prettier-ignore
+  const { writeLock, fetchPromises, cacheStream, streaming, closeStream, closeAllStreams } = streamAndFetchPromises // prettier-ignore
 
   const id = collectionPath.split('/').slice(-1)[0]
   const path = collectionPath
@@ -115,10 +126,20 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
     return docFn(`${path}/${docId}`, merge(moduleConfig, _moduleConfig))
   }
 
-  const insert = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'insert', actionNameTypeMap.insert, fetchPromises, docFn, collectionFn) as MagnetarInsertAction<DocDataType> //prettier-ignore
-  const _delete = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'delete', actionNameTypeMap.delete, fetchPromises, docFn, collectionFn) as MagnetarDeleteAction //prettier-ignore
-  const fetch = handleActionPerStore([collectionPath, docId], moduleConfig, globalConfig, 'fetch', actionNameTypeMap.fetch, fetchPromises, docFn, collectionFn) as MagnetarFetchAction<DocDataType, 'collection'> //prettier-ignore
-  const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streaming, cacheStream) // prettier-ignore
+  const sharedParams: HandleActionSharedParams = {
+    collectionPath,
+    _docId: docId,
+    moduleConfig,
+    globalConfig,
+    fetchPromises,
+    writeLock,
+    docFn,
+    collectionFn,
+  }
+  const insert = handleActionPerStore(sharedParams, 'insert', actionNameTypeMap.insert) as MagnetarInsertAction<DocDataType> //prettier-ignore
+  const _delete = handleActionPerStore(sharedParams, 'delete', actionNameTypeMap.delete) as MagnetarDeleteAction //prettier-ignore
+  const fetch = handleActionPerStore(sharedParams, 'fetch', actionNameTypeMap.fetch) as MagnetarFetchAction<DocDataType, 'collection'> //prettier-ignore
+  const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streaming, cacheStream, writeLock) // prettier-ignore
 
   const actions = { stream, fetch, insert, delete: _delete }
 

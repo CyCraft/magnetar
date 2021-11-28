@@ -6,9 +6,9 @@ import { PluginModuleConfig } from '../types/plugins'
 export const MODULE_IDENTIFIER_SPLIT = ' /// '
 
 /**
- * Saved as enum, just to enforce usage of `getModuleIdentifier()`
+ * Saved as enum, just to enforce usage of `getPathFilterIdentifier()`
  */
-export enum ModuleIdentifier {
+export enum PathFilterIdentifier {
   'KEY' = 'modulePath + JSON.stringify({limit, orderBy, where})',
 }
 
@@ -16,14 +16,14 @@ export enum ModuleIdentifier {
  * Creates the `key` for the Maps used to cache certain values throughout the lifecycle of an instance.
  * @returns `JSON.stringify({ modulePath, modulePath, limit, orderBy, where })`
  */
-export function getModuleIdentifier(
+export function getPathFilterIdentifier(
   modulePath: string,
   moduleConfig: ModuleConfig
-): ModuleIdentifier {
+): PathFilterIdentifier {
   const { limit, orderBy, where } = moduleConfig
   const config = JSON.stringify({ limit, orderBy, where })
 
-  return `${modulePath}${MODULE_IDENTIFIER_SPLIT}${config}` as ModuleIdentifier.KEY
+  return `${modulePath}${MODULE_IDENTIFIER_SPLIT}${config}` as PathFilterIdentifier.KEY
 }
 
 /**

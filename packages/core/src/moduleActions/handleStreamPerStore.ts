@@ -1,4 +1,6 @@
 import { O } from 'ts-toolbelt'
+import { isPromise } from 'is-what'
+import { WriteLock } from '../Magnetar'
 import { handleStream } from './handleStream'
 import { ActionConfig, MagnetarStreamAction } from '../types/actions'
 import { ActionType } from '../types/actionsInternal'
@@ -10,7 +12,6 @@ import { executeOnFns } from '../helpers/executeOnFns'
 import { throwOnIncompleteStreamResponses, throwIfNoFnsToExecute } from '../helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from '../types/config'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers'
-import { isPromise } from 'is-what'
 
 export function handleStreamPerStore(
   [collectionPath, docId]: [string, string | undefined],
@@ -18,10 +19,12 @@ export function handleStreamPerStore(
   globalConfig: O.Compulsory<GlobalConfig>,
   actionType: ActionType,
   streaming: () => Promise<void> | null,
-  cacheStream: (closeStreamFn: () => void, streamingPromise: Promise<void> | null) => void
+  cacheStream: (closeStreamFn: () => void, streamingPromise: Promise<void> | null) => void,
+  writeLock: WriteLock
 ): MagnetarStreamAction {
   // returns the action the dev can call with myModule.insert() etc.
   return async function (payload?: any, actionConfig: ActionConfig = {}): Promise<void> {
+    // return the same stream promise if it's already open
     const foundStream = streaming()
     if (isPromise(foundStream)) return foundStream
 
@@ -57,13 +60,27 @@ export function handleStreamPerStore(
       modified: modifyReadResponseMap.modified,
       removed: modifyReadResponseMap.removed,
     }
+
+    let lastPayloadMetaTuple: [any, any] = [undefined, undefined]
     /**
      * this is what must be executed by a plugin store that implemented "stream" functionality
      */
     const mustExecuteOnRead: O.Compulsory<DoOnStream> = {
-      added: (_payload, _meta) => executeOnFns(doOnStreamFns.added, _payload, [_meta]),
-      modified: (_payload, _meta) => executeOnFns(doOnStreamFns.modified, _payload, [_meta]),
-      removed: (_payload, _meta) => executeOnFns(doOnStreamFns.removed, _payload, [_meta]),
+      added: async (_payload, _meta) => {
+        lastPayloadMetaTuple = [_payload, _meta]
+        await writeLock.promise
+        const [__payload, __meta] = lastPayloadMetaTuple
+        return executeOnFns(doOnStreamFns.added, __payload, [__meta])
+      },
+      modified: async (_payload, _meta) => {
+        lastPayloadMetaTuple = [_payload, _meta]
+        await writeLock.promise
+        const [__payload, __meta] = lastPayloadMetaTuple
+        return executeOnFns(doOnStreamFns.modified, __payload, [__meta])
+      },
+      removed: async (_payload, _meta) => {
+        return executeOnFns(doOnStreamFns.removed, _payload, [_meta])
+      },
     }
 
     // handle and await each action in sequence
