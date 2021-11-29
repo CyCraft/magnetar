@@ -201,6 +201,17 @@ function getCollectionPathDocIdEntry(modulePath) {
     const docId = modulePath.split('/').slice(-1)[0];
     return [collectionPath, docId];
 }
+/**
+ * Gets all WriteLock objects of a certain `collectionPath` from the `WriteLockMap`
+ */
+function getCollectionWriteLocks(collectionPath, writeLockMap) {
+    return [...writeLockMap.entries()]
+        .filter(([modulePath]) => {
+        const [_collectionPath] = getCollectionPathDocIdEntry(modulePath);
+        return _collectionPath === collectionPath;
+    })
+        .map(([modulePath, writeLock]) => writeLock);
+}
 
 function logError(errorMessage) {
     console.error('[@magnetarjs error]\n', errorMessage);
@@ -342,7 +353,7 @@ function getDataProxyHandler([collectionPath, docId], moduleConfig, globalConfig
 }
 
 function handleActionPerStore(sharedParams, actionName, actionType) {
-    const { collectionPath, _docId, moduleConfig, globalConfig, fetchPromises, writeLock, docFn, collectionFn } = sharedParams; // prettier-ignore
+    const { collectionPath, _docId, moduleConfig, globalConfig, fetchPromises, writeLockMap, docFn, collectionFn } = sharedParams; // prettier-ignore
     // returns the action the dev can call with myModule.insert() etc.
     return function (payload, actionConfig = {}) {
         const fetchPromiseKey = JSON.stringify(payload);
@@ -350,10 +361,21 @@ function handleActionPerStore(sharedParams, actionName, actionType) {
         // return the same fetch promise early if it's not yet resolved
         if (actionName === 'fetch' && isPromise(foundFetchPromise))
             return foundFetchPromise;
+        const writeLock = _docId ? writeLockMap.get(`${collectionPath}/${_docId}`) : writeLockMap.get(collectionPath);
         if (actionName !== 'fetch') {
             // we need to create a promise we'll resolve later to prevent any incoming docs from being written to the local state during this time
             if (writeLock.promise === null) {
-                writeLock.promise = new Promise((resolve) => (writeLock.resolve = resolve));
+                writeLock.promise = new Promise((resolve) => {
+                    writeLock.resolve = () => {
+                        resolve();
+                        writeLock.resolve = () => { };
+                        writeLock.promise = null;
+                        if (writeLock.countdown !== null) {
+                            clearTimeout(writeLock.countdown);
+                            writeLock.countdown = null;
+                        }
+                    };
+                });
             }
             if (writeLock.promise !== null && writeLock.countdown !== null) {
                 // there already is a promise, let's just stop the countdown, we'll start it again at the end of all the store actions
@@ -362,6 +384,15 @@ function handleActionPerStore(sharedParams, actionName, actionType) {
         }
         // eslint-disable-next-line no-async-promise-executor
         const actionPromise = new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+            // we need to await any writeLock _before_ fetching, to prevent grabbing outdated data
+            if (actionName === 'fetch') {
+                yield writeLock.promise;
+                if (!_docId) {
+                    // we need to await all promises of all docs in this collection...
+                    const collectionWriteMaps = getCollectionWriteLocks(collectionPath, writeLockMap);
+                    yield Promise.allSettled(collectionWriteMaps.map(w => w.promise));
+                }
+            }
             try {
                 let docId = _docId;
                 let modulePath = [collectionPath, docId].filter(Boolean).join('/');
@@ -484,11 +515,7 @@ function handleActionPerStore(sharedParams, actionName, actionType) {
                 // all the stores resolved their actions
                 // start the writeLock countdown
                 if (actionName !== 'fetch') {
-                    writeLock.countdown = setTimeout(() => {
-                        writeLock.resolve();
-                        writeLock.promise = null;
-                        writeLock.countdown = null;
-                    }, 5000);
+                    writeLock.countdown = setTimeout(writeLock.resolve, 5000);
                 }
                 // anything that's executed from a "collection" module:
                 // 'insert' always returns a DocInstance, unless the "abort" action was called, then the modulePath might still be a collection:
@@ -564,7 +591,7 @@ function handleStream(args) {
     });
 }
 
-function handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionType, streaming, cacheStream, writeLock) {
+function handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionType, streaming, cacheStream, writeLockMap) {
     // returns the action the dev can call with myModule.insert() etc.
     return function (payload, actionConfig = {}) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -572,6 +599,15 @@ function handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfi
             const foundStream = streaming();
             if (isPromise(foundStream))
                 return foundStream;
+            // we need to await any writeLock _before_ opening the stream to prevent grabbing outdated data
+            const writeLock = docId ? writeLockMap.get(`${collectionPath}/${docId}`) : writeLockMap.get(collectionPath);
+            if (isPromise(writeLock.promise))
+                yield writeLock.promise;
+            if (!docId) {
+                // we need to await all promises of all docs in this collection...
+                const collectionWriteLocks = getCollectionWriteLocks(collectionPath, writeLockMap);
+                yield Promise.allSettled(collectionWriteLocks.map(w => w.promise));
+            }
             // get all the config needed to perform this action
             const eventNameFnsMap = getEventNameFnsMap(globalConfig.on, moduleConfig.on, actionConfig.on);
             const modifyPayloadFnsMap = getModifyPayloadFnsMap(globalConfig.modifyPayloadOn, moduleConfig.modifyPayloadOn, actionConfig.modifyPayloadOn);
@@ -593,22 +629,25 @@ function handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfi
                 modified: modifyReadResponseMap.modified,
                 removed: modifyReadResponseMap.removed,
             };
-            let lastPayloadMetaTuple = [undefined, undefined];
             /**
              * this is what must be executed by a plugin store that implemented "stream" functionality
              */
             const mustExecuteOnRead = {
                 added: (_payload, _meta) => __awaiter(this, void 0, void 0, function* () {
-                    lastPayloadMetaTuple = [_payload, _meta];
-                    yield writeLock.promise;
-                    const [__payload, __meta] = lastPayloadMetaTuple;
-                    return executeOnFns(doOnStreamFns.added, __payload, [__meta]);
+                    // check if there's a WriteLock for the document:
+                    const _writeLock = writeLockMap.get(`${collectionPath}/${_meta.id}`);
+                    if (_writeLock && isPromise(_writeLock.promise)) {
+                        yield _writeLock.promise;
+                    }
+                    return executeOnFns(doOnStreamFns.added, _payload, [_meta]);
                 }),
                 modified: (_payload, _meta) => __awaiter(this, void 0, void 0, function* () {
-                    lastPayloadMetaTuple = [_payload, _meta];
-                    yield writeLock.promise;
-                    const [__payload, __meta] = lastPayloadMetaTuple;
-                    return executeOnFns(doOnStreamFns.modified, __payload, [__meta]);
+                    // check if there's a WriteLock for the document:
+                    const _writeLock = writeLockMap.get(`${collectionPath}/${_meta.id}`);
+                    if (_writeLock && isPromise(_writeLock.promise)) {
+                        yield _writeLock.promise;
+                    }
+                    return executeOnFns(doOnStreamFns.modified, _payload, [_meta]);
                 }),
                 removed: (_payload, _meta) => __awaiter(this, void 0, void 0, function* () {
                     return executeOnFns(doOnStreamFns.removed, _payload, [_meta]);
@@ -670,7 +709,7 @@ function handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfi
 }
 
 function createCollectionWithContext([collectionPath, docId], moduleConfig, globalConfig, docFn, collectionFn, streamAndFetchPromises) {
-    const { writeLock, fetchPromises, cacheStream, streaming, closeStream, closeAllStreams } = streamAndFetchPromises; // prettier-ignore
+    const { writeLockMap, fetchPromises, cacheStream, streaming, closeStream, closeAllStreams } = streamAndFetchPromises; // prettier-ignore
     const id = collectionPath.split('/').slice(-1)[0];
     const path = collectionPath;
     const doc = (docId, _moduleConfig = {}) => {
@@ -682,14 +721,14 @@ function createCollectionWithContext([collectionPath, docId], moduleConfig, glob
         moduleConfig,
         globalConfig,
         fetchPromises,
-        writeLock,
+        writeLockMap,
         docFn,
         collectionFn,
     };
     const insert = handleActionPerStore(sharedParams, 'insert', actionNameTypeMap.insert); //prettier-ignore
     const _delete = handleActionPerStore(sharedParams, 'delete', actionNameTypeMap.delete); //prettier-ignore
     const fetch = handleActionPerStore(sharedParams, 'fetch', actionNameTypeMap.fetch); //prettier-ignore
-    const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streaming, cacheStream, writeLock); // prettier-ignore
+    const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streaming, cacheStream, writeLockMap); // prettier-ignore
     const actions = { stream, fetch, insert, delete: _delete };
     // Every store will have its 'setupModule' function executed
     executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig);
@@ -738,7 +777,7 @@ function defaultsGlobalConfig(config) {
 }
 
 function createDocWithContext([collectionPath, docId], moduleConfig, globalConfig, docFn, collectionFn, streamAndFetchPromises) {
-    const { writeLock, fetchPromises, cacheStream, streaming, closeStream } = streamAndFetchPromises; // prettier-ignore
+    const { writeLockMap, fetchPromises, cacheStream, streaming, closeStream } = streamAndFetchPromises; // prettier-ignore
     const id = docId;
     const path = [collectionPath, docId].join('/');
     const collection = (collectionId, _moduleConfig = {}) => {
@@ -750,7 +789,7 @@ function createDocWithContext([collectionPath, docId], moduleConfig, globalConfi
         moduleConfig,
         globalConfig,
         fetchPromises,
-        writeLock,
+        writeLockMap,
         docFn,
     };
     const actions = {
@@ -761,7 +800,7 @@ function createDocWithContext([collectionPath, docId], moduleConfig, globalConfi
         deleteProp: handleActionPerStore(sharedParams, 'deleteProp', actionNameTypeMap.deleteProp),
         delete: handleActionPerStore(sharedParams, 'delete', actionNameTypeMap.delete),
         fetch: handleActionPerStore(sharedParams, 'fetch', actionNameTypeMap.fetch),
-        stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streaming, cacheStream, writeLock), // prettier-ignore
+        stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streaming, cacheStream, writeLockMap), // prettier-ignore
     };
     // Every store will have its 'setupModule' function executed
     executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig);
@@ -808,7 +847,6 @@ function Magnetar(magnetarConfig) {
         if (!writeLockMap.has(modulePath)) {
             writeLockMap.set(modulePath, { promise: null, resolve: () => { }, countdown: null });
         }
-        const writeLock = writeLockMap.get(modulePath);
         // grab (and set) the FetchPromises for this module
         if (!fetchPromiseMap.has(pathFilterIdentifier)) {
             fetchPromiseMap.set(pathFilterIdentifier, new Map());
@@ -842,7 +880,7 @@ function Magnetar(magnetarConfig) {
             }
         }
         const streamAndFetchPromises = {
-            writeLock,
+            writeLockMap,
             fetchPromises,
             cacheStream,
             streaming,
@@ -870,4 +908,4 @@ function Magnetar(magnetarConfig) {
     return instance;
 }
 
-export { Magnetar, getCollectionPathDocIdEntry, isCollectionModule, isDoOnFetch, isDoOnStream, isDocModule, isFetchResponse };
+export { Magnetar, getCollectionPathDocIdEntry, getCollectionWriteLocks, isCollectionModule, isDoOnFetch, isDoOnStream, isDocModule, isFetchResponse };

@@ -89,6 +89,7 @@
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/ban-ts-ignore": "off",
       "tree-shaking/no-side-effects-in-initialization": "error",
+      "@typescript-eslint/no-non-null-assertion": "off",
       "comma-dangle": [
         "warn",
         "always-multiline"

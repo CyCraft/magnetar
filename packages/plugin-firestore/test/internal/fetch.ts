@@ -1,6 +1,7 @@
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { DocMetadata } from '../../../core/src'
+import { pokedex, waitMs } from '@magnetarjs/test-utils'
 
 {
   const testName = 'fetch unexisting (document)'
@@ -26,5 +27,31 @@ import { DocMetadata } from '../../../core/src'
     } catch (error) {
       t.fail(JSON.stringify(error))
     }
+  })
+}
+{
+  const testName = 'fetch (doc) edit right before opening'
+  test(testName, async (t) => {
+    const { trainerModule } = await createMagnetarInstance(testName, {
+      insertDocs: { '': { age: 10, name: 'Luca' } },
+    })
+
+    trainerModule.merge({ name: 'L' })
+    await trainerModule.fetch().catch((e: any) => t.fail(e.message))
+
+    t.deepEqual(trainerModule.data, { name: 'L', age: 10 })
+  })
+}
+{
+  const testName = 'fetch (collection) edit right before opening'
+  test(testName, async (t) => {
+    const { pokedexModule } = await createMagnetarInstance(testName, {
+      insertDocs: { 'pokedex/1': pokedex(1) },
+    })
+
+    pokedexModule.doc('1').merge({ name: 'B' })
+    await pokedexModule.fetch().catch((e: any) => t.fail(e.message))
+
+    t.deepEqual(pokedexModule.data.get('1'), { ...pokedex(1), name: 'B' })
   })
 }

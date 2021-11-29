@@ -109,7 +109,7 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
   docFn: DocFn<DocDataType>,
   collectionFn: CollectionFn<DocDataType>,
   streamAndFetchPromises: {
-    writeLock: WriteLock
+    writeLockMap: Map<string, WriteLock>
     fetchPromises: FetchPromises
     cacheStream: (closeStreamFn: () => void, streamingPromise: Promise<void> | null) => void
     streaming: () => Promise<void> | null
@@ -117,7 +117,7 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
     closeAllStreams: () => void
   }
 ): CollectionInstance<DocDataType> {
-  const { writeLock, fetchPromises, cacheStream, streaming, closeStream, closeAllStreams } = streamAndFetchPromises // prettier-ignore
+  const { writeLockMap, fetchPromises, cacheStream, streaming, closeStream, closeAllStreams } = streamAndFetchPromises // prettier-ignore
 
   const id = collectionPath.split('/').slice(-1)[0]
   const path = collectionPath
@@ -132,14 +132,14 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
     moduleConfig,
     globalConfig,
     fetchPromises,
-    writeLock,
+    writeLockMap,
     docFn,
     collectionFn,
   }
   const insert = handleActionPerStore(sharedParams, 'insert', actionNameTypeMap.insert) as MagnetarInsertAction<DocDataType> //prettier-ignore
   const _delete = handleActionPerStore(sharedParams, 'delete', actionNameTypeMap.delete) as MagnetarDeleteAction //prettier-ignore
   const fetch = handleActionPerStore(sharedParams, 'fetch', actionNameTypeMap.fetch) as MagnetarFetchAction<DocDataType, 'collection'> //prettier-ignore
-  const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streaming, cacheStream, writeLock) // prettier-ignore
+  const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streaming, cacheStream, writeLockMap) // prettier-ignore
 
   const actions = { stream, fetch, insert, delete: _delete }
 

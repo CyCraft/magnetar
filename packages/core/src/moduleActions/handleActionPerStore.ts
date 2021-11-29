@@ -22,6 +22,7 @@ import { throwIfNoFnsToExecute } from '../helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from '../types/config'
 import { CollectionFn, DocFn, WriteLock } from '../Magnetar'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers'
+import { getCollectionWriteLocks } from '../helpers/pathHelpers'
 
 export type HandleActionSharedParams = {
   collectionPath: string
@@ -29,7 +30,7 @@ export type HandleActionSharedParams = {
   moduleConfig: ModuleConfig
   globalConfig: O.Compulsory<GlobalConfig>
   fetchPromises: FetchPromises
-  writeLock: WriteLock
+  writeLockMap: Map<string, WriteLock>
   docFn: DocFn // actions executed on a "doc" will always return `doc()`
   collectionFn?: CollectionFn // actions executed on a "collection" will return `collection()` or `doc()`
 }
@@ -49,7 +50,7 @@ export function handleActionPerStore(
   | MagnetarInsertAction<any>
   | MagnetarDeleteAction
   | MagnetarDeletePropAction<any> {
-  const { collectionPath, _docId, moduleConfig, globalConfig, fetchPromises, writeLock, docFn, collectionFn } = sharedParams // prettier-ignore
+  const { collectionPath, _docId, moduleConfig, globalConfig, fetchPromises, writeLockMap, docFn, collectionFn } = sharedParams // prettier-ignore
 
   // returns the action the dev can call with myModule.insert() etc.
   return function (payload?: any, actionConfig: ActionConfig = {}): Promise<any> {
@@ -58,19 +59,40 @@ export function handleActionPerStore(
     // return the same fetch promise early if it's not yet resolved
     if (actionName === 'fetch' && isPromise(foundFetchPromise)) return foundFetchPromise
 
+    const writeLock = _docId ? writeLockMap.get(`${collectionPath}/${_docId}`)! : writeLockMap.get(collectionPath)!
     if (actionName !== 'fetch') {
       // we need to create a promise we'll resolve later to prevent any incoming docs from being written to the local state during this time
       if (writeLock.promise === null) {
-        writeLock.promise = new Promise((resolve) => (writeLock.resolve = resolve))
+        writeLock.promise = new Promise((resolve) => {
+          writeLock.resolve = () => {
+            resolve()
+            writeLock.resolve = () => {}
+            writeLock.promise = null
+            if (writeLock.countdown !== null) {
+              clearTimeout(writeLock.countdown)
+              writeLock.countdown = null
+            }
+          }
+        })
       }
       if (writeLock.promise !== null && writeLock.countdown !== null) {
         // there already is a promise, let's just stop the countdown, we'll start it again at the end of all the store actions
         clearTimeout(writeLock.countdown)
       }
     }
-
+    
     // eslint-disable-next-line no-async-promise-executor
     const actionPromise = new Promise<any>(async (resolve, reject) => {
+      // we need to await any writeLock _before_ fetching, to prevent grabbing outdated data
+      if (actionName === 'fetch') {
+        await writeLock.promise
+        if (!_docId) {
+          // we need to await all promises of all docs in this collection...
+          const collectionWriteMaps = getCollectionWriteLocks(collectionPath, writeLockMap)
+          await Promise.allSettled(collectionWriteMaps.map(w => w.promise))
+        }
+      }
+
       try {
         let docId = _docId
         let modulePath = [collectionPath, docId].filter(Boolean).join('/')
@@ -222,11 +244,7 @@ export function handleActionPerStore(
 
         // start the writeLock countdown
         if (actionName !== 'fetch') {
-          writeLock.countdown = setTimeout(() => {
-            writeLock.resolve()
-            writeLock.promise = null
-            writeLock.countdown = null
-          }, 5000)
+          writeLock.countdown = setTimeout(writeLock.resolve, 5000)
         }
 
         // anything that's executed from a "collection" module:

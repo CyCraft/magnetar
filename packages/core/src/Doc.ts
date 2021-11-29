@@ -95,14 +95,14 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
   docFn: DocFn<DocDataType>,
   collectionFn: CollectionFn,
   streamAndFetchPromises: {
-    writeLock: WriteLock
+    writeLockMap: Map<string, WriteLock>
     fetchPromises: FetchPromises
     cacheStream: (closeStreamFn: () => void, streamingPromise: Promise<void> | null) => void
     streaming: () => Promise<void> | null
     closeStream: () => void
   }
 ): DocInstance<DocDataType> {
-  const { writeLock, fetchPromises, cacheStream, streaming, closeStream } = streamAndFetchPromises // prettier-ignore
+  const { writeLockMap, fetchPromises, cacheStream, streaming, closeStream } = streamAndFetchPromises // prettier-ignore
 
   const id = docId
   const path = [collectionPath, docId].join('/')
@@ -117,7 +117,7 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
     moduleConfig,
     globalConfig,
     fetchPromises,
-    writeLock,
+    writeLockMap,
     docFn,
   }
   const actions = {
@@ -128,7 +128,7 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
     deleteProp: (handleActionPerStore(sharedParams, 'deleteProp', actionNameTypeMap.deleteProp) as MagnetarDeletePropAction<DocDataType>), // prettier-ignore
     delete: (handleActionPerStore(sharedParams, 'delete', actionNameTypeMap.delete) as MagnetarDeleteAction), // prettier-ignore
     fetch: (handleActionPerStore(sharedParams, 'fetch', actionNameTypeMap.fetch) as MagnetarFetchAction<DocDataType, 'doc'>), // prettier-ignore
-    stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streaming, cacheStream, writeLock), // prettier-ignore
+    stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streaming, cacheStream, writeLockMap), // prettier-ignore
   }
 
   // Every store will have its 'setupModule' function executed

@@ -12,6 +12,7 @@ import { executeOnFns } from '../helpers/executeOnFns'
 import { throwOnIncompleteStreamResponses, throwIfNoFnsToExecute } from '../helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from '../types/config'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers'
+import { getCollectionWriteLocks } from '../helpers/pathHelpers'
 
 export function handleStreamPerStore(
   [collectionPath, docId]: [string, string | undefined],
@@ -20,13 +21,22 @@ export function handleStreamPerStore(
   actionType: ActionType,
   streaming: () => Promise<void> | null,
   cacheStream: (closeStreamFn: () => void, streamingPromise: Promise<void> | null) => void,
-  writeLock: WriteLock
+  writeLockMap: Map<string, WriteLock>
 ): MagnetarStreamAction {
   // returns the action the dev can call with myModule.insert() etc.
   return async function (payload?: any, actionConfig: ActionConfig = {}): Promise<void> {
     // return the same stream promise if it's already open
     const foundStream = streaming()
     if (isPromise(foundStream)) return foundStream
+
+    // we need to await any writeLock _before_ opening the stream to prevent grabbing outdated data
+    const writeLock = docId ? writeLockMap.get(`${collectionPath}/${docId}`)! : writeLockMap.get(collectionPath)!
+    if (isPromise(writeLock.promise)) await writeLock.promise
+    if (!docId) {
+      // we need to await all promises of all docs in this collection...
+      const collectionWriteLocks = getCollectionWriteLocks(collectionPath, writeLockMap)
+      await Promise.allSettled(collectionWriteLocks.map(w => w.promise))
+    }
 
     // get all the config needed to perform this action
     const eventNameFnsMap = getEventNameFnsMap(globalConfig.on, moduleConfig.on, actionConfig.on)
@@ -61,22 +71,25 @@ export function handleStreamPerStore(
       removed: modifyReadResponseMap.removed,
     }
 
-    let lastPayloadMetaTuple: [any, any] = [undefined, undefined]
     /**
      * this is what must be executed by a plugin store that implemented "stream" functionality
      */
     const mustExecuteOnRead: O.Compulsory<DoOnStream> = {
       added: async (_payload, _meta) => {
-        lastPayloadMetaTuple = [_payload, _meta]
-        await writeLock.promise
-        const [__payload, __meta] = lastPayloadMetaTuple
-        return executeOnFns(doOnStreamFns.added, __payload, [__meta])
+        // check if there's a WriteLock for the document:
+        const _writeLock = writeLockMap.get(`${collectionPath}/${_meta.id}`)
+        if (_writeLock && isPromise(_writeLock.promise)) {
+          await _writeLock.promise
+        }
+        return executeOnFns(doOnStreamFns.added, _payload, [_meta])
       },
       modified: async (_payload, _meta) => {
-        lastPayloadMetaTuple = [_payload, _meta]
-        await writeLock.promise
-        const [__payload, __meta] = lastPayloadMetaTuple
-        return executeOnFns(doOnStreamFns.modified, __payload, [__meta])
+        // check if there's a WriteLock for the document:
+        const _writeLock = writeLockMap.get(`${collectionPath}/${_meta.id}`)
+        if (_writeLock && isPromise(_writeLock.promise)) {
+          await _writeLock.promise
+        }
+        return executeOnFns(doOnStreamFns.modified, _payload, [_meta])
       },
       removed: async (_payload, _meta) => {
         return executeOnFns(doOnStreamFns.removed, _payload, [_meta])

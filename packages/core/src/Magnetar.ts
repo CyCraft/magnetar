@@ -105,13 +105,12 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     if (!writeLockMap.has(modulePath)) {
       writeLockMap.set(modulePath, { promise: null, resolve: () => {}, countdown: null })
     }
-    const writeLock = writeLockMap.get(modulePath) as WriteLock
 
     // grab (and set) the FetchPromises for this module
     if (!fetchPromiseMap.has(pathFilterIdentifier)) {
       fetchPromiseMap.set(pathFilterIdentifier, new Map())
     }
-    const fetchPromises = fetchPromiseMap.get(pathFilterIdentifier) as FetchPromises
+    const fetchPromises = fetchPromiseMap.get(pathFilterIdentifier)!
 
     // set the closeStreamFnMap and streamingPromiseMap for this module
     if (!closeStreamFnMap.has(pathFilterIdentifier)) {
@@ -141,7 +140,7 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     }
 
     const streamAndFetchPromises = {
-      writeLock,
+      writeLockMap,
       fetchPromises,
       cacheStream,
       streaming,

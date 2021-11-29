@@ -53,16 +53,10 @@ import { pokedex, waitMs } from '@magnetarjs/test-utils'
 
     // do not await, because it only resolves when the stream is closed
     pokedexModuleWithQuery.stream().catch((e: any) => t.fail(e.message))
-
-    await waitMs(3500)
-
-    pokedexModule
-      .where('type', 'array-contains', 'Fire')
-      .where('base.Speed', '>=', 100)
-      .orderBy('base.Speed', 'asc')
-      .orderBy('name', 'asc')
-      .closeStream()
-
+    
+    await waitMs(5000)
+    pokedexModuleWithQuery.closeStream()
+    
     // the queried instance only has these 3 Pokemon
     t.deepEqual([...pokedexModuleWithQuery.data.values()], [pokedex(6), pokedex(38), pokedex(78)])
     t.is(pokedexModule.data.size, 3)
