@@ -18,10 +18,10 @@
   },
   "dependencies": {
     "copy-anything": "^2.0.3",
-    "fast-sort": "^3.0.3",
+    "fast-sort": "^3.1.1",
     "filter-anything": "^2.2.1",
     "is-what": "^3.14.1",
-    "merge-anything": "^4.0.1",
+    "merge-anything": "^4.0.2",
     "path-to-prop": "^1.0.0"
   },
   "homepage": "https://github.com/cycraft/magnetar#readme",

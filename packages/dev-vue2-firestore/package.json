@@ -10,15 +10,15 @@
     "@magnetarjs/core": "^0.2.6",
     "@magnetarjs/plugin-firestore": "^0.3.5",
     "@magnetarjs/plugin-vue2": "^0.1.9",
-    "core-js": "^3.18.3",
-    "firebase": "^9.1.3",
+    "core-js": "^3.19.2",
+    "firebase": "^9.5.0",
     "vue": "^2.6.14"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.14",
-    "@vue/cli-plugin-vuex": "~4.5.14",
-    "@vue/cli-service": "~4.5.14",
-    "sass": "^1.43.2",
+    "@vue/cli-plugin-babel": "~4.5.15",
+    "@vue/cli-plugin-vuex": "~4.5.15",
+    "@vue/cli-service": "~4.5.15",
+    "sass": "^1.44.0",
     "sass-loader": "^10.2.0",
     "vue-template-compiler": "^2.6.14"
   },

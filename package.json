@@ -22,12 +22,12 @@
     "release": "lerna publish",
     "deploy:docs": "npm run build:favicon && lerna run build:docs && firebase deploy --only hosting && git add -A && git commit -m \"chore: deploy\"",
     "dep:i": "yarn",
-    "dep:update-all": "ncu --target minor -u && lerna exec 'ncu --target minor -u' && npm run dep:i",
+    "dep:update-all": "ncu --target minor -u && lerna exec 'ncu --target minor -u'",
     "dep:check-for-updates": "ncu && lerna exec 'ncu'",
     "dep:reinstall-all": "lerna clean -y && rimraf node_modules && npm run dep:i"
   },
   "devDependencies": {
-    "@types/node": "^16.11.0",
+    "@types/node": "^16.11.11",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "ava": "^3.15.0",
@@ -38,13 +38,13 @@
     "eslint-plugin-tree-shaking": "^1.9.2",
     "lerna": "^4.0.0",
     "npm-check-updates": "^11.8.5",
-    "prettier": "^2.4.1",
+    "prettier": "^2.5.0",
     "rimraf": "^3.0.2",
-    "rollup": "^2.58.0",
-    "rollup-plugin-typescript2": "^0.30.0",
-    "ts-node": "^10.3.0",
+    "rollup": "^2.60.2",
+    "rollup-plugin-typescript2": "^0.31.1",
+    "ts-node": "^10.4.0",
     "tslib": "^2.3.1",
-    "typescript": "^4.4.4"
+    "typescript": "^4.5.2"
   },
   "author": "Luca Ban - Mesqueeb",
   "homepage": "https://github.com/cycraft/magnetar#readme",
