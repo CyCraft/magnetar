@@ -17,7 +17,7 @@
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "peerDependencies": {
-    "vue": "^3.2.22"
+    "vue": "^3.2.0"
   },
   "dependencies": {
     "@magnetarjs/core": "^0.2.6",
@@ -32,7 +32,7 @@
   "devDependencies": {
     "@magnetarjs/test-utils": "^0.1.7",
     "ava": "^3.15.0",
-    "vue": "^3.2.22"
+    "vue": "^3.2.0"
   },
   "keywords": [
     "reactive-store",

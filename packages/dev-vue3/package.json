@@ -10,7 +10,7 @@
     "@magnetarjs/core": "^0.2.6",
     "@magnetarjs/plugin-simple-store": "^0.1.9",
     "@magnetarjs/plugin-vue3": "^0.1.10",
-    "vue": "^3.2.22"
+    "vue": "^3.2.23"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.9.3",
