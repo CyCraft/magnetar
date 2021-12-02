@@ -1,4 +1,4 @@
-import { EventFnSuccess } from '@magnetarjs/core'
+import type { EventFnSuccess } from '@magnetarjs/core'
 import { isFullArray, isNumber } from 'is-what'
 
 export const logger: EventFnSuccess = function ({
