@@ -6,8 +6,8 @@ import { FetchPromises } from './types/actions'
 import { throwIfInvalidModulePath } from './helpers/throwFns'
 import { getCollectionPathDocIdEntry } from './helpers/pathHelpers'
 import {
-  getModuleIdentifier,
-  ModuleIdentifier,
+  getPathFilterIdentifier,
+  PathFilterIdentifier,
   MODULE_IDENTIFIER_SPLIT,
 } from './helpers/moduleHelpers'
 
@@ -26,6 +26,18 @@ export interface MagnetarInstance {
    * @see {@link DocFn}
    */
   doc: DocFn
+}
+
+/**
+ * The write lock promise that is resolved x seconds after the final write action has resolved
+ */
+export type WriteLock = {
+  /** To be resolved after the countdown after the last write action finishes */
+  promise: null | Promise<void>
+  /** Resolves the `WriteLock['promise']` */
+  resolve: () => any
+  /** To be started after every write action & To be reset when a new write action occurs */
+  countdown: null | ReturnType<typeof setTimeout>
 }
 
 /**
@@ -60,17 +72,22 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
   const globalConfig = defaultsGlobalConfig(magnetarConfig)
 
   /**
+   * the global storage for WriteLock objects
+   * @see {@link WriteLock}
+   */
+  const writeLockMap: Map<string, WriteLock> = new Map() // apply type upon get/set
+  /**
    * the global storage for closeStream functions
    */
-  const closeStreamFnMap: Map<ModuleIdentifier, () => void> = new Map() // apply type upon get/set
+  const closeStreamFnMap: Map<PathFilterIdentifier, () => void> = new Map() // apply type upon get/set
   /**
    * the global storage for open stream promises
    */
-  const streamingPromiseMap: Map<ModuleIdentifier, Promise<void> | null> = new Map() // apply type upon get/set
+  const streamingPromiseMap: Map<PathFilterIdentifier, Promise<void> | null> = new Map() // apply type upon get/set
   /**
    * the global storage for fetch promises
    */
-  const fetchPromiseMap: Map<ModuleIdentifier, FetchPromises> = new Map() // apply type upon get/set
+  const fetchPromiseMap: Map<PathFilterIdentifier, FetchPromises> = new Map() // apply type upon get/set
 
   function getModuleInstance(
     modulePath: string,
@@ -82,34 +99,39 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     throwIfInvalidModulePath(modulePath, moduleType)
 
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
-    const moduleIdentifier = getModuleIdentifier(modulePath, moduleConfig)
+    const pathFilterIdentifier = getPathFilterIdentifier(modulePath, moduleConfig)
 
-    // create the closeStreamFnMap and streamingPromiseMap for this module
-    if (!closeStreamFnMap.has(moduleIdentifier)) {
-      closeStreamFnMap.set(moduleIdentifier, () => {/** No stream open yet... */}) // prettier-ignore
-    }
-    if (!streamingPromiseMap.has(moduleIdentifier)) {
-      streamingPromiseMap.set(moduleIdentifier, null)
-    }
-    // create the fetchPromiseMap for this module
-    if (!fetchPromiseMap.has(moduleIdentifier)) {
-      fetchPromiseMap.set(moduleIdentifier, new Map())
+    // grab (and set) the WriteLock for this module
+    if (!writeLockMap.has(modulePath)) {
+      writeLockMap.set(modulePath, { promise: null, resolve: () => {}, countdown: null })
     }
 
+    // grab (and set) the FetchPromises for this module
+    if (!fetchPromiseMap.has(pathFilterIdentifier)) {
+      fetchPromiseMap.set(pathFilterIdentifier, new Map())
+    }
+    const fetchPromises = fetchPromiseMap.get(pathFilterIdentifier)!
+
+    // set the closeStreamFnMap and streamingPromiseMap for this module
+    if (!closeStreamFnMap.has(pathFilterIdentifier)) {
+      closeStreamFnMap.set(pathFilterIdentifier, () => {/** No stream open yet... */}) // prettier-ignore
+    }
+    if (!streamingPromiseMap.has(pathFilterIdentifier)) {
+      streamingPromiseMap.set(pathFilterIdentifier, null)
+    }
+    
+    // grab the stream related functions
     function cacheStream(closeStreamFn: () => void, streamingPromise: Promise<void> | null): void {
-      closeStreamFnMap.set(moduleIdentifier, closeStreamFn)
-      streamingPromiseMap.set(moduleIdentifier, streamingPromise)
+      closeStreamFnMap.set(pathFilterIdentifier, closeStreamFn)
+      streamingPromiseMap.set(pathFilterIdentifier, streamingPromise)
     }
-
     function streaming(): Promise<void> | null {
-      return streamingPromiseMap.get(moduleIdentifier) || null
+      return streamingPromiseMap.get(pathFilterIdentifier) || null
     }
-
     function closeStream(): void {
-      const closeStreamFn = closeStreamFnMap.get(moduleIdentifier)
+      const closeStreamFn = closeStreamFnMap.get(pathFilterIdentifier)
       if (closeStreamFn) closeStreamFn()
     }
-
     function closeAllStreams(): void {
       for (const [identifier, closeStreamFn] of closeStreamFnMap) {
         const _modulePath = identifier.split(MODULE_IDENTIFIER_SPLIT)[0]
@@ -117,15 +139,13 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
       }
     }
 
-    // grab the fetch promise utils
-    const fetchPromises = fetchPromiseMap.get(moduleIdentifier) as FetchPromises
-
     const streamAndFetchPromises = {
+      writeLockMap,
+      fetchPromises,
       cacheStream,
       streaming,
       closeStream,
       closeAllStreams,
-      fetchPromises,
     }
     // then create the module instance
     if (moduleType === 'doc') {

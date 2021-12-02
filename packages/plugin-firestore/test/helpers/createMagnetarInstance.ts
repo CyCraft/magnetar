@@ -24,6 +24,7 @@ export type TrainerModuleData = {
   nickName?: string
   dream?: string
   shouldFail?: string
+  colour?: string
 }
 
 const testNamesUsedSoFar: string[] = []

@@ -23,6 +23,7 @@ import {
 import { StorePluginModuleConfig, RemoteStoreOptions } from './index'
 import { throwIfEmulatedError, waitMs, pokedexMap, generateRandomId } from '../helpers'
 import { filterDataPerClauses } from './helpers'
+import { isFullArray, isPromise } from 'is-what'
 
 export function writeActionFactory(
   storePluginOptions: RemoteStoreOptions,
@@ -173,12 +174,24 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
     }
     // this mocks actual data coming in at different intervals
     dataRetrieved.forEach((data, i) => {
+      const metaData = { data, id: data.id || docId, exists: true }
+      
+      // we can simulate new docs coming in by manually triggerering promises
+      if (isFullArray(payload) && payload.every(isPromise)) {
+        // the payload is an array full of promises!
+        // in this case we will emit every time the promises at the index is triggered
+        const promise = payload[i]
+        if (!promise) return
+        promise.then(() => { mustExecuteOnRead.added(data, metaData) })
+        return
+      }
+      
+      // otherwise emulate server response with setTimeout (can be wonky in automated tests)
       const waitTime = 10 + i * 200
       setTimeout(() => {
         // mock when the stream is already stopped
         if (stopStreaming.stopped) return
         // else go ahead and actually trigger the mustExecuteOnRead function
-        const metaData = { data, id: data.id || docId, exists: true }
         mustExecuteOnRead.added(data, metaData)
       }, waitTime)
     })
