@@ -23,7 +23,7 @@ export function getPathFilterIdentifier(
   const { limit, orderBy, where } = moduleConfig
   const config = JSON.stringify({ limit, orderBy, where })
 
-  return `${modulePath}${MODULE_IDENTIFIER_SPLIT}${config}` as PathFilterIdentifier.KEY
+  return `${modulePath}${MODULE_IDENTIFIER_SPLIT}${config}` as unknown as PathFilterIdentifier.KEY
 }
 
 /**
