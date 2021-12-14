@@ -72,6 +72,10 @@ export function handleStreamPerStore(
     }
 
     /**
+     * Last incoming modified docs are cached here temporarily to prevent UI flashing because of the writeLock
+     */
+    const lastIncomingModifiedDocs: Map<string, [any, any]> = new Map()
+    /**
      * this is what must be executed by a plugin store that implemented "stream" functionality
      */
     const mustExecuteOnRead: O.Compulsory<DoOnStream> = {
@@ -84,14 +88,33 @@ export function handleStreamPerStore(
         return executeOnFns(doOnStreamFns.added, _payload, [_meta])
       },
       modified: async (_payload, _meta) => {
-        // check if there's a WriteLock for the document:
-        const _writeLock = writeLockMap.get(`${collectionPath}/${_meta.id}`)
+        const identifier = `${collectionPath}/${_meta.id}`
+        
+        // add to lastIncoming map
+        lastIncomingModifiedDocs.set(identifier, [_payload, _meta])
+        
+        // check if there's a WriteLock for the document
+        const _writeLock = writeLockMap.get(identifier)
         if (_writeLock && isPromise(_writeLock.promise)) {
           await _writeLock.promise
         }
-        return executeOnFns(doOnStreamFns.modified, _payload, [_meta])
+        
+        // grab from lastIncoming map
+        const [__payload, __meta] = lastIncomingModifiedDocs.get(identifier) as [any, any]
+        
+        // delete from lastIncoming map
+        lastIncomingModifiedDocs.delete(identifier)
+        
+        // executer other plugin `doOnStream` functions
+        return executeOnFns(doOnStreamFns.modified, __payload, [__meta])
       },
       removed: async (_payload, _meta) => {
+        const identifier = `${collectionPath}/${_meta.id}`
+        // check if there's a WriteLock for the document
+        const _writeLock = writeLockMap.get(identifier)
+        if (_writeLock && isPromise(_writeLock.promise)) {
+          await _writeLock.promise
+        }
         return executeOnFns(doOnStreamFns.removed, _payload, [_meta])
       },
     }
