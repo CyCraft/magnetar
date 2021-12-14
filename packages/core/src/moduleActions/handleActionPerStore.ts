@@ -54,11 +54,13 @@ export function handleActionPerStore(
 
   // returns the action the dev can call with myModule.insert() etc.
   return function (payload?: any, actionConfig: ActionConfig = {}): Promise<any> {
+    // first of all, check if the same fetch call was just made or not, if so return the same fetch promise early
     const fetchPromiseKey = JSON.stringify(payload)
     const foundFetchPromise = fetchPromises.get(fetchPromiseKey)
     // return the same fetch promise early if it's not yet resolved
     if (actionName === 'fetch' && isPromise(foundFetchPromise)) return foundFetchPromise
 
+    // set up and/or reset te writeLock for write actions
     const writeLock = _docId ? writeLockMap.get(`${collectionPath}/${_docId}`)! : writeLockMap.get(collectionPath)!
     if (actionName !== 'fetch') {
       // we need to create a promise we'll resolve later to prevent any incoming docs from being written to the local state during this time
