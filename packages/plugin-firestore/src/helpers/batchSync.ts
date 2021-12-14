@@ -28,6 +28,7 @@ export type BatchSync = {
   insert: (documentPath: string, payload: Record<string, any>, debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
   deleteProp: (documentPath: string, payload: string[], debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
   delete: (documentPath: string, debounceMsOverwrite?: number) => Promise<SyncBatch>
+  forceSyncEarly: () => Promise<void>
 }
 
 const newStack = (): Stack => ({
@@ -326,5 +327,5 @@ export function batchSyncFactory(
     return promise
   }
 
-  return { assign, merge, replace, insert, deleteProp, delete: _delete }
+  return { assign, merge, replace, insert, deleteProp, delete: _delete, forceSyncEarly }
 }

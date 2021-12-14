@@ -119,6 +119,7 @@ export const CreatePlugin: MagnetarPlugin<FirestorePluginOptions> = (
   const instance: PluginInstance = {
     revert,
     actions,
+    syncPendingWrites: batchSync.forceSyncEarly,
   }
   return instance
 }

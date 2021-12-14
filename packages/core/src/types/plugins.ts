@@ -52,6 +52,10 @@ export interface PluginInstance {
   getModuleData?: (
     pluginModuleSetupPayload: PluginModuleSetupPayload
   ) => Record<string, any> | Map<string, Record<string, any>>
+  /**
+   * This is an optional function that some "remote" Store Plugins can provide to sync any pending writes that might have stacked because of a `syncDebounceMs`.
+   */
+  syncPendingWrites?: () => Promise<void>
 }
 
 /**
