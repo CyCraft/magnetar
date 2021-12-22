@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/plugin-firestore",
-  "version": "0.3.10",
+  "version": "0.3.11",
   "sideEffects": false,
   "description": "Magnetar plugin firestore",
   "main": "dist/index.cjs.js",
@@ -17,14 +17,14 @@
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
-    "@magnetarjs/core": "^0.2.10",
+    "@magnetarjs/core": "^0.2.11",
     "firebase": "^9.5.0",
     "flatten-anything": "^2.0.4",
     "is-what": "^3.14.1",
     "ts-toolbelt": "^9.6.0"
   },
   "devDependencies": {
-    "@magnetarjs/test-utils": "^0.1.9",
+    "@magnetarjs/test-utils": "^0.1.10",
     "ava": "^3.15.0"
   },
   "keywords": [
@@ -73,5 +73,5 @@
     ],
     "timeout": "60s"
   },
-  "gitHead": "ca164ddeb79efffe53a696b817b7649484b6c616"
+  "gitHead": "7358494dc3072b8f1f8bb7ec64ca1ecba610b3e7"
 }
