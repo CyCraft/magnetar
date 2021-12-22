@@ -61,7 +61,9 @@ export function handleActionPerStore(
     if (actionName === 'fetch' && isPromise(foundFetchPromise)) return foundFetchPromise
 
     // set up and/or reset te writeLock for write actions
-    const writeLock = _docId ? writeLockMap.get(`${collectionPath}/${_docId}`)! : writeLockMap.get(collectionPath)!
+    const writeLock = _docId
+      ? writeLockMap.get(`${collectionPath}/${_docId}`)!
+      : writeLockMap.get(collectionPath)!
     if (actionName !== 'fetch') {
       // we need to create a promise we'll resolve later to prevent any incoming docs from being written to the local state during this time
       if (writeLock.promise === null) {
@@ -82,7 +84,7 @@ export function handleActionPerStore(
         clearTimeout(writeLock.countdown)
       }
     }
-    
+
     // eslint-disable-next-line no-async-promise-executor
     const actionPromise = new Promise<any>(async (resolve, reject) => {
       // we need to await any writeLock _before_ fetching, to prevent grabbing outdated data
@@ -91,7 +93,7 @@ export function handleActionPerStore(
         if (!_docId) {
           // we need to await all promises of all docs in this collection...
           const collectionWriteMaps = getCollectionWriteLocks(collectionPath, writeLockMap)
-          await Promise.allSettled(collectionWriteMaps.map(w => w.promise))
+          await Promise.allSettled(collectionWriteMaps.map((w) => w.promise))
         }
       }
 
@@ -179,7 +181,7 @@ export function handleActionPerStore(
                 stopExecutionAfterAction,
                 storeName,
               })
-          
+
           // handle reverting. stopExecution might have been modified by `handleAction`
           if (stopExecution === 'revert') {
             const storesToRevert = storesToExecute.slice(0, i)

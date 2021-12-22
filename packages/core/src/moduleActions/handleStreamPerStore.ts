@@ -30,12 +30,14 @@ export function handleStreamPerStore(
     if (isPromise(foundStream)) return foundStream
 
     // we need to await any writeLock _before_ opening the stream to prevent grabbing outdated data
-    const writeLock = docId ? writeLockMap.get(`${collectionPath}/${docId}`)! : writeLockMap.get(collectionPath)!
+    const writeLock = docId
+      ? writeLockMap.get(`${collectionPath}/${docId}`)!
+      : writeLockMap.get(collectionPath)!
     if (isPromise(writeLock.promise)) await writeLock.promise
     if (!docId) {
       // we need to await all promises of all docs in this collection...
       const collectionWriteLocks = getCollectionWriteLocks(collectionPath, writeLockMap)
-      await Promise.allSettled(collectionWriteLocks.map(w => w.promise))
+      await Promise.allSettled(collectionWriteLocks.map((w) => w.promise))
     }
 
     // get all the config needed to perform this action
@@ -89,16 +91,16 @@ export function handleStreamPerStore(
       },
       modified: async (_payload, _meta) => {
         const identifier = `${collectionPath}/${_meta.id}`
-        
+
         // add to lastIncoming map
         lastIncomingModifiedDocs.set(identifier, [_payload, _meta])
-        
+
         // check if there's a WriteLock for the document
         const _writeLock = writeLockMap.get(identifier)
         if (_writeLock && isPromise(_writeLock.promise)) {
           await _writeLock.promise
         }
-        
+
         // grab from lastIncoming map
         const lastIncoming = lastIncomingModifiedDocs.get(identifier)
         if (!lastIncoming) {
@@ -107,9 +109,10 @@ export function handleStreamPerStore(
         }
 
         const [__payload, __meta] = lastIncoming
+
         // delete from lastIncoming map
         lastIncomingModifiedDocs.delete(identifier)
-        
+
         // executer other plugin `doOnStream` functions
         return executeOnFns(doOnStreamFns.modified, __payload, [__meta])
       },
