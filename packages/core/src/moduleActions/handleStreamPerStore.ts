@@ -100,8 +100,13 @@ export function handleStreamPerStore(
         }
         
         // grab from lastIncoming map
-        const [__payload, __meta] = lastIncomingModifiedDocs.get(identifier) as [any, any]
-        
+        const lastIncoming = lastIncomingModifiedDocs.get(identifier)
+        if (!lastIncoming) {
+          // do nothing if there is no last incoming. This means more than 1 call might have piled up and
+          return
+        }
+
+        const [__payload, __meta] = lastIncoming
         // delete from lastIncoming map
         lastIncomingModifiedDocs.delete(identifier)
         
