@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/utils",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "sideEffects": false,
   "description": "Magnetar utils like a logger for easier development",
   "main": "dist/index.cjs.js",
@@ -15,7 +15,7 @@
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
-    "@magnetarjs/core": "^0.2.9",
+    "@magnetarjs/core": "^0.2.10",
     "is-what": "^3.14.1"
   },
   "devDependencies": {
@@ -41,5 +41,5 @@
     ],
     "timeout": "60s"
   },
-  "gitHead": "f08f2f5de9ea2ddef8d64a7c6529ded8b5bccf0f"
+  "gitHead": "ca164ddeb79efffe53a696b817b7649484b6c616"
 }

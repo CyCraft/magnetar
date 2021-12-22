@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/plugin-vue2",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "sideEffects": false,
   "description": "Magnetar plugin vue2",
   "main": "dist/index.cjs.js",
@@ -20,7 +20,7 @@
     "vue": "^2.6.0"
   },
   "dependencies": {
-    "@magnetarjs/core": "^0.2.9",
+    "@magnetarjs/core": "^0.2.10",
     "copy-anything": "^2.0.3",
     "fast-sort": "^3.1.1",
     "filter-anything": "^2.2.1",
@@ -30,7 +30,7 @@
     "ts-toolbelt": "^9.6.0"
   },
   "devDependencies": {
-    "@magnetarjs/test-utils": "^0.1.8",
+    "@magnetarjs/test-utils": "^0.1.9",
     "ava": "^3.15.0",
     "vue": "^2.6.0"
   },
@@ -77,5 +77,5 @@
     ],
     "timeout": "60s"
   },
-  "gitHead": "f08f2f5de9ea2ddef8d64a7c6529ded8b5bccf0f"
+  "gitHead": "ca164ddeb79efffe53a696b817b7649484b6c616"
 }
