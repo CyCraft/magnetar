@@ -58,6 +58,7 @@
     border-bottom: thin solid lightgrey
     &._is-done > div
       opacity: 0.6
+      text-decoration: line-through
   ._item-new
     margin-top: 1rem
     input
