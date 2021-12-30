@@ -16,9 +16,11 @@
   "author": "Luca Ban - Mesqueeb",
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
+  "peerDependencies": {
+    "firebase": "^9.5.0"
+  },
   "dependencies": {
     "@magnetarjs/core": "^0.2.11",
-    "firebase": "^9.5.0",
     "flatten-anything": "^2.0.4",
     "is-what": "^3.14.1",
     "ts-toolbelt": "^9.6.0"
