@@ -7,9 +7,7 @@
     "build--": "vuedx-typecheck . && vite build"
   },
   "dependencies": {
-    "@magnetarjs/core": "^0.2.11",
-    "@magnetarjs/plugin-simple-store": "^0.1.14",
-    "@magnetarjs/plugin-vue3": "^0.1.15",
+    "magnetar": "^0.4.12",
     "vue": "^3.2.23"
   },
   "devDependencies": {
