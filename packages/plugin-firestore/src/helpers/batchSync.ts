@@ -170,7 +170,7 @@ export function batchSyncFactory(
 
   function forceSyncEarly(): Promise<void> {
     return new Promise((resolve) => {
-      if (!state.countdown) { return resolve() }
+      if (!state.countdown) return resolve()
       state.countdown.done.then(() => resolve())
       state.countdown.forceFinish()
     })
