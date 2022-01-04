@@ -48,6 +48,7 @@
     "typescript": "^4.5.4"
   },
   "author": "Luca Ban - Mesqueeb",
+  "license": "MIT",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "bugs": {
     "url": "https://github.com/cycraft/magnetar/issues"

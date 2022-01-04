@@ -4,6 +4,7 @@
   "description": "State-management done right with automatic sync to remote databases and services. Framework-agnostic & optimistic-UI built-in 🌟",
   "productName": "Magnetar docs",
   "author": "Luca Ban - Mesqueeb",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
