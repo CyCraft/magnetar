@@ -36,6 +36,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-loader": "^4.0.2",
     "eslint-plugin-tree-shaking": "^1.9.2",
+    "exec-sh": "^0.4.0",
     "lerna": "^4.0.0",
     "npm-check-updates": "^11.8.5",
     "prettier": "^2.5.0",

@@ -86,7 +86,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'multiple writes (insert → insert) to the same record'
   test(testName, async (t) => {
-    const { pokedexModule } = await createMagnetarInstance(testName, { deletePaths: ['pokedex/1'] })
+    const { pokedexModule } = await createMagnetarInstance(testName)
     await firestoreDeepEqual(t, testName, 'pokedex/1', undefined)
     t.deepEqual(pokedexModule.doc('1').data, undefined)
 
@@ -178,7 +178,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'multiple writes (insert → merge) to the same record'
   test(testName, async (t) => {
-    const { pokedexModule } = await createMagnetarInstance(testName, { deletePaths: ['pokedex/1'] })
+    const { pokedexModule } = await createMagnetarInstance(testName)
     await firestoreDeepEqual(t, testName, 'pokedex/1', undefined)
     t.deepEqual(pokedexModule.doc('1').data, undefined)
 
@@ -282,7 +282,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'multiple writes (insert → assign) to the same record'
   test(testName, async (t) => {
-    const { pokedexModule } = await createMagnetarInstance(testName, { deletePaths: ['pokedex/1'] })
+    const { pokedexModule } = await createMagnetarInstance(testName)
     await firestoreDeepEqual(t, testName, 'pokedex/1', undefined)
     t.deepEqual(pokedexModule.doc('1').data, undefined)
 
@@ -369,7 +369,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'multiple writes (insert → replace) to the same record'
   test(testName, async (t) => {
-    const { pokedexModule } = await createMagnetarInstance(testName, { deletePaths: ['pokedex/1'] })
+    const { pokedexModule } = await createMagnetarInstance(testName)
     await firestoreDeepEqual(t, testName, 'pokedex/1', undefined)
     t.deepEqual(pokedexModule.doc('1').data, undefined)
 
@@ -459,7 +459,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'multiple writes (insert → deleteProp) to the same record'
   test(testName, async (t) => {
-    const { pokedexModule } = await createMagnetarInstance(testName, { deletePaths: ['pokedex/1'] })
+    const { pokedexModule } = await createMagnetarInstance(testName)
     await firestoreDeepEqual(t, testName, 'pokedex/1', undefined)
     t.deepEqual(pokedexModule.doc('1').data, undefined)
 
@@ -542,7 +542,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'multiple writes (insert → delete) to the same record'
   test(testName, async (t) => {
-    const { pokedexModule } = await createMagnetarInstance(testName, { deletePaths: ['pokedex/1'] })
+    const { pokedexModule } = await createMagnetarInstance(testName)
     await firestoreDeepEqual(t, testName, 'pokedex/1', undefined)
     t.deepEqual(pokedexModule.doc('1').data, undefined)
 

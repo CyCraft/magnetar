@@ -9,8 +9,8 @@
   "scripts": {
     "build": "npm run rollup",
     "test-and-build": "npm run test && npm run build",
-    "test": "ava",
-    "test--only": "ava --match='*only:*'",
+    "test": "firebase emulators:exec \"ts-node ./test/helpers/scripts/execAllTests.ts\"",
+    "test--only": "firebase emulators:exec \"ts-node ./test/helpers/scripts/execAllTestsOnly.ts\"",
     "rollup": "rimraf dist && rollup -c build.js"
   },
   "author": "Luca Ban - Mesqueeb",

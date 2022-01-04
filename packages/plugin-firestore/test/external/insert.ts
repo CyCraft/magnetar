@@ -7,7 +7,7 @@ import { DocInstance } from '../../../core/src'
 {
   const testName = 'insert (document)'
   test(testName, async (t) => {
-    const { pokedexModule } = await createMagnetarInstance(testName, { deletePaths: ['pokedex/7'] })
+    const { pokedexModule } = await createMagnetarInstance(testName)
     const payload = pokedex(7)
     t.deepEqual(pokedexModule.doc('7').data, undefined)
 
@@ -31,7 +31,7 @@ import { DocInstance } from '../../../core/src'
 {
   const testName = 'insert (collection) → id from payload'
   test(testName, async (t) => {
-    const { pokedexModule } = await createMagnetarInstance(testName, { deletePaths: ['pokedex/7'] })
+    const { pokedexModule } = await createMagnetarInstance(testName)
     const payload = pokedex(7)
 
     let moduleFromResult: DocInstance<PokedexEntry>

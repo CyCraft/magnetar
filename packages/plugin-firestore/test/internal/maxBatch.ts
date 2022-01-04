@@ -6,7 +6,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'Max Batch — 550'
   test(testName, async (t) => {
-    const { pokedexModule } = await createMagnetarInstance(testName, { deletePaths: ['pokedex/1'] })
+    const { pokedexModule } = await createMagnetarInstance(testName)
     await firestoreDeepEqual(t, testName, 'pokedex/1', undefined)
     t.deepEqual(pokedexModule.doc('1').data, undefined)
 
@@ -29,7 +29,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   const testName = 'Max Batch — 1550'
   test(testName, async (t) => {
-    const { pokedexModule } = await createMagnetarInstance(testName, { deletePaths: ['pokedex/1'] })
+    const { pokedexModule } = await createMagnetarInstance(testName)
     await firestoreDeepEqual(t, testName, 'pokedex/1', undefined)
     t.deepEqual(pokedexModule.doc('1').data, undefined)
 

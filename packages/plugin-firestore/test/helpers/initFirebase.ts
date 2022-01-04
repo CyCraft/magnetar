@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app'
-import { getFirestore } from 'firebase/firestore'
+import { connectFirestoreEmulator, initializeFirestore } from 'firebase/firestore'
 
 const config = {
   apiKey: 'AIzaSyDivMlXIuHqDFsTCCqBDTVL0h29xbltcL8',
@@ -10,4 +10,7 @@ const config = {
   // messagingSenderId: '743555674736'
 }
 const firebaseApp = initializeApp(config)
-export const db = getFirestore(firebaseApp)
+const db = initializeFirestore(firebaseApp, { experimentalAutoDetectLongPolling: true })
+connectFirestoreEmulator(db, 'localhost', 8090)
+
+export { db }

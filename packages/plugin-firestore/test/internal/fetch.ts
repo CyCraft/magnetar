@@ -4,11 +4,19 @@ import { DocMetadata } from '../../../core/src'
 import { pokedex, waitMs } from '@magnetarjs/test-utils'
 
 {
-  const testName = 'fetch unexisting (document)'
+  const testName = 'fetch inexistent (document)'
   test(testName, async (t) => {
     /// get resolves once all stores have given a response with data
     const { trainerModule } = await createMagnetarInstance(testName)
-    const inexistentDoc = trainerModule.collection('inexistent').doc('inexistent-doc')
+    const inexistentDoc = trainerModule
+      .collection('inexistent', {
+        configPerStore: {
+          // must pass the `firestorePath` here again if we want to stay within the `magnetarTests` scope.
+          // Otherwise magnetar will computed the path like so: 'app-data/trainer/inexistent/inexistent-doc'
+          remote: { firestorePath: 'magnetarTests/inexistent/inexistent-collection' },
+        },
+      })
+      .doc('inexistent-doc')
     try {
       t.deepEqual(inexistentDoc.data, undefined)
       const result = await inexistentDoc.fetch(
