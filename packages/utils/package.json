@@ -18,9 +18,7 @@
     "@magnetarjs/core": "^0.2.11",
     "is-what": "^3.14.1"
   },
-  "devDependencies": {
-    "ava": "^3.15.0"
-  },
+  "devDependencies": {},
   "keywords": [
     "magnetar",
     "magnetarjs"

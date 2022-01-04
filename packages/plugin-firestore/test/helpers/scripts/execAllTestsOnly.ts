@@ -8,6 +8,12 @@ function execSh(command: string) {
 }
 
 ;(async () => {
-  await setupTestDatabase()
-  await execSh(`yarn workspace @magnetarjs/plugin-firestore ava --match='*only:*'`)
+  try {
+    await setupTestDatabase()
+    await execSh(`yarn workspace @magnetarjs/plugin-firestore ava --match='*only:*'`)
+    process.exit(0)
+  } catch (error) {
+    console.error(error)
+    process.exit(1)
+  }
 })()

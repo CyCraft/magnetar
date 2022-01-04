@@ -28,7 +28,10 @@ import { DocInstance } from '../../../core/src'
 
     // none should have succeeded
     // one bad payload and the entire batch fails!
-    if (moduleOk) return t.fail()
+    if (moduleOk) {
+      t.fail()
+      return
+    }
 
     await firestoreDeepEqual(t, testName, `pokedex/7`, undefined as any)
     await firestoreDeepEqual(t, testName, `pokedex/8`, undefined as any)
