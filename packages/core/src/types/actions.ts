@@ -68,7 +68,7 @@ export type MagnetarFetchAction<
 > = (
   payload?: { force?: boolean } | Record<string, any> | void,
   actionConfig?: ActionConfig
-) => Promise<calledFrom extends 'collection' ? Map<string, DocDataType> : DocDataType>
+) => Promise<calledFrom extends 'collection' ? Map<string, DocDataType> : DocDataType | undefined>
 
 /**
  * @returns The new `doc()` instance after inserting. You can access the inserted `id` by checking this returned instance.
