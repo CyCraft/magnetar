@@ -193,7 +193,7 @@ export function batchSyncFactory(
 
   function triggerSync(debounceMsOverwrite?: number): void {
     const countdown = prepareCountdown(debounceMsOverwrite)
-    countdown.restart()
+    countdown.restart(debounceMsOverwrite)
   }
 
   async function insert(
