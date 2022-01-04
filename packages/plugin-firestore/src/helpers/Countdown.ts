@@ -38,10 +38,10 @@ export function Countdown(ms: number): CountdownInstance {
   }
 
   function restart (newDurationMs?: number): void {
-    startTime = Date.now()
     if (typeof newDurationMs !== 'undefined') {
       duration = newDurationMs
     }
+    startTime = Date.now()
   }
 
   interval = setInterval(() => {
