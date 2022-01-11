@@ -1,6 +1,6 @@
 {
   "name": "dev-vue3-firestore",
-  "version": "0.2.15",
+  "version": "0.2.16",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "firebase": "^9.6.1",
-    "magnetar": "^0.4.15",
+    "magnetar": "^0.4.16",
     "vue": "^3.2.26"
   },
   "devDependencies": {
