@@ -3,8 +3,9 @@ import { Countdown, CountdownInstance } from './Countdown'
 import { SyncBatch } from '@magnetarjs/core'
 import type { WriteBatch } from 'firebase/firestore'
 import { doc, writeBatch as createWriteBatch, deleteField } from 'firebase/firestore'
-import { isNumber } from 'is-what'
+import { isEmptyObject, isNumber } from 'is-what'
 import { merge as mergeObjects } from 'merge-anything'
+import { removeProp } from 'remove-anything'
 
 // https://firebase.google.com/docs/firestore/manage-data/transactions#batched-writes
 // A batched write can contain up to 500 operations.
@@ -250,6 +251,15 @@ export function batchSyncFactory(
     const { payload, operationCount } = preparePayload(_payload)
     let stack = await prepareStack(operationCount)
 
+    // remove any empty objects as value from the payload
+    const payloadSafe = removeProp(payload, {})
+    // when there are no changes after removing all empty objects, return early
+    if (isEmptyObject(payloadSafe)) {
+      const promise = prepareReturnPromise(stack)
+      triggerSync(debounceMsOverwrite)
+      return promise
+    }
+
     // flush! Because these writes cannot be combined
     if (stack.batch.assign.has(documentPath) || stack.batch.deleteProp.has(documentPath)) {
       await forceSyncEarly()
@@ -259,13 +269,13 @@ export function batchSyncFactory(
     // when queueing a `replace` we need to update this payload instead
     const replacePayload = stack.batch.replace.get(documentPath)
     if (replacePayload) {
-      stack.batch.replace.set(documentPath, mergeObjects(replacePayload, payload))
+      stack.batch.replace.set(documentPath, mergeObjects(replacePayload, payloadSafe))
     }
 
     // otherwise combine with any previous payload
     if (!replacePayload) {
       const previousPayload = stack.batch.merge.get(documentPath) || {}
-      stack.batch.merge.set(documentPath, mergeObjects(previousPayload, payload))
+      stack.batch.merge.set(documentPath, mergeObjects(previousPayload, payloadSafe))
     }
 
     const promise = prepareReturnPromise(stack)

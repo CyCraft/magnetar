@@ -23,6 +23,7 @@
     "@magnetarjs/core": "^0.2.13",
     "flatten-anything": "^2.0.4",
     "is-what": "^3.14.1",
+    "remove-anything": "^0.1.0",
     "ts-toolbelt": "^9.6.0"
   },
   "devDependencies": {

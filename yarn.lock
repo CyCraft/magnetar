@@ -14773,6 +14773,13 @@ remote-git-tags@^3.0.0:
   resolved "https://registry.yarnpkg.com/remote-git-tags/-/remote-git-tags-3.0.0.tgz#424f8ec2cdea00bb5af1784a49190f25e16983c3"
   integrity sha512-C9hAO4eoEsX+OXA4rla66pXZQ+TLQ8T9dttgQj18yuKlPMTVkIkdYXvlMC55IuUsIkV6DpmQYi10JKFLaU+l7w==
 
+remove-anything@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/remove-anything/-/remove-anything-0.1.0.tgz#832b8903e39ebc39e631293dbb73b2937f4e4993"
+  integrity sha512-9AX6nwQOtmhpA5f7falvLuFCg5B+MJRcErsyM57NJDxTRL3ZD8TLwLIJuGqjFn/rUwJSmsSFSjq+4SJgbAzKew==
+  dependencies:
+    is-what "^3.14.1"
+
 remove-trailing-separator@^1.0.1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/remove-trailing-separator/-/remove-trailing-separator-1.1.0.tgz#c24bce2a283adad5bc3f58e0d48249b92379d8ef"
