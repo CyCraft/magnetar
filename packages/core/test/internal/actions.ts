@@ -25,7 +25,8 @@ test('write: insert (collection) → random ID', async (t) => {
   try {
     moduleFromResult = await pokedexModule.insert(payload)
   } catch (error) {
-    return t.fail(JSON.stringify(error))
+    t.fail(JSON.stringify(error))
+    return
   }
   const newId = moduleFromResult.id
   // check data of reference returned
@@ -51,7 +52,7 @@ test('deleteProp: (document)', async (t) => {
   try {
     const result = await trainerModule.deleteProp(prop)
     // check data of reference returned
-    t.deepEqual(result, trainerModule.data)
+    t.deepEqual(result, trainerModule.data as any)
   } catch (error) {
     t.fail(JSON.stringify(error))
   }

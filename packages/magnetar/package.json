@@ -1,22 +1,23 @@
 {
   "name": "magnetar",
-  "version": "0.4.6",
+  "version": "0.4.15",
   "description": "State-management done right with automatic sync to remote databases and services. Framework-agnostic & optimistic-UI built-in 🌟",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "author": "Luca Ban - Mesqueeb",
+  "license": "MIT",
   "scripts": {
     "build": "npm run rollup",
     "rollup": "rimraf dist && rollup -c build.js"
   },
   "dependencies": {
-    "@magnetarjs/core": "^0.2.7",
-    "@magnetarjs/plugin-firestore": "^0.3.6",
-    "@magnetarjs/plugin-simple-store": "^0.1.10",
-    "@magnetarjs/plugin-vue2": "^0.1.10",
-    "@magnetarjs/plugin-vue3": "^0.1.11",
-    "@magnetarjs/utils": "^0.1.10"
+    "@magnetarjs/core": "^0.2.13",
+    "@magnetarjs/plugin-firestore": "^0.3.15",
+    "@magnetarjs/plugin-simple-store": "^0.1.16",
+    "@magnetarjs/plugin-vue2": "^0.1.16",
+    "@magnetarjs/plugin-vue3": "^0.1.17",
+    "@magnetarjs/utils": "^0.1.16"
   },
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "keywords": [
@@ -49,5 +50,5 @@
     "type": "git",
     "url": "git+https://github.com/cycraft/magnetar.git"
   },
-  "gitHead": "f08f2f5de9ea2ddef8d64a7c6529ded8b5bccf0f"
+  "gitHead": "7358494dc3072b8f1f8bb7ec64ca1ecba610b3e7"
 }

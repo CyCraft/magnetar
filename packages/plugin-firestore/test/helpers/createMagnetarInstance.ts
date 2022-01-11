@@ -33,11 +33,9 @@ export async function createMagnetarInstance(
   testName: string,
   {
     insertDocs = {},
-    deletePaths = [],
     remoteConfig = {},
   }: {
     insertDocs?: { [path: string]: Record<string, any> }
-    deletePaths?: string[]
     remoteConfig?: Record<string, any>
   } = {}
 ): Promise<{
@@ -53,10 +51,6 @@ export async function createMagnetarInstance(
   }
 
   // prepare the firestore side
-  const deletePromises = deletePaths.map((path) => {
-    const docPath = `magnetarTests/${testName}${path ? '/' + path : ''}`
-    return deleteDoc(doc(db, docPath))
-  })
   const initialEntriesPokedex: [string, Record<string, any>][] = []
   const insertPromises = Object.entries(insertDocs).map(([path, data]) => {
     const docPath = `magnetarTests/${testName}${path ? '/' + path : ''}`
@@ -65,7 +59,7 @@ export async function createMagnetarInstance(
     }
     return setDoc(doc(db, docPath), data)
   })
-  await Promise.all(deletePromises.concat(insertPromises))
+  await Promise.all(insertPromises)
 
   // create & prepare the modules
   const local = CreatePluginLocal({ storeName: 'local', generateRandomId })

@@ -314,7 +314,8 @@ import { pokedex } from '@magnetarjs/test-utils'
     const { pokedexModule } = await createMagnetarInstance('read-no-access')
     let error
     try {
-      const a = await pokedexModule.fetch({ force: true })
+      const res = await pokedexModule.fetch({ force: true })
+      console.warn(`[this should never log] res → `, res)
     } catch (_error) {
       error = _error
     }

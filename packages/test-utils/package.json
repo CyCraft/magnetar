@@ -1,12 +1,13 @@
 {
   "name": "@magnetarjs/test-utils",
   "private": true,
-  "version": "0.1.8",
+  "version": "0.1.11",
   "description": "magnetar test utils",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "types": "dist/types/index.d.ts",
   "author": "Luca Ban - Mesqueeb",
+  "license": "MIT",
   "scripts": {
     "build": "npm run rollup && npm run fix-issue-#19",
     "fix-issue-#19": "copyfiles --up=4 \"dist/types/test-utils/src/**/*\" \"dist/types/\" && rimraf dist/types/test-utils",

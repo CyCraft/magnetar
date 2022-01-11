@@ -119,7 +119,7 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     if (!streamingPromiseMap.has(pathFilterIdentifier)) {
       streamingPromiseMap.set(pathFilterIdentifier, null)
     }
-    
+
     // grab the stream related functions
     function cacheStream(closeStreamFn: () => void, streamingPromise: Promise<void> | null): void {
       closeStreamFnMap.set(pathFilterIdentifier, closeStreamFn)

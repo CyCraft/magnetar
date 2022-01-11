@@ -7,9 +7,7 @@ import { DocInstance } from '../../../core/src'
 {
   const testName = 'insert multiple documents in fast succession with one fail'
   test(testName, async (t) => {
-    const { pokedexModule } = await createMagnetarInstance(testName, {
-      deletePaths: ['pokedex/7', 'pokedex/8'],
-    })
+    const { pokedexModule } = await createMagnetarInstance(testName)
     const payloadNg = { ...pokedex(7), failBecauseOf: undefined }
     const payloadOk = pokedex(8)
     t.deepEqual(pokedexModule.doc('7').data, undefined)
@@ -30,7 +28,10 @@ import { DocInstance } from '../../../core/src'
 
     // none should have succeeded
     // one bad payload and the entire batch fails!
-    if (moduleOk) return t.fail()
+    if (moduleOk) {
+      t.fail()
+      return
+    }
 
     await firestoreDeepEqual(t, testName, `pokedex/7`, undefined as any)
     await firestoreDeepEqual(t, testName, `pokedex/8`, undefined as any)

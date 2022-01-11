@@ -3,7 +3,7 @@
  */
 export type CountdownInstance = {
   done: Promise<void>
-  restart: () => void
+  restart: (newDurationMs?: number) => void
   forceFinish: () => void
 }
 
@@ -11,7 +11,7 @@ export type CountdownInstance = {
  * A countdown which can be restarted and resolves when the provided milliseconds have passed.
  *
  * @param {number} ms The amount of milliseconds to count down.
- * @returns {{done: Promise<void>, restart: () => void}} restart will reset the countdown and start counting down again.
+ * @returns {{done: Promise<void>, restart: (newDurationMs?: number) => void}} restart will reset the countdown and start counting down again.
  * @example
  * const countdown = Countdown(1000)
  * // set up what to do when it's finished:
@@ -25,6 +25,7 @@ export function Countdown(ms: number): CountdownInstance {
   let startTime = Date.now()
   let interval: any = null
   let resolveTrigger: any = null
+  let duration: number = ms
   const done: Promise<void> = new Promise((resolve) => (resolveTrigger = resolve))
 
   function finish() {
@@ -36,7 +37,10 @@ export function Countdown(ms: number): CountdownInstance {
     }
   }
 
-  function restart(): void {
+  function restart (newDurationMs?: number): void {
+    if (typeof newDurationMs !== 'undefined') {
+      duration = newDurationMs
+    }
     startTime = Date.now()
   }
 
@@ -44,7 +48,7 @@ export function Countdown(ms: number): CountdownInstance {
     const now = Date.now()
     const deltaT = now - startTime
 
-    if (deltaT >= ms) finish()
+    if (deltaT >= duration) finish()
   }, 10)
 
   return { done, restart, forceFinish: finish }

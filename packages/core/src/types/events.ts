@@ -1,6 +1,13 @@
 import { O } from 'ts-toolbelt'
 import { ActionName } from './actions'
-import { FetchResponse, StreamResponse, DoOnStream, DoOnFetch, PluginModuleConfig, SyncBatch } from './plugins'
+import {
+  FetchResponse,
+  StreamResponse,
+  DoOnStream,
+  DoOnFetch,
+  PluginModuleConfig,
+  SyncBatch,
+} from './plugins'
 
 // events
 export type EventName = 'before' | 'success' | 'error' | 'revert'
@@ -50,7 +57,15 @@ type EventSharedPayload = {
 }
 
 type EventPayloadPropResult = {
-  result: void | string | FetchResponse | DoOnFetch | StreamResponse | DoOnStream | SyncBatch | [string, SyncBatch]
+  result:
+    | void
+    | string
+    | FetchResponse
+    | DoOnFetch
+    | StreamResponse
+    | DoOnStream
+    | SyncBatch
+    | [string, SyncBatch]
 }
 
 export type EventFnBefore = (args: EventSharedPayload) => void | Promise<void>

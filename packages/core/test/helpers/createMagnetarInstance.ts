@@ -7,11 +7,11 @@ import {
 } from '../../src'
 import {
   pokedex,
-  PokedexEntry,
   generateRandomId,
   PluginMockLocal,
   PluginMockRemote,
 } from '@magnetarjs/test-utils'
+import type { PokedexEntry } from '@magnetarjs/test-utils'
 import { O } from 'ts-toolbelt'
 
 const CreatePluginLocal = PluginMockLocal.CreatePlugin
