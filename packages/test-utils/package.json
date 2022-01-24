@@ -7,6 +7,7 @@
   "module": "dist/index.esm.js",
   "types": "dist/types/index.d.ts",
   "author": "Luca Ban - Mesqueeb",
+  "funding": "https://github.com/sponsors/mesqueeb",
   "license": "MIT",
   "scripts": {
     "build": "npm run rollup && npm run fix-issue-#19",

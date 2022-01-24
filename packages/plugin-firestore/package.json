@@ -14,6 +14,7 @@
     "rollup": "rimraf dist && rollup -c build.js"
   },
   "author": "Luca Ban - Mesqueeb",
+  "funding": "https://github.com/sponsors/mesqueeb",
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "peerDependencies": {
