@@ -26,6 +26,14 @@ export interface MagnetarInstance {
    * @see {@link DocFn}
    */
   doc: DocFn
+  /**
+   * Clear all data of the entire Magnetar instance
+   */
+  clearAllData: () => Promise<void>
+  /**
+   * Close all streams of the entire Magnetar instance
+   */
+  closeAllStreams: () => Promise<void>
 }
 
 /**
@@ -72,6 +80,11 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
   const globalConfig = defaultsGlobalConfig(magnetarConfig)
 
   /**
+   * All collections visited so far, kept to be able to clear all data
+   */
+  const collectionNames = new Set<string>()
+
+  /**
    * the global storage for WriteLock objects
    * @see {@link WriteLock}
    */
@@ -89,6 +102,34 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
    */
   const fetchPromiseMap: Map<PathFilterIdentifier, FetchPromises> = new Map() // apply type upon get/set
 
+  async function awaitAllWriteLocks (): Promise<void> {
+    for (const [_, writelock] of writeLockMap) {
+      if (writelock.promise) await writelock.promise
+    }
+  }
+  
+  async function awaitAllFetches (): Promise<void> {
+    for (const [_, fetchPromises] of fetchPromiseMap) {
+      await Promise.all([...fetchPromises.values()])
+    }
+  }
+
+  async function clearAllData (): Promise<void> {
+    await awaitAllWriteLocks()
+    await awaitAllFetches()
+    for (const collectionName of collectionNames) {
+      collection(collectionName).data?.clear()
+    }
+  }
+
+  async function closeAllStreams (): Promise<void> {
+    await awaitAllWriteLocks()
+    await awaitAllFetches()
+    for (const collectionName of collectionNames) {
+      collection(collectionName).closeAllStreams()
+    }
+  }
+
   function getModuleInstance(
     modulePath: string,
     moduleConfig: ModuleConfig = {},
@@ -99,6 +140,8 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     throwIfInvalidModulePath(modulePath, moduleType)
 
     const [collectionPath, docId] = getCollectionPathDocIdEntry(modulePath)
+    collectionNames.add(collectionPath)
+
     const pathFilterIdentifier = getPathFilterIdentifier(modulePath, moduleConfig)
 
     // grab (and set) the WriteLock for this module
@@ -181,6 +224,8 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     globalConfig,
     collection: collection as CollectionFn,
     doc: doc as DocFn,
+    clearAllData,
+    closeAllStreams,
   }
   return instance
 }
