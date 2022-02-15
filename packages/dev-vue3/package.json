@@ -1,13 +1,13 @@
 {
   "name": "dev-vue3",
-  "version": "0.1.18",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "vite",
     "build--": "vuedx-typecheck . && vite build"
   },
   "dependencies": {
-    "magnetar": "^0.4.16",
+    "magnetar": "^0.5.0",
     "vue": "^3.2.26"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/core",
-  "version": "0.2.14",
+  "version": "0.3.0",
   "sideEffects": false,
   "description": "Magnetar core library.",
   "main": "dist/index.cjs.js",
@@ -23,7 +23,7 @@
     "ts-toolbelt": "^9.6.0"
   },
   "devDependencies": {
-    "@magnetarjs/test-utils": "^0.1.12"
+    "@magnetarjs/test-utils": "^0.1.13"
   },
   "keywords": [
     "vuex-easy-firestore",
