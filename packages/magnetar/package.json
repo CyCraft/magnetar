@@ -1,6 +1,6 @@
 {
   "name": "magnetar",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "State-management done right with automatic sync to remote databases and services. Framework-agnostic & optimistic-UI built-in 🌟",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -13,11 +13,11 @@
     "rollup": "rimraf dist && rollup -c build.js"
   },
   "dependencies": {
-    "@magnetarjs/core": "^0.3.1",
-    "@magnetarjs/plugin-firestore": "^0.3.18",
-    "@magnetarjs/plugin-simple-store": "^0.1.19",
-    "@magnetarjs/plugin-vue3": "^0.1.20",
-    "@magnetarjs/utils": "^0.1.19"
+    "@magnetarjs/core": "^0.3.2",
+    "@magnetarjs/plugin-firestore": "^0.3.19",
+    "@magnetarjs/plugin-simple-store": "^0.1.20",
+    "@magnetarjs/plugin-vue3": "^0.1.21",
+    "@magnetarjs/utils": "^0.1.20"
   },
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "keywords": [
