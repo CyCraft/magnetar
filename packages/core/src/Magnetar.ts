@@ -102,29 +102,13 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
    */
   const fetchPromiseMap: Map<PathFilterIdentifier, FetchPromises> = new Map() // apply type upon get/set
 
-  async function awaitAllWriteLocks (): Promise<void> {
-    for (const [_, writelock] of writeLockMap) {
-      if (writelock.promise) await writelock.promise
-    }
-  }
-  
-  async function awaitAllFetches (): Promise<void> {
-    for (const [_, fetchPromises] of fetchPromiseMap) {
-      await Promise.all([...fetchPromises.values()])
-    }
-  }
-
   async function clearAllData (): Promise<void> {
-    await awaitAllWriteLocks()
-    await awaitAllFetches()
     for (const collectionName of collectionNames) {
       collection(collectionName).data?.clear()
     }
   }
 
   async function closeAllStreams (): Promise<void> {
-    await awaitAllWriteLocks()
-    await awaitAllFetches()
     for (const collectionName of collectionNames) {
       collection(collectionName).closeAllStreams()
     }
