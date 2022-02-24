@@ -11,10 +11,8 @@ When you insert a new document without specifying an ID, you can do so by callin
 ```javascript
 const pokedexModule = magnetar.collection('pokedex')
 
-const data = { name: 'squirtle' }
-
 // insert a new document with random ID
-pokedexModule.insert(data)
+pokedexModule.insert({ name: 'squirtle' })
 ```
 
 This is what happens:
@@ -26,7 +24,7 @@ Your document is passed to both your store plugins. The local store plugin is re
 You can access the new document's data like so:
 
 ```js
-const newDocModule = await magnetar.collection('pokedex').insert(data) // needs await!
+const newDocModule = await magnetar.collection('pokedex').insert({ name: 'squirtle' }) // needs await!
 
 newDocModule.id // the randomly generated id
 newDocModule.data // the data you have inserted
@@ -57,14 +55,13 @@ Instead of awaiting the insert promise, you need to display the **collection mod
 ```js
 const pokedexModule = magnetar.collection('pokedex')
 
-// this would wait for your remote store (NOT optimistic)
-const newDocModule = await pokedexModule.insert(data)
+// ❌ this would wait for your remote store (NOT optimistic)
+const newDocModule = await pokedexModule.insert({ name: 'squirtle' })
 
-// instead do NOT await
-pokedexModule.insert(data)
-// you can immidiately access the inserted data
+// ✅ instead do NOT await
+pokedexModule.insert({ name: 'squirtle' })
+// you can immidiately access the inserted data (even if the remote store takes a while longer)
 pokedexModule.data.values()
-// the collection data will already have the new doc
 ```
 
 ### Insert with Custom ID
@@ -76,7 +73,7 @@ const pokedexModule = magnetar.collection('pokedex')
 
 const newId = generateId() // you have to implement this yourself
 
-pokedexModule.doc(newId).insert(data)
+pokedexModule.doc(newId).insert({ name: 'squirtle' })
 ```
 
 ## Delete a Document
@@ -189,8 +186,8 @@ const pokedexModule = magnetar.collection('pokedex')
 
 const newPokemon = [{ name: 'Flareon' }, { name: 'Vaporeon' }, { name: 'Jolteon' }]
 
-for (const data of newPokemon) {
-  pokedexModule.insert(data)
+for (const pkmn of newPokemon) {
+  pokedexModule.insert(pkmn)
 }
 ```
 

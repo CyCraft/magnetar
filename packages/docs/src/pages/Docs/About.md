@@ -19,9 +19,11 @@
 
 ## Learn by Example
 
-Here is a hypothetical example of a To Do list powered by Magnetar that uses the Vue 2 and Firestore plugins.
+Here is a hypothetical example of a To Do list powered by Magnetar that uses the Vue 3 and Firestore plugins.
 
-```js
+```html
+<script setup>
+import { onCreated, computed } from 'vue'
 // magnetar is instantiated with the firestore and vue 2 plugins
 // (See the Setup chapter)
 import { magnetar } from './my-magnetar-setup.js'
@@ -31,13 +33,52 @@ import { magnetar } from './my-magnetar-setup.js'
  */
 const todoItemsModule = magnetar.collection('todo-items')
 
+onCreated(() => {
+  // fetch all documents from Firestore & continue to watch for any changes
+  // will keep local data up to date when changes on database occur
+  todoItemsModule.stream()
+})
+
+/**
+ * Displays the local data of your module (data comes in via the stream)
+ */
+const items = computed(() => {
+  // in magnetar, the collection `.data` is a JS Map
+  return todoItemsModule.data.values()
+})
+
+/**
+ * Adds a new item to the local data & makes API call to Firestore
+ * UI is reflected automatically
+ */
+function addItem(newData) {
+  todoItemsModule.insert(newData)
+}
+
+/**
+ * Edits an item in the local data & makes API call to Firestore
+ * UI is reflected automatically
+ */
+function editItem(id, newData) {
+  todoItemsModule.doc(id).merge(newData)
+}
+
+/**
+ * Deletes an item from the local data & makes API call to Firestore
+ * UI is reflected automatically
+ */
+function deleteItem(id) {
+  todoItemsModule.delete(id)
+}
+
 // This example is the top level component representing a todo list
 // it holds the logic to display your UI and act on user interaction
+</script>
 
-Vue.component('TodoList', {
-  // the TodoItem and AddNewTodoItem are hypothetical UI components
-  // they should emit events based on user input
-  template: `<div>
+<template>
+  <!-- the TodoItem and AddNewTodoItem are hypothetical UI components -->
+  <!-- they should emit events based on user input -->
+  <div class="my-todo-list">
     <TodoItem
       v-for="item in items"
       :key="item.id"
@@ -50,46 +91,8 @@ Vue.component('TodoList', {
     <AddNewTodoItem
       @add-item="addItem"
     />
-  </div>`,
-
-  created() {
-    // fetch all documents from Firestore & continue to watch for any changes
-    // will keep local data up to date when changes on database occur
-    todoItemsModule.stream()
-  },
-  computed: {
-    /**
-     * Displays the local data of your module (data comes in via the stream)
-     */
-    items() {
-      // in magnetar, the collection `.data` is a JS Map
-      return todoItemsModule.data.values()
-    },
-  },
-  methods: {
-    /**
-     * Adds a new item to the local data & makes API call to Firestore
-     * UI is reflected automatically
-     */
-    addItem(newData) {
-      todoItemsModule.insert(newData)
-    },
-    /**
-     * Edits an item in the local data & makes API call to Firestore
-     * UI is reflected automatically
-     */
-    editItem(id, newData) {
-      todoItemsModule.doc(id).merge(newData)
-    },
-    /**
-     * Deletes an item from the local data & makes API call to Firestore
-     * UI is reflected automatically
-     */
-    deleteItem(id) {
-      todoItemsModule.delete(id)
-    },
-  },
-})
+  </div>
+</template>
 ```
 
 # Concepts

@@ -19,12 +19,12 @@ This is a complete setup example which uses:
 
 <!-- prettier-ignore-start -->
 ```javascript
+import { initializeApp } from 'firebase/app'
+import { getFirestore, collection, doc } from 'firebase/firestore'
+import { PluginFirestore, PluginVue3, Magnetar, logger } from 'magnetar'
 // ---------------------------------------------
 // 0. Initialise firebase
 // ---------------------------------------------
-import { initializeApp } from 'firebase/app'
-import { getFirestore, collection, doc } from 'firebase/firestore'
-
 const firebaseApp = initializeApp({ /* pass your config... */ })
 const db = getFirestore(firebaseApp)
 /**
@@ -34,26 +34,19 @@ function generateRandomId () { return doc(collection(db, 'random')).id }
 
 // ---------------------------------------------
 // 1. the plugin firestore for remote data store
+//    create the remote store plugin instance & pass your `db`:
 // ---------------------------------------------
-import { CreatePlugin as PluginFirestore } from '@magnetarjs/plugin-firestore'
-
-// create the remote store plugin instance & pass your `db`:
-const remote = PluginFirestore({ db })
+const remote = PluginFirestore.CreatePlugin({ db })
 
 // ---------------------------------------
-// 2. the plugin vue2 for local data store
+// 2. the plugin vue3 for local data store
+//    create the local store plugin instance & pass your `generateRandomId`:
 // ---------------------------------------
-import { CreatePlugin as PluginVue } from '@magnetarjs/plugin-vue2'
-
-// create the local store plugin instance & pass your `generateRandomId`:
-const local = PluginVue({ generateRandomId })
+const local = PluginVue3.CreatePlugin({ generateRandomId })
 
 // -----------------------------------------------------
 // 3. instantiate the Magnetar instance with the store plugins
 // -----------------------------------------------------
-import { Magnetar } from 'magnetar'
-import { logger } from '@magnetarjs/utils'
-
 export const magnetar = Magnetar({
   stores: { local, remote },
   localStoreName: 'local',

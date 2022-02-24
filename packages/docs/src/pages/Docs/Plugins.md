@@ -14,14 +14,14 @@ Example setup:
 
 <!-- prettier-ignore-start -->
 ```js
-import { CreatePlugin as PluginFirestore } from '@magnetarjs/plugin-firestore'
+import { PluginFirestore } from 'magnetar'
 import { initializeApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
 
 const firebaseApp = initializeApp({ /* pass your config... */ })
 const db = getFirestore(firebaseApp)
 
-const remote = PluginFirestore({ db })
+const remote = PluginFirestore.CreatePlugin({ db })
 ```
 <!-- prettier-ignore-end -->
 
@@ -34,7 +34,7 @@ Use the Vue 3 plugin for Vue 3 projects.
 Example setup:
 
 ```js
-import { CreatePlugin as PluginVue } from '@magnetarjs/plugin-vue3'
+import { PluginVue3 } from 'magnetar'
 
 function generateRandomId() {
   return [Math.random(), Math.random(), Math.random()].join('-')
@@ -42,7 +42,7 @@ function generateRandomId() {
   // this function is used when you execute `insert` without specifying an ID
 }
 
-const local = PluginVue({ generateRandomId })
+const local = PluginVue3.CreatePlugin({ generateRandomId })
 ```
 
 ## Vue 2
@@ -54,7 +54,7 @@ Use the Vue 2 plugin for Vue 2 projects.
 Example setup:
 
 ```js
-import { CreatePlugin as PluginVue } from '@magnetarjs/plugin-vue2'
+import { CreatePlugin as CreatePluginVue2 } from '@magnetarjs/plugin-vue2'
 import vue from 'vue'
 
 function generateRandomId() {
@@ -63,7 +63,7 @@ function generateRandomId() {
   // this function is used when you execute `insert` without specifying an ID
 }
 
-const local = PluginVue({ vueInstance: vue, generateRandomId })
+const local = CreatePluginVue2({ vueInstance: vue, generateRandomId })
 ```
 
 ## Simple Store
@@ -75,7 +75,7 @@ The Simple Store has no built-in reactivity. Good for a lightweight solution in 
 Example setup:
 
 ```js
-import { CreatePlugin as PluginSimpleStore } from '@magnetarjs/plugin-simple-store'
+import { PluginSimpleStore } from 'magnetar'
 
 function generateRandomId() {
   return [Math.random(), Math.random(), Math.random()].join('-')
@@ -83,5 +83,5 @@ function generateRandomId() {
   // this function is used when you execute `insert` without specifying an ID
 }
 
-const local = PluginSimpleStore({ generateRandomId })
+const local = PluginSimpleStore.CreatePlugin({ generateRandomId })
 ```
