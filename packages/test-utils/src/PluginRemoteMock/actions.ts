@@ -158,9 +158,6 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
   }: PluginStreamActionPayload<StorePluginModuleConfig>): Promise<StreamResponse | DoOnStream> {
     // this is custom logic to be implemented by the plugin author
 
-    // this mocks an error during execution
-    throwIfEmulatedError(payload, storePluginOptions)
-    
     // we'll mock opening a stream
     const dataRetrieved = !docId
       ? mockDataRetrieval(collectionPath, docId, pluginModuleConfig)
@@ -204,7 +201,11 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
       stopStreaming.stop = resolve
       setTimeout(() => {
         // this mocks an error during execution
-        throwIfEmulatedError(payload, storePluginOptions)
+        try {
+          throwIfEmulatedError(payload, storePluginOptions)
+        } catch (e) {
+          reject(e)
+        }
       }, 1)
     })
     function stop(): void {

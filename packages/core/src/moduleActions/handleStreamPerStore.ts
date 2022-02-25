@@ -162,20 +162,25 @@ export function handleStreamPerStore(
     }
     throwOnIncompleteStreamResponses(streamInfoPerStore, doOnStreamFns)
 
-    // handle caching the returned promises
-    const streamPromises = Object.values(streamInfoPerStore).map((res) => res.streaming)
-    // create a single stream promise from multiple stream promises the store plugins return
-    const streamPromise: Promise<void> = new Promise((resolve, reject) => {
-      Promise.all(streamPromises)
-        // todo: why can I not just write then(resolve)
-        .then(() => resolve())
-        .catch(reject)
-    })
     // create a function to closeStream from the stream of each store
     const closeStream = (): void => {
       Object.values(streamInfoPerStore).forEach(({ stop }) => stop())
       cacheStream(() => {}, null)
     }
+    // handle caching the returned promises
+    const streamPromises = Object.values(streamInfoPerStore).map((res) => res.streaming)
+    // create a single stream promise from multiple stream promises the store plugins return
+    const streamPromise: Promise<void> = new Promise((resolve, reject) => {
+      Promise.all(streamPromises)
+      .then(() => {
+          resolve()
+          closeStream()
+        })
+        .catch((e) => {
+          reject(e)
+          closeStream()
+        })
+    })
     cacheStream(closeStream, streamPromise)
     // return the stream promise
     return streamPromise

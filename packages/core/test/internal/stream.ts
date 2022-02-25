@@ -157,7 +157,9 @@ test('stream should not throw again after throwing once', async (t) => {
   }
   // the second time around the stream should NOT fail and open correctly
   t.deepEqual(pokedexModule.data.size, 1)
-  pokedexModule.stream()
+  // we expect this NOT to fail!!!
+  const streaming = pokedexModule.stream()
+  streaming.catch((e) => (t.fail(e.message)))
   await waitMs(600)
   // close the stream:
   pokedexModule.closeStream()
