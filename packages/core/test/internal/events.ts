@@ -17,7 +17,7 @@ test('delete: emits before & success events', async (t) => {
       },
     },
   })
-  t.is(ranAllEvents.length, 4)
+  t.deepEqual(ranAllEvents.length, 4)
 })
 
 test('insert: emits before & success events', async (t) => {
@@ -48,7 +48,7 @@ test('insert: emits before & success events', async (t) => {
       },
     },
   })
-  t.is(ranAllEvents.length, 4)
+  t.deepEqual(ranAllEvents.length, 4)
 })
 
 test('insert: can abort in before events', async (t) => {
@@ -102,5 +102,5 @@ test('insert: can abort in success events', async (t) => {
   } catch (error) {
     t.fail(JSON.stringify(error))
   }
-  t.is(ranAllEvents.length, 2)
+  t.deepEqual(ranAllEvents.length, 2)
 })

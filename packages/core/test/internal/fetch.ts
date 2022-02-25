@@ -6,7 +6,7 @@ test('read: fetch (collection)', async (t) => {
   // 'fetch' resolves once all stores have given a response with data
   const { pokedexModule } = createMagnetarInstance()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-  t.is(pokedexModule.data.size, 1)
+  t.deepEqual(pokedexModule.data.size, 1)
   try {
     const result = await pokedexModule.fetch({ force: true })
     t.deepEqual(result.get('1'), pokedex(1))
@@ -16,7 +16,7 @@ test('read: fetch (collection)', async (t) => {
   }
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.deepEqual(pokedexModule.data.get('136'), pokedex(136))
-  t.is(pokedexModule.data.size, 151)
+  t.deepEqual(pokedexModule.data.size, 151)
 })
 
 test('read: fetch (collection) — should fetch other docs when one throws errors', async (t) => {
@@ -31,7 +31,7 @@ test('read: fetch (collection) — should fetch other docs when one throws error
       pokedexModule.doc('137').fetch(),
     ])
   } catch (error) {
-    t.is(!!error, true)
+    t.deepEqual(!!error, true)
   }
   t.deepEqual(pokedexModule.data.get('135'), pokedex(135))
   t.deepEqual(pokedexModule.data.get('136'), undefined)
@@ -56,7 +56,7 @@ test('read: fetch (document) - prevent multiple fetch requests at the same time'
   }
 
   // make sure the remote store was only triggered once
-  t.is(storeNames.filter((n) => n === 'remote').length, 1)
+  t.deepEqual(storeNames.filter((n) => n === 'remote').length, 1)
 
   try {
     // fetch twice again the same time
@@ -66,7 +66,7 @@ test('read: fetch (document) - prevent multiple fetch requests at the same time'
   }
 
   // make sure the remote store was only triggered once more
-  t.is(storeNames.filter((n) => n === 'remote').length, 2)
+  t.deepEqual(storeNames.filter((n) => n === 'remote').length, 2)
 
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })
@@ -93,7 +93,7 @@ test('read: fetch (document) - optimistic fetch by default', async (t) => {
   }
 
   // make sure the remote store was only triggered once
-  t.is(storeNames.filter((n) => n === 'remote').length, 1)
+  t.deepEqual(storeNames.filter((n) => n === 'remote').length, 1)
 
   try {
     // fetch twice again the same time
@@ -103,7 +103,7 @@ test('read: fetch (document) - optimistic fetch by default', async (t) => {
   }
 
   // make sure the remote store was not triggered again
-  t.is(storeNames.filter((n) => n === 'remote').length, 1)
+  t.deepEqual(storeNames.filter((n) => n === 'remote').length, 1)
 
   t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })

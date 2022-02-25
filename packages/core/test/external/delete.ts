@@ -17,7 +17,7 @@ test('delete (document)', async (t) => {
 
 test('delete (collection)', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
-  t.is(pokedexModule.data.size, 1)
+  t.deepEqual(pokedexModule.data.size, 1)
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
 
   try {
@@ -25,7 +25,7 @@ test('delete (collection)', async (t) => {
   } catch (error) {
     t.fail(JSON.stringify(error))
   }
-  t.is(pokedexModule.data.size, 0)
+  t.deepEqual(pokedexModule.data.size, 0)
   t.deepEqual(pokedexModule.data.get('1'), undefined)
 })
 

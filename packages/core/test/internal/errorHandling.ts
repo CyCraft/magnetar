@@ -23,7 +23,7 @@ test('write + onError: stop -- emits fail events & aborts execution by default',
   } catch (error) {
     t.deepEqual(error, { message: 'failed', payload: insertPayload })
   }
-  t.is(pokedexModule.data.get('testid'), undefined)
+  t.deepEqual(pokedexModule.data.get('testid'), undefined)
 })
 
 test('write + onError: stop -- fail in second store plugin does not prevent execution first store plugin', async (t) => {
@@ -70,7 +70,7 @@ test('write + onError: continue', async (t) => {
   } catch (error) {
     t.fail(JSON.stringify(error))
   }
-  t.is(pokedexModule.data.get('testid'), undefined)
+  t.deepEqual(pokedexModule.data.get('testid'), undefined)
 })
 
 test('write + onError: revert', async (t) => {
@@ -82,7 +82,7 @@ test('write + onError: revert', async (t) => {
       on: {
         revert: ({ payload, result, actionName, storeName }) => {
           if (storeName === 'local') {
-            t.is(actionName, 'insert')
+            t.deepEqual(actionName, 'insert')
           }
         },
         before: ({ storeName }) => {
@@ -99,7 +99,7 @@ test('write + onError: revert', async (t) => {
   } catch (error) {
     t.truthy(error)
   }
-  t.is(pokedexModule.data.get('testid'), undefined)
+  t.deepEqual(pokedexModule.data.get('testid'), undefined)
 })
 
 test('write + onError: revert - will not go to next store', async (t) => {
@@ -127,7 +127,7 @@ test('write + onError: revert - will not go to next store', async (t) => {
   } catch (error) {
     t.truthy(error)
   }
-  t.is(pokedexModule.data.get('testid'), undefined)
+  t.deepEqual(pokedexModule.data.get('testid'), undefined)
 })
 
 test('fetch + onError: stop -- emits fail events & aborts execution by default', async (t) => {

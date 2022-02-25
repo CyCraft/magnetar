@@ -157,8 +157,11 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
     mustExecuteOnRead,
   }: PluginStreamActionPayload<StorePluginModuleConfig>): Promise<StreamResponse | DoOnStream> {
     // this is custom logic to be implemented by the plugin author
-    // we'll mock opening a stream
 
+    // this mocks an error during execution
+    throwIfEmulatedError(payload, storePluginOptions)
+    
+    // we'll mock opening a stream
     const dataRetrieved = !docId
       ? mockDataRetrieval(collectionPath, docId, pluginModuleConfig)
       : [

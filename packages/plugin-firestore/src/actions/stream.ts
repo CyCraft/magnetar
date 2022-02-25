@@ -28,11 +28,11 @@ export function streamActionFactory(
       resolveStream = resolve
       rejectStream = reject
     })
-    let closeStreamStream: any
+    let closeStream: any
     // in case of a doc module
     if (docId) {
       const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
-      closeStreamStream = onSnapshot(
+      closeStream = onSnapshot(
         doc(db, documentPath),
         (docSnapshot: DocumentSnapshot) => {
           const localChange = docSnapshot.metadata.hasPendingWrites
@@ -52,7 +52,7 @@ export function streamActionFactory(
     else if (!docId) {
       const _collectionPath = getFirestoreCollectionPath(collectionPath, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
       const queryInstance = getQueryInstance(_collectionPath, pluginModuleConfig, db)
-      closeStreamStream = onSnapshot(
+      closeStream = onSnapshot(
         queryInstance,
         (querySnapshot: QuerySnapshot) => {
           // do nothing for local changes
@@ -79,7 +79,7 @@ export function streamActionFactory(
     }
     function stop(): void {
       if (resolveStream) resolveStream()
-      closeStreamStream()
+      closeStream()
     }
     return { stop, streaming }
   }

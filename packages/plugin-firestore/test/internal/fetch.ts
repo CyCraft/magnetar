@@ -25,7 +25,7 @@ import { pokedex, waitMs } from '@magnetarjs/test-utils'
           modifyReadResponseOn: {
             added: (docData: any, docMetadata: DocMetadata) => {
               t.deepEqual(docData, undefined)
-              t.is(docMetadata.exists, false)
+              t.deepEqual(docMetadata.exists, false)
             },
           },
         }

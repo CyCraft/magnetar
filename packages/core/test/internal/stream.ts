@@ -6,7 +6,7 @@ import { isPromise } from 'is-what'
 test('stream (collection)', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-  t.is(pokedexModule.data.size, 1)
+  t.deepEqual(pokedexModule.data.size, 1)
   // do not await, because it only resolves when the stream is closed
   pokedexModule.stream().catch((e: any) => t.fail(e.message)) // prettier-ignore
   await waitMs(600)
@@ -16,9 +16,9 @@ test('stream (collection)', async (t) => {
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.deepEqual(pokedexModule.data.get('2'), pokedex(2))
   t.deepEqual(pokedexModule.data.get('3'), pokedex(3))
-  t.is(pokedexModule.data.size, 3)
+  t.deepEqual(pokedexModule.data.size, 3)
   await waitMs(1000)
-  t.is(pokedexModule.data.size, 3)
+  t.deepEqual(pokedexModule.data.size, 3)
   // '4': charmander should come in next, but doesn't because we closed the stream
 })
 
@@ -105,7 +105,7 @@ test('stream (doc) but updating multiple times in between stream', async (t) => 
 // test('stream (collection) edit right before opening', async (t) => {
 //   const { pokedexModule } = createMagnetarInstance()
 //   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-//   t.is(pokedexModule.data.size, 1)
+//   t.deepEqual(pokedexModule.data.size, 1)
 //   pokedexModule.doc('1').merge({ name: 'B' })
 //   pokedexModule.stream().catch((e: any) => t.fail(e.message)) // prettier-ignore
 //   await waitMs(220)
@@ -132,4 +132,34 @@ test('stream (collection) where-filter stream doesnt affect base collection', as
 
   collection.closeStream()
   t.deepEqual(collection.streaming(), null)
+})
+
+test('stream should throw', async (t) => {
+  const { pokedexModule } = createMagnetarInstance()
+  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  t.deepEqual(pokedexModule.data.size, 1)
+  try {
+    // we expect this to fail, so we can await the throw
+    await pokedexModule.stream({ shouldFail: 'remote' })
+  } catch (e: any) {
+    t.deepEqual(e.message, 'failed')
+  }
+})
+
+test('stream should not throw again after throwing once', async (t) => {
+  const { pokedexModule } = createMagnetarInstance()
+  t.deepEqual(pokedexModule.data.size, 1)
+  try {
+    // we expect this to fail, so we can await the throw
+    await pokedexModule.stream({ shouldFail: 'remote' })
+  } catch (e: any) {
+    t.deepEqual(e.message, 'failed')
+  }
+  // the second time around the stream should NOT fail and open correctly
+  t.deepEqual(pokedexModule.data.size, 1)
+  pokedexModule.stream()
+  await waitMs(600)
+  // close the stream:
+  pokedexModule.closeStream()
+  t.deepEqual(pokedexModule.data.size, 3)
 })

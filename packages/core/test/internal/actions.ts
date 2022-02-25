@@ -107,7 +107,7 @@ test('read: fetch (collection)', async (t) => {
   // 'fetch' resolves once all stores have given a response with data
   const { pokedexModule } = createMagnetarInstance()
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-  t.is(pokedexModule.data.size, 1)
+  t.deepEqual(pokedexModule.data.size, 1)
   try {
     const result = await pokedexModule.fetch({ force: true })
     t.deepEqual(result.get('1'), pokedex(1))
@@ -117,7 +117,7 @@ test('read: fetch (collection)', async (t) => {
   }
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   t.deepEqual(pokedexModule.data.get('136'), pokedex(136))
-  t.is(pokedexModule.data.size, 151)
+  t.deepEqual(pokedexModule.data.size, 151)
 })
 
 test('read: fetch (document)', async (t) => {

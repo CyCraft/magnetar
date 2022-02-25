@@ -26,7 +26,7 @@ import test from 'ava'
 //   // should have not yet re-run
 //   t.deepEqual(ranFns, ['ran'])
 //   // should NOT HAVE updated value because `allPokemon` is not reactive.
-//   t.is(vue.bulbasaurComputed.name, 'bulbasaur!')
+//   t.deepEqual(vue.bulbasaurComputed.name, 'bulbasaur!')
 //   // should NOT HAVE re-run because `allPokemon` is not reactive.
 //   t.deepEqual(ranFns, ['ran'])
 // })
@@ -56,7 +56,7 @@ import test from 'ava'
 //   // should have not yet re-run
 //   t.deepEqual(ranFns, ['ran'])
 //   // check
-//   t.is(vue.bulbasaurComputed.name, 'Bsaur!')
+//   t.deepEqual(vue.bulbasaurComputed.name, 'Bsaur!')
 //   // now it should have re-run
 //   t.deepEqual(ranFns, ['ran', 'ran'])
 // })
@@ -83,7 +83,7 @@ import test from 'ava'
 //   // should have not yet re-run
 //   t.deepEqual(ranFns, ['ran'])
 //   // check
-//   t.is(vue.bulbasaurComputed.name, 'Bsaur!')
+//   t.deepEqual(vue.bulbasaurComputed.name, 'Bsaur!')
 //   // now it should have re-run
 //   t.deepEqual(ranFns, ['ran', 'ran'])
 // })
@@ -106,8 +106,8 @@ import test from 'ava'
 //     },
 //   })
 
-//   t.is(vue.dataComputed.name, 'Luca!')
-//   t.is(vue.dataComputed.name, 'Luca!')
+//   t.deepEqual(vue.dataComputed.name, 'Luca!')
+//   t.deepEqual(vue.dataComputed.name, 'Luca!')
 //   // should have only ran once
 //   t.deepEqual(ranFns, ['ran'])
 //   // update from the outside
@@ -115,8 +115,8 @@ import test from 'ava'
 //   // should have not yet re-run
 //   t.deepEqual(ranFns, ['ran'])
 //   // check
-//   t.is(vue.dataComputed.name, 'LUCA!')
-//   t.is(vue.dataComputed.dream, undefined)
+//   t.deepEqual(vue.dataComputed.name, 'LUCA!')
+//   t.deepEqual(vue.dataComputed.dream, undefined)
 //   // now it should have re-run
 //   t.deepEqual(ranFns, ['ran', 'ran'])
 //   // get data from server
@@ -125,9 +125,9 @@ import test from 'ava'
 //   // so a fetch() call should reset the name back to 'Luca'
 //   t.deepEqual(trainerModule.data, { name: 'Luca', dream: 'job', age: 10 })
 
-//   t.is(vue.dataComputed.name, 'Luca!')
-//   t.is(vue.dataComputed.dream, 'job')
-//   t.is(vue.dataComputed.age, 10)
+//   t.deepEqual(vue.dataComputed.name, 'Luca!')
+//   t.deepEqual(vue.dataComputed.dream, 'job')
+//   t.deepEqual(vue.dataComputed.age, 10)
 //   // now it should have re-run
 //   t.deepEqual(ranFns, ['ran', 'ran', 'ran'])
 // })
@@ -150,8 +150,8 @@ import test from 'ava'
 //     },
 //   })
 
-//   t.is(vue.dataComputed.name, 'Luca!')
-//   t.is(vue.dataComputed.name, 'Luca!')
+//   t.deepEqual(vue.dataComputed.name, 'Luca!')
+//   t.deepEqual(vue.dataComputed.name, 'Luca!')
 //   // should have only ran once
 //   t.deepEqual(ranFns, ['ran'])
 //   // update from the outside
@@ -160,8 +160,8 @@ import test from 'ava'
 //   // should have not yet re-run
 //   t.deepEqual(ranFns, ['ran'])
 //   // check
-//   t.is(vue.dataComputed.name, 'LUCA!')
-//   t.is(vue.dataComputed.dream, undefined)
+//   t.deepEqual(vue.dataComputed.name, 'LUCA!')
+//   t.deepEqual(vue.dataComputed.dream, undefined)
 //   // // now it should have re-run
 //   t.deepEqual(ranFns, ['ran', 'ran'])
 //   // // get data from server
@@ -171,9 +171,9 @@ import test from 'ava'
 //   t.deepEqual(trainerModule.data, { name: 'Luca', dream: 'job', age: 10 })
 //   t.deepEqual(ranFns, ['ran', 'ran'])
 
-//   t.is(vue.dataComputed.name, 'Luca!')
-//   t.is(vue.dataComputed.dream, 'job')
-//   t.is(vue.dataComputed.age, 10)
+//   t.deepEqual(vue.dataComputed.name, 'Luca!')
+//   t.deepEqual(vue.dataComputed.dream, 'job')
+//   t.deepEqual(vue.dataComputed.age, 10)
 //   // now it should have re-run
 //   t.deepEqual(ranFns, ['ran', 'ran', 'ran'])
 // })
@@ -199,12 +199,12 @@ import test from 'ava'
 //   a = vue.allPokemon
 //   // should have only ran once
 //   t.deepEqual(ranFns, ['countPokemon', 'allPokemon'])
-//   t.is(vue.countPokemon, 1)
+//   t.deepEqual(vue.countPokemon, 1)
 //   // update
 //   pokedexModule.insert(pokedex(4))
 //   a = vue.countPokemon
 //   a = vue.allPokemon
-//   t.is(vue.countPokemon, 2)
+//   t.deepEqual(vue.countPokemon, 2)
 //   t.deepEqual(ranFns, ['countPokemon', 'allPokemon', 'countPokemon', 'allPokemon'])
 //   // check pokedexModule directly
 // })
@@ -243,10 +243,10 @@ import test from 'ava'
 // //   a = vue.bulbasaurDirect
 // //   // t.deepEqual(ranFns, ['bulbasaurDirect', 'allPokemon', 'bulbasaurDirect'])
 // //   // check pokedexModule directly
-// //   t.is(pokedexModule.doc('1').data.name, 'Bsaur')
-// //   t.is(pokedexModule.data.get('1')?.name, 'Bsaur')
+// //   t.deepEqual(pokedexModule.doc('1').data.name, 'Bsaur')
+// //   t.deepEqual(pokedexModule.data.get('1')?.name, 'Bsaur')
 // //   console.log(vue.bulbasaurDirect.name)
-// //   t.is(vue.bulbasaurDirect.name, 'Bsaur')
-// //   t.is(vue.bulbasaur.name, 'Bsaur')
+// //   t.deepEqual(vue.bulbasaurDirect.name, 'Bsaur')
+// //   t.deepEqual(vue.bulbasaur.name, 'Bsaur')
 // //   t.deepEqual(ranFns, ['bulbasaurDirect', 'allPokemon', 'bulbasaurDirect', 'bulbasaur'])
 // // })

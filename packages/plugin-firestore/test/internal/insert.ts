@@ -24,7 +24,7 @@ import { DocInstance } from '../../../core/src'
       if (settled.status === 'rejected') error = settled.reason
     })
     // check if definitely the error occured
-    t.is(error?.code, 'invalid-argument')
+    t.deepEqual(error?.code, 'invalid-argument')
 
     // none should have succeeded
     // one bad payload and the entire batch fails!
