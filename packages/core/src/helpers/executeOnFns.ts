@@ -8,7 +8,7 @@ type AnyFunction = (...args: any[]) => any
  * @param {any[]} args
  * @returns {void}
  */
-export function executeOnFns<Payload extends any>(
+export function executeOnFns<Payload>(
   fns: AnyFunction[],
   payload: Payload,
   otherArgs: any[]
