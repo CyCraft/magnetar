@@ -19,6 +19,32 @@ test('read: fetch (collection)', async (t) => {
   t.deepEqual(pokedexModule.data.size, 151)
 })
 
+test('read: fetch (collection) — should throw error', async (t) => {
+  const { pokedexModule } = createMagnetarInstance()
+  try {
+    await pokedexModule.doc('136').fetch({ shouldFail: 'remote' })
+  } catch (error) {
+    t.deepEqual(!!error, true)
+  }
+})
+
+test('read: fetch (collection) — should fetch again after one error', async (t) => {
+  const { pokedexModule } = createMagnetarInstance()
+  t.deepEqual(pokedexModule.data.get('136'), undefined)
+  try {
+    await pokedexModule.doc('136').fetch({ shouldFail: 'remote' })
+  } catch (error) {
+    t.deepEqual(!!error, true)
+  }
+  t.deepEqual(pokedexModule.data.get('136'), undefined)
+  try {
+    await pokedexModule.doc('136').fetch()
+  } catch (error) {
+    t.deepEqual(!!error, false)
+  }
+  t.deepEqual(pokedexModule.data.get('136'), pokedex(136))
+})
+
 test('read: fetch (collection) — should fetch other docs when one throws errors', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   t.deepEqual(pokedexModule.data.get('135'), undefined)
