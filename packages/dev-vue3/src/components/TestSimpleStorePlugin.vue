@@ -2,6 +2,7 @@
   <div class="test">
     <h6>simple store doesn't work:</h6>
     <TodoApp @add="addItem" @edit="editItem" @delete="deleteItem" :items="items" />
+    
     <h6>quick playground integration:</h6>
     <TodoApp @add="addItemManual" :items="itemsManual" />
   </div>
@@ -15,7 +16,7 @@ import { reactive, computed, defineComponent } from 'vue'
 import { magnetar } from '../magnetarSimpleStore'
 import TodoApp from './TodoApp.vue'
 
-type Item = { title: string; id: string }
+type Item = { title: string; id: string; isDone: boolean }
 
 const itemsModule = magnetar.collection<Item>('items')
 const itemsModuleManual = {

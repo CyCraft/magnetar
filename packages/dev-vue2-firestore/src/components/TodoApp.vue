@@ -66,7 +66,7 @@
 </style>
 
 <script>
-// type Item = { title: string; isDone: boolean; id: string }
+// type Item = { title: string; id: string; isDone: boolean }
 
 export default {
   name: 'TodoApp',

@@ -3,7 +3,7 @@
 // ---------------------------------------
 import { Magnetar, PluginVue3 } from 'magnetar'
 
-const generateRandomId = () => Math.random().toString()
+export const generateRandomId = () => Math.random().toString()
 
 // create the local store plugin instance:
 const local = PluginVue3.CreatePlugin({ generateRandomId })

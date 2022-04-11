@@ -68,7 +68,7 @@
 <script lang="ts">
 import { defineComponent, ref, PropType } from 'vue'
 
-type Item = { title: string; isDone: boolean; id: string }
+type Item = { title: string; id: string; isDone: boolean }
 
 export default defineComponent({
   name: 'TodoApp',
@@ -78,7 +78,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const newItem = ref('')
     function addItem() {
-      const payload: Item = { title: newItem.value, isDone: false, id: `${Math.random()}` }
+      const payload: Item = { title: newItem.value, isDone: false, id: '' }
       emit('add', payload)
       newItem.value = ''
     }

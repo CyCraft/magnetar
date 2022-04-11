@@ -7,7 +7,12 @@
       <label for="order" style="padding-left: 1rem">alphabetically</label>
       <input type="checkbox" name="" v-model="alphabetically" id="order" />
     </div>
-    <TodoApp @add="addItem" @edit="editItem" @delete="deleteItem" :items="items" />
+    <TodoApp
+      @add="addItem"
+      @edit="editItem"
+      @delete="deleteItem"
+      :items="items"
+    />
   </div>
 </template>
 
@@ -16,36 +21,49 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue'
-import { magnetar } from '../magnetarVue3'
+import { magnetar, generateRandomId } from '../magnetarVue3'
 import TodoApp from './TodoApp.vue'
 
-type Item = { title: string; id: string }
+type Item = { title: string; id: string; isDone: boolean }
 
-const itemsModule = magnetar.collection<Item>('items')
+const itemsModule = magnetar.collection<Item>('magnetarTests/dev-firestore/items')
 
 export default defineComponent({
   components: { TodoApp },
   props: {},
+  created() {
+    itemsModule.stream()
+  },
   setup() {
+    /** Item count */
+    const size = computed(() => itemsModule.data.size)
+
+    /** Options to filter items */
     const showAll = ref(true)
     const alphabetically = ref(false)
 
-    const size = computed(() => itemsModule.data.size)
+    /** The items shown based on the filter */
     const items = computed(() => {
       const _showAll = showAll.value
       const _alphabetically = alphabetically.value
-      const _module =
-        _showAll && _alphabetically
-          ? itemsModule.orderBy('title')
-          : _showAll && !_alphabetically
-          ? itemsModule
-          : !_showAll && _alphabetically
-          ? itemsModule.where('isDone', '==', false).orderBy('title')
-          : itemsModule.where('isDone', '==', false)
+
+      let _module: typeof itemsModule = itemsModule
+
+      if (_showAll && _alphabetically) {
+        _module = itemsModule.orderBy('title')
+      }
+      if (!_showAll && _alphabetically) {
+        _module = itemsModule.where('isDone', '==', false).orderBy('title')
+      }
+      if (!_showAll && !_alphabetically) {
+        _module = itemsModule.where('isDone', '==', false)
+      }
+
       return [..._module.data.values()]
     })
 
     function addItem(item: Item) {
+      item.id = generateRandomId()
       console.log(`add item → `, item)
       itemsModule.insert(item)
     }
@@ -60,7 +78,7 @@ export default defineComponent({
       itemsModule.delete(item.id)
     }
 
-    return { size, items, addItem, editItem, deleteItem, showAll, alphabetically }
+    return { size, items, addItem, editItem, deleteItem, showAll, alphabetically, generateRandomId }
   },
 })
 </script>

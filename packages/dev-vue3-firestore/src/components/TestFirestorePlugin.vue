@@ -12,7 +12,6 @@
       @edit="editItem"
       @delete="deleteItem"
       :items="items"
-      :generateRandomId="generateRandomId"
     />
   </div>
 </template>
@@ -25,7 +24,7 @@ import { computed, defineComponent, ref } from 'vue'
 import { magnetar, generateRandomId } from '../magnetar'
 import TodoApp from './TodoApp.vue'
 
-type Item = { title: string; id: string, nested?: { test: number } }
+type Item = { title: string; id: string; isDone: boolean }
 
 const itemsModule = magnetar.collection<Item>('magnetarTests/dev-firestore/items')
 
@@ -54,7 +53,7 @@ export default defineComponent({
         _module = itemsModule.orderBy('title')
       }
       if (!_showAll && _alphabetically) {
-        _module = itemsModule.where('e', '==', false).orderBy('title')
+        _module = itemsModule.where('isDone', '==', false).orderBy('title')
       }
       if (!_showAll && !_alphabetically) {
         _module = itemsModule.where('isDone', '==', false)
@@ -64,6 +63,7 @@ export default defineComponent({
     })
 
     function addItem(item: Item) {
+      item.id = generateRandomId()
       console.log(`add item → `, item)
       itemsModule.insert(item)
     }
