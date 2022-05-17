@@ -2,6 +2,7 @@ import { Clauses } from '@magnetarjs/core'
 import { isNumber, isArray } from 'is-what'
 import { getProp } from 'path-to-prop'
 import { sort, ISortByObjectSorter } from 'fast-sort'
+import { parseValueForFilters } from '@magnetarjs/utils'
 
 /**
  * Filters a Collection module's data based on provided clauses.
@@ -22,7 +23,7 @@ export function filterDataPerClauses(
   Object.entries(collectionDB).forEach(([docId, docData]) => {
     const passesWhereFilters = where.every((whereQuery) => {
       const [fieldPath, operator, expectedValue] = whereQuery
-      const valueAtFieldPath = getProp(docData, fieldPath) as any
+      const valueAtFieldPath = parseValueForFilters(getProp(docData, fieldPath) as any)
       let passes = false
       switch (operator) {
         case '==':

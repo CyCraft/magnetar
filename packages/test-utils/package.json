@@ -19,6 +19,7 @@
     "rimraf": "^3.0.2"
   },
   "dependencies": {
+    "@magnetarjs/utils": "^0.1.22",
     "copy-anything": "^2.0.3",
     "fast-sort": "^3.1.1",
     "filter-anything": "^2.2.1",
