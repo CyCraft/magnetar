@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/plugin-simple-store",
-  "version": "0.1.22",
+  "version": "0.1.23",
   "sideEffects": false,
   "description": "Magnetar plugin simple store",
   "main": "dist/index.cjs.js",
@@ -18,8 +18,8 @@
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
-    "@magnetarjs/core": "^0.3.4",
-    "@magnetarjs/utils": "^0.1.22",
+    "@magnetarjs/core": "^0.3.5",
+    "@magnetarjs/utils": "^0.1.23",
     "copy-anything": "^2.0.3",
     "fast-sort": "^3.1.1",
     "filter-anything": "^2.2.1",
@@ -29,7 +29,7 @@
     "ts-toolbelt": "^9.6.0"
   },
   "devDependencies": {
-    "@magnetarjs/test-utils": "^0.1.15",
+    "@magnetarjs/test-utils": "^0.1.16",
     "browser-env": "^3.3.0"
   },
   "keywords": [

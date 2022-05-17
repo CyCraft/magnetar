@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/plugin-vue3",
-  "version": "0.1.23",
+  "version": "0.1.24",
   "sideEffects": false,
   "description": "Magnetar plugin vue3",
   "main": "dist/index.cjs.js",
@@ -21,8 +21,8 @@
     "vue": "^3.2.0"
   },
   "dependencies": {
-    "@magnetarjs/core": "^0.3.4",
-    "@magnetarjs/utils": "^0.1.22",
+    "@magnetarjs/core": "^0.3.5",
+    "@magnetarjs/utils": "^0.1.23",
     "copy-anything": "^2.0.3",
     "fast-sort": "^3.1.1",
     "filter-anything": "^2.2.1",
@@ -32,7 +32,7 @@
     "ts-toolbelt": "^9.6.0"
   },
   "devDependencies": {
-    "@magnetarjs/test-utils": "^0.1.15",
+    "@magnetarjs/test-utils": "^0.1.16",
     "vue": "^3.2.26"
   },
   "keywords": [
