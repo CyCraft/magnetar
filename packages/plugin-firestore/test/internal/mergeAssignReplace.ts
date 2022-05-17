@@ -4,7 +4,7 @@ import { pokedex } from '@magnetarjs/test-utils'
 import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 
 {
-  const testName = 'only:merge — empty objects are filtred out'
+  const testName = 'merge — empty objects are filtred out'
   test(testName, async (t) => {
     const { pokedexModule } = await createMagnetarInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
@@ -36,7 +36,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
   })
 }
 {
-  const testName = 'only:merge — empty objects are filtred out — multiple writes'
+  const testName = 'merge — empty objects are filtred out — multiple writes'
   test(testName, async (t) => {
     const { pokedexModule } = await createMagnetarInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
