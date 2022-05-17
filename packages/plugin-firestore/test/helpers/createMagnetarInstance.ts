@@ -1,4 +1,4 @@
-import { doc, setDoc, deleteDoc } from 'firebase/firestore'
+import { doc, setDoc, deleteDoc, Timestamp } from 'firebase/firestore'
 import { O } from 'ts-toolbelt'
 import { PokedexEntry, generateRandomId, PluginMockLocal } from '@magnetarjs/test-utils'
 import { Magnetar, MagnetarInstance, CollectionInstance, DocInstance } from '../../../core/src'
@@ -27,6 +27,8 @@ export type TrainerModuleData = {
   colour?: string
 }
 
+export type DateDoc = { date: Timestamp | Date | null }
+
 const testNamesUsedSoFar: string[] = []
 
 export async function createMagnetarInstance(
@@ -40,6 +42,7 @@ export async function createMagnetarInstance(
   } = {}
 ): Promise<{
   pokedexModule: CollectionInstance<PokedexModuleData>
+  datesModule: CollectionInstance<DateDoc>
   trainerModule: DocInstance<TrainerModuleData>
   magnetar: MagnetarInstance
 }> {
@@ -73,6 +76,7 @@ export async function createMagnetarInstance(
       delete: ['local', 'remote'],
     },
   })
+
   const pokedexModule = magnetar.collection<PokedexModuleData>('pokedex', {
     configPerStore: {
       local: { initialData: initialEntriesPokedex },
@@ -86,5 +90,12 @@ export async function createMagnetarInstance(
       remote: { firestorePath: `magnetarTests/${testName}`, ...remoteConfig },
     },
   })
-  return { pokedexModule, trainerModule, magnetar }
+
+  const datesModule = magnetar.collection<DateDoc>('dateTests', {
+    configPerStore: {
+      remote: { firestorePath: `magnetarTests/_dateTests/${testName}`, ...remoteConfig },
+    },
+  })
+
+  return { pokedexModule, trainerModule, datesModule, magnetar }
 }
