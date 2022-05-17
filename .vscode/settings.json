@@ -1,0 +1,30 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[javascript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[vue]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[sass]": { "editor.defaultFormatter": "syler.sass-indented" },
+  // monorepo / workspace related
+  "eslint.workingDirectories": [{ "pattern": "./packages/*/" }],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
+  // disable conflicting formatting
+  "javascript.validate.enable": false,
+  "typescript.format.enable": false,
+  // emmet related
+  "emmet.triggerExpansionOnTab": true,
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact",
+    "vue-html": "html",
+    "vue": "html"
+  },
+  // global important defaults
+  "editor.tabSize": 2, // make sure this is the same as .prettierrc
+  "files.trimFinalNewlines": true,
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "editor.insertSpaces": true,
+  // gitlens
+  "gitlens.defaultTimeFormat": "HH:mm",
+  "gitlens.codeLens.enabled": false
+}
