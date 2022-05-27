@@ -153,7 +153,7 @@ const bulbasaur = pokedexModule.doc('001')
 
 // bulbasaur.data ≈ { name: 'bulbasaur', types: { grass: true } }
 
-bulbasaur.merge({ types: { poison: true } })
+bulbasaur.assign({ types: { poison: true } })
 
 // bulbasaur.data ≈ { name: 'bulbasaur', types: { poison: true } }
 ```
