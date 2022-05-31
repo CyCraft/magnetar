@@ -63,6 +63,7 @@ export type ModuleConfig = {
   where?: WhereClause[]
   orderBy?: OrderByClause[]
   limit?: Limit
+  startAfter?: any[]
   executionOrder?: ExecutionOrderConfig
   onError?: 'revert' | 'continue' | 'stop'
   modifyPayloadOn?: ModifyPayloadFnMap

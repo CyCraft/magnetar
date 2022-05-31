@@ -53,6 +53,7 @@ export interface FirestoreModuleConfig {
   orderBy?: OrderByClause[]
   limit?: Limit
   syncDebounceMs?: number
+  startAfter?: [string, any]
 }
 
 function firestorePluginOptionsWithDefaults(

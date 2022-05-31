@@ -15,3 +15,5 @@ dist
 *.ntvs*
 *.njsproj
 *.sln
+
+.turbo

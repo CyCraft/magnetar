@@ -21,8 +21,8 @@
     "vue": "^3.2.0"
   },
   "dependencies": {
-    "@magnetarjs/core": "^0.3.5",
-    "@magnetarjs/utils": "^0.1.23",
+    "@magnetarjs/core": "workspace:*",
+    "@magnetarjs/utils": "workspace:*",
     "copy-anything": "^2.0.3",
     "fast-sort": "^3.1.1",
     "filter-anything": "^2.2.1",
@@ -32,7 +32,7 @@
     "ts-toolbelt": "^9.6.0"
   },
   "devDependencies": {
-    "@magnetarjs/test-utils": "^0.1.16",
+    "@magnetarjs/test-utils": "workspace:*",
     "vue": "^3.2.26"
   },
   "keywords": [

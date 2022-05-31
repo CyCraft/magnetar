@@ -16,7 +16,6 @@
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
-    "@magnetarjs/core": "^0.3.5",
     "is-what": "^3.14.1"
   },
   "keywords": [

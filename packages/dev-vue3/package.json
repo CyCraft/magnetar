@@ -7,7 +7,7 @@
     "build--": "vuedx-typecheck . && vite build"
   },
   "dependencies": {
-    "magnetar": "^0.5.6",
+    "magnetar": "workspace:*",
     "vue": "^3.2.26"
   },
   "devDependencies": {

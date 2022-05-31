@@ -18,8 +18,8 @@
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
-    "@magnetarjs/core": "^0.3.5",
-    "@magnetarjs/utils": "^0.1.23",
+    "@magnetarjs/core": "workspace:*",
+    "@magnetarjs/utils": "workspace:*",
     "copy-anything": "^2.0.3",
     "fast-sort": "^3.1.1",
     "filter-anything": "^2.2.1",

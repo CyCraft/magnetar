@@ -7,11 +7,11 @@
   "module": "dist/index.esm.js",
   "types": "dist/types/index.d.ts",
   "scripts": {
-    "build": "npm run rollup",
+    "build": "rollup -c build.js",
+    "dev": "pnpm build --watch",
     "test-and-build": "npm run test && npm run build",
     "test": "firebase emulators:exec \"ts-node ./test/helpers/scripts/execAllTests.ts\"",
-    "test--only": "firebase emulators:exec \"ts-node ./test/helpers/scripts/execAllTestsOnly.ts\"",
-    "rollup": "rimraf dist && rollup -c build.js"
+    "test--only": "firebase emulators:exec \"ts-node ./test/helpers/scripts/execAllTestsOnly.ts\""
   },
   "author": "Luca Ban - Mesqueeb",
   "funding": "https://github.com/sponsors/mesqueeb",
@@ -21,7 +21,7 @@
     "firebase": "^9.5.0"
   },
   "dependencies": {
-    "@magnetarjs/core": "^0.3.5",
+    "@magnetarjs/core": "workspace:*",
     "flatten-anything": "^2.0.4",
     "is-what": "^3.14.1",
     "remove-anything": "^0.1.0",

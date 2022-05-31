@@ -5,7 +5,7 @@ import type {
   DocumentSnapshot,
   QueryDocumentSnapshot,
 } from 'firebase/firestore'
-import { collection, query, where, orderBy, limit } from 'firebase/firestore'
+import { collection, query, where, orderBy, limit, startAfter } from 'firebase/firestore'
 import { isNumber } from 'is-what'
 import { FirestoreModuleConfig } from '../CreatePlugin'
 import { DocMetadata } from '@magnetarjs/core'
@@ -25,6 +25,9 @@ export function getQueryInstance(
   }
   if (isNumber(config.limit)) {
     q = query(q, limit(config.limit))
+  }
+  if (config.startAfter) {
+    q = query(q, startAfter(...config.startAfter))
   }
   return q
 }

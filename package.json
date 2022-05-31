@@ -10,7 +10,7 @@
     "dev:vue3-firestore": "npm run dev -w=dev-vue3-firestore",
     "dev:docs": "cd packages/docs && npm run dev",
     "build:favicon": "copyfiles media/* packages/docs/public && cd packages/docs && npm run build:favicon",
-    "build": "lerna run build",
+    "build": "pnpm -r build",
     "build-and-commit": "npm run build && git add -A && git commit -m \"chore: build\"",
     "test": "npm run test:core && npm run test:plugin-firestore && npm run test:plugin-simple-store && npm run test:plugin-vue2 && npm run test:plugin-vue3",
     "test:core": "cd packages/core && npm run test",
@@ -45,6 +45,7 @@
     "rollup-plugin-typescript2": "^0.31.1",
     "ts-node": "^10.4.0",
     "tslib": "^2.3.1",
+    "turbo": "^1.2.14",
     "typescript": "^4.5.4"
   },
   "author": "Luca Ban - Mesqueeb",
