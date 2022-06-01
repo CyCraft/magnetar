@@ -3,11 +3,11 @@
   "version": "0.3.22",
   "sideEffects": false,
   "description": "Magnetar plugin firestore",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
-  "types": "dist/types/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rollup -c build.js",
+    "build": "tsup src/index.ts --format esm,cjs --dts",
     "dev": "pnpm build --watch",
     "test-and-build": "npm run test && npm run build",
     "test": "firebase emulators:exec \"ts-node ./test/helpers/scripts/execAllTests.ts\"",
@@ -25,10 +25,12 @@
     "flatten-anything": "^2.0.4",
     "is-what": "^3.14.1",
     "remove-anything": "^0.1.0",
-    "ts-toolbelt": "^9.6.0"
+    "ts-toolbelt": "^9.6.0",
+    "merge-anything": "^5.0.2"
   },
   "devDependencies": {
-    "@magnetarjs/test-utils": "^0.1.16"
+    "@magnetarjs/test-utils": "^0.1.16",
+    "firebase": "^9.5.0"
   },
   "keywords": [
     "magnetar-plugin",

@@ -103,7 +103,8 @@ export type CollectionInstance<DocDataType extends Record<string, any> = Record<
   /**
    * Chainable filter. Returns {@link CollectionInstance} with filter applied.
    */
-  startAfter: (...values: string[]) => CollectionInstance<DocDataType>
+  startAfter(docSnapshot: Record<string, any>): CollectionInstance<DocDataType>
+  startAfter(...fieldValues: unknown[]): CollectionInstance<DocDataType>
 }
 
 export function createCollectionWithContext<DocDataType extends Record<string, any>>(
@@ -173,8 +174,12 @@ export function createCollectionWithContext<DocDataType extends Record<string, a
     return collectionFn(path, { ...moduleConfig, limit: limitCount })
   }
 
-  function startAfter(...values: any[]): CollectionInstance<DocDataType> {
-    return collectionFn(path, { ...moduleConfig, startAfter: values })
+  function startAfter(...values: unknown[]): CollectionInstance<DocDataType> {
+    const isDoc = values[0] && typeof values[0] === 'object'
+    return collectionFn(path, {
+      ...moduleConfig,
+      startAfter: isDoc ? (values[0] as object) : values,
+    })
   }
 
   const queryFns = { where, orderBy, limit, startAfter }

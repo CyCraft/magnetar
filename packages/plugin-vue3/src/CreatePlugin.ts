@@ -39,6 +39,7 @@ export interface Vue3StoreModuleConfig {
   where?: WhereClause[]
   orderBy?: OrderByClause[]
   limit?: Limit
+  startAfter?: Record<string, any>
 }
 
 export type MakeRestoreBackup = (collectionPath: string, docId: string) => void
@@ -130,7 +131,7 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
     if (docId) return dataCollectionMap.get(docId)
     // if it's a collection, we must return the dataCollectionMap but with applied query clauses
     // but remember, the return type MUST be a map with id as keys and the docs as value
-    const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
+    const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit', 'startAfter'])
 
     return filterDataPerClauses(dataCollectionMap, clauses)
   }

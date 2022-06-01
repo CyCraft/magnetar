@@ -26,7 +26,7 @@ export default defineComponent({
   components: { TodoApp },
   props: {},
   created() {
-    itemsModule.orderBy('title', 'asc').startAfter('cool').stream()
+    itemsModule.orderBy('title').startAfter('ca').stream()
   },
   setup() {
     /** Item count */

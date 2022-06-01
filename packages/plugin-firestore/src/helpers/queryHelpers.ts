@@ -23,11 +23,16 @@ export function getQueryInstance(
   for (const orderByClause of config.orderBy || []) {
     q = query(q, orderBy(...orderByClause))
   }
+  if (config.startAfter) {
+    q = query(
+      q,
+      Array.isArray(config.startAfter)
+        ? startAfter(...config.startAfter)
+        : startAfter(config.startAfter)
+    )
+  }
   if (isNumber(config.limit)) {
     q = query(q, limit(config.limit))
-  }
-  if (config.startAfter) {
-    q = query(q, startAfter(...config.startAfter))
   }
   return q
 }

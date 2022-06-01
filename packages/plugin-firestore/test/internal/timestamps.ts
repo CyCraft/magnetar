@@ -16,7 +16,7 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
   })
 }
 {
-  const testName = 'only:read timestamps & filter'
+  const testName = 'read timestamps & filter'
   test(testName, async (t) => {
     /// 'fetch' resolves once all stores have given a response with data
     const { datesModule } = await createMagnetarInstance('read')

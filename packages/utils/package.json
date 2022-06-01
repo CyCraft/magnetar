@@ -3,13 +3,13 @@
   "version": "0.1.23",
   "sideEffects": false,
   "description": "Magnetar utils like a logger for easier development",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
-  "types": "dist/types/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "npm run rollup",
-    "test": "",
-    "rollup": "rimraf dist && rollup -c build.js"
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "dev": "pnpm build --watch",
+    "test": ""
   },
   "author": "Luca Ban - Mesqueeb",
   "funding": "https://github.com/sponsors/mesqueeb",

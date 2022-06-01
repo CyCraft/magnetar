@@ -309,6 +309,31 @@ import { pokedex } from '@magnetarjs/test-utils'
   })
 }
 {
+  const testName = 'fetch (collection) orderBy + startAfter'
+  test(testName, async (t) => {
+    const { pokedexModule } = await createMagnetarInstance('read')
+    try {
+      const queryModuleRef = pokedexModule
+        .where('id', '<', 10)
+        .orderBy('id', 'desc')
+        .startAfter(pokedex(5).id)
+        .limit(10)
+      await queryModuleRef.fetch({ force: true }, { onError: 'stop' })
+
+      const actual = [...queryModuleRef.data.values()].map((p) => p.id)
+      const expected = [pokedex(4), pokedex(3), pokedex(2), pokedex(1)].map((p) => p.id)
+
+      t.deepEqual(actual, expected as any)
+      // also check the collection without query
+      const actualDocCountWithoutQuery = pokedexModule.data.size
+      const expectedDocCountWithoutQuery = expected.length
+      t.deepEqual(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
+    } catch (error) {
+      t.fail(JSON.stringify(error))
+    }
+  })
+}
+{
   const testName = 'fetch: errors are thrown'
   test(testName, async (t) => {
     const { pokedexModule } = await createMagnetarInstance('read-no-access')
