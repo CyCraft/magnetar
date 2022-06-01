@@ -6,10 +6,8 @@ import {
   PluginInstance,
   MagnetarPlugin,
   Clauses,
-  WhereClause,
-  OrderByClause,
-  Limit,
   PluginModuleSetupPayload,
+  filterDataPerClauses,
 } from '@magnetarjs/core'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { insertActionFactory } from './actions/insert'
@@ -18,7 +16,6 @@ import { deleteActionFactory } from './actions/delete'
 import { fetchActionFactory } from './actions/fetch'
 import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
-import { filterDataPerClauses } from './helpers/dataHelpers'
 
 // there are two interfaces to be defined & exported by each plugin: `StoreOptions` and `StoreModuleConfig`
 // for this plugin we use:
@@ -33,13 +30,9 @@ export interface Vue3StoreOptions {
   generateRandomId: () => string
 }
 
-export interface Vue3StoreModuleConfig {
+export interface Vue3StoreModuleConfig extends Clauses {
   path?: string
   initialData?: Record<string, any> | [string, Record<string, any>][]
-  where?: WhereClause[]
-  orderBy?: OrderByClause[]
-  limit?: Limit
-  startAfter?: Record<string, any>
 }
 
 export type MakeRestoreBackup = (collectionPath: string, docId: string) => void

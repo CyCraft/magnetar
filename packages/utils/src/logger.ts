@@ -1,13 +1,14 @@
 import { isFullArray, isNumber } from 'is-what'
+import { EventFnSuccess } from '@magnetarjs/core'
 
-export const logger = function ({
+export const logger: EventFnSuccess = function ({
   payload,
   actionName,
   storeName,
   path,
   docId,
   pluginModuleConfig,
-}: any) {
+}) {
   if (storeName !== 'remote') return
   const { where, orderBy, limit } = pluginModuleConfig
   const docOrCollection = docId ? `doc('${path}')` : `collection('${path}')`

@@ -5,10 +5,8 @@ import {
   PluginInstance,
   MagnetarPlugin,
   Clauses,
-  WhereClause,
-  OrderByClause,
-  Limit,
   PluginModuleSetupPayload,
+  filterDataPerClauses,
 } from '@magnetarjs/core'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { insertActionFactory } from './actions/insert'
@@ -17,7 +15,7 @@ import { deleteActionFactory } from './actions/delete'
 import { fetchActionFactory } from './actions/fetch'
 import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
-import { filterDataPerClauses, objectToMap } from './helpers/dataHelpers'
+import { objectToMap } from './helpers/dataHelpers'
 
 // there are two interfaces to be defined & exported by each plugin: `StoreOptions` and `StoreModuleConfig`
 // for this plugin we use:
@@ -36,12 +34,9 @@ export interface Vue2StoreOptions {
   generateRandomId: () => string
 }
 
-export interface Vue2StoreModuleConfig {
+export interface Vue2StoreModuleConfig extends Clauses {
   path?: string
   initialData?: Record<string, any> | [string, Record<string, any>][]
-  where?: WhereClause[]
-  orderBy?: OrderByClause[]
-  limit?: Limit
 }
 
 export type MakeRestoreBackup = (collectionPath: string, docId: string) => void
@@ -134,14 +129,13 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
     if (docId) return dataCollectionDic[docId]
     // if it's a collection, we must return the dataCollectionDic but with applied query clauses
     // but remember, the return type MUST be a map with id as keys and the docs as value
-    const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
+    const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit', 'startAfter'])
 
-    const result = filterDataPerClauses(dataCollectionDic, clauses)
-    if (result === 'no-filter') {
-      return objectToMap(dataCollectionDic, dataCollectionDic)
-    }
-    const resultAsDic = Object.fromEntries(result)
-    return objectToMap(resultAsDic, dataCollectionDic, result)
+    const result = filterDataPerClauses(new Map(Object.entries(dataCollectionDic)), clauses)
+    const resultEntries = [...result.entries()]
+    const resultAsDic = Object.fromEntries(resultEntries)
+
+    return objectToMap(resultAsDic, dataCollectionDic, resultEntries)
   }
   // the plugin must try to implement logic for every `ActionName`
   const fetch = fetchActionFactory(data, vue2StoreOptions)

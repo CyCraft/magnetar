@@ -9,6 +9,7 @@ import {
   OrderByClause,
   Limit,
   PluginModuleSetupPayload,
+  filterDataPerClauses,
 } from '../../../core/src'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { insertActionFactory } from './actions/insert'
@@ -17,7 +18,6 @@ import { deleteActionFactory } from './actions/delete'
 import { fetchActionFactory } from './actions/fetch'
 import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
-import { filterDataPerClauses } from './helpers/dataHelpers'
 
 // there are two interfaces to be defined & exported by each plugin: `StoreOptions` and `StoreModuleConfig`
 // for this plugin we use:

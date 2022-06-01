@@ -1,15 +1,11 @@
-import { Clauses } from '@magnetarjs/core'
 import { isNumber, isArray } from 'is-what'
 import { getProp } from 'path-to-prop'
 import { sort, ISortByObjectSorter } from 'fast-sort'
-import { parseValueForFilters } from '@magnetarjs/utils'
+import { Clauses } from '../types/clauses'
+import { parseValueForFilters } from './parseValueForFilters'
 
 /**
  * Filters a Collection module's data map `Map<string, DocData>` based on provided clauses.
- *
- * @param {Map<string, Record<string, any>>} collectionDB
- * @param {Clauses} clauses
- * @returns {Map<string, Record<string, any>>}
  */
 export function filterDataPerClauses(
   collectionDB: Map<string, Record<string, any>>,
@@ -18,6 +14,7 @@ export function filterDataPerClauses(
   const { where = [], orderBy = [], limit, startAfter } = clauses
   // return the same collectionDB to be sure to keep reactivity
   if (!where.length && !orderBy.length && !isNumber(limit) && !startAfter) return collectionDB
+  const isMap = collectionDB instanceof Map
   // all other cases we need to create a new Map() with the results
   let entries: [string, Record<string, any>][] = []
   collectionDB.forEach((docData, docId) => {
@@ -91,6 +88,5 @@ export function filterDataPerClauses(
   // limit
   entries = isNumber(limit) ? entries.slice(0, limit) : entries
   // turn back into MAP
-  const filteredDataMap: Map<string, Record<string, any>> = new Map(entries)
-  return filteredDataMap
+  return new Map(entries)
 }
