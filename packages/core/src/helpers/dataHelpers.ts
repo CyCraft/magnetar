@@ -75,11 +75,14 @@ export function filterDataPerClauses(
   // startAfter
   if (startAfter && orderBy) {
     const orderByKeys = orderBy.map(([path]) => path)
-    const orderByValues = Array.isArray(startAfter)
+    const startAfterValues = Array.isArray(startAfter)
       ? startAfter
       : orderByKeys.map((key) => startAfter[key])
+    if (startAfterValues.length > orderByKeys.length) {
+      throw new Error('startAfter must have the same or smaller number of values than orderBy')
+    }
     for (const [index, key] of orderByKeys.entries()) {
-      const value = orderByValues[index]
+      const value = startAfterValues[index]
       if (value == null) continue
       const startIndex = entries.findIndex(([docId, docData]) => getProp(docData, key) === value)
       entries = entries.slice(startIndex + 1)
