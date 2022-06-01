@@ -312,12 +312,9 @@ importers:
 
   packages/utils:
     specifiers:
-      '@magnetarjs/core': workspace:*
       is-what: ^3.14.1
     dependencies:
       is-what: 3.14.1
-    devDependencies:
-      '@magnetarjs/core': link:../core
 
 packages:
 

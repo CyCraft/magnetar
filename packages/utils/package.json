@@ -6,6 +6,12 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts",
     "dev": "pnpm build --watch",
@@ -17,12 +23,6 @@
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
     "is-what": "^3.14.1"
-  },
-  "peerDependencies": {
-    "@magnetarjs/core": "workspace:*"
-  },
-  "devDependencies": {
-    "@magnetarjs/core": "workspace:*"
   },
   "keywords": [
     "magnetar",

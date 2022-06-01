@@ -1,5 +1,7 @@
 import { isFullArray, isNumber } from 'is-what'
-import { EventFnSuccess } from '@magnetarjs/core'
+// cannot directly import core because of cyclic workspace dependencies
+// figure out how to share this type in the future
+import { EventFnSuccess } from '../../core'
 
 export const logger: EventFnSuccess = function ({
   payload,
