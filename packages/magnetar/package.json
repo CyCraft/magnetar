@@ -11,6 +11,9 @@
       "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist"
+  ],
   "author": "Luca Ban - Mesqueeb",
   "funding": "https://github.com/sponsors/mesqueeb",
   "license": "MIT",
