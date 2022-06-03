@@ -23,8 +23,8 @@ export function fetchActionFactory(
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
-    const optimisticFetch =
-      !payload || !Object.hasOwnProperty.call(payload || {}, 'force') || payload?.force === false
+    const force = payload?.force === true
+    const optimisticFetch = !force
     if (optimisticFetch) {
       const collectionData = data[collectionPath]
       if (!docId && collectionData.size > 0) {
@@ -34,7 +34,8 @@ export function fetchActionFactory(
           id: _docId,
         }))
         const fetchResponse: FetchResponse = { docs: localDocs }
-        return fetchResponse
+        if (localDocs.length) return fetchResponse
+        // else fall through to returning DoOnFetch down below
       }
       if (docId) {
         const localDoc = collectionData.get(docId)

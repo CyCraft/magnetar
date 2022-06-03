@@ -19,8 +19,8 @@ export function fetchActionFactory(
     actionConfig,
     pluginModuleConfig,
   }: PluginFetchActionPayload<Vue2StoreModuleConfig>): FetchResponse | DoOnFetch {
-    const optimisticFetch =
-      !payload || !Object.hasOwnProperty.call(payload || {}, 'force') || payload?.force === false
+    const force = payload?.force === true
+    const optimisticFetch = !force
     if (optimisticFetch) {
       const collectionData = data[collectionPath]
       if (!docId && Object.keys(collectionData).length > 0) {
@@ -30,7 +30,8 @@ export function fetchActionFactory(
           id: _docId,
         }))
         const fetchResponse: FetchResponse = { docs: localDocs }
-        return fetchResponse
+        if (localDocs.length) return fetchResponse
+        // else fall through to returning DoOnFetch down below
       }
       if (docId) {
         const localDoc = collectionData[docId]

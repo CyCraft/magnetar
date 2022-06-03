@@ -63,3 +63,30 @@ import { pokedex, waitMs } from '@magnetarjs/test-utils'
     t.deepEqual(pokedexModule.data.get('1'), { ...pokedex(1), name: 'B' })
   })
 }
+{
+  const testName = 'only:fetch (collection) default behaviour'
+  test(testName, async (t) => {
+    /// 'fetch' resolves once all stores have given a response with data
+    const { pokedexModule } = await createMagnetarInstance('read')
+    t.deepEqual(pokedexModule.doc('1').data, undefined)
+    t.deepEqual(pokedexModule.doc('136').data, undefined)
+    t.deepEqual(pokedexModule.data.size, 0)
+
+    let result: any
+    try {
+      result = await pokedexModule.where('name', '==', 'Eevee').fetch()
+    } catch (error) {
+      t.fail(JSON.stringify(error))
+    }
+    t.deepEqual(pokedexModule.doc('1').data, undefined)
+    t.deepEqual(pokedexModule.data.size, 1)
+    t.deepEqual(result.size, 1)
+    try {
+      result = await pokedexModule.where('type', 'array-contains', 'Fire').fetch()
+    } catch (error) {
+      t.fail(JSON.stringify(error))
+    }
+    t.deepEqual(result.size, 12)
+    t.deepEqual(pokedexModule.data.size, 13)
+  })
+}
