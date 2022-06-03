@@ -1,7 +1,7 @@
 {
   "name": "@magnetarjs/test-utils",
   "private": true,
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "magnetar test utils",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -19,7 +19,7 @@
     "rimraf": "^3.0.2"
   },
   "dependencies": {
-    "@magnetarjs/utils": "^0.1.23",
+    "@magnetarjs/utils": "^0.1.24",
     "copy-anything": "^2.0.3",
     "fast-sort": "^3.1.1",
     "filter-anything": "^2.2.1",
