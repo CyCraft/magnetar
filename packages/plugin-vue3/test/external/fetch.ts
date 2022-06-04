@@ -257,10 +257,18 @@ test('fetch (collection) limit', async (t) => {
 test('fetch (collection) startAfter', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
-    const queryModuleRef = pokedexModule.orderBy('id').limit(10).startAfter(4)
+    const queryModuleRef = pokedexModule.orderBy('id').startAfter(4).limit(5)
     await queryModuleRef.fetch({ force: true })
+
     const actual = [...queryModuleRef.data.values()]
-    const expected = [pokedex(5), pokedex(6), pokedex(7), pokedex(8), pokedex(9), pokedex(10)]
+    const expected = [
+      // 1 is the initial data
+      pokedex(1),
+      pokedex(5),
+      pokedex(6),
+      pokedex(7),
+      pokedex(8),
+    ]
     t.deepEqual(actual, expected as any)
   } catch (error) {
     t.fail(JSON.stringify(error))

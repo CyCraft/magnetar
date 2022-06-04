@@ -14,7 +14,6 @@ export function filterDataPerClauses(
   const { where = [], orderBy = [], limit, startAfter } = clauses
   // return the same collectionDB to be sure to keep reactivity
   if (!where.length && !orderBy.length && !isNumber(limit) && !startAfter) return collectionDB
-  const isMap = collectionDB instanceof Map
   // all other cases we need to create a new Map() with the results
   let entries: [string, Record<string, any>][] = []
   collectionDB.forEach((docData, docId) => {
@@ -85,6 +84,7 @@ export function filterDataPerClauses(
       const value = startAfterValues[index]
       if (value == null) continue
       const startIndex = entries.findIndex(([docId, docData]) => getProp(docData, key) === value)
+      if (startIndex === -1) continue
       entries = entries.slice(startIndex + 1)
     }
   }
