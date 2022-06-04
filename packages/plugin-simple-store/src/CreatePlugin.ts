@@ -122,7 +122,7 @@ export const CreatePlugin: MagnetarPlugin<SimpleStoreOptions> = (
     if (docId) return collectionDB.get(docId)
     // if it's a collection, we must return the collectionDB but with applied query clauses
     // but remember, the return type MUST be a map with id as keys and the docs as value
-    const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
+    const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit', 'startAfter'])
 
     return filterDataPerClauses(collectionDB, clauses)
   }

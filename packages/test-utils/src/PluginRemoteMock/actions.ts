@@ -114,7 +114,7 @@ function mockDataRetrieval(
       return result ? [result] : []
     }
 
-    const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit'])
+    const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit', 'startAfter'])
     const filteredMap = filterDataPerClauses(_pokedexMap, clauses)
     return [...filteredMap.values()]
   }
