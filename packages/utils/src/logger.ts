@@ -1,7 +1,7 @@
 import { isFullArray, isNumber } from 'is-what'
 // cannot directly import core because of cyclic workspace dependencies
 // figure out how to share this type in the future
-import { EventFnSuccess } from '../../core'
+import { EventFnSuccess } from '../../core/src'
 
 export const logger: EventFnSuccess = function ({
   payload,
