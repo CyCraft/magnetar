@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "firebase": "^9.6.1",
-    "magnetar": "^0.5.8",
+    "magnetar": "workspace:*",
     "vue": "^3.2.26"
   },
   "devDependencies": {

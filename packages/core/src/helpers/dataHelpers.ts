@@ -1,25 +1,22 @@
-import { Clauses } from '@magnetarjs/core'
 import { isNumber, isArray } from 'is-what'
 import { getProp } from 'path-to-prop'
 import { sort, ISortByObjectSorter } from 'fast-sort'
-import { parseValueForFilters } from '@magnetarjs/utils'
+import { Clauses } from '../types/clauses'
+import { parseValueForFilters } from './parseValueForFilters'
 
 /**
  * Filters a Collection module's data map `Map<string, DocData>` based on provided clauses.
- *
- * @param {Map<string, Record<string, any>>} collectionDB
- * @param {Clauses} clauses
- * @returns {Map<string, Record<string, any>>}
  */
 export function filterDataPerClauses(
   collectionDB: Map<string, Record<string, any>>,
   clauses: Clauses
 ): Map<string, Record<string, any>> {
-  const { where = [], orderBy = [], limit } = clauses
+  const { where = [], orderBy = [], limit, startAfter } = clauses
   // return the same collectionDB to be sure to keep reactivity
-  if (!where.length && !orderBy.length && !isNumber(limit)) return collectionDB
+  if (!where.length && !orderBy.length && !isNumber(limit) && !startAfter) return collectionDB
+  const isMap = collectionDB instanceof Map
   // all other cases we need to create a new Map() with the results
-  const entries: [string, Record<string, any>][] = []
+  let entries: [string, Record<string, any>][] = []
   collectionDB.forEach((docData, docId) => {
     const passesWhereFilters = where.every((whereQuery) => {
       const [fieldPath, operator, expectedValue] = whereQuery
@@ -74,10 +71,25 @@ export function filterDataPerClauses(
     carry.push(sorter)
     return carry
   }, [] as ISortByObjectSorter<[string, Record<string, any>]>[])
-  const entriesOrdered = orderBy.length ? sort(entries).by(by) : entries
+  entries = orderBy.length ? sort(entries).by(by) : entries
+  // startAfter
+  if (startAfter && orderBy) {
+    const orderByKeys = orderBy.map(([path]) => path)
+    const startAfterValues = Array.isArray(startAfter)
+      ? startAfter
+      : orderByKeys.map((key) => startAfter[key])
+    if (startAfterValues.length > orderByKeys.length) {
+      throw new Error('startAfter must have the same or smaller number of values than orderBy')
+    }
+    for (const [index, key] of orderByKeys.entries()) {
+      const value = startAfterValues[index]
+      if (value == null) continue
+      const startIndex = entries.findIndex(([docId, docData]) => getProp(docData, key) === value)
+      entries = entries.slice(startIndex + 1)
+    }
+  }
   // limit
-  const entriesLimited = isNumber(limit) ? entriesOrdered.slice(0, limit) : entriesOrdered
+  entries = isNumber(limit) ? entries.slice(0, limit) : entries
   // turn back into MAP
-  const filteredDataMap: Map<string, Record<string, any>> = new Map(entriesLimited)
-  return filteredDataMap
+  return new Map(entries)
 }

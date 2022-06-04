@@ -35,4 +35,5 @@ export type Clauses = {
   where?: WhereClause[]
   orderBy?: OrderByClause[]
   limit?: Limit
+  startAfter?: unknown[] | any
 }

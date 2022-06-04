@@ -102,13 +102,13 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
    */
   const fetchPromiseMap: Map<PathFilterIdentifier, FetchPromises> = new Map() // apply type upon get/set
 
-  async function clearAllData (): Promise<void> {
+  async function clearAllData(): Promise<void> {
     for (const collectionName of collectionNames) {
       collection(collectionName).data?.clear()
     }
   }
 
-  async function closeAllStreams (): Promise<void> {
+  async function closeAllStreams(): Promise<void> {
     for (const collectionName of collectionNames) {
       collection(collectionName).closeAllStreams()
     }
@@ -174,6 +174,7 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
       closeStream,
       closeAllStreams,
     }
+
     // then create the module instance
     if (moduleType === 'doc') {
       return createDocWithContext(
@@ -185,6 +186,7 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
         streamAndFetchPromises
       )
     }
+
     return createCollectionWithContext(
       [collectionPath, docId],
       moduleConfig,

@@ -3,15 +3,24 @@
   "version": "0.1.26",
   "sideEffects": false,
   "description": "Magnetar plugin vue3",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
-  "types": "dist/types/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "npm run rollup",
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "dev": "pnpm build --watch",
     "test-and-build": "npm run test && npm run build",
     "test": "ava",
-    "test--only": "ava --match='*only:*'",
-    "rollup": "rimraf dist && rollup -c build.js"
+    "test--only": "ava --match='*only:*'"
   },
   "author": "Luca Ban - Mesqueeb",
   "funding": "https://github.com/sponsors/mesqueeb",
@@ -21,10 +30,9 @@
     "vue": "^3.2.0"
   },
   "dependencies": {
-    "@magnetarjs/core": "^0.3.7",
-    "@magnetarjs/utils": "^0.1.25",
+    "@magnetarjs/core": "workspace:*",
+    "@magnetarjs/utils": "workspace:*",
     "copy-anything": "^2.0.3",
-    "fast-sort": "^3.1.1",
     "filter-anything": "^2.2.1",
     "is-what": "^3.14.1",
     "merge-anything": "^4.0.2",
@@ -32,7 +40,7 @@
     "ts-toolbelt": "^9.6.0"
   },
   "devDependencies": {
-    "@magnetarjs/test-utils": "^0.1.18",
+    "@magnetarjs/test-utils": "workspace:*",
     "vue": "^3.2.26"
   },
   "keywords": [

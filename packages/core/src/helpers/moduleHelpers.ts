@@ -9,7 +9,7 @@ export const MODULE_IDENTIFIER_SPLIT = ' /// '
  * Saved as enum, just to enforce usage of `getPathFilterIdentifier()`
  */
 export enum PathFilterIdentifier {
-  'KEY' = 'modulePath + JSON.stringify({limit, orderBy, where})',
+  'KEY' = 'modulePath + JSON.stringify({limit, orderBy, where, startAfter})',
 }
 
 /**
@@ -20,8 +20,8 @@ export function getPathFilterIdentifier(
   modulePath: string,
   moduleConfig: ModuleConfig
 ): PathFilterIdentifier {
-  const { limit, orderBy, where } = moduleConfig
-  const config = JSON.stringify({ limit, orderBy, where })
+  const { limit, orderBy, where, startAfter } = moduleConfig
+  const config = JSON.stringify({ limit, orderBy, where, startAfter })
 
   return `${modulePath}${MODULE_IDENTIFIER_SPLIT}${config}` as unknown as PathFilterIdentifier.KEY
 }
@@ -38,9 +38,9 @@ export function getPluginModuleConfig(
   moduleConfig: ModuleConfig,
   storeName: string
 ): PluginModuleConfig {
-  const { where, orderBy, limit, configPerStore = {} } = moduleConfig
+  const { where, orderBy, limit, startAfter, configPerStore = {} } = moduleConfig
   const extraStoreConfig = isPlainObject(configPerStore[storeName]) ? configPerStore[storeName] : {}
-  return { ...extraStoreConfig, where, orderBy, limit }
+  return { ...extraStoreConfig, where, orderBy, limit, startAfter }
 }
 
 /**

@@ -7,17 +7,11 @@
       <label for="order" style="padding-left: 1rem">alphabetically</label>
       <input type="checkbox" name="" v-model="alphabetically" id="order" />
     </div>
-    <TodoApp
-      @add="addItem"
-      @edit="editItem"
-      @delete="deleteItem"
-      :items="items"
-    />
+    <TodoApp @add="addItem" @edit="editItem" @delete="deleteItem" :items="items" />
   </div>
 </template>
 
-<style lang="sass" scoped>
-</style>
+<style lang="sass" scoped></style>
 
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue'
@@ -32,7 +26,7 @@ export default defineComponent({
   components: { TodoApp },
   props: {},
   created() {
-    itemsModule.stream()
+    itemsModule.orderBy('title').startAfter('ca').stream()
   },
   setup() {
     /** Item count */

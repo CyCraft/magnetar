@@ -1,4 +1,4 @@
-import type { Firestore } from 'firebase/firestore'
+import type { DocumentSnapshot, Firestore } from 'firebase/firestore'
 import { PluginInstance, MagnetarPlugin, WhereClause, OrderByClause, Limit } from '@magnetarjs/core'
 import { insertActionFactory } from './actions/insert'
 import { writeActionFactory } from './actions/mergeAssignReplace'
@@ -53,6 +53,7 @@ export interface FirestoreModuleConfig {
   orderBy?: OrderByClause[]
   limit?: Limit
   syncDebounceMs?: number
+  startAfter?: unknown[] | DocumentSnapshot<unknown>
 }
 
 function firestorePluginOptionsWithDefaults(
