@@ -43,7 +43,7 @@
       "ts"
     ],
     "require": [
-      "ts-node/register"
+      "esbuild-register"
     ],
     "timeout": "60s"
   },

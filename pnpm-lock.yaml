@@ -10,6 +10,8 @@ importers:
       ava: ^4.0.0
       bumpp: ^7.1.1
       copyfiles: ^2.4.1
+      esbuild: ^0.14.42
+      esbuild-register: ^3.3.2
       eslint: ^8.6.0
       eslint-config-prettier: ^8.3.0
       eslint-loader: ^4.0.2
@@ -30,6 +32,8 @@ importers:
       ava: 4.2.0
       bumpp: 7.1.1
       copyfiles: 2.4.1
+      esbuild: 0.14.42
+      esbuild-register: 3.3.2_esbuild@0.14.42
       eslint: 8.16.0
       eslint-config-prettier: 8.5.0_eslint@8.16.0
       eslint-loader: 4.0.2_eslint@8.16.0
@@ -8052,6 +8056,14 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /esbuild-register/3.3.2_esbuild@0.14.42:
+    resolution: {integrity: sha512-jceAtTO6zxPmCfSD5cBb3rgIK1vmuqCKYwgylHiS1BF4pq0jJiJb4K2QMuqF4BEw7XDBRatYzip0upyTzfkgsQ==}
+    peerDependencies:
+      esbuild: '>=0.12 <1'
+    dependencies:
+      esbuild: 0.14.42
+    dev: true
 
   /esbuild-sunos-64/0.14.42:
     resolution: {integrity: sha512-uXV8TAZEw36DkgW8Ak3MpSJs1ofBb3Smkc/6pZ29sCAN1KzCAQzsje4sUwugf+FVicrHvlamCOlFZIXgct+iqQ==}
