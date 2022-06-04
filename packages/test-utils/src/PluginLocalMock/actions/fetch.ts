@@ -4,11 +4,11 @@ import {
   DoOnFetch,
   PluginFetchActionPayload,
   DocMetadata,
+  filterDataPerClauses,
 } from '../../../../core/src'
 import { StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 import { throwIfEmulatedError } from '../../helpers'
-import { filterDataPerClauses } from '../helpers/dataHelpers'
 
 export function fetchActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },

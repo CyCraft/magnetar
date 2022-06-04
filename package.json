@@ -19,7 +19,7 @@
     "test:plugin-vue2": "cd packages/plugin-vue2 && npm run test",
     "test:plugin-vue3": "cd packages/plugin-vue3 && npm run test",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "release": "bumpp package.json packages/*/package.json --commit --push --tag && pnpm -r publish --access public",
+    "release": "pnpm build && bumpp package.json packages/*/package.json --commit --push --tag && pnpm -r publish --access public",
     "deploy:docs": "npm run build:favicon && pnpm --filter docs build:docs && firebase deploy --only hosting && git add -A && git commit -m \"chore: deploy\""
   },
   "devDependencies": {

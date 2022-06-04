@@ -4,8 +4,8 @@ import {
   DoOnFetch,
   PluginFetchActionPayload,
   DocMetadata,
+  filterDataPerClauses,
 } from '@magnetarjs/core'
-import { filterDataPerClauses } from '../helpers/dataHelpers'
 import { Vue3StoreModuleConfig, Vue3StoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 
