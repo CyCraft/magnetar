@@ -5,9 +5,6 @@ import {
   PluginInstance,
   MagnetarPlugin,
   Clauses,
-  WhereClause,
-  OrderByClause,
-  Limit,
   PluginModuleSetupPayload,
   filterDataPerClauses,
 } from '@magnetarjs/core'
@@ -27,12 +24,9 @@ import { revertActionFactory } from './actions/revert'
 export interface SimpleStoreOptions {
   generateRandomId: () => string
 }
-export interface SimpleStoreModuleConfig {
+export interface SimpleStoreModuleConfig extends Clauses {
   path?: string
   initialData?: Record<string, any> | [string, Record<string, any>][]
-  where?: WhereClause[]
-  orderBy?: OrderByClause[]
-  limit?: Limit
 }
 
 export type MakeRestoreBackup = (collectionPath: string, docId: string) => void

@@ -28,8 +28,13 @@ export function fetchActionFactory(
     const optimisticFetch = !force
     if (optimisticFetch) {
       if (!docId) {
-        const { where, orderBy, limit } = pluginModuleConfig
-        const collectionData = filterDataPerClauses(data[collectionPath], { where, orderBy, limit })
+        const { where, orderBy, limit, startAfter } = pluginModuleConfig
+        const collectionData = filterDataPerClauses(data[collectionPath], {
+          where,
+          orderBy,
+          limit,
+          startAfter,
+        })
         if (collectionData.size > 0) {
           const localDocs: DocMetadata[] = [...collectionData.entries()].map(([_docId, data]) => ({
             data,

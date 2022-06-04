@@ -5,9 +5,6 @@ import {
   PluginInstance,
   MagnetarPlugin,
   Clauses,
-  WhereClause,
-  OrderByClause,
-  Limit,
   PluginModuleSetupPayload,
   filterDataPerClauses,
 } from '../../../core/src'
@@ -28,12 +25,9 @@ export interface StorePluginOptions {
   generateRandomId: () => string
   storeName: string
 }
-export interface StorePluginModuleConfig {
+export interface StorePluginModuleConfig extends Clauses {
   path?: string
   initialData?: Record<string, any> | [string, Record<string, any>][]
-  where?: WhereClause[]
-  orderBy?: OrderByClause[]
-  limit?: Limit
 }
 
 export type MakeRestoreBackup = (collectionPath: string, docId: string) => void
