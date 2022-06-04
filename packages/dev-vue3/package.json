@@ -1,6 +1,6 @@
 {
   "name": "dev-vue3",
-  "version": "0.2.6",
+  "version": "0.2.8",
   "private": true,
   "scripts": {
     "dev": "vite",

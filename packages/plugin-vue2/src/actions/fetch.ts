@@ -5,6 +5,7 @@ import {
   PluginFetchActionPayload,
   DocMetadata,
 } from '@magnetarjs/core'
+import { filterDataPerClauses } from '../helpers/dataHelpers'
 import { Vue2StoreModuleConfig, Vue2StoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 
@@ -19,21 +20,24 @@ export function fetchActionFactory(
     actionConfig,
     pluginModuleConfig,
   }: PluginFetchActionPayload<Vue2StoreModuleConfig>): FetchResponse | DoOnFetch {
-    const optimisticFetch =
-      !payload || !Object.hasOwnProperty.call(payload || {}, 'force') || payload?.force === false
+    const force = payload?.force === true
+    const optimisticFetch = !force
     if (optimisticFetch) {
-      const collectionData = data[collectionPath]
-      if (!docId && Object.keys(collectionData).length > 0) {
-        const localDocs: DocMetadata[] = Object.entries(collectionData).map(([_docId, data]) => ({
-          data,
-          exists: 'unknown',
-          id: _docId,
-        }))
-        const fetchResponse: FetchResponse = { docs: localDocs }
-        return fetchResponse
+      if (!docId) {
+        const { where, orderBy, limit } = pluginModuleConfig
+        const collectionData = filterDataPerClauses(data[collectionPath], { where, orderBy, limit })
+        if (Object.keys(collectionData).length > 0) {
+          const localDocs: DocMetadata[] = Object.entries(collectionData).map(([_docId, data]) => ({
+            data,
+            exists: 'unknown',
+            id: _docId,
+          }))
+          const fetchResponse: FetchResponse = { docs: localDocs }
+          return fetchResponse // if size === 0 fall through to returning DoOnFetch down below
+        }
       }
       if (docId) {
-        const localDoc = collectionData[docId]
+        const localDoc = data[collectionPath][docId]
         // if already fetched
         if (localDoc) {
           const fetchResponse: FetchResponse = {

@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/plugin-simple-store",
-  "version": "0.1.23",
+  "version": "0.1.25",
   "sideEffects": false,
   "description": "Magnetar plugin simple store",
   "main": "dist/index.js",
@@ -38,7 +38,7 @@
     "ts-toolbelt": "^9.6.0"
   },
   "devDependencies": {
-    "@magnetarjs/test-utils": "^0.1.16",
+    "@magnetarjs/test-utils": "^0.1.18",
     "browser-env": "^3.3.0"
   },
   "keywords": [

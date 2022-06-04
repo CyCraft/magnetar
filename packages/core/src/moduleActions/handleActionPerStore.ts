@@ -224,13 +224,15 @@ export function handleActionPerStore(
 
           // special handling for 'fetch' (resultFromPlugin will always be `FetchResponse | OnAddedFn`)
           if (actionName === 'fetch') {
-            const optimisticFetch =
-              !payload ||
-              !Object.hasOwnProperty.call(payload || {}, 'force') ||
-              payload?.force === false
+            const force = payload?.force === true
+            const optimisticFetch = !force
             if (optimisticFetch) {
               // the local store successfully returned a fetch response based on already fetched data
-              if (storeName === globalConfig.localStoreName && isFetchResponse(resultFromPlugin)) {
+              if (
+                storeName === globalConfig.localStoreName &&
+                isFetchResponse(resultFromPlugin) &&
+                resultFromPlugin.docs.length
+              ) {
                 stopExecutionAfterAction(true)
               }
             }

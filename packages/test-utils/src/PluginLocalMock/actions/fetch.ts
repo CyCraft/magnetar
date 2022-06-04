@@ -8,6 +8,7 @@ import {
 import { StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 import { throwIfEmulatedError } from '../../helpers'
+import { filterDataPerClauses } from '../helpers/dataHelpers'
 
 export function fetchActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, any>> },
@@ -23,21 +24,24 @@ export function fetchActionFactory(
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
-    const optimisticFetch =
-      !payload || !Object.hasOwnProperty.call(payload || {}, 'force') || payload?.force === false
+    const force = payload?.force === true
+    const optimisticFetch = !force
     if (optimisticFetch) {
-      const collectionData = data[collectionPath]
-      if (!docId && collectionData.size > 0) {
-        const localDocs: DocMetadata[] = [...collectionData.entries()].map(([_docId, data]) => ({
-          data,
-          exists: 'unknown',
-          id: _docId,
-        }))
-        const fetchResponse: FetchResponse = { docs: localDocs }
-        return fetchResponse
+      if (!docId) {
+        const { where, orderBy, limit } = pluginModuleConfig
+        const collectionData = filterDataPerClauses(data[collectionPath], { where, orderBy, limit })
+        if (collectionData.size > 0) {
+          const localDocs: DocMetadata[] = [...collectionData.entries()].map(([_docId, data]) => ({
+            data,
+            exists: 'unknown',
+            id: _docId,
+          }))
+          const fetchResponse: FetchResponse = { docs: localDocs }
+          return fetchResponse // if size === 0 fall through to returning DoOnFetch down below
+        }
       }
       if (docId) {
-        const localDoc = collectionData.get(docId)
+        const localDoc = data[collectionPath].get(docId)
         // if already fetched
         if (localDoc) {
           const fetchResponse: FetchResponse = {
