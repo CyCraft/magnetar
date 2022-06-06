@@ -14,6 +14,10 @@ export function revertActionFactory(
     actionName,
     error,
   }: PluginRevertActionPayload<Vue3StoreModuleConfig>): void {
+    if (actionName === 'stream' || actionName === 'fetch') {
+      // no need to "revert" anything on stream or fetch
+      return
+    }
     // revert all write actions when called on a doc
     if (
       docId &&
@@ -24,7 +28,6 @@ export function revertActionFactory(
     }
     // insert on collection (no id)
     if (!docId && actionName === 'insert') actionName = 'insert on collections' as any
-    // haven't implemented reverting 'fetch', 'stream' actions yet
     console.error(`[@magnetarjs/plugin-vue3] revert not yet implemented for ${actionName}`)
   }
 }

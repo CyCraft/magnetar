@@ -19,6 +19,10 @@ export function revertActionFactory(
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
 
+    if (actionName === 'stream' || actionName === 'fetch') {
+      // no need to "revert" anything on stream or fetch
+      return
+    }
     // revert all write actions when called on a doc
     if (
       docId &&
@@ -29,7 +33,6 @@ export function revertActionFactory(
     }
     // insert on collection (no id)
     if (!docId && actionName === 'insert') actionName = 'insert on collections' as any
-    // haven't implemented reverting 'fetch', 'stream' actions yet
     console.error(`[@magnetarjs/test-utils] revert not yet implemented for ${actionName}`)
   }
 }
