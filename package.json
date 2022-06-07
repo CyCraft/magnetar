@@ -96,5 +96,6 @@
       ],
       "@typescript-eslint/ban-ts-comment": "warn"
     }
-  }
+  },
+  "version": "0.5.9-beta.1"
 }
