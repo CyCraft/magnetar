@@ -1,6 +1,6 @@
 {
   "name": "dev-vue3-firestore",
-  "version": "0.5.9-beta.1",
+  "version": "0.5.9-beta.2",
   "private": true,
   "scripts": {
     "dev": "vite",
