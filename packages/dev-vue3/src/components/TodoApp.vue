@@ -1,3 +1,55 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+
+type Item = { title: string; id: string; isDone: boolean }
+
+const props = defineProps<{
+  items: Item[]
+}>()
+
+const emit = defineEmits<{
+  (e: 'add', payload: Item): void
+  (e: 'edit', payload: Item): void
+  (e: 'delete', payload: Item): void
+  (e: 'edit', payload: Item): void
+}>()
+
+const newItem = ref('')
+
+function addItem() {
+  const payload: Item = { title: newItem.value, isDone: false, id: '' }
+  emit('add', payload)
+  newItem.value = ''
+}
+
+const editingIndex = ref(-1)
+const editingTitle = ref('')
+
+function editItem(i: number) {
+  const original = props.items[i]
+  editingTitle.value = original.title
+  editingIndex.value = i
+}
+
+function saveEdits() {
+  const title = editingTitle.value
+  const item = props.items[editingIndex.value]
+  const payload = { ...item, title }
+  editingIndex.value = -1
+  editingTitle.value = ''
+  emit('edit', payload)
+}
+
+function deleteItem(item: Item) {
+  emit('delete', item)
+}
+
+function toggleItemDone(item: Item) {
+  const payload = { ...item, isDone: !item.isDone }
+  emit('edit', payload)
+}
+</script>
+
 <template>
   <div class="todo-app">
     <div
@@ -64,60 +116,3 @@
     input
       margin-right: 0.5rem
 </style>
-
-<script lang="ts">
-import { defineComponent, ref, PropType } from 'vue'
-
-type Item = { title: string; id: string; isDone: boolean }
-
-export default defineComponent({
-  name: 'TodoApp',
-  props: {
-    items: { type: Array as PropType<Item[]>, default: () => [] },
-  },
-  setup(props, { emit }) {
-    const newItem = ref('')
-    function addItem() {
-      const payload: Item = { title: newItem.value, isDone: false, id: '' }
-      emit('add', payload)
-      newItem.value = ''
-    }
-
-    const editingIndex = ref(-1)
-    const editingTitle = ref('')
-    function editItem(i: number) {
-      const original = props.items[i]
-      editingTitle.value = original.title
-      editingIndex.value = i
-    }
-    function saveEdits() {
-      const title = editingTitle.value
-      const item = props.items[editingIndex.value]
-      const payload = { ...item, title }
-      editingIndex.value = -1
-      editingTitle.value = ''
-      emit('edit', payload)
-    }
-
-    function deleteItem(item: Item) {
-      emit('delete', item)
-    }
-
-    function toggleItemDone(item: Item) {
-      const payload = { ...item, isDone: !item.isDone }
-      emit('edit', payload)
-    }
-
-    return {
-      newItem,
-      addItem,
-      editItem,
-      editingIndex,
-      saveEdits,
-      editingTitle,
-      deleteItem,
-      toggleItemDone,
-    }
-  },
-})
-</script>
