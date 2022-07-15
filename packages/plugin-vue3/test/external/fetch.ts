@@ -274,3 +274,35 @@ test('fetch (collection) startAfter', async (t) => {
     t.fail(JSON.stringify(error))
   }
 })
+
+test('fetch (collection) fetchMore', async (t) => {
+  const { pokedexModule } = createMagnetarInstance()
+  try {
+    const queryModuleRef = pokedexModule.orderBy('id').limit(5)
+    const result = await queryModuleRef.fetchMore()
+
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [pokedex(1), pokedex(2), pokedex(3), pokedex(4), pokedex(5)]
+    t.deepEqual(actual, expected as any)
+    t.deepEqual(result, expected as any)
+
+    const result2 = await queryModuleRef.fetchMore()
+    const actual2 = [...queryModuleRef.data.values()]
+    const expected2 = [
+      pokedex(1),
+      pokedex(2),
+      pokedex(3),
+      pokedex(4),
+      pokedex(5),
+      pokedex(6),
+      pokedex(7),
+      pokedex(8),
+      pokedex(9),
+      pokedex(10),
+    ]
+    t.deepEqual(actual2, expected2 as any)
+    t.deepEqual(result2, [pokedex(6), pokedex(7), pokedex(8), pokedex(9), pokedex(10)] as any)
+  } catch (error) {
+    t.fail(JSON.stringify(error))
+  }
+})
