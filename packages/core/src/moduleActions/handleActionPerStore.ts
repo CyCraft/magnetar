@@ -87,8 +87,12 @@ export function handleActionPerStore(
 
     // eslint-disable-next-line no-async-promise-executor
     const actionPromise = new Promise<any>(async (resolve, reject) => {
+      /**
+       * Are we forcing to check in with the DB or can we be satisfied with only optimistic fetch?
+       */
+      const force = payload?.force === true
       // we need to await any writeLock _before_ fetching, to prevent grabbing outdated data
-      if (actionName === 'fetch') {
+      if (actionName === 'fetch' && force) {
         await writeLock.promise
         if (!_docId) {
           // we need to await all promises of all docs in this collection...
@@ -224,7 +228,6 @@ export function handleActionPerStore(
 
           // special handling for 'fetch' (resultFromPlugin will always be `FetchResponse | OnAddedFn`)
           if (actionName === 'fetch') {
-            const force = payload?.force === true
             const optimisticFetch = !force
             if (optimisticFetch) {
               // the local store successfully returned a fetch response based on already fetched data
