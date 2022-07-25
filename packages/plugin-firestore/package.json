@@ -38,7 +38,7 @@
     "merge-anything": "^5.0.2"
   },
   "devDependencies": {
-    "@magnetarjs/test-utils": "^0.1.16",
+    "@magnetarjs/test-utils": "workspace:*",
     "firebase": "^9.5.0"
   },
   "keywords": [
