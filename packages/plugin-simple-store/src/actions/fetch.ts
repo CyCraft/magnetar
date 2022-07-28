@@ -72,7 +72,7 @@ export function fetchActionFactory(
       )({
         payload: _payload,
         collectionPath,
-        docId,
+        docId: docId || meta.id, // docId is undefined in case of a collection fetch
         actionConfig,
         pluginModuleConfig,
       })
