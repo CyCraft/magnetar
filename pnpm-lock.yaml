@@ -192,7 +192,7 @@ importers:
   packages/plugin-firestore:
     specifiers:
       '@magnetarjs/core': workspace:*
-      '@magnetarjs/test-utils': ^0.1.16
+      '@magnetarjs/test-utils': workspace:*
       firebase: ^9.5.0
       flatten-anything: ^2.0.4
       is-what: ^3.14.1
@@ -213,7 +213,7 @@ importers:
   packages/plugin-simple-store:
     specifiers:
       '@magnetarjs/core': workspace:*
-      '@magnetarjs/test-utils': ^0.1.18
+      '@magnetarjs/test-utils': workspace:*
       '@magnetarjs/utils': workspace:*
       browser-env: ^3.3.0
       copy-anything: ^2.0.3
@@ -240,7 +240,7 @@ importers:
   packages/plugin-vue2:
     specifiers:
       '@magnetarjs/core': workspace:*
-      '@magnetarjs/test-utils': ^0.1.18
+      '@magnetarjs/test-utils': workspace:*
       '@magnetarjs/utils': workspace:*
       copy-anything: ^2.0.3
       fast-sort: ^3.1.1
@@ -6508,7 +6508,7 @@ packages:
       lodash: ^4.17.20
       marko: ^3.14.4
       mote: ^0.2.0
-      mustache: ^4.0.1
+      mustache: ^3.0.0
       nunjucks: ^3.2.2
       plates: ~0.4.11
       pug: ^3.0.0
@@ -9181,16 +9181,6 @@ packages:
       readable-stream: 2.3.7
     dev: true
 
-  /follow-redirects/1.15.1:
-    resolution: {integrity: sha512-yLAMQs+k0b2m7cVxpS1VKJVvoz7SS9Td1zss3XRwXj+ZDH00RJgnuLx7E44wx02kQLrdM3aOOy+FpzS7+8OizA==}
-    engines: {node: '>=4.0'}
-    peerDependencies:
-      debug: '*'
-    peerDependenciesMeta:
-      debug:
-        optional: true
-    dev: true
-
   /follow-redirects/1.15.1_debug@4.3.4:
     resolution: {integrity: sha512-yLAMQs+k0b2m7cVxpS1VKJVvoz7SS9Td1zss3XRwXj+ZDH00RJgnuLx7E44wx02kQLrdM3aOOy+FpzS7+8OizA==}
     engines: {node: '>=4.0'}
@@ -10193,7 +10183,7 @@ packages:
     engines: {node: '>=8.0.0'}
     dependencies:
       eventemitter3: 4.0.7
-      follow-redirects: 1.15.1
+      follow-redirects: 1.15.1_debug@4.3.4
       requires-port: 1.0.0
     transitivePeerDependencies:
       - debug
