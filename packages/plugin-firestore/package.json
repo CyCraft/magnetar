@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/plugin-firestore",
-  "version": "0.5.12",
+  "version": "0.5.13",
   "sideEffects": false,
   "description": "Magnetar plugin firestore",
   "main": "dist/index.js",
