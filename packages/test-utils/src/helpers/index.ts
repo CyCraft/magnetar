@@ -1,4 +1,5 @@
 export * from './generateRandomId'
+export * from './moves'
 export * from './pokedex'
-export * from './wait'
 export * from './throwFns'
+export * from './wait'

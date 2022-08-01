@@ -193,6 +193,7 @@ importers:
     specifiers:
       '@magnetarjs/core': workspace:*
       '@magnetarjs/test-utils': workspace:*
+      array-shuffle: ^3.0.0
       firebase: ^9.5.0
       flatten-anything: ^2.0.4
       is-what: ^3.14.1
@@ -208,6 +209,7 @@ importers:
       ts-toolbelt: 9.6.0
     devDependencies:
       '@magnetarjs/test-utils': link:../test-utils
+      array-shuffle: 3.0.0
       firebase: 9.8.2
 
   packages/plugin-simple-store:
@@ -4858,6 +4860,11 @@ packages:
 
   /array-flatten/2.1.2:
     resolution: {integrity: sha512-hNfzcOV8W4NdualtqBFPyVO+54DSJuZGY9qT4pRroB6S9e3iiido2ISIC5h9R2sPJ8H3FHCIiEnsv1lPXO3KtQ==}
+    dev: true
+
+  /array-shuffle/3.0.0:
+    resolution: {integrity: sha512-rogEGxHOQPhslOhpg12LJkB+bbAl484/s2AJq0BxtzQDQfKl76fS2u9zWgg3p3b9ENcuvE7K8A7l5ddiPjCRnw==}
+    engines: {node: '>=12.20'}
     dev: true
 
   /array-union/1.0.2:
