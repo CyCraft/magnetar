@@ -8,6 +8,8 @@
     "dev:vue2-firestore": "pnpm --filter dev-vue2-firestore dev",
     "dev:vue3": "pnpm --filter dev-vue3 dev",
     "dev:vue3-firestore": "pnpm --filter dev-vue3-firestore dev",
+    "dep:check-all": "ncu --target minor && pnpm --parallel exec ncu --target minor",
+    "dep:update-all": "ncu --target minor -u && pnpm --parallel exec ncu --target minor -u && pnpm i",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:serve": "vitepress serve docs",
