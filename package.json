@@ -12,6 +12,7 @@
     "dep:update-all": "ncu --target minor -u && pnpm --parallel exec ncu --target minor -u && pnpm i",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
+    "docs:deploy": "pnpm run docs:build && firebase deploy --only hosting && git add -A && git commit -m \"chore: deploy\"",
     "docs:serve": "vitepress serve docs",
     "build": "pnpm -r build",
     "build-and-commit": "npm run build && git add -A && git commit -m \"chore: build\"",
@@ -23,8 +24,7 @@
     "test:plugin-vue2": "cd packages/plugin-vue2 && npm run test",
     "test:plugin-vue3": "cd packages/plugin-vue3 && npm run test",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "release": "pnpm build && bumpp package.json packages/*/package.json --commit --push --tag && pnpm -r publish --access public",
-    "deploy:docs": "pnpm run docs:build && firebase deploy --only hosting && git add -A && git commit -m \"chore: deploy\""
+    "release": "pnpm build && bumpp package.json packages/*/package.json --commit --push --tag && pnpm -r publish --access public"
   },
   "devDependencies": {
     "@types/node": "^18.7.8",
