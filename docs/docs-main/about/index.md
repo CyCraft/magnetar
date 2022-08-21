@@ -14,7 +14,7 @@
 
 - Magnetar has plugins for Vue 2 & Vue 3 that offer **_built-in reactivity_**.<br />Just like Vuex, displaying data in Vue just works as you would expect and is reactive on local/server changes. (Magnetar does not rely on Vuex)
 
-<img src="../../public/media/magnetar-value-proposition.jpg" style="width: 100%" />
+<img src="/media/magnetar-value-proposition.jpg" style="width: 100%" />
 
 ## Learn by Example
 

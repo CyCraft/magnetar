@@ -1,4 +1,6 @@
-@import url('http://fonts.cdnfonts.com/css/montserrat'): root {
+@import url('http://fonts.cdnfonts.com/css/montserrat');
+
+:root {
   --vp-font-family-mono: 'Montserrat', sans-serif;
   --vp-code-line-height: 1.5;
 }
