@@ -1,3 +1,4 @@
+import { isNumber, isFullString } from 'is-what'
 import {
   PluginFetchAction,
   FetchResponse,
@@ -71,7 +72,7 @@ export function fetchActionFactory(
       )({
         payload: _payload,
         collectionPath,
-        docId,
+        docId: docId || (isFullString(meta.id) || isNumber(meta.id) ? `${meta.id}` : undefined),
         actionConfig,
         pluginModuleConfig,
       })

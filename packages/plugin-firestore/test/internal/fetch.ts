@@ -64,7 +64,7 @@ import { pokedex, waitMs } from '@magnetarjs/test-utils'
   })
 }
 {
-  const testName = 'only:fetch (collection) default behaviour'
+  const testName = 'fetch (collection) default behaviour'
   test(testName, async (t) => {
     /// 'fetch' resolves once all stores have given a response with data
     const { pokedexModule } = await createMagnetarInstance('read')
@@ -88,5 +88,31 @@ import { pokedex, waitMs } from '@magnetarjs/test-utils'
     }
     t.deepEqual(result.size, 12)
     t.deepEqual(pokedexModule.data.size, 13)
+  })
+}
+{
+  const testName = 'only:fetch (collectionGroup) default behaviour'
+  test(testName, async (t) => {
+    /// 'fetch' resolves once all stores have given a response with data
+    const { movesModuleOf, movesModuleGroupCollection } = await createMagnetarInstance('read')
+    t.deepEqual(movesModuleOf(1).data.size, 0)
+
+    let result: any
+    try {
+      result = await movesModuleOf(1).fetch()
+    } catch (error) {
+      t.fail(JSON.stringify(error))
+    }
+    t.deepEqual(result.size, 4)
+    t.deepEqual(movesModuleOf(1).data.size, 4)
+
+    t.deepEqual(movesModuleGroupCollection.data.size, 0)
+    try {
+      result = await movesModuleGroupCollection.fetch()
+    } catch (error) {
+      t.fail(JSON.stringify(error))
+    }
+    t.deepEqual(result.size, 604)
+    t.deepEqual(movesModuleGroupCollection.data.size, 604)
   })
 }

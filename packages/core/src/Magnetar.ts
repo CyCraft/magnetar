@@ -108,7 +108,8 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     }
   }
 
-  async function closeAllStreams(): Promise<void> {
+  /** _ to prevent name clash */
+  async function _closeAllStreams(): Promise<void> {
     for (const collectionName of collectionNames) {
       collection(collectionName).closeAllStreams()
     }
@@ -211,7 +212,7 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     collection: collection as CollectionFn,
     doc: doc as DocFn,
     clearAllData,
-    closeAllStreams,
+    closeAllStreams: _closeAllStreams,
   }
   return instance
 }

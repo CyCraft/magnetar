@@ -5,18 +5,31 @@ import type {
   DocumentSnapshot,
   QueryDocumentSnapshot,
 } from 'firebase/firestore'
-import { collection, query, where, orderBy, limit, startAfter } from 'firebase/firestore'
+import {
+  collection,
+  collectionGroup,
+  query,
+  where,
+  orderBy,
+  limit,
+  startAfter,
+} from 'firebase/firestore'
 import { isNumber } from 'is-what'
 import { FirestoreModuleConfig } from '../CreatePlugin'
 import { DocMetadata } from '@magnetarjs/core'
 
+/**
+ * If the collectionPath includes a `*` it will use a collectionQuery for the part beyond that point
+ */
 export function getQueryInstance(
   collectionPath: string,
   config: FirestoreModuleConfig,
   db: Firestore
 ): Query {
   let q: CollectionReference | Query
-  q = collection(db, collectionPath)
+  q = collectionPath.includes('*/')
+    ? collectionGroup(db, collectionPath.split('*/')[1])
+    : collection(db, collectionPath)
   for (const whereClause of config.where || []) {
     q = query(q, where(...whereClause))
   }

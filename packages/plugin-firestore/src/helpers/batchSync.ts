@@ -331,7 +331,7 @@ export function batchSyncFactory(
   }
 
   async function _delete(documentPath: string, debounceMsOverwrite?: number): Promise<SyncBatch> {
-    const operationCount = 0
+    const operationCount = 1
     const stack = await prepareStack(operationCount)
     const promise = prepareReturnPromise(stack)
 

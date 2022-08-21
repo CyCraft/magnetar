@@ -19,6 +19,7 @@
     "test": "npm run test:core && npm run test:plugin-firestore && npm run test:plugin-simple-store && npm run test:plugin-vue2 && npm run test:plugin-vue3",
     "test:core": "cd packages/core && npm run test",
     "test:plugin-firestore": "cd packages/plugin-firestore && npm run test",
+    "test:plugin-firestore:only": "cd packages/plugin-firestore && npm run test--only",
     "test:plugin-simple-store": "cd packages/plugin-simple-store && npm run test",
     "test:plugin-vue2": "cd packages/plugin-vue2 && npm run test",
     "test:plugin-vue3": "cd packages/plugin-vue3 && npm run test",
@@ -101,7 +102,7 @@
       "@typescript-eslint/ban-ts-comment": "warn"
     }
   },
-  "version": "0.5.11",
+  "version": "0.6.0",
   "pnpm": {
     "peerDependencyRules": {
       "ignoreMissing": [

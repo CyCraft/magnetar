@@ -1,3 +1,5 @@
+rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
     match /magnetarTests/{docId} {
@@ -7,6 +9,10 @@ service cloud.firestore {
     match /magnetarTests/{docId}/{restOfPath=**} {
       allow read: if docId != 'read-no-access';
       allow write: if docId != 'write-no-access';
+    }
+    match /{restOfPath=**}/moves/{move} {
+      allow read;
+      allow write;
     }
   }
 }

@@ -1,6 +1,6 @@
 import { doc, setDoc, deleteDoc, Timestamp } from 'firebase/firestore'
 import { O } from 'ts-toolbelt'
-import { PokedexEntry, generateRandomId, PluginMockLocal } from '@magnetarjs/test-utils'
+import { PokedexEntry, generateRandomId, PluginMockLocal, MoveEntry } from '@magnetarjs/test-utils'
 import { Magnetar, MagnetarInstance, CollectionInstance, DocInstance } from '../../../core/src'
 import { CreatePlugin as CreatePluginRemote } from '../../src'
 import { db } from './initFirebase'
@@ -42,8 +42,10 @@ export async function createMagnetarInstance(
   } = {}
 ): Promise<{
   pokedexModule: CollectionInstance<PokedexModuleData>
-  datesModule: CollectionInstance<DateDoc>
   trainerModule: DocInstance<TrainerModuleData>
+  datesModule: CollectionInstance<DateDoc>
+  movesModuleGroupCollection: CollectionInstance<MoveEntry>
+  movesModuleOf: (pkmnId: number) => CollectionInstance<MoveEntry>
   magnetar: MagnetarInstance
 }> {
   if (testName.includes('/')) throw new Error('no / in test names allowed!')
@@ -57,7 +59,7 @@ export async function createMagnetarInstance(
   const initialEntriesPokedex: [string, Record<string, any>][] = []
   const insertPromises = Object.entries(insertDocs).map(([path, data]) => {
     const docPath = `magnetarTests/${testName}${path ? '/' + path : ''}`
-    if (path.startsWith('pokedex/')) {
+    if (path.startsWith('pokedex/') && !path.endsWith('/moves')) {
       initialEntriesPokedex.push([path.split('/').pop() || '', data])
     }
     return setDoc(doc(db, docPath), data)
@@ -84,6 +86,22 @@ export async function createMagnetarInstance(
     },
   })
 
+  const movesModuleGroupCollection = magnetar.collection<MoveEntry>('pokedex/*/moves', {
+    configPerStore: {
+      remote: { firestorePath: `magnetarTests/${testName}/pokedex/*/moves`, ...remoteConfig },
+    },
+  })
+
+  const movesModuleOf = (pkmnId: number) =>
+    magnetar.collection<MoveEntry>(`pokedex/${pkmnId}/moves`, {
+      configPerStore: {
+        remote: {
+          firestorePath: `magnetarTests/${testName}/pokedex/${pkmnId}/moves`,
+          ...remoteConfig,
+        },
+      },
+    })
+
   const trainerModule = magnetar.doc<TrainerModuleData>('app-data/trainer', {
     configPerStore: {
       local: { initialData: getInitialDataDocument() },
@@ -97,5 +115,12 @@ export async function createMagnetarInstance(
     },
   })
 
-  return { pokedexModule, trainerModule, datesModule, magnetar }
+  return {
+    pokedexModule,
+    trainerModule,
+    datesModule,
+    movesModuleGroupCollection,
+    movesModuleOf,
+    magnetar,
+  }
 }
