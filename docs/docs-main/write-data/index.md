@@ -1,6 +1,6 @@
 # Write Data
 
-Be sure to first read the [Setup chapter](#) to have a basic understanding.
+Be sure to first read the [Setup chapter](../setup/) to have a basic understanding.
 
 ## Insert a Document
 
@@ -60,7 +60,7 @@ const newDocModule = await pokedexModule.insert({ name: 'squirtle' })
 
 // ✅ instead do NOT await
 pokedexModule.insert({ name: 'squirtle' })
-// you can immidiately access the inserted data (even if the remote store takes a while longer)
+// you can immediately access the inserted data (even if the remote store takes a while longer)
 pokedexModule.data.values()
 ```
 
