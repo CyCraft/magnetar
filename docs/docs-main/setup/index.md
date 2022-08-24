@@ -65,7 +65,7 @@ Some info on the main Magnetar instance props:
 - `stores` ⸺ an object with the store name as key and the store plugin instance as value
 - `localStoreName` ⸺ the name of the store that saves data locally
 - `executionOrder` ⸺ the execution order of your stores, this order is required for optimistic UI (but can be flipped)
-- `on` ⸺ event listeners for anything that happens in Magnetar, see the [Events chapter](#events) for more info
+- `on` ⸺ event listeners for anything that happens in Magnetar, see the [Events chapter](../hooks-and-events/) for more info
 
 ## Working with Modules
 
@@ -84,7 +84,7 @@ magnetar.collection('pokedex').doc('001')
 magnetar.doc('pokedex/001')
 ```
 
-Ideally you want to create a separate file for the modules you intend to use (or one file per module). This way you can more easily add some documentation on how the data structure looks for your database documents. <small>(for more info on this read [Module Setup](#))</small>
+Ideally you want to create a separate file for the modules you intend to use (or one file per module). This way you can more easily add some documentation on how the data structure looks for your database documents. <small>(for more info on this read [Module Setup](../module-setup/))</small>
 
 ```javascript
 import { magnetar } from 'magnetarSetup.js'

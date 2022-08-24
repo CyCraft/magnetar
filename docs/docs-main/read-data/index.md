@@ -9,7 +9,7 @@ There are two ways to retrieve data from your remote stores. Either of these met
 
 When you get data by executing `fetch()`, the data will be fetched from a server by your "remote" store plugin and then added to your module's data by your "local" store plugin.
 
-For displaying fetched data in the DOM see the [Displaying data in the DOM](#displaying-data-in-the-dom).
+For displaying fetched data in the DOM see the [Displaying data in the DOM](../setup/#displaying-data-in-the-dom).
 
 ### Fetch a Single Document
 
@@ -32,7 +32,7 @@ const data = bulbasaur.data
 The `fetch` action returns whatever data was fetched. When fetching a single document, the data will be an object.
 
 ```js
-// create the module and immidiately use the fetched data
+// create the module and immediately use the fetched data
 const bulbasaurData = await magnetar.doc('pokedex/001').fetch()
 
 // bulbasaurData ≈ { name: 'Bulbasaur' }
@@ -73,7 +73,7 @@ const allPokemon = pokedexModule.data.values()
 The `fetch` action returns whatever data was fetched. When fetching a collection, the data will be a Map <small>[？](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)</small>.
 
 ```js
-// create the module and immidiately use the fetched data
+// create the module and immediately use the fetched data
 const pokedexData = await magnetar.collection('pokedex').fetch()
 
 // pokedexData ≈ Map<
@@ -114,7 +114,7 @@ Afterwards, any changes to this document remotely will automatically be reflecte
 
 Please note: a streaming promise will never resolve as long as your stream is open! There is **no way** to know when or how many documents will be loaded in, as this depends on your remote store.
 
-For displaying streamed data in the DOM see the [Displaying data in the DOM](#displaying-data-in-the-dom).
+For displaying streamed data in the DOM see the [Displaying data in the DOM](../setup/#displaying-data-in-the-dom).
 
 ### Firestore vs Magnetar
 
@@ -123,7 +123,7 @@ The Firestore JS SDK has a [built-in feature for realtime updates](https://fireb
 - The syntax you have to use is very convoluted and complex
 - If your not careful, you can open the same stream twice and they both will use memory
 - You need to write a lot of code to capture the documents that comes in and save them in local cache
-- You need to organise where and how to temporarily save the function you get back to stop the stream
+- You need to organize where and how to temporarily save the function you get back to stop the stream
 
 Magnetar's Firestore Plugin uses `onSnapshot` [under the hood](https://github.com/CyCraft/magnetar/blob/production/packages/plugin-firestore/src/actions/stream.ts) but does these things for you:
 
@@ -214,7 +214,7 @@ magnetar
     // the stream was closed because of an error! !
   })
 
-// The code here will get executed immidiately
+// The code here will get executed immediately
 console.log('The stream was opened!')
 ```
 

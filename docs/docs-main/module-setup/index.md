@@ -1,6 +1,6 @@
 # Module Setup
 
-Before you dive in here, it's best to have a basic grasp of how to [Add & Edit Data](#) and how to [Read Data](#). So check out that documentation first, and then come back here!
+Before you dive in here, it's best to have a basic grasp of how to [Add & Edit Data](../write-data/) and how to [Read Data](../read-data/). So check out that documentation first, and then come back here!
 
 ## Documenting your Data Structure
 
@@ -55,7 +55,7 @@ It's also become clear that these modules might be better off each having their 
 - `modifyPayloadOn.insert` — is triggered every time you write data locally (which is then synced to the server with those default values)
 - `modifyReadResponseOn.added` — is triggered every time data comes in from your remote store (the server)
 
-To learn more about these functions and other possibilities read [Hooks and Events](#hooks-and-events).
+To learn more about these functions and other possibilities read [Hooks and Events](../hooks-and-events/).
 
 ## Filtering Data with Queries
 
@@ -66,7 +66,7 @@ When you need to have only a sub-set of your documents in a collection, you have
 
 ### Set up a Query at the Module Level
 
-At the module level the query will be active whenever you try to read data with [fetch](#) or [stream](#). You should only set up the query at the module when you never need to query for other data in the same collection throughout your app.
+At the module level the query will be active whenever you try to read data with [fetch](../read-data/#fetch-data-once) or [stream](../read-data/#stream-realtime-updates). You should only set up the query at the module when you never need to query for other data in the same collection throughout your app.
 
 Example use case 1: **Filter and order documents based on some fields**
 
@@ -169,7 +169,7 @@ async function searchPokemon(type) {
 
 As you can see in the example, using a query in Magnetar is very powerful because it will not only query your read requests to the remote store, but can also apply that same query when reading your local data.
 
-You can find more information on reading data at [Read Data](#).
+You can find more information on reading data at [Read Data](../read-data/#query-data-filter-order-by-limit).
 
 ## Dynamic Module Paths
 
