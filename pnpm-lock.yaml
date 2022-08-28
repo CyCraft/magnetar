@@ -157,6 +157,7 @@ importers:
       array-shuffle: ^3.0.0
       firebase: ^9.9.3
       flatten-anything: ^2.0.7
+      getorset-anything: ^0.0.2
       is-what: ^3.14.1
       merge-anything: ^5.0.2
       remove-anything: ^0.1.0
@@ -164,6 +165,7 @@ importers:
     dependencies:
       '@magnetarjs/core': link:../core
       flatten-anything: 2.0.7
+      getorset-anything: 0.0.2
       is-what: 3.14.1
       merge-anything: 5.0.2
       remove-anything: 0.1.3
@@ -8439,6 +8441,11 @@ packages:
     resolution: {integrity: sha512-Ln0UQDlxH1BapMu3GPtf7CuYNwRZf2gwCuPqbyG6pB8WfmFpzqcy4xtAaAMUhnNqjMKTiCPZG2oMT3YSx8U2NA==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /getorset-anything/0.0.2:
+    resolution: {integrity: sha512-rDQa2Bb1+tqAKAgKF2/Bvx3yW0yYSMr6h57uO3SYJNDVb3MZh6NwXFuEu0NSGJD5JrlegCiR9Yrf7mEQxOgjkg==}
+    engines: {node: '>=12.13'}
+    dev: false
 
   /getpass/0.1.7:
     resolution: {integrity: sha512-0fzj9JxOLfJ+XGLhR8ze3unN0KZCgZwiSSDz168VERjK8Wl8kVSdcu2kspd4s4wtAa1y/qrVRiAA0WclVsu0ng==}

@@ -32,6 +32,7 @@
   "dependencies": {
     "@magnetarjs/core": "workspace:*",
     "flatten-anything": "^2.0.7",
+    "getorset-anything": "^0.0.2",
     "is-what": "^3.14.1",
     "merge-anything": "^5.0.2",
     "remove-anything": "^0.1.0",

@@ -1,11 +1,12 @@
 import { isNumber } from 'is-what'
+import { mapGetOrSet } from 'getorset-anything'
 import { PluginWriteAction, PluginWriteActionPayload, SyncBatch } from '@magnetarjs/core'
-import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
-import { BatchSync } from '../helpers/batchSync'
+import { FirestoreModuleConfig, FirestorePluginOptions, BatchSyncMap } from '../CreatePlugin'
 import { getFirestoreDocPath } from '../helpers/pathHelpers'
+import { batchSyncFactory } from '../helpers/batchSync'
 
 export function writeActionFactory(
-  batchSync: BatchSync,
+  batchSyncMap: BatchSyncMap,
   firestorePluginOptions: Required<FirestorePluginOptions>,
   actionName: 'merge' | 'assign' | 'replace'
 ): PluginWriteAction {
@@ -22,6 +23,10 @@ export function writeActionFactory(
     const syncDebounceMs = isNumber(actionConfig.syncDebounceMs)
       ? actionConfig.syncDebounceMs
       : pluginModuleConfig.syncDebounceMs
+
+    const batchSync = mapGetOrSet(batchSyncMap, collectionPath, () =>
+      batchSyncFactory(firestorePluginOptions)
+    )
 
     if (actionName === 'assign') {
       const result = await batchSync.assign(documentPath, payload, syncDebounceMs)

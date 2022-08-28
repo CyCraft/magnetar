@@ -1,11 +1,12 @@
 import { isFullString, isNumber } from 'is-what'
+import { mapGetOrSet } from 'getorset-anything'
 import { PluginDeleteAction, PluginDeleteActionPayload, SyncBatch } from '@magnetarjs/core'
-import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
-import { BatchSync } from '../helpers/batchSync'
+import { FirestoreModuleConfig, FirestorePluginOptions, BatchSyncMap } from '../CreatePlugin'
+import { batchSyncFactory } from '../helpers/batchSync'
 import { getFirestoreDocPath } from '../helpers/pathHelpers'
 
 export function deleteActionFactory(
-  batchSync: BatchSync,
+  batchSyncMap: BatchSyncMap,
   firestorePluginOptions: Required<FirestorePluginOptions>
 ): PluginDeleteAction {
   return async function ({
@@ -22,6 +23,10 @@ export function deleteActionFactory(
     const syncDebounceMs = isNumber(actionConfig.syncDebounceMs)
       ? actionConfig.syncDebounceMs
       : pluginModuleConfig.syncDebounceMs
+
+    const batchSync = mapGetOrSet(batchSyncMap, collectionPath, () =>
+      batchSyncFactory(firestorePluginOptions)
+    )
 
     const result = await batchSync.delete(documentPath, syncDebounceMs)
     return result

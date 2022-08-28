@@ -91,7 +91,7 @@ import { pokedex, waitMs } from '@magnetarjs/test-utils'
   })
 }
 {
-  const testName = 'only:fetch (collectionGroup) default behaviour'
+  const testName = 'fetch (collectionGroup) default behaviour'
   test(testName, async (t) => {
     /// 'fetch' resolves once all stores have given a response with data
     const { movesModuleOf, movesModuleGroupCollection } = await createMagnetarInstance('read')
