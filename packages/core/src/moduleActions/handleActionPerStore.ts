@@ -243,8 +243,8 @@ export function handleActionPerStore(
               doOnFetchFns.push(resultFromPlugin)
             }
             if (isFetchResponse(resultFromPlugin)) {
-              for (const docRetrieved of resultFromPlugin.docs) {
-                executeOnFns(doOnFetchFns, docRetrieved.data, [docRetrieved])
+              for (const docMetaData of resultFromPlugin.docs) {
+                executeOnFns(doOnFetchFns, docMetaData.data, [docMetaData])
               }
             }
           }
