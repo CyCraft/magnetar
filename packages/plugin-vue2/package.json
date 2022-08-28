@@ -35,6 +35,7 @@
     "copy-anything": "^2.0.6",
     "fast-sort": "^3.2.0",
     "filter-anything": "^2.2.4",
+    "getorset-anything": "^0.0.2",
     "is-what": "^3.14.1",
     "merge-anything": "^4.0.5",
     "path-to-prop": "1.0.2",

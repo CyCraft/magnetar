@@ -1,11 +1,12 @@
-import { FirestorePluginOptions } from '../CreatePlugin'
-import { Countdown, CountdownInstance } from './Countdown'
-import { SyncBatch } from '@magnetarjs/core'
 import type { WriteBatch } from 'firebase/firestore'
 import { doc, writeBatch as createWriteBatch, deleteField } from 'firebase/firestore'
 import { isEmptyObject, isNumber } from 'is-what'
 import { merge as mergeObjects } from 'merge-anything'
 import { removeProp } from 'remove-anything'
+import { mapGetOrSet } from 'getorset-anything'
+import { SyncBatch } from '@magnetarjs/core'
+import { FirestorePluginOptions } from '../CreatePlugin'
+import { Countdown, CountdownInstance } from './Countdown'
 
 // https://firebase.google.com/docs/firestore/manage-data/transactions#batched-writes
 // A batched write can contain up to 500 operations.
@@ -312,16 +313,12 @@ export function batchSyncFactory(
     propPaths: string[],
     debounceMsOverwrite?: number
   ): Promise<SyncBatch> {
-    let operationCount = 0
+    const operationCount = 1
     const stack = await prepareStack(operationCount)
 
     const map = stack.batch.deleteProp
-    if (!map.has(documentPath)) {
-      map.set(documentPath, new Set())
-      operationCount = 1
-    }
 
-    const set = map.get(documentPath) as Set<string>
+    const set = mapGetOrSet(map, documentPath, () => new Set())
 
     propPaths.forEach((p) => set.add(p))
 

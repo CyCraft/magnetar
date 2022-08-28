@@ -1,6 +1,7 @@
 import { copy } from 'copy-anything'
 import { pick } from 'filter-anything'
 import { isArray, isPlainObject } from 'is-what'
+import { mapGetOrSet } from 'getorset-anything'
 import { reactive } from 'vue'
 import {
   PluginInstance,
@@ -55,11 +56,10 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
     if (!(collectionPath in dataBackups)) dataBackups[collectionPath] = new Map()
     const backupCollectionMap = dataBackups[collectionPath]
     // set the backup array for the doc
-    if (!backupCollectionMap.has(docId)) backupCollectionMap.set(docId, [])
+    const arr = mapGetOrSet(backupCollectionMap, docId, () => [])
     // make a backup of whatever is found in the data
-    const docBackup = copy(data[collectionPath].get(docId))
-    const arr = backupCollectionMap.get(docId)
-    if (docBackup && arr) arr.push(docBackup)
+    const foundDoc = data[collectionPath].get(docId)
+    if (foundDoc) arr.push(copy(foundDoc))
   }
 
   const restoreBackup: MakeRestoreBackup = (collectionPath, docId) => {

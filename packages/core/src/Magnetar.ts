@@ -1,4 +1,5 @@
 import { O } from 'ts-toolbelt'
+import { mapGetOrSet } from 'getorset-anything'
 import { createCollectionWithContext, CollectionInstance } from './Collection'
 import { GlobalConfig, ModuleConfig, defaultsGlobalConfig } from './types/config'
 import { createDocWithContext, DocInstance } from './Doc'
@@ -129,16 +130,13 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
 
     const pathFilterIdentifier = getPathFilterIdentifier(modulePath, moduleConfig)
 
-    // grab (and set) the WriteLock for this module
+    // set the WriteLock for this module
     if (!writeLockMap.has(modulePath)) {
       writeLockMap.set(modulePath, { promise: null, resolve: () => {}, countdown: null })
     }
 
     // grab (and set) the FetchPromises for this module
-    if (!fetchPromiseMap.has(pathFilterIdentifier)) {
-      fetchPromiseMap.set(pathFilterIdentifier, new Map())
-    }
-    const fetchPromises = fetchPromiseMap.get(pathFilterIdentifier)!
+    const fetchPromises = mapGetOrSet(fetchPromiseMap, pathFilterIdentifier, () => new Map())
 
     // set the closeStreamFnMap and streamingPromiseMap for this module
     if (!closeStreamFnMap.has(pathFilterIdentifier)) {
