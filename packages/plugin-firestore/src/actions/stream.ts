@@ -35,11 +35,12 @@ export function streamActionFactory(
       closeStream = onSnapshot(
         doc(db, documentPath),
         (docSnapshot: DocumentSnapshot) => {
-          const localChange = docSnapshot.metadata.hasPendingWrites
-          // do nothing for local changes
-          if (localChange) return
+          // even if `docSnapshot.metadata.hasPendingWrites`
+          //       we should always execute `added/modified`
+          //       because `core` handles overlapping calls for us
+
           // do nothing if the doc doesn't exist
-          if (!docSnapshot.exists) return
+          if (!docSnapshot.exists()) return
           // serverChanges only
           const docData = docSnapshot.data() as Record<string, any>
           const docMetadata = docSnapshotToDocMetadata(docSnapshot)
@@ -55,9 +56,10 @@ export function streamActionFactory(
       closeStream = onSnapshot(
         queryInstance,
         (querySnapshot: QuerySnapshot) => {
-          // do nothing for local changes
-          const localChanges = querySnapshot.metadata.hasPendingWrites
-          if (localChanges) return
+          // even if `docSnapshot.metadata.hasPendingWrites`
+          //       we should always execute `added/modified`
+          //       because `core` handles overlapping calls for us
+
           // serverChanges only
           querySnapshot.docChanges().forEach((docChange: DocumentChange) => {
             const docSnapshot: QueryDocumentSnapshot = docChange.doc

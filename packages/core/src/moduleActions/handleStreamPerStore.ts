@@ -12,6 +12,8 @@ import { executeOnFns } from '../helpers/executeOnFns'
 import { throwOnIncompleteStreamResponses, throwIfNoFnsToExecute } from '../helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from '../types/config'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers'
+import { DocMetadata } from '../types/atoms'
+import { getDocAfterWritelock, writeLockPromise } from '../helpers/writeLockHelpers'
 
 export function handleStreamPerStore(
   [collectionPath, docId]: [string, string | undefined],
@@ -62,55 +64,54 @@ export function handleStreamPerStore(
     }
 
     /**
-     * Last incoming modified docs are cached here temporarily to prevent UI flashing because of the writeLock
+     * Last incoming added/modified docs are cached here temporarily to prevent UI flashing because of the writeLock
      */
-    const lastIncomingModifiedDocs: Map<string, [any, any]> = new Map()
+    const lastIncomingDocs = new Map<
+      string,
+      { payload: Record<string, any> | undefined; meta: DocMetadata }
+    >()
+
     /**
      * this is what must be executed by a plugin store that implemented "stream" functionality
      */
     const mustExecuteOnRead: O.Compulsory<DoOnStream> = {
       added: async (_payload, _meta) => {
         // check if there's a WriteLock for the document:
-        const _writeLock = writeLockMap.get(`${collectionPath}/${_meta.id}`)
-        if (_writeLock && isPromise(_writeLock.promise)) {
-          await _writeLock.promise
-        }
-        return executeOnFns(doOnStreamFns.added, _payload, [_meta])
+        const docIdentifier = `${collectionPath}/${_meta.id}`
+        const result = await getDocAfterWritelock({
+          writeLockMap,
+          docIdentifier,
+          lastIncomingDocs,
+          meta: _meta,
+          payload: _payload,
+        })
+
+        // if `undefined` nothing further must be done
+        if (!result) return
+
+        return executeOnFns(doOnStreamFns.added, result.payload, [result.meta])
       },
       modified: async (_payload, _meta) => {
-        const identifier = `${collectionPath}/${_meta.id}`
+        // check if there's a WriteLock for the document:
+        const docIdentifier = `${collectionPath}/${_meta.id}`
+        const result = await getDocAfterWritelock({
+          writeLockMap,
+          docIdentifier,
+          lastIncomingDocs,
+          meta: _meta,
+          payload: _payload,
+        })
 
-        // add to lastIncoming map
-        lastIncomingModifiedDocs.set(identifier, [_payload, _meta])
+        // if `undefined` nothing further must be done
+        if (!result) return
 
-        // check if there's a WriteLock for the document
-        const _writeLock = writeLockMap.get(identifier)
-        if (_writeLock && isPromise(_writeLock.promise)) {
-          await _writeLock.promise
-        }
-
-        // grab from lastIncoming map
-        const lastIncoming = lastIncomingModifiedDocs.get(identifier)
-        if (!lastIncoming) {
-          // do nothing if there is no last incoming. This means more than 1 call might have piled up and
-          return
-        }
-
-        const [__payload, __meta] = lastIncoming
-
-        // delete from lastIncoming map
-        lastIncomingModifiedDocs.delete(identifier)
-
-        // executer other plugin `doOnStream` functions
-        return executeOnFns(doOnStreamFns.modified, __payload, [__meta])
+        return executeOnFns(doOnStreamFns.added, result.payload, [result.meta])
       },
       removed: async (_payload, _meta) => {
-        const identifier = `${collectionPath}/${_meta.id}`
         // check if there's a WriteLock for the document
-        const _writeLock = writeLockMap.get(identifier)
-        if (_writeLock && isPromise(_writeLock.promise)) {
-          await _writeLock.promise
-        }
+        const docIdentifier = `${collectionPath}/${_meta.id}`
+        await writeLockPromise(writeLockMap, docIdentifier)
+
         return executeOnFns(doOnStreamFns.removed, _payload, [_meta])
       },
     }
