@@ -12,7 +12,6 @@ import { executeOnFns } from '../helpers/executeOnFns'
 import { throwOnIncompleteStreamResponses, throwIfNoFnsToExecute } from '../helpers/throwFns'
 import { ModuleConfig, GlobalConfig } from '../types/config'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers'
-import { getCollectionWriteLocks } from '../helpers/pathHelpers'
 
 export function handleStreamPerStore(
   [collectionPath, docId]: [string, string | undefined],
@@ -28,17 +27,6 @@ export function handleStreamPerStore(
     // return the same stream promise if it's already open
     const foundStream = streaming()
     if (isPromise(foundStream)) return foundStream
-
-    // we need to await any writeLock _before_ opening the stream to prevent grabbing outdated data
-    const writeLock = docId
-      ? writeLockMap.get(`${collectionPath}/${docId}`)!
-      : writeLockMap.get(collectionPath)!
-    if (isPromise(writeLock.promise)) await writeLock.promise
-    if (!docId) {
-      // we need to await all promises of all docs in this collection...
-      const collectionWriteLocks = getCollectionWriteLocks(collectionPath, writeLockMap)
-      await Promise.allSettled(collectionWriteLocks.map((w) => w.promise))
-    }
 
     // get all the config needed to perform this action
     const eventNameFnsMap = getEventNameFnsMap(globalConfig.on, moduleConfig.on, actionConfig.on)
@@ -172,7 +160,7 @@ export function handleStreamPerStore(
     // create a single stream promise from multiple stream promises the store plugins return
     const streamPromise: Promise<void> = new Promise((resolve, reject) => {
       Promise.all(streamPromises)
-      .then(() => {
+        .then(() => {
           resolve()
           closeStream()
         })
