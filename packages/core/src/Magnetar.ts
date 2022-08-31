@@ -77,14 +77,14 @@ export type DocFn<DocDataTypeInherited extends Record<string, any> = Record<stri
  * @see {@link MagnetarInstance}
  */
 export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
-  // the passed GlobalConfig is merged onto defaults
+  /**
+   * the passed GlobalConfig is merged onto defaults
+   */
   const globalConfig = defaultsGlobalConfig(magnetarConfig)
-
   /**
    * All collections visited so far, kept to be able to clear all data
    */
   const collectionNames = new Set<string>()
-
   /**
    * the global storage for WriteLock objects
    * @see {@link WriteLock}
@@ -138,14 +138,6 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     // grab (and set) the FetchPromises for this module
     const fetchPromises = mapGetOrSet(fetchPromiseMap, pathFilterIdentifier, () => new Map())
 
-    // set the closeStreamFnMap and streamingPromiseMap for this module
-    if (!closeStreamFnMap.has(pathFilterIdentifier)) {
-      closeStreamFnMap.set(pathFilterIdentifier, () => {/** No stream open yet... */}) // prettier-ignore
-    }
-    if (!streamingPromiseMap.has(pathFilterIdentifier)) {
-      streamingPromiseMap.set(pathFilterIdentifier, null)
-    }
-
     // grab the stream related functions
     function cacheStream(closeStreamFn: () => void, streamingPromise: Promise<void> | null): void {
       closeStreamFnMap.set(pathFilterIdentifier, closeStreamFn)
@@ -156,12 +148,20 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     }
     function closeStream(): void {
       const closeStreamFn = closeStreamFnMap.get(pathFilterIdentifier)
-      if (closeStreamFn) closeStreamFn()
+      if (closeStreamFn) {
+        closeStreamFn()
+        setTimeout(() => {
+          streamingPromiseMap.delete(pathFilterIdentifier)
+          closeStreamFnMap.delete(pathFilterIdentifier)
+        })
+      }
     }
     function closeAllStreams(): void {
       for (const [identifier, closeStreamFn] of closeStreamFnMap) {
-        const _modulePath = identifier.split(MODULE_IDENTIFIER_SPLIT)[0]
-        if (_modulePath === modulePath) closeStreamFn()
+        const openStreamPath = identifier.split(MODULE_IDENTIFIER_SPLIT)[0]
+        if (openStreamPath === modulePath || openStreamPath.startsWith(modulePath + '/')) {
+          closeStreamFn()
+        }
       }
     }
 
