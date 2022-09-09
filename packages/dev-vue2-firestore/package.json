@@ -7,6 +7,7 @@
     "build--": "vue-cli-service build"
   },
   "dependencies": {
+    "@magnetarjs/plugin-vue2": "workspace:*",
     "core-js": "^3.20.2",
     "firebase": "^9.6.1",
     "magnetar": "workspace:*",

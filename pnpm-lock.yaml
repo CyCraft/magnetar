@@ -67,6 +67,7 @@ importers:
 
   packages/dev-vue2-firestore:
     specifiers:
+      '@magnetarjs/plugin-vue2': workspace:*
       '@vue/cli-plugin-babel': ~4.5.15
       '@vue/cli-plugin-vuex': ~4.5.15
       '@vue/cli-service': ~4.5.15
@@ -78,6 +79,7 @@ importers:
       vue: ^2.6.14
       vue-template-compiler: ^2.6.14
     dependencies:
+      '@magnetarjs/plugin-vue2': link:../plugin-vue2
       core-js: 3.22.7
       firebase: 9.8.2
       magnetar: link:../magnetar
