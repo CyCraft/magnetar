@@ -41,6 +41,7 @@
     "ts-toolbelt": "^9.6.0"
   },
   "devDependencies": {
+    "@magnetarjs/core": "workspace:*",
     "@magnetarjs/test-utils": "workspace:*",
     "vue": "^3.2.26"
   },

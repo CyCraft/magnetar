@@ -1,7 +1,8 @@
 import { doc, setDoc, deleteDoc, Timestamp } from 'firebase/firestore'
 import { O } from 'ts-toolbelt'
 import { PokedexEntry, generateRandomId, PluginMockLocal, MoveEntry } from '@magnetarjs/test-utils'
-import { Magnetar, MagnetarInstance, CollectionInstance, DocInstance } from '@magnetarjs/types'
+import { MagnetarInstance, CollectionInstance, DocInstance } from '@magnetarjs/types'
+import { Magnetar } from '@magnetarjs/core'
 import { CreatePlugin as CreatePluginRemote } from '../../src'
 import { db } from './initFirebase'
 

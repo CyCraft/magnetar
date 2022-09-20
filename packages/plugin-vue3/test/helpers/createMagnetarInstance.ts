@@ -1,4 +1,5 @@
-import { Magnetar, MagnetarInstance, CollectionInstance, DocInstance } from '@magnetarjs/types'
+import { MagnetarInstance, CollectionInstance, DocInstance } from '@magnetarjs/types'
+import { Magnetar } from '@magnetarjs/core'
 import { CreatePlugin as CreatePluginLocal } from '../../src'
 import { pokedex, PokedexEntry, generateRandomId, PluginMockRemote } from '@magnetarjs/test-utils'
 import { O } from 'ts-toolbelt'
