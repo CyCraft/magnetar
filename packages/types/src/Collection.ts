@@ -8,7 +8,10 @@ import { DocFn } from './Magnetar'
 import { WhereFilterOp } from './types/clauses'
 import { OPaths } from './types/utils'
 
-export type CollectionInstance<DocDataType extends Record<string, any> = Record<string, any>> = {
+export type CollectionInstance<
+  DocDataType extends Record<string, any> = Record<string, any>,
+  GranularTypes extends { insert: Record<string, any> } = { insert: DocDataType }
+> = {
   /**
    * The cached data that was written or read so far
    */
@@ -18,7 +21,7 @@ export type CollectionInstance<DocDataType extends Record<string, any> = Record<
    * @see {@link DocFn}
    * @example collection('pokedex').doc('001')
    */
-  doc: DocFn<DocDataType>
+  doc: DocFn<DocDataType, GranularTypes>
   /**
    * The id of the collection. When this is a nested collection, it will not include the full path, only the final part
    * @example 'items'
@@ -63,7 +66,7 @@ export type CollectionInstance<DocDataType extends Record<string, any> = Record<
   /**
    * @see {@link MagnetarInsertAction}
    */
-  insert: MagnetarInsertAction<DocDataType>
+  insert: MagnetarInsertAction<GranularTypes['insert']>
   /**
    * @see {@link MagnetarDeleteAction}
    */

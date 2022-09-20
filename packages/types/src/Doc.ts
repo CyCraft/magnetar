@@ -8,7 +8,10 @@ import {
 } from './types/actions'
 import { CollectionFn } from './Magnetar'
 
-export type DocInstance<DocDataType extends Record<string, any> = Record<string, any>> = {
+export type DocInstance<
+  DocDataType extends Record<string, any> = Record<string, any>,
+  GranularTypes extends { insert: Record<string, any> } = { insert: DocDataType }
+> = {
   /**
    * The cached data that was written or read so far
    */
@@ -55,7 +58,7 @@ export type DocInstance<DocDataType extends Record<string, any> = Record<string,
   /**
    * @see {@link MagnetarInsertAction}
    */
-  insert: MagnetarInsertAction<DocDataType>
+  insert: MagnetarInsertAction<GranularTypes['insert']>
   /**
    * @see {@link MagnetarWriteAction}
    */

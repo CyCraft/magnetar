@@ -42,20 +42,22 @@ export type WriteLock = {
  * This is the `collection()` method type.
  * @see {@link CollectionInstance}
  */
-export type CollectionFn<DocDataTypeInherited extends Record<string, any> = Record<string, any>> = <
-  DocDataType extends Record<string, any> = DocDataTypeInherited
->(
+export type CollectionFn<
+  DocDataTypeInherited extends Record<string, any> = Record<string, any>,
+  GranularTypes extends { insert: Record<string, any> } = { insert: DocDataTypeInherited }
+> = <DocDataType extends Record<string, any> = DocDataTypeInherited>(
   idOrPath: string,
   moduleConfig?: ModuleConfig
-) => CollectionInstance<DocDataType>
+) => CollectionInstance<DocDataType, GranularTypes>
 
 /**
  * This is the `doc()` method type.
  * @see {@link DocInstance}
  */
-export type DocFn<DocDataTypeInherited extends Record<string, any> = Record<string, any>> = <
-  DocDataType extends Record<string, any> = DocDataTypeInherited
->(
+export type DocFn<
+  DocDataTypeInherited extends Record<string, any> = Record<string, any>,
+  GranularTypes extends { insert: Record<string, any> } = { insert: DocDataTypeInherited }
+> = <DocDataType extends Record<string, any> = DocDataTypeInherited>(
   idOrPath: string,
   moduleConfig?: ModuleConfig
-) => DocInstance<DocDataType>
+) => DocInstance<DocDataType, GranularTypes>
