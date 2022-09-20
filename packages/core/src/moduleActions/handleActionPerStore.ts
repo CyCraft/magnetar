@@ -12,15 +12,23 @@ import {
   MagnetarInsertAction,
   ActionName,
   FetchPromises,
-} from '../types/actions'
-import { ActionType, ActionTernary } from '../types/actionsInternal'
-import { FetchResponse, isDoOnFetch, isFetchResponse, DoOnFetch, SyncBatch } from '../types/plugins'
+  DoOnFetch,
+  SyncBatch,
+  FetchResponse,
+  ActionType,
+  ActionTernary,
+  OnAddedFn,
+  ModuleConfig,
+  GlobalConfig,
+  CollectionFn,
+  DocFn,
+  WriteLock,
+} from '@magnetarjs/types'
+import { isDoOnFetch, isFetchResponse } from '../types/plugins'
 import { getModifyPayloadFnsMap } from '../types/modifyPayload'
-import { OnAddedFn, getModifyReadResponseFnsMap } from '../types/modifyReadResponse'
+import { getModifyReadResponseFnsMap } from '../types/modifyReadResponse'
 import { executeOnFns } from '../helpers/executeOnFns'
 import { throwIfNoFnsToExecute } from '../helpers/throwFns'
-import { ModuleConfig, GlobalConfig } from '../types/config'
-import { CollectionFn, DocFn, WriteLock } from '../Magnetar'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers'
 import { getCollectionWriteLocks } from '../helpers/pathHelpers'
 

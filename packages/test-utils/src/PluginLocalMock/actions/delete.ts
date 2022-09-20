@@ -1,5 +1,5 @@
 import { isFullString } from 'is-what'
-import { PluginDeleteAction, PluginDeleteActionPayload } from '../../../../core/src'
+import { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/types'
 import { StorePluginModuleConfig, StorePluginOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../helpers'
 

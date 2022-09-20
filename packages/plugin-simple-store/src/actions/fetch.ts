@@ -5,8 +5,8 @@ import {
   DoOnFetch,
   PluginFetchActionPayload,
   DocMetadata,
-  filterDataPerClauses,
-} from '@magnetarjs/core'
+} from '@magnetarjs/types'
+import { filterDataPerClauses } from '@magnetarjs/utils'
 import { SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 

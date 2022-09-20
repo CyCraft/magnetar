@@ -1,6 +1,5 @@
 import { isPromise } from 'is-what'
-import { DocMetadata } from '../types/atoms'
-import { WriteLock } from '../Magnetar'
+import { DocMetadata, WriteLock } from '@magnetarjs/types'
 
 /**
  * await if there's a WriteLock for the document

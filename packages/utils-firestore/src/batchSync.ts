@@ -1,12 +1,10 @@
-import type { WriteBatch } from 'firebase/firestore'
-import { doc, writeBatch as createWriteBatch, deleteField } from 'firebase/firestore'
 import { isEmptyObject, isNumber } from 'is-what'
 import { merge as mergeObjects } from 'merge-anything'
 import { removeProp } from 'remove-anything'
 import { mapGetOrSet } from 'getorset-anything'
-import { SyncBatch } from '@magnetarjs/core'
-import { FirestorePluginOptions } from '../CreatePlugin'
+import { SyncBatch } from '@magnetarjs/types'
 import { Countdown, CountdownInstance } from './Countdown'
+import { FirestorePluginOptions, Firestore, ApplySyncBatch, CreateWriteBatch } from './types'
 
 // https://firebase.google.com/docs/firestore/manage-data/transactions#batched-writes
 // A batched write can contain up to 500 operations.
@@ -78,47 +76,12 @@ function prepareReturnPromise(stack: Stack): Promise<SyncBatch> {
  * @returns {BatchSync}
  */
 export function batchSyncFactory(
-  firestorePluginOptions: Required<FirestorePluginOptions>
+  firestorePluginOptions: Required<FirestorePluginOptions<Firestore>>,
+  createWriteBatch: CreateWriteBatch,
+  applySyncBatch: ApplySyncBatch
 ): BatchSync {
   const { db, syncDebounceMs, debug } = firestorePluginOptions
-
-  /**
-   * A function that applies everything in the `SyncBatch` to a Firestore's `WriteBatch`.
-   * It mutates the passed `batch`.
-   */
-  function applySyncBatch(writeBatch: WriteBatch, batch: SyncBatch): void {
-    batch.insert.forEach((payload, documentPath) => {
-      const ref = doc(db, documentPath)
-      writeBatch.set(ref, payload)
-    })
-    batch.assign.forEach((payload, documentPath) => {
-      const ref = doc(db, documentPath)
-      writeBatch.set(ref, payload, { mergeFields: Object.keys(payload) })
-    })
-    batch.merge.forEach((payload, documentPath) => {
-      const ref = doc(db, documentPath)
-      writeBatch.set(ref, payload, { merge: true })
-    })
-    batch.replace.forEach((payload, documentPath) => {
-      const ref = doc(db, documentPath)
-      writeBatch.set(ref, payload)
-    })
-    batch.deleteProp.forEach((payload, documentPath) => {
-      const ref = doc(db, documentPath)
-      const _payload = [...payload].reduce(
-        (carry, propPath) => ({
-          ...carry,
-          [propPath]: deleteField(),
-        }),
-        {} as any
-      )
-      writeBatch.update(ref, _payload)
-    })
-    batch.delete.forEach((documentPath) => {
-      const ref = doc(db, documentPath)
-      writeBatch.delete(ref)
-    })
-  }
+  // const applySyncBatch = applySyncBatchFactory(db, )
 
   const state: { queue: Stack[]; countdown: CountdownInstance | null } = {
     queue: [],
@@ -144,9 +107,9 @@ export function batchSyncFactory(
     if (!stack) {
       throw new Error('executeSync executed before it was instantiated')
     }
-    const writeBatch = createWriteBatch(db)
+    const writeBatch = createWriteBatch(db as any)
     try {
-      applySyncBatch(writeBatch, stack.batch)
+      applySyncBatch(writeBatch as any, stack.batch, db as any)
     } catch (error) {
       stack.rejects.forEach((rej) => rej(error))
       if (state.queue.length) {

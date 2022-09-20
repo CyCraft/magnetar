@@ -5,10 +5,14 @@ import type {
   QueryDocumentSnapshot,
 } from 'firebase/firestore'
 import { doc, onSnapshot } from 'firebase/firestore'
-import { StreamResponse, PluginStreamAction, PluginStreamActionPayload } from '@magnetarjs/core'
-import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
-import { getFirestoreDocPath, getFirestoreCollectionPath } from '../helpers/pathHelpers'
-import { getQueryInstance, docSnapshotToDocMetadata } from '../helpers/queryHelpers'
+import { StreamResponse, PluginStreamAction, PluginStreamActionPayload } from '@magnetarjs/types'
+import {
+  getFirestoreDocPath,
+  getFirestoreCollectionPath,
+  FirestoreModuleConfig,
+} from '@magnetarjs/utils-firestore'
+import { getQueryInstance, docSnapshotToDocMetadata } from '../helpers/getFirestore'
+import { FirestorePluginOptions } from '../CreatePlugin'
 
 export function streamActionFactory(
   firestorePluginOptions: Required<FirestorePluginOptions>

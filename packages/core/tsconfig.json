@@ -6,5 +6,5 @@
     // This must be specified if "paths" is set
     "baseUrl": "."
   },
-  "include": ["src/**/*", "test/**/*"]
+  "include": ["src/**/*", "test/**/*", "../utils/src/internal/countHelpers.ts", "../utils/src/dataHelpers.ts"]
 }

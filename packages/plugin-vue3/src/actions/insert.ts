@@ -1,4 +1,4 @@
-import { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/core'
+import { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/types'
 import { Vue3StoreModuleConfig, Vue3StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'
 

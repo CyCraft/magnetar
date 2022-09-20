@@ -1,8 +1,8 @@
-import { ActionConfig, ActionName } from '../types/actions'
-import { SyncBatch } from '../types/plugins'
-
-import { EventNameFnsMap } from '../types/events'
 import {
+  ActionConfig,
+  ActionName,
+  SyncBatch,
+  EventNameFnsMap,
   PluginModuleConfig,
   PluginFetchAction,
   PluginWriteAction,
@@ -10,8 +10,8 @@ import {
   PluginDeletePropAction,
   PluginInsertAction,
   FetchResponse,
-} from '../types/plugins'
-import { OnAddedFn } from '../types/modifyReadResponse'
+  OnAddedFn,
+} from '@magnetarjs/types'
 
 /**
  * handleAction is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success (4) optional: onNextStoresSuccess.

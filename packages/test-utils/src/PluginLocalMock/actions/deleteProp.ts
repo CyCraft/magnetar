@@ -1,6 +1,6 @@
 import { isArray } from 'is-what'
 import { getProp } from 'path-to-prop'
-import { PluginDeletePropAction, PluginDeletePropActionPayload } from '../../../../core/src'
+import { PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetarjs/types'
 import { StorePluginModuleConfig, StorePluginOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../helpers'
 

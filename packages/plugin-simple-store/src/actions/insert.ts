@@ -1,4 +1,4 @@
-import { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/core'
+import { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/types'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'
 

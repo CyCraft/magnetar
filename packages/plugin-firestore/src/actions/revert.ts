@@ -1,5 +1,6 @@
-import { PluginRevertAction, PluginInstance, PluginRevertActionPayload } from '@magnetarjs/core'
-import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
+import { PluginRevertAction, PluginInstance, PluginRevertActionPayload } from '@magnetarjs/types'
+import { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'
+import { FirestorePluginOptions } from '../CreatePlugin'
 
 export function revertActionFactory(
   actions: PluginInstance['actions'],

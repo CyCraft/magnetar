@@ -1,7 +1,6 @@
 import { isFunction, isPlainObject } from 'is-what'
-import { GlobalConfig, ModuleConfig } from '../types/config'
+import { GlobalConfig, ModuleConfig, PluginModuleConfig } from '@magnetarjs/types'
 import { throwIfNolocalStoreName } from './throwFns'
-import { PluginModuleConfig } from '../types/plugins'
 
 export const MODULE_IDENTIFIER_SPLIT = ' /// '
 

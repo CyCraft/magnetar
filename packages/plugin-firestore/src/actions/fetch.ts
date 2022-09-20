@@ -6,9 +6,13 @@ import {
   DocMetadata,
   PluginFetchActionPayload,
 } from '@magnetarjs/core'
-import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
-import { getFirestoreDocPath, getFirestoreCollectionPath } from '../helpers/pathHelpers'
-import { getQueryInstance, docSnapshotToDocMetadata } from '../helpers/queryHelpers'
+import {
+  FirestoreModuleConfig,
+  getFirestoreDocPath,
+  getFirestoreCollectionPath,
+} from '@magnetarjs/utils-firestore'
+import { getQueryInstance, docSnapshotToDocMetadata } from '../helpers/getFirestore'
+import { FirestorePluginOptions } from '../CreatePlugin'
 
 export function fetchActionFactory(
   firestorePluginOptions: Required<FirestorePluginOptions>

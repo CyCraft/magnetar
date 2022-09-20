@@ -30,7 +30,7 @@
     "vue": "^3.2.0"
   },
   "dependencies": {
-    "@magnetarjs/core": "workspace:*",
+    "@magnetarjs/types": "workspace:*",
     "@magnetarjs/utils": "workspace:*",
     "copy-anything": "^2.0.6",
     "filter-anything": "^2.2.4",

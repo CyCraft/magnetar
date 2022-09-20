@@ -15,8 +15,8 @@ import {
   startAfter,
 } from 'firebase/firestore'
 import { isNumber } from 'is-what'
-import { FirestoreModuleConfig } from '../CreatePlugin'
-import { DocMetadata } from '@magnetarjs/core'
+import type { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'
+import { DocMetadata } from '@magnetarjs/types'
 
 /**
  * If the collectionPath includes a `*` it will use a collectionQuery for the part beyond that point

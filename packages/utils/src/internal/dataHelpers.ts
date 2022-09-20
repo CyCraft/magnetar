@@ -1,7 +1,7 @@
 import { isNumber, isArray } from 'is-what'
 import { getProp } from 'path-to-prop'
 import { sort, ISortByObjectSorter } from 'fast-sort'
-import { Clauses } from '../types/clauses'
+import { Clauses } from '@magnetarjs/types'
 import { parseValueForFilters } from './parseValueForFilters'
 
 /**

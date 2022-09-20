@@ -1,4 +1,4 @@
-import { Magnetar, MagnetarInstance, CollectionInstance, DocInstance } from '../../../core/src'
+import { Magnetar, MagnetarInstance, CollectionInstance, DocInstance } from '@magnetarjs/types'
 import { CreatePlugin as CreatePluginLocal } from '../../src'
 import { pokedex, PokedexEntry, generateRandomId, PluginMockRemote } from '@magnetarjs/test-utils'
 import { O } from 'ts-toolbelt'
@@ -30,9 +30,7 @@ export type TrainerModuleData = {
   colour?: string
 }
 
-export function createMagnetarInstance(
-  vueInstance: any = Vue
-): {
+export function createMagnetarInstance(vueInstance: any = Vue): {
   pokedexModule: CollectionInstance<PokedexModuleData>
   trainerModule: DocInstance<TrainerModuleData>
   magnetar: MagnetarInstance

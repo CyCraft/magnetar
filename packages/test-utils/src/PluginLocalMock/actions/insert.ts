@@ -1,4 +1,4 @@
-import { PluginInsertAction, PluginInsertActionPayload } from '../../../../core/src'
+import { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/types'
 import { StorePluginModuleConfig, StorePluginOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'
 import { throwIfEmulatedError } from '../../helpers'

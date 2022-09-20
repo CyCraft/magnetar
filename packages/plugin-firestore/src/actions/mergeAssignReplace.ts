@@ -1,9 +1,13 @@
 import { isNumber } from 'is-what'
 import { mapGetOrSet } from 'getorset-anything'
-import { PluginWriteAction, PluginWriteActionPayload, SyncBatch } from '@magnetarjs/core'
-import { FirestoreModuleConfig, FirestorePluginOptions, BatchSyncMap } from '../CreatePlugin'
-import { getFirestoreDocPath } from '../helpers/pathHelpers'
-import { batchSyncFactory } from '../helpers/batchSync'
+import { PluginWriteAction, PluginWriteActionPayload, SyncBatch } from '@magnetarjs/types'
+import {
+  getFirestoreDocPath,
+  batchSyncFactory,
+  FirestoreModuleConfig,
+} from '@magnetarjs/utils-firestore'
+import { BatchSyncMap, FirestorePluginOptions } from '../CreatePlugin'
+import { createWriteBatch, applySyncBatch } from '../helpers/batchHelpers'
 
 export function writeActionFactory(
   batchSyncMap: BatchSyncMap,
@@ -25,7 +29,7 @@ export function writeActionFactory(
       : pluginModuleConfig.syncDebounceMs
 
     const batchSync = mapGetOrSet(batchSyncMap, collectionPath, () =>
-      batchSyncFactory(firestorePluginOptions)
+      batchSyncFactory(firestorePluginOptions, createWriteBatch, applySyncBatch)
     )
 
     if (actionName === 'assign') {

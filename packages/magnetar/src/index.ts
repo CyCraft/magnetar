@@ -1,4 +1,5 @@
 export * from '@magnetarjs/core'
+export * from '@magnetarjs/types'
 export * from '@magnetarjs/utils'
 
 export * as PluginFirestore from '@magnetarjs/plugin-firestore'

@@ -1,0 +1,56 @@
+{
+  "name": "@magnetarjs/types",
+  "version": "0.6.2",
+  "sideEffects": false,
+  "description": "Magnetar shared types",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "author": "Luca Ban - Mesqueeb",
+  "funding": "https://github.com/sponsors/mesqueeb",
+  "license": "TBD",
+  "homepage": "https://github.com/cycraft/magnetar#readme",
+  "dependencies": {
+    "ts-toolbelt": "^9.6.0"
+  },
+  "keywords": [
+    "vuex-easy-firestore",
+    "magnetar",
+    "magnetarjs",
+    "state-management",
+    "syncing-solution",
+    "db-sync",
+    "auto-sync",
+    "framework-agnostic",
+    "optimistic-ui",
+    "vuejs",
+    "vuex",
+    "vue-sync",
+    "vue-state",
+    "vue-db",
+    "vue-store",
+    "firestore",
+    "data-store",
+    "local-store",
+    "remote-store",
+    "global-store",
+    "database-sync",
+    "database-management",
+    "database"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cycraft/magnetar.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cycraft/magnetar/issues"
+  }
+}

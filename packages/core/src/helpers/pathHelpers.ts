@@ -1,13 +1,5 @@
-import { isOdd, isEven, countCharacter } from './countHelpers'
-import type { WriteLock } from '../Magnetar'
-
-export function isDocModule(path: string): boolean {
-  return isOdd(countCharacter(path, /\//g))
-}
-
-export function isCollectionModule(path: string): boolean {
-  return isEven(countCharacter(path, /\//g))
-}
+import { isCollectionModule } from '@magnetarjs/utils'
+import type { WriteLock } from '@magnetarjs/types'
 
 type CollectionPath = string
 type DocId = string | undefined

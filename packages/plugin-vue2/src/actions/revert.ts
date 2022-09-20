@@ -1,4 +1,4 @@
-import { PluginRevertAction, PluginRevertActionPayload } from '@magnetarjs/core'
+import { PluginRevertAction, PluginRevertActionPayload } from '@magnetarjs/types'
 import { Vue2StoreModuleConfig, Vue2StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function revertActionFactory(

@@ -1,0 +1,90 @@
+{
+  "name": "@magnetarjs/utils-firestore",
+  "version": "0.6.2",
+  "sideEffects": false,
+  "description": "Magnetar utils firestore",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --clean --format esm,cjs --dts",
+    "dev": "pnpm build --watch",
+    "test-and-build": "npm run test && npm run build",
+    "test": "firebase emulators:exec \"node -r esbuild-register ./test/helpers/scripts/execAllTests.ts\"",
+    "test--only": "firebase emulators:exec \"node -r esbuild-register ./test/helpers/scripts/execAllTestsOnly.ts\""
+  },
+  "author": "Luca Ban - Mesqueeb",
+  "funding": "https://github.com/sponsors/mesqueeb",
+  "license": "TBD",
+  "homepage": "https://github.com/cycraft/magnetar#readme",
+  "dependencies": {
+    "@magnetarjs/types": "workspace:*",
+    "@magnetarjs/utils": "workspace:*",
+    "flatten-anything": "^2.0.7",
+    "getorset-anything": "^0.0.2",
+    "is-what": "^3.14.1",
+    "merge-anything": "^5.0.2",
+    "remove-anything": "^0.1.0",
+    "ts-toolbelt": "^9.6.0"
+  },
+  "devDependencies": {
+    "firebase": "^9.10.0",
+    "firebase-admin": "^11.0.1"
+  },
+  "keywords": [
+    "magnetar-utils",
+    "firebase",
+    "firestore",
+    "cloud-firestore",
+    "google-cloud-firestore",
+    "vuex-easy-firestore",
+    "magnetar",
+    "magnetarjs",
+    "state-management",
+    "syncing-solution",
+    "db-sync",
+    "auto-sync",
+    "framework-agnostic",
+    "optimistic-ui",
+    "vuejs",
+    "vuex",
+    "vue-sync",
+    "vue-state",
+    "vue-db",
+    "vue-store",
+    "firestore",
+    "data-store",
+    "local-store",
+    "remote-store",
+    "global-store",
+    "database-sync",
+    "database-management",
+    "database"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cycraft/magnetar.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cycraft/magnetar/issues"
+  },
+  "ava": {
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "esbuild-register"
+    ],
+    "timeout": "60s"
+  },
+  "gitHead": "7358494dc3072b8f1f8bb7ec64ca1ecba610b3e7"
+}

@@ -4,7 +4,7 @@ import {
   WhereClause,
   OrderByClause,
   Limit,
-} from '../../../core/src'
+} from '@magnetarjs/types'
 import {
   writeActionFactory,
   insertActionFactory,

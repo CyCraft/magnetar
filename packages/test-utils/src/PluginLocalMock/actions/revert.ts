@@ -1,4 +1,4 @@
-import { PluginRevertAction, PluginRevertActionPayload } from '../../../../core/src'
+import { PluginRevertAction, PluginRevertActionPayload } from '@magnetarjs/types'
 import { StorePluginModuleConfig, StorePluginOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../helpers'
 

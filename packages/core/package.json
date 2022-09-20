@@ -27,11 +27,11 @@
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
-    "fast-sort": "^3.2.0",
+    "@magnetarjs/types": "workspace:*",
+    "@magnetarjs/utils": "workspace:*",
     "getorset-anything": "^0.0.2",
     "is-what": "^3.14.1",
     "merge-anything": "^4.0.5",
-    "path-to-prop": "^2.0.2",
     "ts-toolbelt": "^9.6.0"
   },
   "devDependencies": {

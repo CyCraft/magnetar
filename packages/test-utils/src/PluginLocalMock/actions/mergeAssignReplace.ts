@@ -1,5 +1,5 @@
 import { merge } from 'merge-anything'
-import { PluginWriteAction, PluginWriteActionPayload } from '../../../../core/src'
+import { PluginWriteAction, PluginWriteActionPayload } from '@magnetarjs/types'
 import { StorePluginModuleConfig, StorePluginOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../helpers'
 

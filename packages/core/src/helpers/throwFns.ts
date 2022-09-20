@@ -1,6 +1,6 @@
-import { StreamResponse, DoOnStreamFns } from '../types/plugins'
+import { StreamResponse, DoOnStreamFns } from '@magnetarjs/types'
 import { isFullString } from 'is-what'
-import { isDocModule, isCollectionModule } from './pathHelpers'
+import { isDocModule, isCollectionModule } from '@magnetarjs/utils'
 
 export function logError(errorMessage: string): void {
   console.error('[@magnetarjs error]\n', errorMessage)

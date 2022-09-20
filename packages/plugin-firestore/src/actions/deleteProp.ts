@@ -1,9 +1,13 @@
 import { isArray, isNumber } from 'is-what'
 import { mapGetOrSet } from 'getorset-anything'
-import { PluginDeletePropAction, PluginDeletePropActionPayload, SyncBatch } from '@magnetarjs/core'
-import { FirestoreModuleConfig, FirestorePluginOptions, BatchSyncMap } from '../CreatePlugin'
-import { getFirestoreDocPath } from '../helpers/pathHelpers'
-import { batchSyncFactory } from '../helpers/batchSync'
+import { PluginDeletePropAction, PluginDeletePropActionPayload, SyncBatch } from '@magnetarjs/types'
+import {
+  FirestoreModuleConfig,
+  getFirestoreDocPath,
+  batchSyncFactory,
+} from '@magnetarjs/utils-firestore'
+import { BatchSyncMap, FirestorePluginOptions } from '../CreatePlugin'
+import { createWriteBatch, applySyncBatch } from '../helpers/batchHelpers'
 
 export function deletePropActionFactory(
   batchSyncMap: BatchSyncMap,
@@ -24,7 +28,7 @@ export function deletePropActionFactory(
       : pluginModuleConfig.syncDebounceMs
 
     const batchSync = mapGetOrSet(batchSyncMap, collectionPath, () =>
-      batchSyncFactory(firestorePluginOptions)
+      batchSyncFactory(firestorePluginOptions, createWriteBatch, applySyncBatch)
     )
 
     const result = await batchSync.deleteProp(documentPath, payloadArray, syncDebounceMs)

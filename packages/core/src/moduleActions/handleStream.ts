@@ -1,13 +1,12 @@
 import { O } from 'ts-toolbelt'
-import { ActionConfig } from '../types/actions'
-
-import { EventNameFnsMap } from '../types/events'
 import {
+  ActionConfig,
+  EventNameFnsMap,
   PluginModuleConfig,
   PluginStreamAction,
   DoOnStream,
   StreamResponse,
-} from '../types/plugins'
+} from '@magnetarjs/types'
 
 /**
  * handleStream is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success

@@ -8,8 +8,8 @@ import {
   MagnetarPlugin,
   Clauses,
   PluginModuleSetupPayload,
-  filterDataPerClauses,
-} from '@magnetarjs/core'
+} from '@magnetarjs/types'
+import { filterDataPerClauses } from '@magnetarjs/utils'
 import { writeActionFactory } from './actions/mergeAssignReplace'
 import { insertActionFactory } from './actions/insert'
 import { deletePropActionFactory } from './actions/deleteProp'

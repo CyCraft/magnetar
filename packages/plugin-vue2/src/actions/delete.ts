@@ -1,5 +1,5 @@
 import { isFullString } from 'is-what'
-import { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/core'
+import { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/types'
 import { Vue2StoreModuleConfig, Vue2StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function deleteActionFactory(

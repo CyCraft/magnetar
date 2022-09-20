@@ -1,5 +1,5 @@
 import { merge } from 'merge-anything'
-import { PluginWriteAction, PluginWriteActionPayload } from '@magnetarjs/core'
+import { PluginWriteAction, PluginWriteActionPayload } from '@magnetarjs/types'
 import { Vue2StoreModuleConfig, Vue2StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function writeActionFactory(

@@ -4,7 +4,7 @@ import {
   StreamResponse,
   DoOnStream,
   PluginStreamActionPayload,
-} from '../../../../core/src'
+} from '@magnetarjs/types'
 import { StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 import { deleteActionFactory } from './delete'

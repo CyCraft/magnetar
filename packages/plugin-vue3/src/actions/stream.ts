@@ -4,7 +4,7 @@ import {
   StreamResponse,
   DoOnStream,
   PluginStreamActionPayload,
-} from '@magnetarjs/core'
+} from '@magnetarjs/types'
 import { Vue3StoreModuleConfig, Vue3StoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 import { deleteActionFactory } from './delete'

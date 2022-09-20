@@ -19,8 +19,8 @@ import {
   PluginInsertActionPayload,
   PluginWriteActionPayload,
   Clauses,
-  filterDataPerClauses,
-} from '../../../core/src'
+} from '@magnetarjs/types'
+import { filterDataPerClauses } from '@magnetarjs/utils'
 import { StorePluginModuleConfig, RemoteStoreOptions } from './index'
 import { throwIfEmulatedError, waitMs, pokedexMap, generateRandomId } from '../helpers'
 import { isFullArray, isPromise } from 'is-what'

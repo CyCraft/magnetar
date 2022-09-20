@@ -1,19 +1,26 @@
 import { O } from 'ts-toolbelt'
 import { isPromise } from 'is-what'
-import { WriteLock } from '../Magnetar'
+import {
+  StreamResponse,
+  DocMetadata,
+  ModuleConfig,
+  GlobalConfig,
+  DoOnStreamFns,
+  DoOnStream,
+  ActionType,
+  WriteLock,
+  ActionConfig,
+  MagnetarStreamAction,
+} from '@magnetarjs/types'
 import { handleStream } from './handleStream'
-import { ActionConfig, MagnetarStreamAction } from '../types/actions'
-import { ActionType } from '../types/actionsInternal'
-import { StreamResponse, DoOnStreamFns, isDoOnStream, DoOnStream } from '../types/plugins'
 import { getEventNameFnsMap } from '../types/events'
 import { getModifyPayloadFnsMap } from '../types/modifyPayload'
 import { getModifyReadResponseFnsMap } from '../types/modifyReadResponse'
 import { executeOnFns } from '../helpers/executeOnFns'
 import { throwOnIncompleteStreamResponses, throwIfNoFnsToExecute } from '../helpers/throwFns'
-import { ModuleConfig, GlobalConfig } from '../types/config'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers'
-import { DocMetadata } from '../types/atoms'
 import { getDocAfterWritelock, writeLockPromise } from '../helpers/writeLockHelpers'
+import { isDoOnStream } from '../types/plugins'
 
 export function handleStreamPerStore(
   [collectionPath, docId]: [string, string | undefined],

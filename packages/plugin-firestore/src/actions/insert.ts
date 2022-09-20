@@ -1,10 +1,14 @@
 import { doc, collection } from 'firebase/firestore'
 import { mapGetOrSet } from 'getorset-anything'
-import { PluginInsertAction, PluginInsertActionPayload, SyncBatch } from '@magnetarjs/core'
-import { FirestoreModuleConfig, FirestorePluginOptions, BatchSyncMap } from '../CreatePlugin'
+import { PluginInsertAction, PluginInsertActionPayload, SyncBatch } from '@magnetarjs/types'
+import {
+  getFirestoreDocPath,
+  batchSyncFactory,
+  FirestoreModuleConfig,
+} from '@magnetarjs/utils-firestore'
+import { BatchSyncMap, FirestorePluginOptions } from '../CreatePlugin'
 import { isFullString, isNumber } from 'is-what'
-import { getFirestoreDocPath } from '../helpers/pathHelpers'
-import { batchSyncFactory } from '../helpers/batchSync'
+import { createWriteBatch, applySyncBatch } from '../helpers/batchHelpers'
 
 export function insertActionFactory(
   batchSyncMap: BatchSyncMap,
@@ -32,7 +36,7 @@ export function insertActionFactory(
       : pluginModuleConfig.syncDebounceMs
 
     const batchSync = mapGetOrSet(batchSyncMap, collectionPath, () =>
-      batchSyncFactory(firestorePluginOptions)
+      batchSyncFactory(firestorePluginOptions, createWriteBatch, applySyncBatch)
     )
 
     const result = await batchSync.insert(documentPath, payload, syncDebounceMs)

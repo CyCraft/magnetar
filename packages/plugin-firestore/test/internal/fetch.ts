@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { DocMetadata } from '../../../core/src'
+import { DocMetadata } from '@magnetarjs/types'
 import { pokedex, waitMs } from '@magnetarjs/test-utils'
 
 {

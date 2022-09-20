@@ -1,13 +1,13 @@
 import { isFullString } from 'is-what'
-import { FirestoreModuleConfig, FirestorePluginOptions } from '../CreatePlugin'
-import { isCollectionModule } from '@magnetarjs/core'
+import type { Firestore, FirestoreModuleConfig, FirestorePluginOptions } from './types'
+import { isCollectionModule } from '@magnetarjs/utils'
 import { throwIfInvalidFirestorePath } from './throwFns'
 
 export function getFirestoreDocPath(
   collectionPath: string,
   docId: string,
   firestoreModuleConfig: FirestoreModuleConfig,
-  firestorePluginOptions: FirestorePluginOptions
+  firestorePluginOptions: FirestorePluginOptions<Firestore>
 ): string {
   let documentPath: string
   // if firestorePath is set on the module level, always return this
@@ -29,7 +29,7 @@ export function getFirestoreDocPath(
 export function getFirestoreCollectionPath(
   _collectionPath: string,
   firestoreModuleConfig: FirestoreModuleConfig,
-  firestorePluginOptions: FirestorePluginOptions
+  firestorePluginOptions: FirestorePluginOptions<Firestore>
 ): string {
   let collectionPath: string
   // if firestorePath is set on the module level, always return this
