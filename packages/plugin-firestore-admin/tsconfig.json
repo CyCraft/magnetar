@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    // This must be specified if "paths" is set
+    "baseUrl": "."
+  },
+  "include": ["src/**/*", "test/**/*"]
+}
