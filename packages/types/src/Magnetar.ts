@@ -44,8 +44,11 @@ export type WriteLock = {
  */
 export type CollectionFn<
   DocDataTypeInherited extends Record<string, any> = Record<string, any>,
-  GranularTypes extends { insert: Record<string, any> } = { insert: DocDataTypeInherited }
-> = <DocDataType extends Record<string, any> = DocDataTypeInherited>(
+  GranularTypesInherited extends { insert: Record<string, any> } = { insert: DocDataTypeInherited }
+> = <
+  DocDataType extends Record<string, any> = DocDataTypeInherited,
+  GranularTypes extends { insert: Record<string, any> } = GranularTypesInherited
+>(
   idOrPath: string,
   moduleConfig?: ModuleConfig
 ) => CollectionInstance<DocDataType, GranularTypes>
@@ -56,8 +59,11 @@ export type CollectionFn<
  */
 export type DocFn<
   DocDataTypeInherited extends Record<string, any> = Record<string, any>,
-  GranularTypes extends { insert: Record<string, any> } = { insert: DocDataTypeInherited }
-> = <DocDataType extends Record<string, any> = DocDataTypeInherited>(
+  GranularTypesInherited extends { insert: Record<string, any> } = { insert: DocDataTypeInherited }
+> = <
+  DocDataType extends Record<string, any> = DocDataTypeInherited,
+  GranularTypes extends { insert: Record<string, any> } = GranularTypesInherited
+>(
   idOrPath: string,
   moduleConfig?: ModuleConfig
 ) => DocInstance<DocDataType, GranularTypes>
