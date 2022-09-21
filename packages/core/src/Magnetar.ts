@@ -1,6 +1,6 @@
 import { mapGetOrSet } from 'getorset-anything'
 import { createCollectionWithContext } from './Collection'
-import { defaultsGlobalConfig } from './types/config'
+import { defaultsGlobalConfig } from './helpers/configHelpers'
 import { createDocWithContext } from './Doc'
 import { getCollectionPathDocIdEntry } from './helpers/pathHelpers'
 import {

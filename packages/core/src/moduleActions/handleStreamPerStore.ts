@@ -13,14 +13,14 @@ import {
   MagnetarStreamAction,
 } from '@magnetarjs/types'
 import { handleStream } from './handleStream'
-import { getEventNameFnsMap } from '../types/events'
-import { getModifyPayloadFnsMap } from '../types/modifyPayload'
-import { getModifyReadResponseFnsMap } from '../types/modifyReadResponse'
+import { getEventNameFnsMap } from '../helpers/eventHelpers'
+import { getModifyPayloadFnsMap } from '../helpers/modifyPayload'
+import { getModifyReadResponseFnsMap } from '../helpers/modifyReadResponse'
 import { executeOnFns } from '../helpers/executeOnFns'
 import { throwOnIncompleteStreamResponses, throwIfNoFnsToExecute } from '../helpers/throwFns'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers'
 import { getDocAfterWritelock, writeLockPromise } from '../helpers/writeLockHelpers'
-import { isDoOnStream } from '../types/plugins'
+import { isDoOnStream } from '../helpers/pluginHelpers'
 
 export function handleStreamPerStore(
   [collectionPath, docId]: [string, string | undefined],

@@ -2,7 +2,7 @@
 import { O } from 'ts-toolbelt'
 import { isFullArray, isFullString, isPromise } from 'is-what'
 import { handleAction } from './handleAction'
-import { getEventNameFnsMap } from '../types/events'
+import { getEventNameFnsMap } from '../helpers/eventHelpers'
 import {
   ActionConfig,
   MagnetarFetchAction,
@@ -24,9 +24,9 @@ import {
   DocFn,
   WriteLock,
 } from '@magnetarjs/types'
-import { isDoOnFetch, isFetchResponse } from '../types/plugins'
-import { getModifyPayloadFnsMap } from '../types/modifyPayload'
-import { getModifyReadResponseFnsMap } from '../types/modifyReadResponse'
+import { isDoOnFetch, isFetchResponse } from '../helpers/pluginHelpers'
+import { getModifyPayloadFnsMap } from '../helpers/modifyPayload'
+import { getModifyReadResponseFnsMap } from '../helpers/modifyReadResponse'
 import { executeOnFns } from '../helpers/executeOnFns'
 import { throwIfNoFnsToExecute } from '../helpers/throwFns'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers'

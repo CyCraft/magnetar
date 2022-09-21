@@ -1,6 +1,6 @@
 import { O } from 'ts-toolbelt'
-import { StoreName } from './atoms'
 import { DocInstance } from '../Doc'
+import { StoreName } from './core'
 import { EventNameFnMap } from './events'
 import { ModifyPayloadFnMap } from './modifyPayload'
 import { ModifyReadResponseFnMap } from './modifyReadResponse'
