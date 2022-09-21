@@ -79,11 +79,11 @@ export type CollectionInstance<
   orderBy: (
     fieldPath: OPaths<DocDataType, 4>,
     direction?: 'asc' | 'desc'
-  ) => CollectionInstance<DocDataType>
+  ) => CollectionInstance<DocDataType, GranularTypes>
   /**
    * Chainable filter. Returns {@link CollectionInstance} with filter applied.
    */
-  limit: (limitCount: number) => CollectionInstance<DocDataType>
+  limit: (limitCount: number) => CollectionInstance<DocDataType, GranularTypes>
   /**
    * Chainable filter. Returns {@link CollectionInstance} with filter applied.
    */
@@ -91,10 +91,10 @@ export type CollectionInstance<
     fieldPath: OPaths<DocDataType, 4>,
     operator: WhereFilterOp,
     value: any
-  ) => CollectionInstance<DocDataType>
+  ) => CollectionInstance<DocDataType, GranularTypes>
   /**
    * Chainable filter. Returns {@link CollectionInstance} with filter applied.
    */
-  startAfter(docSnapshot: Record<string, any>): CollectionInstance<DocDataType>
-  startAfter(...fieldValues: unknown[]): CollectionInstance<DocDataType>
+  startAfter(docSnapshot: Record<string, any>): CollectionInstance<DocDataType, GranularTypes>
+  startAfter(...fieldValues: unknown[]): CollectionInstance<DocDataType, GranularTypes>
 }
