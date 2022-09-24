@@ -3,17 +3,22 @@
   "version": "0.7.5",
   "sideEffects": false,
   "description": "Magnetar shared types",
-  "main": "src/index.ts",
-  "module": "src/index.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./src/index.ts",
-      "default": "./src/index.ts"
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.js"
     }
   },
   "files": [
-    "src"
+    "dist"
   ],
+  "scripts": {
+    "build": "tsup src/index.ts --clean --format esm,cjs --dts",
+    "dev": "pnpm build --watch"
+  },
   "author": "Luca Ban - Mesqueeb",
   "funding": "https://github.com/sponsors/mesqueeb",
   "license": "TBD",
