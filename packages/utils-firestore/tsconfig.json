@@ -5,5 +5,5 @@
     // This must be specified if "paths" is set
     "baseUrl": "."
   },
-  "include": ["src/**/*", "test/**/*", "../plugin-firestore/src/helpers/queryHelpers.ts"]
+  "include": ["src/**/*", "test/**/*"]
 }
