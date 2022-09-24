@@ -27,6 +27,7 @@
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
+    "@magnetarjs/types": "workspace:*",
     "@magnetarjs/utils": "workspace:*",
     "copy-anything": "^2.0.6",
     "filter-anything": "^2.2.4",

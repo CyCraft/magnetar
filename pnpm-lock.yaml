@@ -4,7 +4,6 @@ importers:
 
   .:
     specifiers:
-      '@magnetarjs/types': workspace:*
       '@types/node': ^18.7.8
       '@typescript-eslint/eslint-plugin': ^5.33.1
       '@typescript-eslint/parser': ^5.33.1
@@ -26,7 +25,6 @@ importers:
       typescript: ^4.7.4
       vitepress: 1.0.0-alpha.9
     devDependencies:
-      '@magnetarjs/types': link:packages/types
       '@types/node': 18.7.8
       '@typescript-eslint/eslint-plugin': 5.33.1_vsoshirnpb7xw6mr7xomgfas2i
       '@typescript-eslint/parser': 5.33.1_4rv7y5c6xz3vfxwhbrcxxi73bq
@@ -51,12 +49,14 @@ importers:
   packages/core:
     specifiers:
       '@magnetarjs/test-utils': workspace:*
+      '@magnetarjs/types': workspace:*
       '@magnetarjs/utils': workspace:*
       getorset-anything: ^0.0.2
       is-what: ^3.14.1
       merge-anything: ^4.0.5
       ts-toolbelt: ^9.6.0
     dependencies:
+      '@magnetarjs/types': link:../types
       '@magnetarjs/utils': link:../utils
       getorset-anything: 0.0.2
       is-what: 3.14.1
@@ -146,18 +146,21 @@ importers:
       '@magnetarjs/plugin-firestore': workspace:*
       '@magnetarjs/plugin-simple-store': workspace:*
       '@magnetarjs/plugin-vue3': workspace:*
+      '@magnetarjs/types': workspace:*
       '@magnetarjs/utils': workspace:*
     dependencies:
       '@magnetarjs/core': link:../core
       '@magnetarjs/plugin-firestore': link:../plugin-firestore
       '@magnetarjs/plugin-simple-store': link:../plugin-simple-store
       '@magnetarjs/plugin-vue3': link:../plugin-vue3
+      '@magnetarjs/types': link:../types
       '@magnetarjs/utils': link:../utils
 
   packages/plugin-firestore:
     specifiers:
       '@magnetarjs/core': workspace:*
       '@magnetarjs/test-utils': workspace:*
+      '@magnetarjs/types': workspace:*
       '@magnetarjs/utils-firestore': workspace:*
       array-shuffle: ^3.0.0
       firebase: ^9.9.3
@@ -168,6 +171,7 @@ importers:
       remove-anything: ^0.1.0
       ts-toolbelt: ^9.6.0
     dependencies:
+      '@magnetarjs/types': link:../types
       '@magnetarjs/utils-firestore': link:../utils-firestore
       flatten-anything: 2.0.7
       getorset-anything: 0.0.2
@@ -185,6 +189,7 @@ importers:
     specifiers:
       '@magnetarjs/core': workspace:*
       '@magnetarjs/test-utils': workspace:*
+      '@magnetarjs/types': workspace:*
       '@magnetarjs/utils-firestore': workspace:*
       array-shuffle: ^3.0.0
       firebase-admin: ^11.0.1
@@ -195,6 +200,7 @@ importers:
       remove-anything: ^0.1.0
       ts-toolbelt: ^9.6.0
     dependencies:
+      '@magnetarjs/types': link:../types
       '@magnetarjs/utils-firestore': link:../utils-firestore
       flatten-anything: 2.0.7
       getorset-anything: 0.0.2
@@ -212,6 +218,7 @@ importers:
     specifiers:
       '@magnetarjs/core': workspace:*
       '@magnetarjs/test-utils': workspace:*
+      '@magnetarjs/types': workspace:*
       '@magnetarjs/utils': workspace:*
       browser-env: ^3.3.0
       copy-anything: ^2.0.6
@@ -222,6 +229,7 @@ importers:
       path-to-prop: 1.0.2
       ts-toolbelt: ^9.6.0
     dependencies:
+      '@magnetarjs/types': link:../types
       '@magnetarjs/utils': link:../utils
       copy-anything: 2.0.6
       filter-anything: 2.2.4
@@ -239,6 +247,7 @@ importers:
     specifiers:
       '@magnetarjs/core': workspace:*
       '@magnetarjs/test-utils': workspace:*
+      '@magnetarjs/types': workspace:*
       '@magnetarjs/utils': workspace:*
       copy-anything: ^2.0.6
       filter-anything: ^2.2.4
@@ -249,6 +258,7 @@ importers:
       ts-toolbelt: ^9.6.0
       vue: ^2.6.14
     dependencies:
+      '@magnetarjs/types': link:../types
       '@magnetarjs/utils': link:../utils
       copy-anything: 2.0.6
       filter-anything: 2.2.4
@@ -266,6 +276,7 @@ importers:
     specifiers:
       '@magnetarjs/core': workspace:*
       '@magnetarjs/test-utils': workspace:*
+      '@magnetarjs/types': workspace:*
       '@magnetarjs/utils': workspace:*
       copy-anything: ^2.0.6
       filter-anything: ^2.2.4
@@ -276,6 +287,7 @@ importers:
       ts-toolbelt: ^9.6.0
       vue: ^3.2.26
     dependencies:
+      '@magnetarjs/types': link:../types
       '@magnetarjs/utils': link:../utils
       copy-anything: 2.0.6
       filter-anything: 2.2.4
@@ -291,6 +303,7 @@ importers:
 
   packages/test-utils:
     specifiers:
+      '@magnetarjs/types': workspace:*
       '@magnetarjs/utils': workspace:*
       copy-anything: ^2.0.6
       copyfiles: ^2.4.1
@@ -301,6 +314,7 @@ importers:
       path-to-prop: ^1.0.2
       rimraf: ^3.0.2
     dependencies:
+      '@magnetarjs/types': link:../types
       '@magnetarjs/utils': link:../utils
       copy-anything: 2.0.6
       filter-anything: 2.2.4
@@ -320,16 +334,19 @@ importers:
 
   packages/utils:
     specifiers:
+      '@magnetarjs/types': workspace:*
       fast-sort: ^3.2.0
       is-what: ^3.14.1
       path-to-prop: ^2.0.2
     dependencies:
+      '@magnetarjs/types': link:../types
       fast-sort: 3.2.0
       is-what: 3.14.1
       path-to-prop: 2.0.2
 
   packages/utils-firestore:
     specifiers:
+      '@magnetarjs/types': workspace:*
       '@magnetarjs/utils': workspace:*
       firebase: ^9.10.0
       firebase-admin: ^11.0.1
@@ -340,6 +357,7 @@ importers:
       remove-anything: ^0.1.0
       ts-toolbelt: ^9.6.0
     dependencies:
+      '@magnetarjs/types': link:../types
       '@magnetarjs/utils': link:../utils
       flatten-anything: 2.0.7
       getorset-anything: 0.0.2

@@ -31,6 +31,7 @@
     "firebase-admin": "^11.0.1"
   },
   "dependencies": {
+    "@magnetarjs/types": "workspace:*",
     "@magnetarjs/utils-firestore": "workspace:*",
     "flatten-anything": "^2.0.7",
     "getorset-anything": "^0.0.2",
