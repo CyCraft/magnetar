@@ -26,7 +26,6 @@
     "@magnetarjs/plugin-firestore": "workspace:*",
     "@magnetarjs/plugin-simple-store": "workspace:*",
     "@magnetarjs/plugin-vue3": "workspace:*",
-    "@magnetarjs/types": "workspace:*",
     "@magnetarjs/utils": "workspace:*"
   },
   "homepage": "https://github.com/cycraft/magnetar#readme",

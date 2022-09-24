@@ -21,7 +21,6 @@
     "rimraf": "^3.0.2"
   },
   "dependencies": {
-    "@magnetarjs/types": "workspace:*",
     "@magnetarjs/utils": "workspace:*",
     "copy-anything": "^2.0.6",
     "filter-anything": "^2.2.4",
