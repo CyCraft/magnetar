@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/plugin-simple-store",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "sideEffects": false,
   "description": "Magnetar plugin simple store",
   "main": "dist/index.js",
