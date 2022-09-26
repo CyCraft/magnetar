@@ -1,5 +1,6 @@
 /* eslint-disable no-inner-declarations */
 import { O } from 'ts-toolbelt'
+import { mapGetOrSet } from 'getorset-anything'
 import { isFullArray, isFullString, isPromise } from 'is-what'
 import { handleAction } from './handleAction'
 import { getEventNameFnsMap } from '../helpers/eventHelpers'
@@ -69,9 +70,11 @@ export function handleActionPerStore(
     if (actionName === 'fetch' && isPromise(foundFetchPromise)) return foundFetchPromise
 
     // set up and/or reset te writeLock for write actions
-    const writeLock = _docId
-      ? writeLockMap.get(`${collectionPath}/${_docId}`)!
-      : writeLockMap.get(collectionPath)!
+    const writeLockId = _docId ? `${collectionPath}/${_docId}` : collectionPath
+    const writeLock = mapGetOrSet(writeLockMap, writeLockId, () => {
+      return { promise: null, resolve: () => {}, countdown: null }
+    })
+
     if (actionName !== 'fetch') {
       // we need to create a promise we'll resolve later to prevent any incoming docs from being written to the local state during this time
       if (writeLock.promise === null) {

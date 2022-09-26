@@ -80,11 +80,6 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
 
     const pathFilterIdentifier = getPathFilterIdentifier(modulePath, moduleConfig)
 
-    // set the WriteLock for this module
-    if (!writeLockMap.has(modulePath)) {
-      writeLockMap.set(modulePath, { promise: null, resolve: () => {}, countdown: null })
-    }
-
     // grab (and set) the FetchPromises for this module
     const fetchPromises = mapGetOrSet(fetchPromiseMap, pathFilterIdentifier, () => new Map())
 
