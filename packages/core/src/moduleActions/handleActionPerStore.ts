@@ -93,6 +93,7 @@ export function handleActionPerStore(
       if (writeLock.promise !== null && writeLock.countdown !== null) {
         // there already is a promise, let's just stop the countdown, we'll start it again at the end of all the store actions
         clearTimeout(writeLock.countdown)
+        writeLock.countdown = null
       }
     }
 
@@ -263,7 +264,7 @@ export function handleActionPerStore(
         // all the stores resolved their actions
 
         // start the writeLock countdown
-        if (actionName !== 'fetch') {
+        if (actionName !== 'fetch' && !writeLock.countdown) {
           writeLock.countdown = setTimeout(writeLock.resolve, 5000)
         }
 
