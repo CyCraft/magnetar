@@ -19,7 +19,7 @@
     "build": "tsup src/index.ts --clean --format esm,cjs --dts",
     "dev": "pnpm build --watch",
     "test-and-build": "npm run test && npm run build",
-    "start-emulators": "export FIRESTORE_EMULATOR_HOST=\"localhost:8099\"",
+    "start-emulators": "export FIRESTORE_EMULATOR_HOST=\"localhost:8199\"",
     "test": "npm run start-emulators && firebase emulators:exec \"node -r esbuild-register ./test/helpers/scripts/execAllTests.ts\"",
     "test--only": "npm run start-emulators && firebase emulators:exec \"node -r esbuild-register ./test/helpers/scripts/execAllTestsOnly.ts\""
   },
