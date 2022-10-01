@@ -31,11 +31,11 @@ test('deleteProp nested', async (t) => {
     name: 'Bulbasaur',
     type: ['Grass', 'Poison'],
     base: {
-      'Attack': 49,
-      'Defense': 49,
-      'SpAttack': 65,
-      'SpDefense': 65,
-      'Speed': 45,
+      Attack: 49,
+      Defense: 49,
+      SpAttack: 65,
+      SpDefense: 65,
+      Speed: 45,
     },
   }
   t.deepEqual(pokedexModule.doc('1').data, expected as any)
@@ -56,11 +56,11 @@ test('deleteProp multiple', async (t) => {
     id: 1,
     type: ['Grass', 'Poison'],
     base: {
-      'Attack': 49,
-      'Defense': 49,
-      'SpAttack': 65,
-      'SpDefense': 65,
-      'Speed': 45,
+      Attack: 49,
+      Defense: 49,
+      SpAttack: 65,
+      SpDefense: 65,
+      Speed: 45,
     },
   }
   t.deepEqual(pokedexModule.doc('1').data, expected as any)

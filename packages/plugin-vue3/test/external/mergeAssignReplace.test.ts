@@ -18,12 +18,12 @@ test('merge', async (t) => {
     name: 'Bulbasaur',
     type: ['Grass', 'Poison'],
     base: {
-      'HP': 9000,
-      'Attack': 49,
-      'Defense': 49,
-      'SpAttack': 65,
-      'SpDefense': 65,
-      'Speed': 45,
+      HP: 9000,
+      Attack: 49,
+      Defense: 49,
+      SpAttack: 65,
+      SpDefense: 65,
+      Speed: 45,
     },
   }
   t.deepEqual(pokedexModule.doc('1').data, expected as any)
