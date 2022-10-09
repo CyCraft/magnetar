@@ -117,6 +117,8 @@ export function handleStreamPerStore(
       removed: async (_payload, _meta) => {
         // check if there's a WriteLock for the document
         const docIdentifier = `${collectionPath}/${_meta.id}`
+        // must delete any piled up writeLock docs if by now it's deleted
+        lastIncomingDocs.delete(docIdentifier)
         await writeLockPromise(writeLockMap, docIdentifier)
 
         return executeOnFns(doOnStreamFns.removed, _payload, [_meta])
