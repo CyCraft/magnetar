@@ -10,7 +10,10 @@ import { OPaths } from './types/utils'
 
 export type CollectionInstance<
   DocDataType extends Record<string, any> = Record<string, any>,
-  GranularTypes extends { insert: Record<string, any> } = { insert: DocDataType }
+  GranularTypes extends { insert: Record<string, any>; id: string } = {
+    insert: DocDataType
+    id: string
+  }
 > = {
   /**
    * The cached data that was written or read so far
@@ -26,7 +29,7 @@ export type CollectionInstance<
    * The id of the collection. When this is a nested collection, it will not include the full path, only the final part
    * @example 'items'
    */
-  id: string
+  id: GranularTypes['id']
   /**
    * The full path of the collection
    * @example 'pokedex/001/items'
