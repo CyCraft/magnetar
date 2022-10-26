@@ -10,10 +10,7 @@ import { CollectionFn } from './Magnetar'
 
 export type DocInstance<
   DocDataType extends Record<string, any> = Record<string, any>,
-  GranularTypes extends { insert: Record<string, any>; id: string } = {
-    insert: DocDataType
-    id: string
-  }
+  GranularTypes extends { insert: Record<string, any> } = { insert: DocDataType }
 > = {
   /**
    * The cached data that was written or read so far
@@ -28,7 +25,7 @@ export type DocInstance<
    * The id of the document. When this is a nested document, it will not include the full path, only the final part
    * @example '001'
    */
-  id: GranularTypes['id']
+  id: string
   /**
    * The full path of the document
    * @example 'pokedex/001'
