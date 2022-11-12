@@ -72,7 +72,7 @@ export function filterDataPerClauses(
   }, [] as ISortByObjectSorter<[string, Record<string, unknown>]>[])
   entries = orderBy.length ? sort(entries).by(by) : entries
   // startAfter
-  if (startAfter && orderBy) {
+  if (startAfter && orderBy.length) {
     const orderByKeys = orderBy.map(([path]) => path)
     const startAfterValues = Array.isArray(startAfter)
       ? startAfter
