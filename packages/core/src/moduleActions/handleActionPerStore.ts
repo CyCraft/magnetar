@@ -1,6 +1,6 @@
 /* eslint-disable no-inner-declarations */
 import { mapGetOrSet } from 'getorset-anything'
-import { isFullArray, isFullString, isPromise } from 'is-what'
+import { isBoolean, isFullArray, isFullString, isPromise } from 'is-what'
 import { handleAction } from './handleAction'
 import { getEventNameFnsMap } from '../helpers/eventHelpers'
 import {
@@ -257,7 +257,7 @@ export function handleActionPerStore(
             }
             if (isFetchResponse(resultFromPlugin)) {
               const { docs, reachedEnd, cursor } = resultFromPlugin
-              setLastFetched?.({ reachedEnd, cursor })
+              if (isBoolean(reachedEnd)) setLastFetched?.({ reachedEnd, cursor })
               for (const docMetaData of docs) {
                 executeOnFns(doOnFetchFns, docMetaData.data, [docMetaData])
               }

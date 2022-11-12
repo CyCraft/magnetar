@@ -315,13 +315,15 @@ export type MustExecuteOnRead = Required<DoOnStream>
 
 /**
  * Plugin's response to a 'fetch' action, when acting as a "remote" Store Plugin.
+ *
+ * Optimistic fetch responses don't need to return `reachedEnd` nor `cursor`
  */
 export type FetchResponse = {
   docs: DocMetadata[]
   /** Wether or not the end was reached, in case there is no `limit` this is always true */
-  reachedEnd: boolean
+  reachedEnd?: boolean
   /** The last fetched doc */
-  cursor: unknown
+  cursor?: unknown
 }
 
 /**
