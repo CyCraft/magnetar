@@ -21,7 +21,7 @@ export type CollectionInstance<
    * @see {@link DocFn}
    * @example collection('pokedex').doc('001')
    */
-  doc: DocFn<DocDataType, GranularTypes>
+  doc: DocFn<DocDataType>
   /**
    * The id of the collection. When this is a nested collection, it will not include the full path, only the final part
    * @example 'items'
@@ -62,7 +62,7 @@ export type CollectionInstance<
   /**
    * @see {@link MagnetarStreamAction}
    */
-  stream: MagnetarStreamAction
+  stream: MagnetarStreamAction<DocDataType>
   /**
    * @see {@link MagnetarInsertAction}
    */

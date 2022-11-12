@@ -21,11 +21,11 @@ export type ActionName = 'fetch' | 'stream' | 'insert' | 'merge' | 'assign' | 'r
  * // don't throw errors for this action, wherever it might fail
  * { onError: 'continue' }
  */
-export type ActionConfig = {
+export type ActionConfig<DocDataType extends Record<string, any> = Record<string, any>> = {
   executionOrder?: StoreName[]
   onError?: 'revert' | 'continue' | 'stop'
-  modifyPayloadOn?: ModifyPayloadFnMap
-  modifyReadResponseOn?: ModifyReadResponseFnMap
+  modifyPayloadOn?: ModifyPayloadFnMap<DocDataType>
+  modifyReadResponseOn?: ModifyReadResponseFnMap<DocDataType>
   on?: EventNameFnMap
   /**
    * An option for remote stores like Firestore to delay a sync to the server and batch any additional actions made during the `syncDebounceMs`.
@@ -39,9 +39,13 @@ export type ActionConfig = {
  * Opens a continuous stream to a document or collection.
  * @returns the open stream promise. This will never resolve as long as the stream is open.
  */
-export type MagnetarStreamAction = (
+export type MagnetarStreamAction<DocDataType extends Record<string, any> = Record<string, any>> = (
   payload?: any | void,
-  actionConfig?: ActionConfig
+  /**
+   * TODO
+   * @deprecated — should deprecated this "general" action config and replace with one specific for this action
+   */
+  actionConfig?: ActionConfig<DocDataType>
 ) => Promise<void>
 
 /**
@@ -67,7 +71,11 @@ export type MagnetarFetchAction<
   calledFrom extends 'collection' | 'doc' = 'collection' | 'doc'
 > = (
   payload?: { force?: boolean } | Record<string, any> | void,
-  actionConfig?: ActionConfig
+  /**
+   * TODO
+   * @deprecated — should deprecated this "general" action config and replace with one specific for this action
+   */
+  actionConfig?: ActionConfig<DocDataType>
 ) => Promise<calledFrom extends 'collection' ? Map<string, DocDataType> : DocDataType | undefined>
 
 /**
@@ -79,7 +87,11 @@ export type MagnetarFetchAction<
  */
 export type MagnetarInsertAction<DocDataType extends Record<string, any> = Record<string, any>> = (
   payload: DocDataType,
-  actionConfig?: ActionConfig
+  /**
+   * TODO
+   * @deprecated — should deprecated this "general" action config and replace with one specific for this action
+   */
+  actionConfig?: ActionConfig<DocDataType>
 ) => Promise<DocInstance<DocDataType>>
 
 /**
@@ -87,7 +99,11 @@ export type MagnetarInsertAction<DocDataType extends Record<string, any> = Recor
  */
 export type MagnetarWriteAction<DocDataType extends Record<string, any> = Record<string, any>> = (
   payload: PartialDeep<DocDataType>,
-  actionConfig?: ActionConfig
+  /**
+   * TODO
+   * @deprecated — should deprecated this "general" action config and replace with one specific for this action
+   */
+  actionConfig?: ActionConfig<DocDataType>
 ) => Promise<DocDataType>
 
 /**
@@ -97,7 +113,11 @@ export type MagnetarDeletePropAction<
   DocDataType extends Record<string, any> = Record<string, any>
 > = (
   payload: keyof DocDataType | string | (keyof DocDataType | string)[],
-  actionConfig?: ActionConfig
+  /**
+   * TODO
+   * @deprecated — should deprecated this "general" action config and replace with one specific for this action
+   */
+  actionConfig?: ActionConfig<DocDataType>
 ) => Promise<Partial<DocDataType>>
 
 /**
@@ -106,7 +126,14 @@ export type MagnetarDeletePropAction<
  * @example collection('pokedex').delete('001')
  * @example doc('pokedex/001').delete()
  */
-export type MagnetarDeleteAction = (payload?: any, actionConfig?: ActionConfig) => Promise<void>
+export type MagnetarDeleteAction = (
+  payload?: any,
+  /**
+   * TODO
+   * @deprecated — should deprecated this "general" action config and replace with one specific for this action
+   */
+  actionConfig?: ActionConfig
+) => Promise<void>
 
 /**
  * All fetch promises with the payload passed to `fetch(payload)` as key (JSON.stringify) and the "fetch promise" as value. In case `fetch()` had no payload, use `undefined`

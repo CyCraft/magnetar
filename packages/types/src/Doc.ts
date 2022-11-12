@@ -54,7 +54,7 @@ export type DocInstance<
   /**
    * @see {@link MagnetarStreamAction}
    */
-  stream: MagnetarStreamAction
+  stream: MagnetarStreamAction<DocDataType>
   /**
    * @see {@link MagnetarInsertAction}
    */

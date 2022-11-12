@@ -47,22 +47,17 @@ export type CollectionFn = <
   GranularTypes extends { insert: Record<string, any> } = { insert: DocDataType }
 >(
   idOrPath: string,
-  moduleConfig?: ModuleConfig
+  moduleConfig?: ModuleConfig<DocDataType>
 ) => CollectionInstance<DocDataType, GranularTypes>
 
 /**
  * This is the `doc()` method type.
  * @see {@link DocInstance}
  */
-export type DocFn<
-  DocDataTypeInherited extends Record<string, any> = Record<string, any>,
-  GranularTypesInherited extends { insert: Record<string, any> } = { insert: DocDataTypeInherited }
-> = <
+export type DocFn<DocDataTypeInherited extends Record<string, any> = Record<string, any>> = <
   DocDataType extends Record<string, any> = DocDataTypeInherited,
-  GranularTypes extends { insert: Record<string, any> } = DocDataType extends DocDataTypeInherited
-    ? GranularTypesInherited
-    : { insert: DocDataType }
+  GranularTypes extends { insert: Record<string, any> } = { insert: DocDataType }
 >(
   idOrPath: string,
-  moduleConfig?: ModuleConfig
+  moduleConfig?: ModuleConfig<DocDataType>
 ) => DocInstance<DocDataType, GranularTypes>

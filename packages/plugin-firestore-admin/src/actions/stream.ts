@@ -48,7 +48,7 @@ export function streamActionFactory(
           // serverChanges only
           const docData = docSnapshot.data()
           const docMetadata = docSnapshotToDocMetadata(docSnapshot)
-          added(docData, docMetadata)
+          if (docData) added(docData, docMetadata)
         }, rejectStream)
     }
     // in case of a collection module
@@ -68,10 +68,10 @@ export function streamActionFactory(
               const docSnapshot = docChange.doc
               const docData = docSnapshot.data()
               const docMetadata = docSnapshotToDocMetadata(docSnapshot)
-              if (docChange.type === 'added') {
+              if (docChange.type === 'added' && docData) {
                 added(docData, docMetadata)
               }
-              if (docChange.type === 'modified') {
+              if (docChange.type === 'modified' && docData) {
                 modified(docData, docMetadata)
               }
               if (docChange.type === 'removed') {

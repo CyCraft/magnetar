@@ -183,7 +183,7 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
         const promise = payload[i]
         if (!promise) return
         promise.then(() => {
-          mustExecuteOnRead.added(data, metaData)
+          if (data) mustExecuteOnRead.added(data, metaData)
         })
         return
       }
@@ -194,7 +194,7 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
         // mock when the stream is already stopped
         if (stopStreaming.stopped) return
         // else go ahead and actually trigger the mustExecuteOnRead function
-        mustExecuteOnRead.added(data, metaData)
+        if (data) mustExecuteOnRead.added(data, metaData)
       }, waitTime)
     })
 

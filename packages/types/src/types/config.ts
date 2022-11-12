@@ -40,15 +40,15 @@ export type GlobalConfig = {
 /**
  * Extra options the dev can pass when creating a module with collection() or doc(). These will take precedence over the global config.
  */
-export type ModuleConfig = {
+export type ModuleConfig<DocDataType extends Record<string, any> = Record<string, any>> = {
   where?: WhereClause[]
   orderBy?: OrderByClause[]
   limit?: Limit
   startAfter?: unknown[] | Record<string, any>
   executionOrder?: ExecutionOrderConfig
   onError?: 'revert' | 'continue' | 'stop'
-  modifyPayloadOn?: ModifyPayloadFnMap
-  modifyReadResponseOn?: ModifyReadResponseFnMap
+  modifyPayloadOn?: ModifyPayloadFnMap<DocDataType>
+  modifyReadResponseOn?: ModifyReadResponseFnMap<DocDataType>
   on?: EventNameFnMap
   /**
    * Custom config the dev can set per Store Plugin. This will be passed to the plugin's action handler.
