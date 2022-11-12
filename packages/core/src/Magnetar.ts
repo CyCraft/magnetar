@@ -1,4 +1,5 @@
 import { mapGetOrSet } from 'getorset-anything'
+import { isString } from 'is-what'
 import { createCollectionWithContext } from './Collection'
 import { defaultsGlobalConfig } from './helpers/configHelpers'
 import { createDocWithContext } from './Doc'
@@ -7,6 +8,8 @@ import {
   getPathFilterIdentifier,
   PathFilterIdentifier,
   MODULE_IDENTIFIER_SPLIT,
+  PathWhereOrderByIdentifier,
+  getPathWhereOrderByIdentifier,
 } from './helpers/moduleHelpers'
 import {
   MagnetarInstance,
@@ -18,6 +21,7 @@ import {
   WriteLock,
   DocFn,
   CollectionFn,
+  FetchMetaData,
 } from '@magnetarjs/types'
 import { throwIfInvalidModulePath } from './helpers/throwFns'
 
@@ -52,6 +56,10 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
    * the global storage for fetch promises
    */
   const fetchPromiseMap: Map<PathFilterIdentifier, FetchPromises> = new Map() // apply type upon get/set
+  /**
+   * the global storage for last fetched (unknown) "thing" (only used by the plugin)
+   */
+  const fetchMetaMap: Map<PathWhereOrderByIdentifier, FetchMetaData> = new Map()
 
   async function clearAllData(): Promise<void> {
     for (const collectionName of collectionNames) {
@@ -82,6 +90,13 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
 
     // grab (and set) the FetchPromises for this module
     const fetchPromises = mapGetOrSet(fetchPromiseMap, pathFilterIdentifier, () => new Map())
+    // Create the FetchMeta helpers for this module
+    const pathWhereOrderByIdentifier = getPathWhereOrderByIdentifier(modulePath, moduleConfig)
+    const fetchMeta: { get: () => FetchMetaData; set: (payload: FetchMetaData) => void } = {
+      get: () =>
+        fetchMetaMap.get(pathWhereOrderByIdentifier) || { reachedEnd: false, last: undefined },
+      set: (payload: FetchMetaData) => fetchMetaMap.set(pathWhereOrderByIdentifier, payload),
+    }
 
     // grab the stream related functions
     function cacheStream(closeStreamFn: () => void, streamingPromise: Promise<void> | null): void {
@@ -120,7 +135,7 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     }
 
     // then create the module instance
-    if (moduleType === 'doc') {
+    if (moduleType === 'doc' && isString(docId)) {
       return createDocWithContext(
         [collectionPath, docId],
         moduleConfig,
@@ -132,12 +147,13 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     }
 
     return createCollectionWithContext(
-      [collectionPath, docId],
+      collectionPath,
       moduleConfig,
       globalConfig,
       docFn,
       collectionFn,
-      streamAndFetchPromises
+      streamAndFetchPromises,
+      fetchMeta
     )
   }
 

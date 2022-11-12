@@ -1,27 +1,33 @@
-<template>
-  <TestFirestorePlugin />
-  <div></div>
-</template>
+<script setup lang="ts">
+import { ref } from 'vue'
+import ButtonToggle from './components/ButtonToggle.vue'
+import TestFirestorePluginFetch from './components/TestFirestorePluginFetch.vue'
+import TestFirestorePluginStream from './components/TestFirestorePluginStream.vue'
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import TestFirestorePlugin from './components/TestFirestorePlugin.vue'
-
-export default defineComponent({
-  name: 'App',
-  components: {
-    TestFirestorePlugin,
-  },
-})
+const example = ref<'stream' | 'fetch'>('stream')
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<template>
+  <div>
+    <ButtonToggle
+      v-model="example"
+      :options="[
+        { label: 'Stream Example', value: 'stream' },
+        { label: 'Fetch Example', value: 'fetch' },
+      ]"
+      style="margin-bottom: 1rem"
+    />
+
+    <TestFirestorePluginStream v-if="example === 'stream'" />
+    <TestFirestorePluginFetch v-if="example === 'fetch'" />
+  </div>
+</template>
+
+<style lang="sass">
+#app
+  font-family: Avenir, Helvetica, Arial, sans-serif
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+  text-align: center
+  margin-top: 60px
 </style>

@@ -3,6 +3,7 @@ import {
   MagnetarStreamAction,
   MagnetarInsertAction,
   MagnetarDeleteAction,
+  FetchMetaData,
 } from './types/actions'
 import { DocFn } from './Magnetar'
 import { WhereFilterOp } from './types/clauses'
@@ -97,4 +98,8 @@ export type CollectionInstance<
    */
   startAfter(docSnapshot: Record<string, any>): CollectionInstance<DocDataType, GranularTypes>
   startAfter(...fieldValues: unknown[]): CollectionInstance<DocDataType, GranularTypes>
+  /**
+   * Meta data from the last fetch call
+   */
+  fetched: FetchMetaData
 }

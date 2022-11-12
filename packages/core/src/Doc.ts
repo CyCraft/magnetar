@@ -18,10 +18,10 @@ import {
   HandleActionSharedParams,
 } from './moduleActions/handleActionPerStore'
 import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
-import { executeSetupModulePerStore, getDataProxyHandler } from './helpers/moduleHelpers'
+import { executeSetupModulePerStore, getDataFromDataStore, proxify } from './helpers/moduleHelpers'
 
 export function createDocWithContext(
-  [collectionPath, docId]: [string, string | undefined],
+  [collectionPath, docId]: [string, string],
   moduleConfig: ModuleConfig,
   globalConfig: Required<GlobalConfig>,
   docFn: DocFn,
@@ -36,7 +36,6 @@ export function createDocWithContext(
 ): DocInstance {
   const { writeLockMap, fetchPromises, cacheStream, streaming, closeStream } = streamAndFetchPromises // prettier-ignore
 
-  const id = docId
   const path = [collectionPath, docId].join('/')
 
   const collection: CollectionFn = (collectionId, _moduleConfig = {}) => {
@@ -68,21 +67,14 @@ export function createDocWithContext(
 
   const moduleInstance: Omit<DocInstance, 'data'> = {
     collection,
-    id: id as string,
+    id: docId,
     path,
     streaming,
     closeStream,
     ...actions,
   }
 
-  /**
-   * The data returned by the store specified as 'localStoreName'
-   */
-  const dataProxyHandler = getDataProxyHandler<'doc', Record<string, unknown>>(
-    [collectionPath, docId],
-    moduleConfig,
-    globalConfig
-  )
-
-  return new Proxy(moduleInstance, dataProxyHandler)
+  return proxify(moduleInstance, {
+    data: () => getDataFromDataStore(moduleConfig, globalConfig, collectionPath, docId),
+  })
 }

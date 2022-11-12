@@ -46,13 +46,13 @@ export type FirestorePluginOptions<Firestore extends Client.Firestore | Admin.Fi
    * ```js
    * import { initializeApp } from 'firebase-admin/app'
    * import { getFirestore } from 'firebase-admin/firestore'
-   * import { CreatePlugin as FirestorePlugin } from '@magnetarjs/firestore'
+   * import { CreatePlugin as FirestoreAdminPlugin } from '@magnetarjs/firestore-admin'
    *
    * const firebaseApp = initializeApp()
    * const db = getFirestore(firebaseApp)
    *
    * // initialise plugin
-   * const remote = FirestorePlugin({ db })
+   * const remote = FirestoreAdminPlugin({ db })
    *
    * // add to magnetar during initialisation
    * const magnetar = Magnetar({
@@ -79,7 +79,7 @@ export type FirestorePluginOptions<Firestore extends Client.Firestore | Admin.Fi
   debug?: boolean
 }
 
-export interface FirestoreModuleConfig {
+export type FirestoreModuleConfig = {
   firestorePath?: string
   where?: WhereClause[]
   orderBy?: OrderByClause[]

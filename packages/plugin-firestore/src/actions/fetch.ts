@@ -5,7 +5,7 @@ import {
   FetchResponse,
   DocMetadata,
   PluginFetchActionPayload,
-} from '@magnetarjs/core'
+} from '@magnetarjs/types'
 import {
   FirestoreModuleConfig,
   getFirestoreDocPath,
@@ -34,13 +34,22 @@ export function fetchActionFactory(
     // in case of a collection module
     else if (!docId) {
       const _collectionPath = getFirestoreCollectionPath(collectionPath, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
+
       const queryInstance = getQueryInstance(_collectionPath, pluginModuleConfig, db)
       const querySnapshot = await getDocs(queryInstance)
       snapshots = querySnapshot.docs
     }
-    if (!snapshots) return { docs: [] }
+
+    if (!snapshots) return { docs: [], reachedEnd: true, last: undefined }
+
+    const { limit } = pluginModuleConfig
+    const reachedEnd = docId || limit === undefined ? true : snapshots.length < limit
+    /** @see https://firebase.google.com/docs/firestore/query-data/query-cursors */
+    const last = snapshots[snapshots.length - 1]
+
     // map snapshots to DocMetadata type
     const docs: DocMetadata[] = snapshots.map(docSnapshotToDocMetadata)
-    return { docs }
+
+    return { docs, reachedEnd, last }
   }
 }

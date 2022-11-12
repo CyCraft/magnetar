@@ -9,7 +9,7 @@
   "dependencies": {
     "@magnetarjs/plugin-vue2": "workspace:*",
     "core-js": "^3.20.2",
-    "firebase": "^9.6.1",
+    "firebase": "^9.14.0",
     "magnetar": "workspace:*",
     "vue": "^2.6.14"
   },

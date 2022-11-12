@@ -42,7 +42,7 @@
     "@magnetarjs/core": "workspace:*",
     "@magnetarjs/test-utils": "workspace:*",
     "array-shuffle": "^3.0.0",
-    "firebase": "^9.9.3"
+    "firebase": "^9.14.0"
   },
   "keywords": [
     "magnetar-plugin",

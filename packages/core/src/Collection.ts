@@ -14,16 +14,17 @@ import {
   OrderByClause,
   actionNameTypeMap,
   CollectionInstance,
+  FetchMetaData,
 } from '@magnetarjs/types'
 import {
   handleActionPerStore,
   HandleActionSharedParams,
 } from './moduleActions/handleActionPerStore'
 import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
-import { executeSetupModulePerStore, getDataProxyHandler } from './helpers/moduleHelpers'
+import { executeSetupModulePerStore, getDataFromDataStore, proxify } from './helpers/moduleHelpers'
 
 export function createCollectionWithContext(
-  [collectionPath, docId]: [string, string | undefined],
+  collectionPath: string,
   moduleConfig: ModuleConfig,
   globalConfig: Required<GlobalConfig>,
   docFn: DocFn,
@@ -35,7 +36,8 @@ export function createCollectionWithContext(
     streaming: () => Promise<void> | null
     closeStream: () => void
     closeAllStreams: () => void
-  }
+  },
+  fetchMeta: { get: () => FetchMetaData; set: (payload: FetchMetaData) => void }
 ): CollectionInstance {
   const { writeLockMap, fetchPromises, cacheStream, streaming, closeStream, closeAllStreams } = streamAndFetchPromises // prettier-ignore
 
@@ -48,23 +50,24 @@ export function createCollectionWithContext(
 
   const sharedParams: HandleActionSharedParams = {
     collectionPath,
-    _docId: docId,
+    _docId: undefined,
     moduleConfig,
     globalConfig,
     fetchPromises,
     writeLockMap,
     docFn,
     collectionFn,
+    setLastFetched: fetchMeta.set,
   }
   const insert = handleActionPerStore(sharedParams, 'insert', actionNameTypeMap.insert) as MagnetarInsertAction //prettier-ignore
   const _delete = handleActionPerStore(sharedParams, 'delete', actionNameTypeMap.delete) as MagnetarDeleteAction //prettier-ignore
   const fetch = handleActionPerStore(sharedParams, 'fetch', actionNameTypeMap.fetch) as MagnetarFetchAction<Record<string, unknown>, 'collection'> //prettier-ignore
-  const stream = handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streaming, cacheStream, writeLockMap) // prettier-ignore
+  const stream = handleStreamPerStore([collectionPath, undefined], moduleConfig, globalConfig, actionNameTypeMap.stream, streaming, cacheStream, writeLockMap) // prettier-ignore
 
   const actions = { stream, fetch, insert, delete: _delete }
 
   // Every store will have its 'setupModule' function executed
-  executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig)
+  executeSetupModulePerStore(globalConfig.stores, [collectionPath, undefined], moduleConfig)
 
   function where(fieldPath: string, operator: WhereFilterOp, value: any): CollectionInstance {
     const whereClause: WhereClause = [fieldPath, operator, value]
@@ -83,6 +86,8 @@ export function createCollectionWithContext(
   }
 
   function startAfter(...values: unknown[]): CollectionInstance {
+    if (values[0] === undefined) return collectionFn(path, moduleConfig)
+
     const isDoc = values[0] && typeof values[0] === 'object'
     return collectionFn(path, {
       ...moduleConfig,
@@ -92,7 +97,7 @@ export function createCollectionWithContext(
 
   const queryFns = { where, orderBy, limit, startAfter }
 
-  const moduleInstance: Omit<CollectionInstance, 'data'> = {
+  const moduleInstance: Omit<CollectionInstance, 'data' | 'fetched'> = {
     doc,
     id,
     path,
@@ -103,14 +108,8 @@ export function createCollectionWithContext(
     ...queryFns,
   }
 
-  /**
-   * The data returned by the store specified as 'localStoreName'
-   */
-  const dataProxyHandler = getDataProxyHandler<'collection', Record<string, unknown>>(
-    [collectionPath, docId],
-    moduleConfig,
-    globalConfig
-  )
-
-  return new Proxy(moduleInstance, dataProxyHandler)
+  return proxify(moduleInstance, {
+    data: () => getDataFromDataStore(moduleConfig, globalConfig, collectionPath),
+    fetched: fetchMeta.get,
+  })
 }

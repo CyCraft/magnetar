@@ -36,7 +36,7 @@
     "remove-anything": "^0.1.0"
   },
   "devDependencies": {
-    "firebase": "^9.10.0",
+    "firebase": "^9.14.0",
     "firebase-admin": "^11.0.1"
   },
   "keywords": [

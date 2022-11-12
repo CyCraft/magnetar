@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { Spread } from 'type-fest'
-import { ActionConfig, ActionName } from './actions'
+import { ActionConfig, ActionName, FetchMetaData } from './actions'
 import { DocMetadata } from './core'
 import { OnAddedFn, OnModifiedFn, OnRemovedFn } from './modifyReadResponse'
 import { Clauses } from './clauses'
@@ -318,6 +318,10 @@ export type MustExecuteOnRead = Required<DoOnStream>
  */
 export type FetchResponse = {
   docs: DocMetadata[]
+  /** Wether or not the end was reached, in case there is no `limit` this is always true */
+  reachedEnd: boolean
+  /** The last fetched doc */
+  last: unknown
 }
 
 /**

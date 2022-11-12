@@ -8,21 +8,42 @@ export const MODULE_IDENTIFIER_SPLIT = ' /// '
  * Saved as enum, just to enforce usage of `getPathFilterIdentifier()`
  */
 export enum PathFilterIdentifier {
-  'KEY' = 'modulePath + JSON.stringify({limit, orderBy, where, startAfter})',
+  'KEY' = 'modulePath + JSON.stringify({ where, orderBy, startAfter, limit })',
 }
 
 /**
  * Creates the `key` for the Maps used to cache certain values throughout the lifecycle of an instance.
- * @returns `JSON.stringify({ modulePath, modulePath, limit, orderBy, where })`
+ * @returns `modulePath + ' /// ' + JSON.stringify({ where, orderBy, startAfter, limit })`
  */
 export function getPathFilterIdentifier(
   modulePath: string,
   moduleConfig: ModuleConfig
 ): PathFilterIdentifier {
-  const { limit, orderBy, where, startAfter } = moduleConfig
-  const config = JSON.stringify({ limit, orderBy, where, startAfter })
+  const { where, orderBy, startAfter, limit } = moduleConfig
+  const config = JSON.stringify({ where, orderBy, startAfter, limit })
 
   return `${modulePath}${MODULE_IDENTIFIER_SPLIT}${config}` as unknown as PathFilterIdentifier.KEY
+}
+
+/**
+ * Saved as enum, just to enforce usage of `getPathWhereOrderByIdentifier()`
+ */
+export enum PathWhereOrderByIdentifier {
+  'KEY' = 'modulePath + JSON.stringify({ where, orderBy })',
+}
+
+/**
+ * Creates the `key` for the Maps used to cache the last fetched (unknown) "thing" (only used by the plugin) throughout the lifecycle of an instance.
+ * @returns `modulePath + ' /// ' + JSON.stringify({ where, orderBy })`
+ */
+export function getPathWhereOrderByIdentifier(
+  modulePath: string,
+  moduleConfig: ModuleConfig
+): PathWhereOrderByIdentifier {
+  const { where, orderBy } = moduleConfig
+  const config = JSON.stringify({ where, orderBy })
+
+  return `${modulePath}${MODULE_IDENTIFIER_SPLIT}${config}` as unknown as PathWhereOrderByIdentifier.KEY
 }
 
 /**
@@ -64,19 +85,17 @@ export function executeSetupModulePerStore(
   }
 }
 
-/**
- * Returns the `getModuleData` function form the store specified as 'localStoreName'
- *
- * @export
- * @template DocDataType
- * @param {ModuleConfig} moduleConfig
- * @param {GlobalConfig} globalConfig
- * @returns {(collectionPath: string, docId: string | undefined) => (Map<string, DocDataType> | DocDataType)}
- */
-export function getDataFnFromDataStore<DocDataType>(
+/** Executes the `getModuleData` function from the store specified as 'localStoreName' */
+export function getDataFromDataStore(moduleConfig: ModuleConfig, globalConfig: GlobalConfig, collectionPath: string): Map<string, Record<string, any>> // prettier-ignore
+/** Executes the `getModuleData` function from the store specified as 'localStoreName' */
+export function getDataFromDataStore(moduleConfig: ModuleConfig, globalConfig: GlobalConfig, collectionPath: string, docId: string): Record<string, any> // prettier-ignore
+/** Executes the `getModuleData` function from the store specified as 'localStoreName' */
+export function getDataFromDataStore(
   moduleConfig: ModuleConfig,
-  globalConfig: GlobalConfig
-): (collectionPath: string, docId: string | undefined) => Map<string, DocDataType> | DocDataType {
+  globalConfig: GlobalConfig,
+  collectionPath: string,
+  docId?: string
+): Record<string, any> | Map<string, Record<string, any>> {
   const localStoreName = globalConfig.localStoreName
   throwIfNolocalStoreName(localStoreName)
   const getModuleData = globalConfig.stores[localStoreName].getModuleData
@@ -85,34 +104,24 @@ export function getDataFnFromDataStore<DocDataType>(
   }
   const pluginModuleConfig = getPluginModuleConfig(moduleConfig, localStoreName)
 
-  return (collectionPath, docId): Map<string, DocDataType> | DocDataType =>
-    getModuleData({ collectionPath, docId, pluginModuleConfig }) as any
+  return getModuleData({ collectionPath, docId, pluginModuleConfig }) as any
 }
 
 /**
- * Returns an object with the `data` prop as proxy which triggers every time the data is accessed
- *
- * @export
- * @template calledFrom {'doc' | 'collection'}
- * @template DocDataType
- * @param {[string, string | undefined]} [collectionPath, docId]
- * @param {ModuleConfig} moduleConfig
- * @param {GlobalConfig} globalConfig
- * @returns {calledFrom extends 'doc' ? { get: (...p: any[]) => DocDataType } : { get: (...p: any[]) => Map<string, DocDataType> }}
+ * Returns an object as proxy which will execute the given functions upon prop access for the params passed here
  */
-export function getDataProxyHandler<calledFrom extends 'doc' | 'collection', DocDataType>(
-  [collectionPath, docId]: [string, string | undefined],
-  moduleConfig: ModuleConfig,
-  globalConfig: GlobalConfig
-): calledFrom extends 'doc'
-  ? { get: (...p: any[]) => DocDataType }
-  : { get: (...p: any[]) => Map<string, DocDataType> } {
-  const getModuleData = getDataFnFromDataStore<DocDataType>(moduleConfig, globalConfig)
+export function proxify<T extends Record<string, unknown>, P extends Record<string, () => any>>(
+  target: T,
+  propExecutionDic: P
+): T & { [key in keyof P]: ReturnType<P[key]> } {
   const dataHandler = {
     get: function (target: any, key: any, proxyRef: any): any {
-      if (key === 'data') return getModuleData(collectionPath, docId)
+      if (key in propExecutionDic) {
+        return propExecutionDic[key]()
+      }
       return Reflect.get(target, key, proxyRef)
     },
   }
-  return dataHandler as any
+  // eslint-disable-next-line tree-shaking/no-side-effects-in-initialization
+  return new Proxy(target, dataHandler)
 }

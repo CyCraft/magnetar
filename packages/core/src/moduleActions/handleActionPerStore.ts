@@ -23,6 +23,7 @@ import {
   CollectionFn,
   DocFn,
   WriteLock,
+  FetchMetaData,
 } from '@magnetarjs/types'
 import { isDoOnFetch, isFetchResponse } from '../helpers/pluginHelpers'
 import { getModifyPayloadFnsMap } from '../helpers/modifyPayload'
@@ -41,6 +42,7 @@ export type HandleActionSharedParams = {
   writeLockMap: Map<string, WriteLock>
   docFn: DocFn // actions executed on a "doc" will always return `doc()`
   collectionFn?: CollectionFn // actions executed on a "collection" will return `collection()` or `doc()`
+  setLastFetched?: (payload: FetchMetaData) => void
 }
 
 export function handleActionPerStore<TActionName extends Exclude<ActionName, 'stream'>>(
@@ -58,7 +60,7 @@ export function handleActionPerStore(
   | MagnetarInsertAction<any>
   | MagnetarDeleteAction
   | MagnetarDeletePropAction<any> {
-  const { collectionPath, _docId, moduleConfig, globalConfig, fetchPromises, writeLockMap, docFn, collectionFn } = sharedParams // prettier-ignore
+  const { collectionPath, _docId, moduleConfig, globalConfig, fetchPromises, writeLockMap, docFn, collectionFn, setLastFetched } = sharedParams // prettier-ignore
 
   // returns the action the dev can call with myModule.insert() etc.
   return function (payload?: any, actionConfig: ActionConfig = {}): Promise<any> {
@@ -254,7 +256,9 @@ export function handleActionPerStore(
               doOnFetchFns.push(resultFromPlugin)
             }
             if (isFetchResponse(resultFromPlugin)) {
-              for (const docMetaData of resultFromPlugin.docs) {
+              const { docs, reachedEnd, last } = resultFromPlugin
+              setLastFetched?.({ reachedEnd, last })
+              for (const docMetaData of docs) {
                 executeOnFns(doOnFetchFns, docMetaData.data, [docMetaData])
               }
             }

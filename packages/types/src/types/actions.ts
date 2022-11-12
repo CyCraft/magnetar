@@ -139,3 +139,13 @@ export type MagnetarDeleteAction = (
  * All fetch promises with the payload passed to `fetch(payload)` as key (JSON.stringify) and the "fetch promise" as value. In case `fetch()` had no payload, use `undefined`
  */
 export type FetchPromises = Map<string, Promise<any>>
+
+/**
+ * Stored by plugins to be able to more easily fetch more data with `startAfter(last)`
+ */
+export type FetchMetaData = {
+  /** Wether or not the end was reached, in case there is no `limit` this is always true */
+  reachedEnd: boolean
+  /** The last fetched doc */
+  last: unknown
+}

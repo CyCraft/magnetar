@@ -333,6 +333,51 @@ import { pokedex } from '@magnetarjs/test-utils'
     }
   })
 }
+// {
+//   // TODO: I wonder why this doesn't work 🤔
+//   const testName = 'only:fetch (collection) orderBy + startAfter with fetched.last'
+//   test(testName, async (t) => {
+//     const { pokedexModule } = await createMagnetarInstance('read')
+//     try {
+//       const queryModuleRef = pokedexModule.where('id', '<', 20).orderBy('id', 'desc').limit(8)
+
+//       async function fetchMore() {
+//         await queryModuleRef.startAfter(queryModuleRef.fetched.last).fetch({ force: true })
+//       }
+
+//       await fetchMore()
+//       await fetchMore()
+
+//       const actual = [...queryModuleRef.data.values()].map((p) => p.id)
+//       const expected = [
+//         pokedex(19),
+//         pokedex(18),
+//         pokedex(17),
+//         pokedex(16),
+//         pokedex(15),
+//         pokedex(14),
+//         pokedex(13),
+//         pokedex(12),
+//         pokedex(11),
+//         pokedex(10),
+//         pokedex(9),
+//         pokedex(8),
+//         pokedex(7),
+//         pokedex(6),
+//         pokedex(5),
+//         pokedex(4),
+//       ].map((p) => p.id)
+//       t.deepEqual(actual, expected as any)
+
+//       // also check the collection without query
+//       const actualDocCountWithoutQuery = pokedexModule.data.size
+//       const expectedDocCountWithoutQuery = expected.length
+//       t.deepEqual(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
+//     } catch (error) {
+//       t.fail(JSON.stringify(error))
+//     }
+//   })
+// }
 {
   const testName = 'fetch: errors are thrown'
   test(testName, async (t) => {
