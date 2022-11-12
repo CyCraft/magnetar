@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/utils",
-  "version": "0.8.4",
+  "version": "0.9.0",
   "sideEffects": false,
   "description": "Magnetar utils like a logger for easier development",
   "main": "dist/index.js",
