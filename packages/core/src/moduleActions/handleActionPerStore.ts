@@ -1,5 +1,4 @@
 /* eslint-disable no-inner-declarations */
-import { O } from 'ts-toolbelt'
 import { mapGetOrSet } from 'getorset-anything'
 import { isFullArray, isFullString, isPromise } from 'is-what'
 import { handleAction } from './handleAction'
@@ -37,7 +36,7 @@ export type HandleActionSharedParams = {
   collectionPath: string
   _docId: string | undefined
   moduleConfig: ModuleConfig
-  globalConfig: O.Compulsory<GlobalConfig>
+  globalConfig: Required<GlobalConfig>
   fetchPromises: FetchPromises
   writeLockMap: Map<string, WriteLock>
   docFn: DocFn // actions executed on a "doc" will always return `doc()`

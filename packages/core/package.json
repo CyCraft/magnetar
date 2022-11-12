@@ -31,8 +31,7 @@
     "@magnetarjs/utils": "workspace:*",
     "getorset-anything": "^0.0.2",
     "is-what": "^3.14.1",
-    "merge-anything": "^4.0.5",
-    "ts-toolbelt": "^9.6.0"
+    "merge-anything": "^4.0.5"
   },
   "devDependencies": {
     "@magnetarjs/test-utils": "workspace:*"

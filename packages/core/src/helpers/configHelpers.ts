@@ -1,8 +1,7 @@
-import { O } from 'ts-toolbelt'
 import { merge } from 'merge-anything'
 import { GlobalConfig } from '@magnetarjs/types'
 
-export function defaultsGlobalConfig(config: GlobalConfig): O.Compulsory<GlobalConfig> {
+export function defaultsGlobalConfig(config: GlobalConfig): Required<GlobalConfig> {
   const defaults: GlobalConfig = {
     localStoreName: '',
     stores: {},

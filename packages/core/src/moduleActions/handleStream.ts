@@ -1,4 +1,3 @@
-import { O } from 'ts-toolbelt'
 import {
   ActionConfig,
   EventNameFnsMap,
@@ -21,7 +20,7 @@ export async function handleStream(args: {
   eventNameFnsMap: EventNameFnsMap
   actionName: 'stream'
   storeName: string
-  mustExecuteOnRead: O.Compulsory<DoOnStream>
+  mustExecuteOnRead: Required<DoOnStream>
 }): Promise<StreamResponse | DoOnStream> {
   const {
     collectionPath,

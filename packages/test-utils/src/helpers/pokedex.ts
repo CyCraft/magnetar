@@ -1,8 +1,7 @@
 import { copy } from 'copy-anything'
 import { merge } from 'merge-anything'
 import { PokedexEntry, allPokemonArray } from './pokemon'
-
-export { PokedexEntry, PokemonType } from './pokemon'
+export type { PokedexEntry, PokemonType } from './pokemon'
 
 export function pokedexEntryDefaults(values: { [key in string]: any }): PokedexEntry {
   const defaults = {

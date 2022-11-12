@@ -2,7 +2,7 @@ import { MagnetarInstance, CollectionInstance, DocInstance } from '@magnetarjs/t
 import { Magnetar } from '@magnetarjs/core'
 import { CreatePlugin as CreatePluginLocal } from '../../src'
 import { pokedex, PokedexEntry, generateRandomId, PluginMockRemote } from '@magnetarjs/test-utils'
-import { O } from 'ts-toolbelt'
+
 // @ts-ignore
 // import Vue from 'vue/dist/vue.cjs.js'
 
@@ -14,13 +14,7 @@ const getInitialDataCollection = () => [
 ]
 const getInitialDataDocument = () => ({ name: 'Luca', age: 10 })
 
-export type PokedexModuleData = O.Patch<
-  PokedexEntry,
-  {
-    seen?: boolean
-    shouldFail?: string
-  }
->
+export type PokedexModuleData = PokedexEntry & { seen?: boolean; shouldFail?: string }
 
 export type TrainerModuleData = {
   name: string

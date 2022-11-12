@@ -1,4 +1,4 @@
-import { U } from 'ts-toolbelt'
+import { UnionToIntersection } from 'type-fest'
 
 /**
  * Returns the type for string literals.
@@ -32,7 +32,7 @@ type Prev = [never, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
  */
 export type OPaths<T, D extends number = 10> = [D] extends [never]
   ? never
-  : U.Intersect<T, null | undefined> extends never
+  : UnionToIntersection<T | null | undefined> extends never
   ? T extends Record<string, any>
     ? {
         [K in keyof T]-?: K extends string ? `${K}` | Join<K, OPaths<T[K], Prev[D]>> : never
@@ -47,7 +47,7 @@ export type OPaths<T, D extends number = 10> = [D] extends [never]
  */
 export type OLeaves<T, D extends number = 10> = [D] extends [never]
   ? ''
-  : U.Intersect<T, null | undefined> extends never
+  : UnionToIntersection<T | null | undefined> extends never
   ? T extends Record<string, any>
     ? {
         [K in keyof T]-?: IsFullStringLiteral<K> extends true ? Join<K, OLeaves<T[K], Prev[D]>> : ''

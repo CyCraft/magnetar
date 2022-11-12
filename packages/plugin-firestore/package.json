@@ -36,8 +36,7 @@
     "getorset-anything": "^0.0.2",
     "is-what": "^3.14.1",
     "merge-anything": "^5.0.2",
-    "remove-anything": "^0.1.0",
-    "ts-toolbelt": "^9.6.0"
+    "remove-anything": "^0.1.0"
   },
   "devDependencies": {
     "@magnetarjs/core": "workspace:*",

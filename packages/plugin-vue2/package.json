@@ -37,8 +37,7 @@
     "getorset-anything": "^0.0.2",
     "is-what": "^3.14.1",
     "merge-anything": "^4.0.5",
-    "path-to-prop": "1.0.2",
-    "ts-toolbelt": "^9.6.0"
+    "path-to-prop": "1.0.2"
   },
   "devDependencies": {
     "@magnetarjs/core": "workspace:*",

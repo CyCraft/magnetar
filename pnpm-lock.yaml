@@ -54,14 +54,12 @@ importers:
       getorset-anything: ^0.0.2
       is-what: ^3.14.1
       merge-anything: ^4.0.5
-      ts-toolbelt: ^9.6.0
     dependencies:
       '@magnetarjs/types': link:../types
       '@magnetarjs/utils': link:../utils
       getorset-anything: 0.0.2
       is-what: 3.14.1
       merge-anything: 4.0.5
-      ts-toolbelt: 9.6.0
     devDependencies:
       '@magnetarjs/test-utils': link:../test-utils
 
@@ -169,7 +167,6 @@ importers:
       is-what: ^3.14.1
       merge-anything: ^5.0.2
       remove-anything: ^0.1.0
-      ts-toolbelt: ^9.6.0
     dependencies:
       '@magnetarjs/types': link:../types
       '@magnetarjs/utils-firestore': link:../utils-firestore
@@ -178,7 +175,6 @@ importers:
       is-what: 3.14.1
       merge-anything: 5.0.2
       remove-anything: 0.1.3
-      ts-toolbelt: 9.6.0
     devDependencies:
       '@magnetarjs/core': link:../core
       '@magnetarjs/test-utils': link:../test-utils
@@ -198,7 +194,6 @@ importers:
       is-what: ^3.14.1
       merge-anything: ^5.0.2
       remove-anything: ^0.1.0
-      ts-toolbelt: ^9.6.0
     dependencies:
       '@magnetarjs/types': link:../types
       '@magnetarjs/utils-firestore': link:../utils-firestore
@@ -207,7 +202,6 @@ importers:
       is-what: 3.14.1
       merge-anything: 5.0.2
       remove-anything: 0.1.3
-      ts-toolbelt: 9.6.0
     devDependencies:
       '@magnetarjs/core': link:../core
       '@magnetarjs/test-utils': link:../test-utils
@@ -227,7 +221,6 @@ importers:
       is-what: ^3.14.1
       merge-anything: ^4.0.5
       path-to-prop: 1.0.2
-      ts-toolbelt: ^9.6.0
     dependencies:
       '@magnetarjs/types': link:../types
       '@magnetarjs/utils': link:../utils
@@ -237,7 +230,6 @@ importers:
       is-what: 3.14.1
       merge-anything: 4.0.5
       path-to-prop: 1.0.2
-      ts-toolbelt: 9.6.0
     devDependencies:
       '@magnetarjs/core': link:../core
       '@magnetarjs/test-utils': link:../test-utils
@@ -255,7 +247,6 @@ importers:
       is-what: ^3.14.1
       merge-anything: ^4.0.5
       path-to-prop: 1.0.2
-      ts-toolbelt: ^9.6.0
       vue: ^2.6.14
     dependencies:
       '@magnetarjs/types': link:../types
@@ -266,7 +257,6 @@ importers:
       is-what: 3.14.1
       merge-anything: 4.0.5
       path-to-prop: 1.0.2
-      ts-toolbelt: 9.6.0
     devDependencies:
       '@magnetarjs/core': link:../core
       '@magnetarjs/test-utils': link:../test-utils
@@ -284,7 +274,6 @@ importers:
       is-what: ^3.14.1
       merge-anything: ^4.0.5
       path-to-prop: 1.0.2
-      ts-toolbelt: ^9.6.0
       vue: ^3.2.26
     dependencies:
       '@magnetarjs/types': link:../types
@@ -295,7 +284,6 @@ importers:
       is-what: 3.14.1
       merge-anything: 4.0.5
       path-to-prop: 1.0.2
-      ts-toolbelt: 9.6.0
     devDependencies:
       '@magnetarjs/core': link:../core
       '@magnetarjs/test-utils': link:../test-utils
@@ -328,10 +316,8 @@ importers:
 
   packages/types:
     specifiers:
-      ts-toolbelt: ^9.6.0
       type-fest: ^3.2.0
     dependencies:
-      ts-toolbelt: 9.6.0
       type-fest: 3.2.0
 
   packages/utils:
@@ -357,7 +343,6 @@ importers:
       is-what: ^3.14.1
       merge-anything: ^5.0.2
       remove-anything: ^0.1.0
-      ts-toolbelt: ^9.6.0
     dependencies:
       '@magnetarjs/types': link:../types
       '@magnetarjs/utils': link:../utils
@@ -366,7 +351,6 @@ importers:
       is-what: 3.14.1
       merge-anything: 5.0.2
       remove-anything: 0.1.3
-      ts-toolbelt: 9.6.0
     devDependencies:
       firebase: 9.10.0
       firebase-admin: 11.0.1

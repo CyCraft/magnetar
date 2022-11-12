@@ -1,4 +1,3 @@
-import { O } from 'ts-toolbelt'
 import { isPromise } from 'is-what'
 import {
   StreamResponse,
@@ -25,7 +24,7 @@ import { isDoOnStream } from '../helpers/pluginHelpers'
 export function handleStreamPerStore(
   [collectionPath, docId]: [string, string | undefined],
   moduleConfig: ModuleConfig,
-  globalConfig: O.Compulsory<GlobalConfig>,
+  globalConfig: Required<GlobalConfig>,
   actionType: ActionType,
   streaming: () => Promise<void> | null,
   cacheStream: (closeStreamFn: () => void, streamingPromise: Promise<void> | null) => void,
@@ -81,7 +80,7 @@ export function handleStreamPerStore(
     /**
      * this is what must be executed by a plugin store that implemented "stream" functionality
      */
-    const mustExecuteOnRead: O.Compulsory<DoOnStream> = {
+    const mustExecuteOnRead: Required<DoOnStream> = {
       added: async (_payload, _meta) => {
         // check if there's a WriteLock for the document:
         const docIdentifier = `${collectionPath}/${_meta.id}`

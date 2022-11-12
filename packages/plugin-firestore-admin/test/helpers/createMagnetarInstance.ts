@@ -1,5 +1,4 @@
 import { Timestamp } from 'firebase-admin/firestore'
-import { O } from 'ts-toolbelt'
 import { PokedexEntry, generateRandomId, PluginMockLocal, MoveEntry } from '@magnetarjs/test-utils'
 import { MagnetarInstance, CollectionInstance, DocInstance } from '@magnetarjs/types'
 import { Magnetar } from '@magnetarjs/core'
@@ -10,14 +9,11 @@ const CreatePluginLocal = PluginMockLocal.CreatePlugin
 
 const getInitialDataDocument = () => ({ name: 'Luca', age: 10 })
 
-export type PokedexModuleData = O.Patch<
-  PokedexEntry,
-  {
-    seen?: boolean
-    shouldFail?: string
-    shouldFailDelete?: string
-  }
->
+export type PokedexModuleData = PokedexEntry & {
+  seen?: boolean
+  shouldFail?: string
+  shouldFailDelete?: string
+}
 
 export type TrainerModuleData = {
   name: string

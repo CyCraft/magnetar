@@ -1,4 +1,5 @@
 import { merge } from 'merge-anything'
+import { isPlainObject } from 'is-what'
 import { PluginWriteAction, PluginWriteActionPayload } from '@magnetarjs/types'
 import { Vue2StoreModuleConfig, Vue2StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
@@ -33,7 +34,12 @@ export function writeActionFactory(
 
     if (actionName === 'merge') {
       Object.entries(payload).forEach(([key, value]) => {
-        vue.set(docDataToMutate, key, merge(docDataToMutate[key], value))
+        const originalValue = docDataToMutate[key]
+        if (isPlainObject(originalValue) && isPlainObject(value)) {
+          vue.set(docDataToMutate, key, merge(originalValue, value))
+        } else {
+          vue.set(docDataToMutate, key, value)
+        }
       })
     }
     if (actionName === 'assign' || actionName === 'replace') {

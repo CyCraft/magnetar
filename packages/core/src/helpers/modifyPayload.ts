@@ -1,9 +1,8 @@
-import { O } from 'ts-toolbelt'
 import { ModifyPayloadFnMap, ModifyPayloadFnsMap } from '@magnetarjs/types'
 
 export function getModifyPayloadFnsMap(
   ...onMaps: (ModifyPayloadFnMap | void)[]
-): O.Omit<ModifyPayloadFnsMap, 'write' | 'read'> {
+): Omit<ModifyPayloadFnsMap, 'write' | 'read'> {
   const _onMaps = onMaps.filter(Boolean) as ModifyPayloadFnMap[]
   const writeFns = _onMaps.flatMap((on) => on.write ?? [])
   const readFns = _onMaps.flatMap((on) => on.read ?? [])

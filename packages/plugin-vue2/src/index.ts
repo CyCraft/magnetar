@@ -1,1 +1,2 @@
-export { Vue2StoreOptions, Vue2StoreModuleConfig, CreatePlugin } from './CreatePlugin'
+export { CreatePlugin } from './CreatePlugin'
+export type { Vue2StoreOptions, Vue2StoreModuleConfig } from './CreatePlugin'

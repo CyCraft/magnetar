@@ -1,14 +1,23 @@
 {
   "compilerOptions": {
     "baseUrl": "./packages",
-    "strict": true,
-    "target": "es6",
-    "types": ["node"],
     "downlevelIteration": true,
-    "lib": ["ES2015", "ES2016", "ES2017", "ES2018", "ES2019", "ES2020", "ESNext"],
-    "noImplicitReturns": true,
     "esModuleInterop": true,
-    "moduleResolution": "node"
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "lib": ["ESNext", "DOM", "scripthost", "DOM.Iterable"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noErrorTruncation": false,
+    "noImplicitAny": false,
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "esnext",
+    "useDefineForClassFields": true
   },
   "exclude": ["/dist", "node_modules"]
 }

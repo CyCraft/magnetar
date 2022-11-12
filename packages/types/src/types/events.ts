@@ -1,4 +1,4 @@
-import { O } from 'ts-toolbelt'
+import { Spread } from 'type-fest'
 import { ActionName } from './actions'
 import {
   FetchResponse,
@@ -71,15 +71,15 @@ type EventPayloadPropResult = {
 export type EventFnBefore = (args: EventSharedPayload) => void | Promise<void>
 
 export type EventFnSuccess = (
-  args: O.Patch<EventSharedPayload, EventPayloadPropResult>
+  args: Spread<EventSharedPayload, EventPayloadPropResult>
 ) => void | Promise<void>
 
 export type EventFnError = (
-  args: O.Patch<EventSharedPayload, { error: any }>
+  args: Spread<EventSharedPayload, { error: any }>
 ) => void | Promise<void>
 
 export type EventFnRevert = (
-  args: O.Patch<O.Omit<EventSharedPayload, 'abort'>, { result: unknown }>
+  args: Spread<Omit<EventSharedPayload, 'abort'>, { result: unknown }>
 ) => void | Promise<void>
 
 export type EventFn = EventFnBefore | EventFnSuccess | EventFnError | EventFnRevert

@@ -1,4 +1,3 @@
-import { O } from 'ts-toolbelt'
 import {
   MagnetarWriteAction,
   MagnetarFetchAction,
@@ -24,7 +23,7 @@ import { executeSetupModulePerStore, getDataProxyHandler } from './helpers/modul
 export function createDocWithContext(
   [collectionPath, docId]: [string, string | undefined],
   moduleConfig: ModuleConfig,
-  globalConfig: O.Compulsory<GlobalConfig>,
+  globalConfig: Required<GlobalConfig>,
   docFn: DocFn,
   collectionFn: CollectionFn,
   streamAndFetchPromises: {

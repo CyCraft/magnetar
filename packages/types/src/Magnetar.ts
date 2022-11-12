@@ -1,4 +1,3 @@
-import { O } from 'ts-toolbelt'
 import { CollectionInstance } from './Collection'
 import { GlobalConfig, ModuleConfig } from './types/config'
 import { DocInstance } from './Doc'
@@ -7,7 +6,7 @@ import { DocInstance } from './Doc'
  * This is the global Magnetar instance that is returned when instantiating with Magnetar()
  */
 export interface MagnetarInstance {
-  globalConfig: O.Compulsory<GlobalConfig>
+  globalConfig: Required<GlobalConfig>
   /**
    * @see {@link CollectionFn}
    */

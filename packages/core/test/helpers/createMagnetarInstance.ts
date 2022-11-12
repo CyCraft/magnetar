@@ -12,7 +12,6 @@ import {
   PluginMockRemote,
 } from '@magnetarjs/test-utils'
 import type { PokedexEntry } from '@magnetarjs/test-utils'
-import { O } from 'ts-toolbelt'
 
 const CreatePluginLocal = PluginMockLocal.CreatePlugin
 const CreatePluginRemote = PluginMockRemote.CreatePlugin
@@ -23,13 +22,7 @@ const getInitialDataCollection = () => [
 ]
 const getInitialDataDocument = () => ({ name: 'Luca', age: 10 })
 
-export type PokedexModuleData = O.Patch<
-  PokedexEntry,
-  {
-    seen?: boolean
-    shouldFail?: string
-  }
->
+export type PokedexModuleData = PokedexEntry & { seen?: boolean; shouldFail?: string }
 
 export type TrainerModuleData = {
   name: string

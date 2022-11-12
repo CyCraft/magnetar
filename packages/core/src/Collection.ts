@@ -1,4 +1,3 @@
-import { O } from 'ts-toolbelt'
 import { merge, mergeAndConcat } from 'merge-anything'
 import {
   MagnetarFetchAction,
@@ -10,7 +9,6 @@ import {
   DocFn,
   CollectionFn,
   WriteLock,
-  OPaths,
   WhereClause,
   WhereFilterOp,
   OrderByClause,
@@ -27,7 +25,7 @@ import { executeSetupModulePerStore, getDataProxyHandler } from './helpers/modul
 export function createCollectionWithContext(
   [collectionPath, docId]: [string, string | undefined],
   moduleConfig: ModuleConfig,
-  globalConfig: O.Compulsory<GlobalConfig>,
+  globalConfig: Required<GlobalConfig>,
   docFn: DocFn,
   collectionFn: CollectionFn,
   streamAndFetchPromises: {
@@ -44,9 +42,9 @@ export function createCollectionWithContext(
   const id = collectionPath.split('/').slice(-1)[0]
   const path = collectionPath
 
-  const doc: DocFn = (docId: string, _moduleConfig: ModuleConfig = {}) => {
+  const doc: DocFn = ((docId: string, _moduleConfig: ModuleConfig = {}) => {
     return docFn(`${path}/${docId}`, merge(moduleConfig, _moduleConfig))
-  }
+  }) as any
 
   const sharedParams: HandleActionSharedParams = {
     collectionPath,

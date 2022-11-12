@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import { O } from 'ts-toolbelt'
+import { Spread } from 'type-fest'
 import { ActionConfig, ActionName } from './actions'
 import { DocMetadata } from './core'
 import { OnAddedFn, OnModifiedFn, OnRemovedFn } from './modifyReadResponse'
@@ -60,7 +60,7 @@ export interface PluginInstance {
 /**
  * Where, orderBy, limit clauses or extra config a dev might pass when instanciates a module as second param (under `configPerStore`). Eg. `collection('pokedex', { configPerStore: { local: pluginModuleConfig } })`
  */
-export type PluginModuleConfig = O.Patch<Clauses, { [key in string]: any }>
+export type PluginModuleConfig = Spread<Clauses, { [key in string]: any }>
 
 /**
  * The payload the core lib will pass when executing plugin's `setupModule` and `getModuleData` functions.
@@ -104,7 +104,7 @@ export type PluginActionPayloadBase<SpecificPluginModuleConfig = PluginModuleCon
 
 // each of the following actions must be implemented by the plugin!
 
-export type PluginStreamActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
+export type PluginStreamActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = Spread<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -126,7 +126,7 @@ export type PluginStreamAction = (
   payload: PluginStreamActionPayload
 ) => StreamResponse | DoOnStream | Promise<StreamResponse | DoOnStream>
 
-export type PluginFetchActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
+export type PluginFetchActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = Spread<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -135,6 +135,7 @@ export type PluginFetchActionPayload<SpecificPluginModuleConfig = PluginModuleCo
     payload: { force?: boolean } | Record<string, any> | void
   }
 >
+
 /**
  * Should handle 'fetch' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc). Should return `FetchResponse` when acting as a "remote" Store Plugin, and `DoOnFetch` when acting as "local" Store Plugin.
  */
@@ -142,7 +143,7 @@ export type PluginFetchAction = (
   payload: PluginFetchActionPayload
 ) => FetchResponse | DoOnFetch | Promise<FetchResponse | DoOnFetch>
 
-export type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
+export type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = Spread<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -151,6 +152,7 @@ export type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleCo
     payload: Record<string, any>
   }
 >
+
 /**
  * Should handle 'merge' 'assign' 'replace' for docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
  * @returns
@@ -161,7 +163,7 @@ export type PluginWriteAction = (
   payload: PluginWriteActionPayload
 ) => void | Promise<void | SyncBatch>
 
-export type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
+export type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = Spread<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -170,6 +172,7 @@ export type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleC
     payload: Record<string, any>
   }
 >
+
 /**
  * Should handle 'insert' for collections & docs. Must return the new document's ID! When executed on a collection, the plugin must provide a newly generated ID. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc)
  * @returns
@@ -180,20 +183,20 @@ export type PluginInsertAction = (
   payload: PluginInsertActionPayload
 ) => string | Promise<string | [string, SyncBatch]>
 
-export type PluginDeletePropActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> =
-  O.Patch<
-    PluginActionPayloadBase<SpecificPluginModuleConfig>,
-    {
-      /**
-       * Whatever payload was passed to the action that was triggered
-       */
-      payload: string | string[]
-      /**
-       * docId must be provided
-       */
-      docId: string
-    }
-  >
+export type PluginDeletePropActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = Spread<
+  PluginActionPayloadBase<SpecificPluginModuleConfig>,
+  {
+    /**
+     * Whatever payload was passed to the action that was triggered
+     */
+    payload: string | string[]
+    /**
+     * docId must be provided
+     */
+    docId: string
+  }
+>
+
 /**
  * Should handle 'deleteProp' for docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
  * @returns
@@ -204,7 +207,7 @@ export type PluginDeletePropAction = (
   payload: PluginDeletePropActionPayload
 ) => void | Promise<void | SyncBatch>
 
-export type PluginDeleteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
+export type PluginDeleteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = Spread<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -213,6 +216,7 @@ export type PluginDeleteActionPayload<SpecificPluginModuleConfig = PluginModuleC
     payload: void | any
   }
 >
+
 /**
  * Should handle 'delete' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
  * @returns
@@ -223,7 +227,7 @@ export type PluginDeleteAction = (
   payload: PluginDeleteActionPayload
 ) => void | Promise<void | SyncBatch>
 
-export type PluginRevertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = O.Patch<
+export type PluginRevertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = Spread<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -240,6 +244,7 @@ export type PluginRevertActionPayload<SpecificPluginModuleConfig = PluginModuleC
     error: any
   }
 >
+
 /**
  * The 'revert' action is triggered when another Store Plugin had an error during the execution of an action, and any changes already made need to be reverted. Please use the `payload` and `actionName` parameters to determine how to revert the plugin's state to its previous state.
  */
@@ -304,7 +309,7 @@ export type DoOnStreamFns = {
  * MustExecuteOnRead:
  * The functions for 'added', 'modified' and 'removed' **must** be executed by the plugin whenever the stream sees any of these changes. These are the functions that will pass the data to the other "local" Store Plugins.
  */
-export type MustExecuteOnRead = O.Compulsory<DoOnStream>
+export type MustExecuteOnRead = Required<DoOnStream>
 
 // 'fetch' related
 
