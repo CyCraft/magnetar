@@ -8,14 +8,14 @@ import { parseValueForFilters } from './parseValueForFilters'
  * Filters a Collection module's data map `Map<string, DocData>` based on provided clauses.
  */
 export function filterDataPerClauses(
-  collectionDB: Map<string, Record<string, any>>,
+  collectionDB: Map<string, Record<string, unknown>>,
   clauses: Clauses
-): Map<string, Record<string, any>> {
+): Map<string, Record<string, unknown>> {
   const { where = [], orderBy = [], limit, startAfter } = clauses
   // return the same collectionDB to be sure to keep reactivity
   if (!where.length && !orderBy.length && !isNumber(limit) && !startAfter) return collectionDB
   // all other cases we need to create a new Map() with the results
-  let entries: [string, Record<string, any>][] = []
+  let entries: [string, Record<string, unknown>][] = []
   collectionDB.forEach((docData, docId) => {
     const passesWhereFilters = where.every((whereQuery) => {
       const [fieldPath, operator, expectedValue] = whereQuery
@@ -64,12 +64,12 @@ export function filterDataPerClauses(
   })
   // orderBy
   const by = orderBy.reduce((carry, [path, direction = 'asc']) => {
-    const sorter: ISortByObjectSorter<[string, Record<string, any>]> = {
-      [direction as 'asc']: (entry: [string, Record<string, any>]) => getProp(entry[1], path),
+    const sorter: ISortByObjectSorter<[string, Record<string, unknown>]> = {
+      [direction as 'asc']: (entry: [string, Record<string, unknown>]) => getProp(entry[1], path),
     }
     carry.push(sorter)
     return carry
-  }, [] as ISortByObjectSorter<[string, Record<string, any>]>[])
+  }, [] as ISortByObjectSorter<[string, Record<string, unknown>]>[])
   entries = orderBy.length ? sort(entries).by(by) : entries
   // startAfter
   if (startAfter && orderBy) {

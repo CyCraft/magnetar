@@ -21,11 +21,11 @@ import {
 import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
 import { executeSetupModulePerStore, getDataProxyHandler } from './helpers/moduleHelpers'
 
-export function createDocWithContext<DocDataType extends Record<string, any>>(
+export function createDocWithContext(
   [collectionPath, docId]: [string, string | undefined],
   moduleConfig: ModuleConfig,
   globalConfig: O.Compulsory<GlobalConfig>,
-  docFn: DocFn<DocDataType>,
+  docFn: DocFn,
   collectionFn: CollectionFn,
   streamAndFetchPromises: {
     writeLockMap: Map<string, WriteLock>
@@ -34,7 +34,7 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
     streaming: () => Promise<void> | null
     closeStream: () => void
   }
-): DocInstance<DocDataType> {
+): DocInstance {
   const { writeLockMap, fetchPromises, cacheStream, streaming, closeStream } = streamAndFetchPromises // prettier-ignore
 
   const id = docId
@@ -54,20 +54,20 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
     docFn,
   }
   const actions = {
-    insert: (handleActionPerStore(sharedParams, 'insert', actionNameTypeMap.insert) as MagnetarInsertAction<DocDataType>), // prettier-ignore
-    merge: (handleActionPerStore(sharedParams, 'merge', actionNameTypeMap.merge) as MagnetarWriteAction<DocDataType>), // prettier-ignore
-    assign: (handleActionPerStore(sharedParams, 'assign', actionNameTypeMap.assign) as MagnetarWriteAction<DocDataType>), // prettier-ignore
-    replace: (handleActionPerStore(sharedParams, 'replace', actionNameTypeMap.replace) as MagnetarWriteAction<DocDataType>), // prettier-ignore
-    deleteProp: (handleActionPerStore(sharedParams, 'deleteProp', actionNameTypeMap.deleteProp) as MagnetarDeletePropAction<DocDataType>), // prettier-ignore
+    insert: (handleActionPerStore(sharedParams, 'insert', actionNameTypeMap.insert) as MagnetarInsertAction), // prettier-ignore
+    merge: (handleActionPerStore(sharedParams, 'merge', actionNameTypeMap.merge) as MagnetarWriteAction), // prettier-ignore
+    assign: (handleActionPerStore(sharedParams, 'assign', actionNameTypeMap.assign) as MagnetarWriteAction), // prettier-ignore
+    replace: (handleActionPerStore(sharedParams, 'replace', actionNameTypeMap.replace) as MagnetarWriteAction), // prettier-ignore
+    deleteProp: (handleActionPerStore(sharedParams, 'deleteProp', actionNameTypeMap.deleteProp) as MagnetarDeletePropAction), // prettier-ignore
     delete: (handleActionPerStore(sharedParams, 'delete', actionNameTypeMap.delete) as MagnetarDeleteAction), // prettier-ignore
-    fetch: (handleActionPerStore(sharedParams, 'fetch', actionNameTypeMap.fetch) as MagnetarFetchAction<DocDataType, 'doc'>), // prettier-ignore
+    fetch: (handleActionPerStore(sharedParams, 'fetch', actionNameTypeMap.fetch) as MagnetarFetchAction<Record<string, unknown>, 'doc'>), // prettier-ignore
     stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, actionNameTypeMap.stream, streaming, cacheStream, writeLockMap), // prettier-ignore
   }
 
   // Every store will have its 'setupModule' function executed
   executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig)
 
-  const moduleInstance: Omit<DocInstance<DocDataType>, 'data'> = {
+  const moduleInstance: Omit<DocInstance, 'data'> = {
     collection,
     id: id as string,
     path,
@@ -79,7 +79,7 @@ export function createDocWithContext<DocDataType extends Record<string, any>>(
   /**
    * The data returned by the store specified as 'localStoreName'
    */
-  const dataProxyHandler = getDataProxyHandler<'doc', DocDataType>(
+  const dataProxyHandler = getDataProxyHandler<'doc', Record<string, unknown>>(
     [collectionPath, docId],
     moduleConfig,
     globalConfig

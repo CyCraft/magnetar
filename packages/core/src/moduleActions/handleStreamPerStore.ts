@@ -75,7 +75,7 @@ export function handleStreamPerStore(
      */
     const lastIncomingDocs = new Map<
       string,
-      { payload: Record<string, any> | undefined; meta: DocMetadata }
+      { payload: Record<string, unknown> | undefined; meta: DocMetadata }
     >()
 
     /**

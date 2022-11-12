@@ -3,7 +3,7 @@ import { StorePluginModuleConfig, StorePluginOptions, MakeRestoreBackup } from '
 import { throwIfEmulatedError } from '../../helpers'
 
 export function revertActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, any>> },
+  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
   storePluginOptions: StorePluginOptions,
   restoreBackup: MakeRestoreBackup
 ): PluginRevertAction {

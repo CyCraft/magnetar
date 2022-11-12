@@ -3,7 +3,7 @@ import { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/types
 import { Vue2StoreModuleConfig, Vue2StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function deleteActionFactory(
-  data: { [collectionPath: string]: Record<string, Record<string, any>> },
+  data: { [collectionPath: string]: Record<string, Record<string, unknown>> },
   vue2StoreOptions: Vue2StoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeleteAction {

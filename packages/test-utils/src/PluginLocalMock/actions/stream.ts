@@ -11,7 +11,7 @@ import { deleteActionFactory } from './delete'
 import { throwIfEmulatedError } from '../../helpers'
 
 export function streamActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, any>> },
+  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
   storePluginOptions: StorePluginOptions
 ): PluginStreamAction {
   return function ({

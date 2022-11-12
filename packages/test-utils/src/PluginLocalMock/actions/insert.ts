@@ -4,7 +4,7 @@ import { isFullString, isNumber } from 'is-what'
 import { throwIfEmulatedError } from '../../helpers'
 
 export function insertActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, any>> },
+  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
   storePluginOptions: StorePluginOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginInsertAction {

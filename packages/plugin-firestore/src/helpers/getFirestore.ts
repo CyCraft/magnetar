@@ -51,10 +51,12 @@ export function getQueryInstance(
 }
 
 export function docSnapshotToDocMetadata(
-  docSnapshot: DocumentSnapshot | QueryDocumentSnapshot
+  docSnapshot:
+    | DocumentSnapshot<Record<string, unknown>>
+    | QueryDocumentSnapshot<Record<string, unknown>>
 ): DocMetadata {
   const docMetaData: DocMetadata = {
-    data: docSnapshot.data() as Record<string, any> | undefined,
+    data: docSnapshot.data(),
     metadata: docSnapshot as any,
     id: docSnapshot.id,
     exists: docSnapshot.exists(),

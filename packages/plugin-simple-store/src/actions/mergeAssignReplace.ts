@@ -3,7 +3,7 @@ import { PluginWriteAction, PluginWriteActionPayload } from '@magnetarjs/types'
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function writeActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, any>> },
+  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
   simpleStoreOptions: SimpleStoreOptions,
   actionName: 'merge' | 'assign' | 'replace',
   makeBackup?: MakeRestoreBackup

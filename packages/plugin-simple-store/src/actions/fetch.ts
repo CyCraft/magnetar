@@ -11,7 +11,7 @@ import { SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 
 export function fetchActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, any>> },
+  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
   simpleStoreOptions: SimpleStoreOptions
 ): PluginFetchAction {
   return function ({

@@ -1,10 +1,11 @@
 import { merge } from 'merge-anything'
+import { isPlainObject } from 'is-what'
 import { PluginWriteAction, PluginWriteActionPayload } from '@magnetarjs/types'
 import { StorePluginModuleConfig, StorePluginOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../helpers'
 
 export function writeActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, any>> },
+  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
   storePluginOptions: StorePluginOptions,
   actionName: 'merge' | 'assign' | 'replace',
   makeBackup?: MakeRestoreBackup
@@ -30,12 +31,18 @@ export function writeActionFactory(
     if (actionName === 'replace' || !collectionMap.get(docId)) collectionMap.set(docId, {})
     const docDataToMutate = collectionMap.get(docId)
 
-    if (!docDataToMutate)
+    if (!docDataToMutate) {
       throw new Error(`Document data not found for id: ${collectionPath} ${docId}`)
+    }
 
     if (actionName === 'merge') {
       Object.entries(payload).forEach(([key, value]) => {
-        docDataToMutate[key] = merge(docDataToMutate[key], value)
+        const originalValue = docDataToMutate[key]
+        if (isPlainObject(originalValue) && isPlainObject(value)) {
+          docDataToMutate[key] = merge(originalValue, value)
+        } else {
+          docDataToMutate[key] = value
+        }
       })
     }
     if (actionName === 'assign' || actionName === 'replace') {

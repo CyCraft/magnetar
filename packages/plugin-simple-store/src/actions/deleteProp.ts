@@ -4,7 +4,7 @@ import { PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetar
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function deletePropActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, any>> },
+  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
   simpleStoreOptions: SimpleStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeletePropAction {
@@ -30,7 +30,7 @@ export function deletePropActionFactory(
       if (isNestedPropPath) {
         const parts = propToDelete.split(/[./]/)
         const lastPart = parts.pop()
-        const parentRef = getProp(docData, parts.join('.')) as Record<string, any>
+        const parentRef = getProp(docData, parts.join('.')) as Record<string, unknown>
         delete parentRef[lastPart || '']
       } else {
         delete docData[propToDelete]

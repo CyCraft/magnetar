@@ -10,7 +10,7 @@ import { insertActionFactory } from './insert'
 import { deleteActionFactory } from './delete'
 
 export function streamActionFactory(
-  data: { [collectionPath: string]: Record<string, Record<string, any>> },
+  data: { [collectionPath: string]: Record<string, Record<string, unknown>> },
   vue2StoreOptions: Vue2StoreOptions
 ): PluginStreamAction {
   return function ({

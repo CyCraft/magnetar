@@ -3,7 +3,7 @@ import { Vue3StoreModuleConfig, Vue3StoreOptions, MakeRestoreBackup } from '../C
 import { isFullString, isNumber } from 'is-what'
 
 export function insertActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, any>> },
+  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
   Vue3StoreOptions: Vue3StoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginInsertAction {

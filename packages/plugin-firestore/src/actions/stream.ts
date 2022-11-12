@@ -1,9 +1,4 @@
-import type {
-  DocumentSnapshot,
-  QuerySnapshot,
-  DocumentChange,
-  QueryDocumentSnapshot,
-} from 'firebase/firestore'
+import type { DocumentSnapshot, QuerySnapshot, DocumentChange } from 'firebase/firestore'
 import { doc, onSnapshot } from 'firebase/firestore'
 import { StreamResponse, PluginStreamAction, PluginStreamActionPayload } from '@magnetarjs/types'
 import {
@@ -38,7 +33,7 @@ export function streamActionFactory(
       const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
       closeStream = onSnapshot(
         doc(db, documentPath),
-        (docSnapshot: DocumentSnapshot) => {
+        (docSnapshot: DocumentSnapshot<Record<string, unknown>>) => {
           // even if `docSnapshot.metadata.hasPendingWrites`
           //       we should always execute `added/modified`
           //       because `core` handles overlapping calls for us
@@ -46,7 +41,7 @@ export function streamActionFactory(
           // do nothing if the doc doesn't exist
           if (!docSnapshot.exists()) return
           // serverChanges only
-          const docData = docSnapshot.data() as Record<string, any>
+          const docData = docSnapshot.data()
           const docMetadata = docSnapshotToDocMetadata(docSnapshot)
           added(docData, docMetadata)
         },
@@ -65,20 +60,22 @@ export function streamActionFactory(
           //       because `core` handles overlapping calls for us
 
           // serverChanges only
-          querySnapshot.docChanges().forEach((docChange: DocumentChange) => {
-            const docSnapshot: QueryDocumentSnapshot = docChange.doc
-            const docData = docSnapshot.data() as Record<string, any>
-            const docMetadata = docSnapshotToDocMetadata(docSnapshot)
-            if (docChange.type === 'added') {
-              added(docData, docMetadata)
-            }
-            if (docChange.type === 'modified') {
-              modified(docData, docMetadata)
-            }
-            if (docChange.type === 'removed') {
-              removed(docData, docMetadata)
-            }
-          })
+          querySnapshot
+            .docChanges()
+            .forEach((docChange: DocumentChange<Record<string, unknown>>) => {
+              const docSnapshot = docChange.doc
+              const docData = docSnapshot.data()
+              const docMetadata = docSnapshotToDocMetadata(docSnapshot)
+              if (docChange.type === 'added') {
+                added(docData, docMetadata)
+              }
+              if (docChange.type === 'modified') {
+                modified(docData, docMetadata)
+              }
+              if (docChange.type === 'removed') {
+                removed(docData, docMetadata)
+              }
+            })
         },
         rejectStream
       )

@@ -37,7 +37,7 @@ export interface Vue2StoreOptions {
 
 export interface Vue2StoreModuleConfig extends Clauses {
   path?: string
-  initialData?: Record<string, any> | [string, Record<string, any>][]
+  initialData?: Record<string, unknown> | [string, Record<string, unknown>][]
 }
 
 export type MakeRestoreBackup = (collectionPath: string, docId: string) => void
@@ -53,9 +53,10 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
   const { vueInstance: vue } = vue2StoreOptions
   // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
-  const data: { [collectionPath: string]: Record<string, Record<string, any>> } = vue.observable({})
+  const data: { [collectionPath: string]: Record<string, Record<string, unknown>> } =
+    vue.observable({})
 
-  const dataBackups: { [collectionPath: string]: Map<string, Record<string, any>[]> } = {}
+  const dataBackups: { [collectionPath: string]: Map<string, Record<string, unknown>[]> } = {}
   const makeBackup: MakeRestoreBackup = (collectionPath, docId) => {
     // set the backup map for the collection
     if (!(collectionPath in dataBackups)) dataBackups[collectionPath] = new Map()
@@ -112,7 +113,7 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
       }
     } else if (docId && isPlainObject(initialData)) {
       if (docId in dataCollectionDic) return
-      vue.set(dataCollectionDic, docId, initialData as Record<string, any>)
+      vue.set(dataCollectionDic, docId, initialData as Record<string, unknown>)
     }
   }
 

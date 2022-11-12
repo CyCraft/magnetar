@@ -12,7 +12,7 @@ import { insertActionFactory } from './insert'
 import { throwIfEmulatedError } from '../../helpers'
 
 export function fetchActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, any>> },
+  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
   storePluginOptions: StorePluginOptions
 ): PluginFetchAction {
   return function ({

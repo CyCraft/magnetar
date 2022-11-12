@@ -11,7 +11,7 @@ import { Vue3StoreModuleConfig, Vue3StoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 
 export function fetchActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, any>> },
+  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
   Vue3StoreOptions: Vue3StoreOptions
 ): PluginFetchAction {
   return function ({

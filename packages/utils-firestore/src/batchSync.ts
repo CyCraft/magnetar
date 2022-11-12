@@ -22,10 +22,10 @@ type Stack = {
 }
 
 export type BatchSync = {
-  assign: (documentPath: string, payload: Record<string, any>, debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
-  merge: (documentPath: string, payload: Record<string, any>, debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
-  replace: (documentPath: string, payload: Record<string, any>, debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
-  insert: (documentPath: string, payload: Record<string, any>, debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
+  assign: (documentPath: string, payload: Record<string, unknown>, debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
+  merge: (documentPath: string, payload: Record<string, unknown>, debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
+  replace: (documentPath: string, payload: Record<string, unknown>, debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
+  insert: (documentPath: string, payload: Record<string, unknown>, debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
   deleteProp: (documentPath: string, payload: string[], debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
   delete: (documentPath: string, debounceMsOverwrite?: number) => Promise<SyncBatch>
   forceSyncEarly: () => Promise<void>
@@ -43,17 +43,17 @@ const newStack = (): Stack => ({
  * Within a write operation, field transforms like serverTimestamp,
  * arrayUnion, and increment each count as an additional operation.
  *
- * @param {Record<string, any>} payload
+ * @param {Record<string, unknown>} payload
  * @returns {number}
  */
-function countOperations(payload: Record<string, any>): number {
+function countOperations(payload: Record<string, unknown>): number {
   const count = 1
   // todo: when actions like serverTimestamp, arrayUnion and increment are supported, count them here
   return count
 }
 
-function preparePayload(_payload: Record<string, any>): {
-  payload: Record<string, any>
+function preparePayload(_payload: Record<string, unknown>): {
+  payload: Record<string, unknown>
   operationCount: number
 } {
   // todo: properly handle any serverTimestamp, arrayUnion and increment in here
@@ -166,7 +166,7 @@ export function batchSyncFactory(
 
   async function insert(
     documentPath: string,
-    _payload: Record<string, any>,
+    _payload: Record<string, unknown>,
     debounceMsOverwrite?: number
   ): Promise<SyncBatch> {
     const { payload, operationCount } = preparePayload(_payload)
@@ -181,7 +181,7 @@ export function batchSyncFactory(
 
   async function assign(
     documentPath: string,
-    _payload: Record<string, any>,
+    _payload: Record<string, unknown>,
     debounceMsOverwrite?: number
   ): Promise<SyncBatch> {
     const { payload, operationCount } = preparePayload(_payload)
@@ -212,7 +212,7 @@ export function batchSyncFactory(
 
   async function merge(
     documentPath: string,
-    _payload: Record<string, any>,
+    _payload: Record<string, unknown>,
     debounceMsOverwrite?: number
   ): Promise<SyncBatch> {
     const { payload, operationCount } = preparePayload(_payload)
@@ -252,7 +252,7 @@ export function batchSyncFactory(
 
   async function replace(
     documentPath: string,
-    _payload: Record<string, any>,
+    _payload: Record<string, unknown>,
     debounceMsOverwrite?: number
   ): Promise<SyncBatch> {
     const { payload, operationCount } = preparePayload(_payload)

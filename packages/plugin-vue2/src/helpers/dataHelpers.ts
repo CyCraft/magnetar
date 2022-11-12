@@ -1,4 +1,4 @@
-type CustomMap<DocDataType = Record<string, any>> = {
+type CustomMap<DocDataType = Record<string, unknown>> = {
   // data
   /**
    * Returns the number of key/value pairs in the Map object.
@@ -50,10 +50,10 @@ type CustomMap<DocDataType = Record<string, any>> = {
 }
 
 export function objectToMap(
-  object: Record<string, any> | undefined,
-  originalObjectToClear: Record<string, any> | undefined,
-  entriesInCustomOrder?: [string, Record<string, any>][]
-): Map<string, Record<string, any>> {
+  object: Record<string, unknown> | undefined,
+  originalObjectToClear: Record<string, unknown> | undefined,
+  entriesInCustomOrder?: [string, Record<string, unknown>][]
+): Map<string, Record<string, unknown>> {
   const dic = object || {}
 
   function get(id: string) {
@@ -70,12 +70,12 @@ export function objectToMap(
   function values() {
     if (entriesInCustomOrder) return entriesInCustomOrder.map((e) => e[1])
     return Object.values(dic)
-    // return IterableIterator<Record<string, any>>
+    // return IterableIterator<Record<string, unknown>>
   }
   function entries() {
     if (entriesInCustomOrder) return entriesInCustomOrder
     return Object.entries(dic)
-    // return IterableIterator<[string, Record<string, any>]>
+    // return IterableIterator<[string, Record<string, unknown>]>
   }
   function clear() {
     if (!originalObjectToClear) return

@@ -23,7 +23,7 @@ import {
 export type RemoteStoreOptions = { storeName: string }
 export interface StorePluginModuleConfig {
   path?: string
-  initialData?: Record<string, any> | [string, Record<string, any>][]
+  initialData?: Record<string, unknown> | [string, Record<string, unknown>][]
   where?: WhereClause[]
   orderBy?: OrderByClause[]
   limit?: Limit

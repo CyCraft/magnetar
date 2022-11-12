@@ -103,7 +103,7 @@ function mockDataRetrieval(
   collectionPath: string | undefined,
   docId: string | undefined,
   pluginModuleConfig: StorePluginModuleConfig
-): Record<string, any>[] {
+): Record<string, unknown>[] {
   if (docId === 'trainer') return [{ name: 'Luca', age: 10, dream: 'job' }]
 
   if (collectionPath === 'pokedex') {
@@ -138,7 +138,7 @@ export function fetchActionFactory(storePluginOptions: RemoteStoreOptions): Plug
         // this mocks an error during execution
         const dataRetrieved = mockDataRetrieval(collectionPath, docId, pluginModuleConfig)
         // we must trigger `mustExecuteOnGet.added` for each document that was retrieved and return whatever that returns
-        const results = dataRetrieved.map((_data) => {
+        const results = dataRetrieved.map((_data: Record<string, any>) => {
           const _metaData = { data: _data, exists: true, id: _data.id || docId }
           return _metaData
         })
@@ -173,7 +173,7 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
       stop: () => {},
     }
     // this mocks actual data coming in at different intervals
-    dataRetrieved.forEach((data, i) => {
+    dataRetrieved.forEach((data: Record<string, any>, i) => {
       const metaData = { data, id: data.id || docId, exists: true }
 
       // we can simulate new docs coming in by manually triggerering promises

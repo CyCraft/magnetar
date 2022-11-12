@@ -4,7 +4,7 @@ import { StorePluginModuleConfig, StorePluginOptions, MakeRestoreBackup } from '
 import { throwIfEmulatedError } from '../../helpers'
 
 export function deleteActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, any>> },
+  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
   storePluginOptions: StorePluginOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeleteAction {

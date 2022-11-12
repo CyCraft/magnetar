@@ -3,7 +3,7 @@ import { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/types
 import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function deleteActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, any>> },
+  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
   simpleStoreOptions: SimpleStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeleteAction {

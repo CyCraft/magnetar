@@ -4,7 +4,7 @@ import { PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetar
 import { Vue2StoreModuleConfig, Vue2StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function deletePropActionFactory(
-  data: { [collectionPath: string]: Record<string, Record<string, any>> },
+  data: { [collectionPath: string]: Record<string, Record<string, unknown>> },
   vue2StoreOptions: Vue2StoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeletePropAction {
@@ -31,7 +31,7 @@ export function deletePropActionFactory(
       if (isNestedPropPath) {
         const parts = propToDelete.split(/[./]/)
         const lastPart = parts.pop()
-        const parentRef = getProp(docData, parts.join('.')) as Record<string, any>
+        const parentRef = getProp(docData, parts.join('.')) as Record<string, unknown>
         vue.delete(parentRef, lastPart || '')
       } else {
         vue.delete(docData, propToDelete)

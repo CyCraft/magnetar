@@ -24,7 +24,7 @@ export async function handleAction(args: {
   modulePath: string
   pluginModuleConfig: PluginModuleConfig
   pluginAction: PluginFetchAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction // prettier-ignore
-  payload: void | Record<string, any> | Record<string, any>[] | string | string[]
+  payload: void | Record<string, unknown> | Record<string, unknown>[] | string | string[]
   actionConfig: ActionConfig
   eventNameFnsMap: EventNameFnsMap
   onError: 'revert' | 'continue' | 'stop'

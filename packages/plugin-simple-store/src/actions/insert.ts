@@ -3,7 +3,7 @@ import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '
 import { isFullString, isNumber } from 'is-what'
 
 export function insertActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, any>> },
+  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
   simpleStoreOptions: SimpleStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginInsertAction {

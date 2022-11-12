@@ -20,7 +20,7 @@ import type { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'
 import type { DocMetadata } from '@magnetarjs/types'
 import { FieldValue } from 'firebase-admin/firestore'
 
-export function doc(db: Firestore, path: string): DocumentReference<Record<string, any>> {
+export function doc(db: Firestore, path: string): DocumentReference<Record<string, unknown>> {
   return db.doc(path)
 }
 
@@ -62,10 +62,12 @@ export function getQueryInstance(
 }
 
 export function docSnapshotToDocMetadata(
-  docSnapshot: DocumentSnapshot | QueryDocumentSnapshot
+  docSnapshot:
+    | DocumentSnapshot<Record<string, unknown>>
+    | QueryDocumentSnapshot<Record<string, unknown>>
 ): DocMetadata {
   const docMetaData: DocMetadata = {
-    data: docSnapshot.data() as Record<string, any> | undefined,
+    data: docSnapshot.data(),
     metadata: docSnapshot as any,
     id: docSnapshot.id,
     exists: docSnapshot.exists,

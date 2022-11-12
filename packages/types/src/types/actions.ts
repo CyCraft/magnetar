@@ -1,4 +1,4 @@
-import { O } from 'ts-toolbelt'
+import { PartialDeep } from 'type-fest'
 import { DocInstance } from '../Doc'
 import { StoreName } from './core'
 import { EventNameFnMap } from './events'
@@ -86,7 +86,7 @@ export type MagnetarInsertAction<DocDataType extends Record<string, any> = Recor
  * @returns the new document data after applying the changes to the local document (including any modifications from modifyPayloadOn)
  */
 export type MagnetarWriteAction<DocDataType extends Record<string, any> = Record<string, any>> = (
-  payload: O.Optional<DocDataType, keyof DocDataType, 'deep'>,
+  payload: PartialDeep<DocDataType>,
   actionConfig?: ActionConfig
 ) => Promise<DocDataType>
 

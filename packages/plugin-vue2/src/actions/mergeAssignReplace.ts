@@ -3,7 +3,7 @@ import { PluginWriteAction, PluginWriteActionPayload } from '@magnetarjs/types'
 import { Vue2StoreModuleConfig, Vue2StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
 
 export function writeActionFactory(
-  data: { [collectionPath: string]: Record<string, Record<string, any>> },
+  data: { [collectionPath: string]: Record<string, Record<string, unknown>> },
   vue2StoreOptions: Vue2StoreOptions,
   actionName: 'merge' | 'assign' | 'replace',
   makeBackup?: MakeRestoreBackup

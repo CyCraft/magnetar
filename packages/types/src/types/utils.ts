@@ -1,6 +1,4 @@
-import { O, U, M } from 'ts-toolbelt'
-
-export type DeepPartial<T extends Record<string, any>> = O.Optional<T, keyof T, 'deep'>
+import { U } from 'ts-toolbelt'
 
 /**
  * Returns the type for string literals.
