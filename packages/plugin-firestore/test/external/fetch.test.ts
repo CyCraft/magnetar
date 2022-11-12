@@ -335,14 +335,14 @@ import { pokedex } from '@magnetarjs/test-utils'
 }
 // {
 //   // TODO: I wonder why this doesn't work 🤔
-//   const testName = 'only:fetch (collection) orderBy + startAfter with fetched.last'
+//   const testName = 'only:fetch (collection) orderBy + startAfter with fetched.cursor'
 //   test(testName, async (t) => {
 //     const { pokedexModule } = await createMagnetarInstance('read')
 //     try {
 //       const queryModuleRef = pokedexModule.where('id', '<', 20).orderBy('id', 'desc').limit(8)
 
 //       async function fetchMore() {
-//         await queryModuleRef.startAfter(queryModuleRef.fetched.last).fetch({ force: true })
+//         await queryModuleRef.startAfter(queryModuleRef.fetched.cursor).fetch({ force: true })
 //       }
 
 //       await fetchMore()

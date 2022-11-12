@@ -256,8 +256,8 @@ export function handleActionPerStore(
               doOnFetchFns.push(resultFromPlugin)
             }
             if (isFetchResponse(resultFromPlugin)) {
-              const { docs, reachedEnd, last } = resultFromPlugin
-              setLastFetched?.({ reachedEnd, last })
+              const { docs, reachedEnd, cursor } = resultFromPlugin
+              setLastFetched?.({ reachedEnd, cursor })
               for (const docMetaData of docs) {
                 executeOnFns(doOnFetchFns, docMetaData.data, [docMetaData])
               }

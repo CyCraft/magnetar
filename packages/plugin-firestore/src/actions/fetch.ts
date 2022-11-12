@@ -40,16 +40,16 @@ export function fetchActionFactory(
       snapshots = querySnapshot.docs
     }
 
-    if (!snapshots) return { docs: [], reachedEnd: true, last: undefined }
+    if (!snapshots) return { docs: [], reachedEnd: true, cursor: undefined }
 
     const { limit } = pluginModuleConfig
     const reachedEnd = docId || limit === undefined ? true : snapshots.length < limit
     /** @see https://firebase.google.com/docs/firestore/query-data/query-cursors */
-    const last = snapshots[snapshots.length - 1]
+    const cursor = snapshots[snapshots.length - 1]
 
     // map snapshots to DocMetadata type
     const docs: DocMetadata[] = snapshots.map(docSnapshotToDocMetadata)
 
-    return { docs, reachedEnd, last }
+    return { docs, reachedEnd, cursor }
   }
 }

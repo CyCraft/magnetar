@@ -141,11 +141,11 @@ export type MagnetarDeleteAction = (
 export type FetchPromises = Map<string, Promise<any>>
 
 /**
- * Stored by plugins to be able to more easily fetch more data with `startAfter(last)`
+ * Stored by plugins to be able to more easily fetch more data with `startAfter(cursor)`
  */
 export type FetchMetaData = {
   /** Wether or not the end was reached, in case there is no `limit` this is always true */
   reachedEnd: boolean
-  /** The last fetched doc */
-  last: unknown
+  /** The last fetched doc, in a format defined by the Plugin */
+  cursor: unknown
 }

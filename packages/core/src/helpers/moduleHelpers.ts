@@ -33,7 +33,7 @@ export enum PathWhereOrderByIdentifier {
 }
 
 /**
- * Creates the `key` for the Maps used to cache the last fetched (unknown) "thing" (only used by the plugin) throughout the lifecycle of an instance.
+ * Creates the `key` for the Maps used to cache the FetchMetaData throughout the lifecycle of an instance.
  * @returns `modulePath + ' /// ' + JSON.stringify({ where, orderBy })`
  */
 export function getPathWhereOrderByIdentifier(

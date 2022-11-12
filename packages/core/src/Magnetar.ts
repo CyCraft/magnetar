@@ -57,7 +57,7 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
    */
   const fetchPromiseMap: Map<PathFilterIdentifier, FetchPromises> = new Map() // apply type upon get/set
   /**
-   * the global storage for last fetched (unknown) "thing" (only used by the plugin)
+   * the global storage for FetchMetaData
    */
   const fetchMetaMap: Map<PathWhereOrderByIdentifier, FetchMetaData> = new Map()
 
@@ -94,7 +94,7 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     const pathWhereOrderByIdentifier = getPathWhereOrderByIdentifier(modulePath, moduleConfig)
     const fetchMeta: { get: () => FetchMetaData; set: (payload: FetchMetaData) => void } = {
       get: () =>
-        fetchMetaMap.get(pathWhereOrderByIdentifier) || { reachedEnd: false, last: undefined },
+        fetchMetaMap.get(pathWhereOrderByIdentifier) || { reachedEnd: false, cursor: undefined },
       set: (payload: FetchMetaData) => fetchMetaMap.set(pathWhereOrderByIdentifier, payload),
     }
 

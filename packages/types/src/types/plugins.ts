@@ -321,7 +321,7 @@ export type FetchResponse = {
   /** Wether or not the end was reached, in case there is no `limit` this is always true */
   reachedEnd: boolean
   /** The last fetched doc */
-  last: unknown
+  cursor: unknown
 }
 
 /**

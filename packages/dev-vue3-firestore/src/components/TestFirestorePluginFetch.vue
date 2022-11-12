@@ -14,7 +14,7 @@ const query = itemsModuleF.orderBy('title', 'desc').limit(10)
 
 async function fetchMore() {
   try {
-    await query.startAfter(query.fetched.last).fetch({ force: true })
+    await query.startAfter(query.fetched.cursor).fetch({ force: true })
     if (query.fetched.reachedEnd) console.log(`that's all!`)
   } catch (error) {
     console.error(`fetchMore error:`, error)
