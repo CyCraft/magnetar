@@ -72,7 +72,7 @@ export function handleActionPerStore(
 
     // set up and/or reset te writeLock for write actions
     const writeLockId = _docId ? `${collectionPath}/${_docId}` : collectionPath
-    const writeLock = mapGetOrSet(writeLockMap, writeLockId, () => {
+    const writeLock = mapGetOrSet(writeLockMap, writeLockId, (): WriteLock => {
       return { promise: null, resolve: () => {}, countdown: null }
     })
 

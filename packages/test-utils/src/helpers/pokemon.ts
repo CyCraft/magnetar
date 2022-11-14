@@ -1,36 +1,4 @@
-export type PokemonType =
-  | 'Normal'
-  | 'Fire'
-  | 'Fighting'
-  | 'Water'
-  | 'Flying'
-  | 'Grass'
-  | 'Poison'
-  | 'Electric'
-  | 'Ground'
-  | 'Psychic'
-  | 'Rock'
-  | 'Ice'
-  | 'Bug'
-  | 'Dragon'
-  | 'Ghost'
-  | 'Dark'
-  | 'Steel'
-  | 'Fairy'
-
-export type PokedexEntry = {
-  id?: number
-  name: string
-  type: PokemonType[]
-  base: {
-    HP: number
-    Attack: number
-    Defense: number
-    SpAttack: number
-    SpDefense: number
-    Speed: number
-  }
-}
+import { PokedexEntry } from './types'
 
 export const allPokemonArray: PokedexEntry[] = [
   {

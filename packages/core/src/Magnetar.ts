@@ -89,7 +89,11 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     const pathFilterIdentifier = getPathFilterIdentifier(modulePath, moduleConfig)
 
     // grab (and set) the FetchPromises for this module
-    const fetchPromises = mapGetOrSet(fetchPromiseMap, pathFilterIdentifier, () => new Map())
+    const fetchPromises = mapGetOrSet(
+      fetchPromiseMap,
+      pathFilterIdentifier,
+      (): FetchPromises => new Map()
+    )
     // Create the FetchMeta helpers for this module
     const pathWhereOrderByIdentifier = getPathWhereOrderByIdentifier(modulePath, moduleConfig)
     const fetchMeta: { get: () => FetchMetaData; set: (payload: FetchMetaData) => void } = {

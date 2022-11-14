@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import { Spread } from 'type-fest'
-import { ActionConfig, ActionName, FetchMetaData } from './actions'
+import { ActionConfig, ActionName } from './actions'
 import { DocMetadata } from './core'
 import { OnAddedFn, OnModifiedFn, OnRemovedFn } from './modifyReadResponse'
 import { Clauses } from './clauses'
+import { MergeDeep } from './utils/MergeDeep'
 
 // stores / plugins
 
@@ -60,7 +59,7 @@ export interface PluginInstance {
 /**
  * Where, orderBy, limit clauses or extra config a dev might pass when instanciates a module as second param (under `configPerStore`). Eg. `collection('pokedex', { configPerStore: { local: pluginModuleConfig } })`
  */
-export type PluginModuleConfig = Spread<Clauses, { [key in string]: any }>
+export type PluginModuleConfig = MergeDeep<Clauses, { [key in string]: any }>
 
 /**
  * The payload the core lib will pass when executing plugin's `setupModule` and `getModuleData` functions.
@@ -104,7 +103,7 @@ export type PluginActionPayloadBase<SpecificPluginModuleConfig = PluginModuleCon
 
 // each of the following actions must be implemented by the plugin!
 
-export type PluginStreamActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = Spread<
+export type PluginStreamActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = MergeDeep<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -126,7 +125,7 @@ export type PluginStreamAction = (
   payload: PluginStreamActionPayload
 ) => StreamResponse | DoOnStream | Promise<StreamResponse | DoOnStream>
 
-export type PluginFetchActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = Spread<
+export type PluginFetchActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = MergeDeep<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -143,7 +142,7 @@ export type PluginFetchAction = (
   payload: PluginFetchActionPayload
 ) => FetchResponse | DoOnFetch | Promise<FetchResponse | DoOnFetch>
 
-export type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = Spread<
+export type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = MergeDeep<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -163,7 +162,7 @@ export type PluginWriteAction = (
   payload: PluginWriteActionPayload
 ) => void | Promise<void | SyncBatch>
 
-export type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = Spread<
+export type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = MergeDeep<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -183,19 +182,20 @@ export type PluginInsertAction = (
   payload: PluginInsertActionPayload
 ) => string | Promise<string | [string, SyncBatch]>
 
-export type PluginDeletePropActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = Spread<
-  PluginActionPayloadBase<SpecificPluginModuleConfig>,
-  {
-    /**
-     * Whatever payload was passed to the action that was triggered
-     */
-    payload: string | string[]
-    /**
-     * docId must be provided
-     */
-    docId: string
-  }
->
+export type PluginDeletePropActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> =
+  MergeDeep<
+    PluginActionPayloadBase<SpecificPluginModuleConfig>,
+    {
+      /**
+       * Whatever payload was passed to the action that was triggered
+       */
+      payload: string | string[]
+      /**
+       * docId must be provided
+       */
+      docId: string
+    }
+  >
 
 /**
  * Should handle 'deleteProp' for docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
@@ -207,7 +207,7 @@ export type PluginDeletePropAction = (
   payload: PluginDeletePropActionPayload
 ) => void | Promise<void | SyncBatch>
 
-export type PluginDeleteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = Spread<
+export type PluginDeleteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = MergeDeep<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**
@@ -227,7 +227,7 @@ export type PluginDeleteAction = (
   payload: PluginDeleteActionPayload
 ) => void | Promise<void | SyncBatch>
 
-export type PluginRevertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = Spread<
+export type PluginRevertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = MergeDeep<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
   {
     /**

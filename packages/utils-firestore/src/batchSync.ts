@@ -281,7 +281,7 @@ export function batchSyncFactory(
 
     const map = stack.batch.deleteProp
 
-    const set = mapGetOrSet(map, documentPath, () => new Set())
+    const set = mapGetOrSet(map, documentPath, (): Set<string> => new Set())
 
     propPaths.forEach((p) => set.add(p))
 

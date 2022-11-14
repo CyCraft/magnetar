@@ -53,13 +53,13 @@ importers:
       '@magnetarjs/utils': workspace:*
       getorset-anything: ^0.0.3
       is-what: ^4.1.7
-      merge-anything: ^5.1.0
+      merge-anything: ^5.1.1
     dependencies:
       '@magnetarjs/types': link:../types
       '@magnetarjs/utils': link:../utils
       getorset-anything: 0.0.3
       is-what: 4.1.7
-      merge-anything: 5.1.0
+      merge-anything: 5.1.1
     devDependencies:
       '@magnetarjs/test-utils': link:../test-utils
 
@@ -136,7 +136,7 @@ importers:
       flatten-anything: ^3.0.2
       getorset-anything: ^0.0.3
       is-what: ^4.1.7
-      merge-anything: ^5.1.0
+      merge-anything: ^5.1.1
       remove-anything: ^1.0.3
     dependencies:
       '@magnetarjs/types': link:../types
@@ -144,7 +144,7 @@ importers:
       flatten-anything: 3.0.2
       getorset-anything: 0.0.3
       is-what: 4.1.7
-      merge-anything: 5.1.0
+      merge-anything: 5.1.1
       remove-anything: 1.0.3
     devDependencies:
       '@magnetarjs/core': link:../core
@@ -163,7 +163,7 @@ importers:
       flatten-anything: ^3.0.2
       getorset-anything: ^0.0.3
       is-what: ^4.1.7
-      merge-anything: ^5.1.0
+      merge-anything: ^5.1.1
       remove-anything: ^1.0.3
     dependencies:
       '@magnetarjs/types': link:../types
@@ -171,7 +171,7 @@ importers:
       flatten-anything: 3.0.2
       getorset-anything: 0.0.3
       is-what: 4.1.7
-      merge-anything: 5.1.0
+      merge-anything: 5.1.1
       remove-anything: 1.0.3
     devDependencies:
       '@magnetarjs/core': link:../core
@@ -190,7 +190,7 @@ importers:
       filter-anything: ^3.0.3
       getorset-anything: ^0.0.3
       is-what: ^4.1.7
-      merge-anything: ^5.1.0
+      merge-anything: ^5.1.1
       path-to-prop: 2.0.2
     dependencies:
       '@magnetarjs/types': link:../types
@@ -199,7 +199,7 @@ importers:
       filter-anything: 3.0.3
       getorset-anything: 0.0.3
       is-what: 4.1.7
-      merge-anything: 5.1.0
+      merge-anything: 5.1.1
       path-to-prop: 2.0.2
     devDependencies:
       '@magnetarjs/core': link:../core
@@ -216,7 +216,7 @@ importers:
       filter-anything: ^3.0.3
       getorset-anything: ^0.0.3
       is-what: ^4.1.7
-      merge-anything: ^5.1.0
+      merge-anything: ^5.1.1
       path-to-prop: 2.0.2
       vue: ^2.7.14
     dependencies:
@@ -226,7 +226,7 @@ importers:
       filter-anything: 3.0.3
       getorset-anything: 0.0.3
       is-what: 4.1.7
-      merge-anything: 5.1.0
+      merge-anything: 5.1.1
       path-to-prop: 2.0.2
     devDependencies:
       '@magnetarjs/core': link:../core
@@ -243,7 +243,7 @@ importers:
       filter-anything: ^3.0.3
       getorset-anything: ^0.0.3
       is-what: ^4.1.7
-      merge-anything: ^5.1.0
+      merge-anything: ^5.1.1
       path-to-prop: 2.0.2
       vue: ^3.2.45
     dependencies:
@@ -253,7 +253,7 @@ importers:
       filter-anything: 3.0.3
       getorset-anything: 0.0.3
       is-what: 4.1.7
-      merge-anything: 5.1.0
+      merge-anything: 5.1.1
       path-to-prop: 2.0.2
     devDependencies:
       '@magnetarjs/core': link:../core
@@ -269,7 +269,7 @@ importers:
       filter-anything: ^3.0.3
       getorset-anything: ^0.0.3
       is-what: ^4.1.7
-      merge-anything: ^5.1.0
+      merge-anything: ^5.1.1
       path-to-prop: ^2.0.2
       rimraf: ^3.0.2
     dependencies:
@@ -279,7 +279,7 @@ importers:
       filter-anything: 3.0.3
       getorset-anything: 0.0.3
       is-what: 4.1.7
-      merge-anything: 5.1.0
+      merge-anything: 5.1.1
       path-to-prop: 2.0.2
     devDependencies:
       copyfiles: 2.4.1
@@ -287,9 +287,9 @@ importers:
 
   packages/types:
     specifiers:
-      type-fest: ^3.2.0
+      merge-anything: ^5.1.1
     dependencies:
-      type-fest: 3.2.0
+      merge-anything: 5.1.1
 
   packages/utils:
     specifiers:
@@ -312,7 +312,7 @@ importers:
       flatten-anything: ^3.0.2
       getorset-anything: ^0.0.3
       is-what: ^4.1.7
-      merge-anything: ^5.1.0
+      merge-anything: ^5.1.1
       remove-anything: ^1.0.3
     dependencies:
       '@magnetarjs/types': link:../types
@@ -320,7 +320,7 @@ importers:
       flatten-anything: 3.0.2
       getorset-anything: 0.0.3
       is-what: 4.1.7
-      merge-anything: 5.1.0
+      merge-anything: 5.1.1
       remove-anything: 1.0.3
     devDependencies:
       firebase: 9.14.0
@@ -9689,8 +9689,8 @@ packages:
       readable-stream: 2.3.7
     dev: true
 
-  /merge-anything/5.1.0:
-    resolution: {integrity: sha512-0n7nYMvjMkCcuVyZnT466w7tGEvfqe4xDHEsc51zFXK2R8I2Sh4JaU+y/JRD/cZN0JDE2NOVMtzdpGzv7c0cRw==}
+  /merge-anything/5.1.1:
+    resolution: {integrity: sha512-9fdLH+jK6l2PuIBE0qXztvnSt6bPCObqYuMulbWVlljQY7xX/hKwOnvp2oyNhbgPARVup4kJa9WkpSt8EXDzZg==}
     engines: {node: '>=12.13'}
     dependencies:
       is-what: 4.1.7
@@ -13450,11 +13450,6 @@ packages:
     resolution: {integrity: sha512-UKCINsd4qiATXD6OIlnQw9t1ux/n2ld+Nl0kzPbCONhCaUIS/BhJbNw14w6584HCQWf3frBK8vmWnGZq/sbPHQ==}
     engines: {node: '>=12.20'}
     dev: true
-
-  /type-fest/3.2.0:
-    resolution: {integrity: sha512-Il3wdLRzWvbAEtocgxGQA9YOoRVeVUGOMBtel5LdEpNeEAol6GJTLw8GbX6Z8EIMfvfhoOXs2bwOijtAZdK5og==}
-    engines: {node: '>=14.16'}
-    dev: false
 
   /type-is/1.6.18:
     resolution: {integrity: sha512-TkRKr9sUTxEH8MdfuCSP7VizJyzRNMjj2J2do2Jr3Kym598JVdEksuzPQCnlFPW4ky9Q+iA+ma9BGm06XQBy8g==}

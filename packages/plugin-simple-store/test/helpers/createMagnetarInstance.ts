@@ -1,4 +1,4 @@
-import { MagnetarInstance, CollectionInstance, DocInstance } from '@magnetarjs/types'
+import { MagnetarInstance, CollectionInstance, DocInstance, PartialDeep } from '@magnetarjs/types'
 import { Magnetar } from '@magnetarjs/core'
 import { CreatePlugin as CreatePluginLocal } from '../../src'
 import { pokedex, PokedexEntry, generateRandomId, PluginMockRemote } from '@magnetarjs/test-utils'

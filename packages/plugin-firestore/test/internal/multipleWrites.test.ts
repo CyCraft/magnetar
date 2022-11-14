@@ -24,12 +24,12 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
       name: 'Bulbasaur',
       type: ['Grass', 'Poison'],
       base: {
-        'HP': 9000,
-        'Attack': 50,
-        'Defense': 49,
-        'SpAttack': 65,
-        'SpDefense': 65,
-        'Speed': 45,
+        HP: 9000,
+        Attack: 50,
+        Defense: 49,
+        SpAttack: 65,
+        SpDefense: 65,
+        Speed: 45,
       },
     }
     t.deepEqual(pokedexModule.doc('1').data, expected as any)
@@ -194,12 +194,12 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
       name: 'Bulbasaur',
       type: ['Grass', 'Poison'],
       base: {
-        'HP': 9000,
-        'Attack': 49,
-        'Defense': 49,
-        'SpAttack': 65,
-        'SpDefense': 65,
-        'Speed': 45,
+        HP: 9000,
+        Attack: 49,
+        Defense: 49,
+        SpAttack: 65,
+        SpDefense: 65,
+        Speed: 45,
       },
     }
     t.deepEqual(pokedexModule.doc('1').data, expected as any)
@@ -569,12 +569,12 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     const all: Promise<any>[] = []
     const debounce = 1000
     let complete = 0
-    let timeoutResolve:any = null
-    let timeoutReject:any = null
+    let timeoutResolve: any = null
+    let timeoutReject: any = null
 
-    function testComplete () {
+    function testComplete() {
       complete++
-      if (complete === (all.length - 1)) {
+      if (complete === all.length - 1) {
         if (timeoutResolve) {
           timeoutResolve()
         }
@@ -589,26 +589,38 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     })
 
     // Time the merges. Watch for early completion and merges that take too long.
-    all.push(new Promise((resolve, reject) => {
-      timeoutResolve = resolve
-      timeoutReject = reject
+    all.push(
+      new Promise((resolve, reject) => {
+        timeoutResolve = resolve
+        timeoutReject = reject
 
-      // Check for early completion
-      setTimeout(() => {
-        if (complete) {
-          reject(new Error(complete + ' tests completed before the debounce time'))
-        }
-      }, debounce)
+        // Check for early completion
+        setTimeout(() => {
+          if (complete) {
+            reject(new Error(complete + ' tests completed before the debounce time'))
+          }
+        }, debounce)
 
-      // Check for transactions that take too long.
-      setTimeout(() => {
-        reject(new Error('timeout - tests completed: ' + complete))
-      }, debounce + 500)
-    }))
+        // Check for transactions that take too long.
+        setTimeout(() => {
+          reject(new Error('timeout - tests completed: ' + complete))
+        }, debounce + 500)
+      })
+    )
 
     try {
-      all.push(pokedexModule.doc('1').merge({ base: { HP: 9000 } }).then(testComplete))
-      all.push(pokedexModule.doc('1').merge({ base: { Attack: 50 } }).then(testComplete))
+      all.push(
+        pokedexModule
+          .doc('1')
+          .merge({ base: { HP: 9000 } })
+          .then(testComplete)
+      )
+      all.push(
+        pokedexModule
+          .doc('1')
+          .merge({ base: { Attack: 50 } })
+          .then(testComplete)
+      )
     } catch (error) {
       t.fail(JSON.stringify(error))
       if (timeoutReject) {
@@ -623,12 +635,12 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
       name: 'Bulbasaur',
       type: ['Grass', 'Poison'],
       base: {
-        'HP': 9000,
-        'Attack': 50,
-        'Defense': 49,
-        'SpAttack': 65,
-        'SpDefense': 65,
-        'Speed': 45,
+        HP: 9000,
+        Attack: 50,
+        Defense: 49,
+        SpAttack: 65,
+        SpDefense: 65,
+        Speed: 45,
       },
     }
     t.deepEqual(pokedexModule.doc('1').data, expected as any)
@@ -636,7 +648,8 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
   })
 }
 {
-  const testName = 'timing of multiple writes with custom debounce (merge → merge) to the same record'
+  const testName =
+    'timing of multiple writes with custom debounce (merge → merge) to the same record'
   test(testName, async (t) => {
     const { pokedexModule } = await createMagnetarInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
@@ -647,12 +660,12 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     const all: Promise<any>[] = []
     const debounce = 5000
     let complete = 0
-    let timeoutResolve:any = null
-    let timeoutReject:any = null
+    let timeoutResolve: any = null
+    let timeoutReject: any = null
 
-    function testComplete () {
+    function testComplete() {
       complete++
-      if (complete === (all.length - 1)) {
+      if (complete === all.length - 1) {
         if (timeoutResolve) {
           timeoutResolve()
         }
@@ -667,26 +680,38 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     })
 
     // Time the merges. Watch for early completion and merges that take too long.
-    all.push(new Promise((resolve, reject) => {
-      timeoutResolve = resolve
-      timeoutReject = reject
+    all.push(
+      new Promise((resolve, reject) => {
+        timeoutResolve = resolve
+        timeoutReject = reject
 
-      // Check for early completion
-      setTimeout(() => {
-        if (complete) {
-          reject(new Error(complete + ' tests completed before the debounce time'))
-        }
-      }, debounce)
+        // Check for early completion
+        setTimeout(() => {
+          if (complete) {
+            reject(new Error(complete + ' tests completed before the debounce time'))
+          }
+        }, debounce)
 
-      // Check for transactions that take too long.
-      setTimeout(() => {
-        reject(new Error('timeout - tests completed: ' + complete))
-      }, debounce + 500)
-    }))
+        // Check for transactions that take too long.
+        setTimeout(() => {
+          reject(new Error('timeout - tests completed: ' + complete))
+        }, debounce + 500)
+      })
+    )
 
     try {
-      all.push(pokedexModule.doc('1').merge({ base: { HP: 9000 } }, { syncDebounceMs: debounce }).then(testComplete))
-      all.push(pokedexModule.doc('1').merge({ base: { Attack: 50 } }, { syncDebounceMs: debounce }).then(testComplete))
+      all.push(
+        pokedexModule
+          .doc('1')
+          .merge({ base: { HP: 9000 } }, { syncDebounceMs: debounce })
+          .then(testComplete)
+      )
+      all.push(
+        pokedexModule
+          .doc('1')
+          .merge({ base: { Attack: 50 } }, { syncDebounceMs: debounce })
+          .then(testComplete)
+      )
     } catch (error) {
       t.fail(JSON.stringify(error))
       if (timeoutReject) {
@@ -701,12 +726,12 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
       name: 'Bulbasaur',
       type: ['Grass', 'Poison'],
       base: {
-        'HP': 9000,
-        'Attack': 50,
-        'Defense': 49,
-        'SpAttack': 65,
-        'SpDefense': 65,
-        'Speed': 45,
+        HP: 9000,
+        Attack: 50,
+        Defense: 49,
+        SpAttack: 65,
+        SpDefense: 65,
+        Speed: 45,
       },
     }
     t.deepEqual(pokedexModule.doc('1').data, expected as any)
@@ -714,7 +739,8 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
   })
 }
 {
-  const testName = 'timing of multiple writes with various custom debounce (merge → merge) to the same record'
+  const testName =
+    'timing of multiple writes with various custom debounce (merge → merge) to the same record'
   test(testName, async (t) => {
     const { pokedexModule } = await createMagnetarInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
@@ -725,12 +751,12 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     const all: Promise<any>[] = []
     const debounce = 2000
     let complete = 0
-    let timeoutResolve:any = null
-    let timeoutReject:any = null
+    let timeoutResolve: any = null
+    let timeoutReject: any = null
 
-    function testComplete () {
+    function testComplete() {
       complete++
-      if (complete === (all.length - 1)) {
+      if (complete === all.length - 1) {
         if (timeoutResolve) {
           timeoutResolve()
         }
@@ -745,29 +771,51 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     })
 
     // Time the merges. Watch for early completion and merges that take too long.
-    all.push(new Promise((resolve, reject) => {
-      timeoutResolve = resolve
-      timeoutReject = reject
+    all.push(
+      new Promise((resolve, reject) => {
+        timeoutResolve = resolve
+        timeoutReject = reject
 
-      // Check for early completion
-      setTimeout(() => {
-        if (complete) {
-          reject(new Error(complete + ' tests completed before the debounce time'))
-        }
-      }, debounce)
+        // Check for early completion
+        setTimeout(() => {
+          if (complete) {
+            reject(new Error(complete + ' tests completed before the debounce time'))
+          }
+        }, debounce)
 
-      // Check for transactions that take too long.
-      setTimeout(() => {
-        reject(new Error('timeout - tests completed: ' + complete))
-      }, debounce + 500)
-    }))
+        // Check for transactions that take too long.
+        setTimeout(() => {
+          reject(new Error('timeout - tests completed: ' + complete))
+        }, debounce + 500)
+      })
+    )
 
     // The syncDebounceMs time of the last merge should be the actual debounce time used.
     try {
-      all.push(pokedexModule.doc('1').merge({ base: { HP: 9000 } }, { syncDebounceMs: debounce + 2000 }).then(testComplete))
-      all.push(pokedexModule.doc('1').merge({ base: { Attack: 50 } }, { syncDebounceMs: debounce + 1000 }).then(testComplete))
-      all.push(pokedexModule.doc('1').merge({ base: { Defense: 55 } }, { syncDebounceMs: debounce + 3000 }).then(testComplete))
-      all.push(pokedexModule.doc('1').merge({ base: { Speed: 46 } }, { syncDebounceMs: debounce  }).then(testComplete))
+      all.push(
+        pokedexModule
+          .doc('1')
+          .merge({ base: { HP: 9000 } }, { syncDebounceMs: debounce + 2000 })
+          .then(testComplete)
+      )
+      all.push(
+        pokedexModule
+          .doc('1')
+          .merge({ base: { Attack: 50 } }, { syncDebounceMs: debounce + 1000 })
+          .then(testComplete)
+      )
+      all.push(
+        pokedexModule
+          .doc('1')
+          .merge({ base: { Defense: 55 } }, { syncDebounceMs: debounce + 3000 })
+          .then(testComplete)
+      )
+      all.push(
+        pokedexModule
+          .doc('1')
+          .merge({ base: { Speed: 46 } }, { syncDebounceMs: debounce })
+          .then(testComplete)
+      )
     } catch (error) {
       t.fail(JSON.stringify(error))
       if (timeoutReject) {
@@ -782,12 +830,12 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
       name: 'Bulbasaur',
       type: ['Grass', 'Poison'],
       base: {
-        'HP': 9000,
-        'Attack': 50,
-        'Defense': 55,
-        'SpAttack': 65,
-        'SpDefense': 65,
-        'Speed': 46,
+        HP: 9000,
+        Attack: 50,
+        Defense: 55,
+        SpAttack: 65,
+        SpDefense: 65,
+        Speed: 46,
       },
     }
     t.deepEqual(pokedexModule.doc('1').data, expected as any)
@@ -795,7 +843,8 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
   })
 }
 {
-  const testName = 'timing of multiple writes with various custom debounces including 0ms (merge → merge) to the same record'
+  const testName =
+    'timing of multiple writes with various custom debounces including 0ms (merge → merge) to the same record'
   test(testName, async (t) => {
     const { pokedexModule } = await createMagnetarInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
@@ -806,12 +855,12 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     const all: Promise<any>[] = []
     const debounce = 0
     let complete = 0
-    let timeoutResolve:any = null
-    let timeoutReject:any = null
+    let timeoutResolve: any = null
+    let timeoutReject: any = null
 
-    function testComplete () {
+    function testComplete() {
       complete++
-      if (complete === (all.length - 1)) {
+      if (complete === all.length - 1) {
         if (timeoutResolve) {
           timeoutResolve()
         }
@@ -826,29 +875,51 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     })
 
     // Time the merges. Watch for early completion and merges that take too long.
-    all.push(new Promise((resolve, reject) => {
-      timeoutResolve = resolve
-      timeoutReject = reject
+    all.push(
+      new Promise((resolve, reject) => {
+        timeoutResolve = resolve
+        timeoutReject = reject
 
-      // Check for early completion
-      setTimeout(() => {
-        if (complete) {
-          reject(new Error(complete + ' tests completed before the debounce time'))
-        }
-      }, debounce)
+        // Check for early completion
+        setTimeout(() => {
+          if (complete) {
+            reject(new Error(complete + ' tests completed before the debounce time'))
+          }
+        }, debounce)
 
-      // Check for transactions that take too long.
-      setTimeout(() => {
-        reject(new Error('timeout - tests completed: ' + complete))
-      }, debounce + 500)
-    }))
+        // Check for transactions that take too long.
+        setTimeout(() => {
+          reject(new Error('timeout - tests completed: ' + complete))
+        }, debounce + 500)
+      })
+    )
 
     // The syncDebounceMs time of the last merge should be the actual debounce time used.
     try {
-      all.push(pokedexModule.doc('1').merge({ base: { HP: 9000 } }, { syncDebounceMs: debounce + 2000 }).then(testComplete))
-      all.push(pokedexModule.doc('1').merge({ base: { Attack: 50 } }, { syncDebounceMs: debounce + 1000 }).then(testComplete))
-      all.push(pokedexModule.doc('1').merge({ base: { Defense: 55 } }, { syncDebounceMs: debounce + 3000 }).then(testComplete))
-      all.push(pokedexModule.doc('1').merge({ base: { Speed: 46 } }, { syncDebounceMs: debounce  }).then(testComplete))
+      all.push(
+        pokedexModule
+          .doc('1')
+          .merge({ base: { HP: 9000 } }, { syncDebounceMs: debounce + 2000 })
+          .then(testComplete)
+      )
+      all.push(
+        pokedexModule
+          .doc('1')
+          .merge({ base: { Attack: 50 } }, { syncDebounceMs: debounce + 1000 })
+          .then(testComplete)
+      )
+      all.push(
+        pokedexModule
+          .doc('1')
+          .merge({ base: { Defense: 55 } }, { syncDebounceMs: debounce + 3000 })
+          .then(testComplete)
+      )
+      all.push(
+        pokedexModule
+          .doc('1')
+          .merge({ base: { Speed: 46 } }, { syncDebounceMs: debounce })
+          .then(testComplete)
+      )
     } catch (error) {
       t.fail(JSON.stringify(error))
       if (timeoutReject) {
@@ -863,12 +934,12 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
       name: 'Bulbasaur',
       type: ['Grass', 'Poison'],
       base: {
-        'HP': 9000,
-        'Attack': 50,
-        'Defense': 55,
-        'SpAttack': 65,
-        'SpDefense': 65,
-        'Speed': 46,
+        HP: 9000,
+        Attack: 50,
+        Defense: 55,
+        SpAttack: 65,
+        SpDefense: 65,
+        Speed: 46,
       },
     }
     t.deepEqual(pokedexModule.doc('1').data, expected as any)

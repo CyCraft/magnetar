@@ -62,7 +62,7 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
     if (!(collectionPath in dataBackups)) dataBackups[collectionPath] = new Map()
     const backupCollectionMap = dataBackups[collectionPath]
     // set the backup array for the doc
-    const arr = mapGetOrSet(backupCollectionMap, docId, () => [])
+    const arr = mapGetOrSet(backupCollectionMap, docId, (): Record<string, unknown>[] => [])
     // make a backup of whatever is found in the data
     const foundDoc = data[collectionPath][docId]
     if (foundDoc) arr.push(copy(foundDoc))

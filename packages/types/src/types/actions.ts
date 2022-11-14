@@ -1,9 +1,9 @@
-import { PartialDeep } from 'type-fest'
 import { DocInstance } from '../Doc'
 import { StoreName } from './core'
 import { EventNameFnMap } from './events'
 import { ModifyPayloadFnMap } from './modifyPayload'
 import { ModifyReadResponseFnMap } from './modifyReadResponse'
+import { PartialDeep } from './utils/PartialDeep'
 
 /**
  * these are all the actions that Magnetar streamlines, whichever plugin is used

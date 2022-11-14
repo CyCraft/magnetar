@@ -5,6 +5,7 @@ import {
   getFirestoreDocPath,
   batchSyncFactory,
   FirestoreModuleConfig,
+  BatchSync,
 } from '@magnetarjs/utils-firestore'
 import { BatchSyncMap, FirestorePluginOptions } from '../CreatePlugin'
 import { createWriteBatch, applySyncBatch } from '../helpers/batchHelpers'
@@ -28,8 +29,10 @@ export function writeActionFactory(
       ? actionConfig.syncDebounceMs
       : pluginModuleConfig.syncDebounceMs
 
-    const batchSync = mapGetOrSet(batchSyncMap, collectionPath, () =>
-      batchSyncFactory(firestorePluginOptions, createWriteBatch, applySyncBatch)
+    const batchSync = mapGetOrSet(
+      batchSyncMap,
+      collectionPath,
+      (): BatchSync => batchSyncFactory(firestorePluginOptions, createWriteBatch, applySyncBatch)
     )
 
     if (actionName === 'assign') {

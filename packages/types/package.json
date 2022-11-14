@@ -24,7 +24,7 @@
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
-    "type-fest": "^3.2.0"
+    "merge-anything": "^5.1.1"
   },
   "keywords": [
     "vuex-easy-firestore",

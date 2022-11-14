@@ -104,7 +104,7 @@ export function getDataFromDataStore(
   }
   const pluginModuleConfig = getPluginModuleConfig(moduleConfig, localStoreName)
 
-  return getModuleData({ collectionPath, docId, pluginModuleConfig }) as any
+  return getModuleData({ collectionPath, docId, pluginModuleConfig })
 }
 
 /**

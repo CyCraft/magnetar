@@ -5,6 +5,7 @@ import {
   FirestoreModuleConfig,
   getFirestoreDocPath,
   batchSyncFactory,
+  BatchSync,
 } from '@magnetarjs/utils-firestore'
 import { BatchSyncMap, FirestorePluginOptions } from '../CreatePlugin'
 import { createWriteBatch, applySyncBatch } from '../helpers/batchHelpers'
@@ -27,8 +28,10 @@ export function deletePropActionFactory(
       ? actionConfig.syncDebounceMs
       : pluginModuleConfig.syncDebounceMs
 
-    const batchSync = mapGetOrSet(batchSyncMap, collectionPath, () =>
-      batchSyncFactory(firestorePluginOptions, createWriteBatch, applySyncBatch)
+    const batchSync = mapGetOrSet(
+      batchSyncMap,
+      collectionPath,
+      (): BatchSync => batchSyncFactory(firestorePluginOptions, createWriteBatch, applySyncBatch)
     )
 
     const result = await batchSync.deleteProp(documentPath, payloadArray, syncDebounceMs)

@@ -35,7 +35,7 @@
     "flatten-anything": "^3.0.2",
     "getorset-anything": "^0.0.3",
     "is-what": "^4.1.7",
-    "merge-anything": "^5.1.0",
+    "merge-anything": "^5.1.1",
     "remove-anything": "^1.0.3"
   },
   "devDependencies": {

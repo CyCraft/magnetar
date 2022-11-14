@@ -2,7 +2,7 @@ import { merge } from 'merge-anything'
 import { GlobalConfig } from '@magnetarjs/types'
 
 export function defaultsGlobalConfig(config: GlobalConfig): Required<GlobalConfig> {
-  const defaults: GlobalConfig = {
+  const defaults: Required<GlobalConfig> = {
     localStoreName: '',
     stores: {},
     executionOrder: {
@@ -15,5 +15,5 @@ export function defaultsGlobalConfig(config: GlobalConfig): Required<GlobalConfi
     modifyReadResponseOn: {},
   }
   const merged = merge(defaults, config)
-  return merged as any
+  return merged
 }

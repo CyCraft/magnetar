@@ -7,7 +7,7 @@ import {
 } from './types/actions'
 import { DocFn } from './Magnetar'
 import { WhereFilterOp } from './types/clauses'
-import { OPaths } from './types/utils'
+import { OPaths } from './types/utils/Paths'
 
 export type CollectionInstance<
   DocDataType extends Record<string, any> = Record<string, any>,
@@ -78,7 +78,7 @@ export type CollectionInstance<
    * Chainable filter. Returns {@link CollectionInstance} with filter applied.
    */
   orderBy: (
-    fieldPath: OPaths<DocDataType, 4>,
+    fieldPath: OPaths<DocDataType>,
     direction?: 'asc' | 'desc'
   ) => CollectionInstance<DocDataType, GranularTypes>
   /**
@@ -89,7 +89,7 @@ export type CollectionInstance<
    * Chainable filter. Returns {@link CollectionInstance} with filter applied.
    */
   where: (
-    fieldPath: OPaths<DocDataType, 4>,
+    fieldPath: OPaths<DocDataType>,
     operator: WhereFilterOp,
     value: any
   ) => CollectionInstance<DocDataType, GranularTypes>

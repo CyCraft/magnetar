@@ -1,5 +1,5 @@
-import { PartialDeep } from 'type-fest'
 import { DocMetadata } from './core'
+import { PartialDeep } from './utils/PartialDeep'
 
 /**
  * Can be used to modify docs that come in from 'stream' or 'fetch' actions, before they are added to your store data. When returning `undefined` they will be discarded & won't be added to the store data.

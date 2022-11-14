@@ -1,4 +1,4 @@
-import { PartialDeep } from 'type-fest'
+import { PartialDeep } from './utils/PartialDeep'
 
 /**
  * This function will be executed everytime BEFORE the related action is triggered. The function defined will receive the payload of the action. You can then modify and return this payload.

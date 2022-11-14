@@ -1,4 +1,3 @@
-import { Spread } from 'type-fest'
 import { ActionName } from './actions'
 import {
   FetchResponse,
@@ -8,6 +7,7 @@ import {
   PluginModuleConfig,
   SyncBatch,
 } from './plugins'
+import { MergeDeep } from './utils/MergeDeep'
 
 // events
 export type EventName = 'before' | 'success' | 'error' | 'revert'
@@ -71,15 +71,15 @@ type EventPayloadPropResult = {
 export type EventFnBefore = (args: EventSharedPayload) => void | Promise<void>
 
 export type EventFnSuccess = (
-  args: Spread<EventSharedPayload, EventPayloadPropResult>
+  args: MergeDeep<EventSharedPayload, EventPayloadPropResult>
 ) => void | Promise<void>
 
 export type EventFnError = (
-  args: Spread<EventSharedPayload, { error: any }>
+  args: MergeDeep<EventSharedPayload, { error: any }>
 ) => void | Promise<void>
 
 export type EventFnRevert = (
-  args: Spread<Omit<EventSharedPayload, 'abort'>, { result: unknown }>
+  args: MergeDeep<Omit<EventSharedPayload, 'abort'>, { result: unknown }>
 ) => void | Promise<void>
 
 export type EventFn = EventFnBefore | EventFnSuccess | EventFnError | EventFnRevert

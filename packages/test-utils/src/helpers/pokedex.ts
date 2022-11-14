@@ -1,23 +1,17 @@
 import { copy } from 'copy-anything'
 import { merge } from 'merge-anything'
-import { PokedexEntry, allPokemonArray } from './pokemon'
-export type { PokedexEntry, PokemonType } from './pokemon'
+import type { PartialDeep } from '@magnetarjs/types'
+import type { PokedexEntry } from './types'
+import { allPokemonArray } from './pokemon'
 
-export function pokedexEntryDefaults(values: { [key in string]: any }): PokedexEntry {
-  const defaults = {
+export function pokedexEntryDefaults(partial: PartialDeep<PokedexEntry>): PokedexEntry {
+  const defaults: PokedexEntry = {
     id: 0,
     name: '',
     type: [],
-    base: {
-      HP: 0,
-      Attack: 0,
-      Defense: 0,
-      SpAttack: 0,
-      SpDefense: 0,
-      Speed: 0,
-    },
+    base: { HP: 0, Attack: 0, Defense: 0, SpAttack: 0, SpDefense: 0, Speed: 0 },
   }
-  return merge(defaults, values)
+  return merge(defaults, partial)
 }
 
 export function pokedex(pokedexNr: number): PokedexEntry {

@@ -1,18 +1,4 @@
-import type { PokemonType } from './pokemon'
-
-export type MoveEntry = {
-  accuracy: null | number
-  category: string
-  cname: string
-  ename: string
-  id: number
-  jname: string
-  power: null | number
-  pp: null | number
-  max_pp?: number
-  tm?: number
-  type: PokemonType
-}
+import type { MoveEntry } from './types'
 
 export const allMovesArray: MoveEntry[] = [
   {
