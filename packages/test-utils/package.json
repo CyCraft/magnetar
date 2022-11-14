@@ -23,12 +23,12 @@
   "dependencies": {
     "@magnetarjs/types": "workspace:*",
     "@magnetarjs/utils": "workspace:*",
-    "copy-anything": "^2.0.6",
-    "filter-anything": "^2.2.4",
+    "copy-anything": "^3.0.2",
+    "filter-anything": "^3.0.3",
     "getorset-anything": "^0.0.3",
-    "is-what": "^3.14.1",
-    "merge-anything": "^4.0.5",
-    "path-to-prop": "^1.0.2"
+    "is-what": "^4.1.7",
+    "merge-anything": "^5.1.0",
+    "path-to-prop": "^2.0.2"
   },
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "bugs": "https://github.com/cycraft/magnetar/issues",

@@ -33,11 +33,11 @@
   "dependencies": {
     "@magnetarjs/types": "workspace:*",
     "@magnetarjs/utils-firestore": "workspace:*",
-    "flatten-anything": "^2.0.7",
+    "flatten-anything": "^3.0.2",
     "getorset-anything": "^0.0.3",
-    "is-what": "^3.14.1",
+    "is-what": "^4.1.7",
     "merge-anything": "^5.1.0",
-    "remove-anything": "^0.1.3"
+    "remove-anything": "^1.0.3"
   },
   "devDependencies": {
     "@magnetarjs/core": "workspace:*",
