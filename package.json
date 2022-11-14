@@ -9,7 +9,7 @@
     "dev:vue3": "pnpm --filter dev-vue3 dev",
     "dev:vue3-firestore": "pnpm --filter dev-vue3-firestore dev",
     "dep:update-minor": "ncu --target minor -u && pnpm --parallel exec ncu --target minor -u && echo \"review git changes and install with ni\"",
-    "dep:update-major": "ncu && pnpm --parallel exec ncu && echo \review git changes and install with ni\"",
+    "dep:update-major": "ncu && pnpm --parallel exec ncu && echo \"review git changes and install with ni\"",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:deploy": "pnpm docs:build && firebase deploy --only hosting && git add -A && git commit -m \"chore: deploy\"",
