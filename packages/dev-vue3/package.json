@@ -8,15 +8,15 @@
   },
   "dependencies": {
     "magnetar": "workspace:*",
-    "vue": "^3.2.26"
+    "vue": "^3.2.45"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^2.0.1",
-    "@vue/compiler-sfc": "3.2.26",
-    "@vuedx/typecheck": "^0.7.4",
-    "@vuedx/typescript-plugin-vue": "^0.7.4",
-    "sass": "^1.45.2",
-    "typescript": "^4.5.4",
-    "vite": "^2.7.10"
+    "@vitejs/plugin-vue": "^2.3.4",
+    "@vue/compiler-sfc": "3.2.45",
+    "@vuedx/typecheck": "^0.7.6",
+    "@vuedx/typescript-plugin-vue": "^0.7.6",
+    "sass": "^1.56.1",
+    "typescript": "^4.8.4",
+    "vite": "^2.9.15"
   }
 }

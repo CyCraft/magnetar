@@ -34,7 +34,7 @@
     "@magnetarjs/utils": "workspace:*",
     "copy-anything": "^2.0.6",
     "filter-anything": "^2.2.4",
-    "getorset-anything": "^0.0.2",
+    "getorset-anything": "^0.0.3",
     "is-what": "^3.14.1",
     "merge-anything": "^4.0.5",
     "path-to-prop": "1.0.2"
@@ -42,7 +42,7 @@
   "devDependencies": {
     "@magnetarjs/core": "workspace:*",
     "@magnetarjs/test-utils": "workspace:*",
-    "vue": "^2.6.14"
+    "vue": "^2.7.14"
   },
   "keywords": [
     "reactive-store",
