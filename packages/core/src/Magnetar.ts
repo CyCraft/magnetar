@@ -41,7 +41,7 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
   /**
    * All collections visited so far, kept to be able to clear all data
    */
-  const collectionNames = new Set<string>()
+  const collectionNames = new Set<CollectionName>()
   /**
    * the global storage for WriteLock objects
    * @see {@link WriteLock}
