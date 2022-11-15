@@ -25,6 +25,9 @@ import {
 } from '@magnetarjs/types'
 import { throwIfInvalidModulePath } from './helpers/throwFns'
 
+/** Any of the possible collection paths used so far */
+export type CollectionName = string
+
 /**
  * Creates a magnetar instance.
  * @see {@link GlobalConfig}
@@ -61,7 +64,32 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
    */
   const fetchMetaMap: Map<PathWhereOrderByIdentifier, FetchMetaData> = new Map()
 
-  async function clearAllData(): Promise<void> {
+  /**
+   * You can exclude any collection when clearing data
+   * @example
+   * ```ts
+   * magnetar.clearAllData({ exclude: ['users'] })
+   * ```
+   */
+  async function clearAllData(
+    /**
+     * You can exclude any collection when clearing data
+     * @example
+     * ```ts
+     * magnetar.clearAllData({ exclude: ['users'] })
+     * ```
+     */
+    options?: {
+      /**
+       * You can exclude any collection when clearing data
+       * @example
+       * ```ts
+       * magnetar.clearAllData({ exclude: ['users'] })
+       * ```
+       */
+      exclude?: CollectionName[]
+    }
+  ): Promise<void> {
     for (const collectionName of collectionNames) {
       collection(collectionName).data?.clear()
     }
