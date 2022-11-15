@@ -2,6 +2,9 @@ import { CollectionInstance } from './Collection'
 import { GlobalConfig, ModuleConfig } from './types/config'
 import { DocInstance } from './Doc'
 
+/** Any of the possible collection paths used so far */
+export type CollectionName = string
+
 /**
  * This is the global Magnetar instance that is returned when instantiating with Magnetar()
  */
@@ -17,12 +20,42 @@ export interface MagnetarInstance {
   doc: DocFn
   /**
    * Clear all data of the entire Magnetar instance
+   *
+   * You can exclude any collection when clearing data
+   * @example
+   * ```ts
+   * magnetar.clearAllData({ exclude: ['users'] })
+   * ```
    */
-  clearAllData: () => Promise<void>
+  clearAllData: (
+    /**
+     * You can exclude any collection when clearing data
+     * @example
+     * ```ts
+     * magnetar.clearAllData({ exclude: ['users'] })
+     * ```
+     */
+    options?: { exclude?: CollectionName[] }
+  ) => Promise<void>
   /**
    * Close all streams of the entire Magnetar instance
+   *
+   * You can exclude any collection when closing streams
+   * @example
+   * ```ts
+   * magnetar.closeAllStreams({ exclude: ['users'] })
+   * ```
    */
-  closeAllStreams: () => Promise<void>
+  closeAllStreams: (
+    /**
+     * You can exclude any collection when closing streams
+     * @example
+     * ```ts
+     * magnetar.closeAllStreams({ exclude: ['users'] })
+     * ```
+     */
+    options?: { exclude?: CollectionName[] }
+  ) => Promise<void>
 }
 
 /**

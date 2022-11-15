@@ -22,11 +22,9 @@ import {
   DocFn,
   CollectionFn,
   FetchMetaData,
+  CollectionName,
 } from '@magnetarjs/types'
 import { throwIfInvalidModulePath } from './helpers/throwFns'
-
-/** Any of the possible collection paths used so far */
-export type CollectionName = string
 
 /**
  * Creates a magnetar instance.
@@ -64,40 +62,17 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
    */
   const fetchMetaMap: Map<PathWhereOrderByIdentifier, FetchMetaData> = new Map()
 
-  /**
-   * You can exclude any collection when clearing data
-   * @example
-   * ```ts
-   * magnetar.clearAllData({ exclude: ['users'] })
-   * ```
-   */
-  async function clearAllData(
-    /**
-     * You can exclude any collection when clearing data
-     * @example
-     * ```ts
-     * magnetar.clearAllData({ exclude: ['users'] })
-     * ```
-     */
-    options?: {
-      /**
-       * You can exclude any collection when clearing data
-       * @example
-       * ```ts
-       * magnetar.clearAllData({ exclude: ['users'] })
-       * ```
-       */
-      exclude?: CollectionName[]
-    }
-  ): Promise<void> {
+  async function clearAllData(options?: { exclude?: CollectionName[] }): Promise<void> {
     for (const collectionName of collectionNames) {
+      if (options?.exclude?.includes(collectionName)) continue
       collection(collectionName).data?.clear()
     }
   }
 
   /** _ to prevent name clash */
-  async function _closeAllStreams(): Promise<void> {
+  async function _closeAllStreams(options?: { exclude?: CollectionName[] }): Promise<void> {
     for (const collectionName of collectionNames) {
+      if (options?.exclude?.includes(collectionName)) continue
       collection(collectionName).closeAllStreams()
     }
   }
