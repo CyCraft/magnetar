@@ -1,6 +1,17 @@
 import { isFullArray, isNumber } from 'is-what'
 import { EventFnSuccess } from '@magnetarjs/types'
 
+/**
+ * Logs to the console with `console.info` and colors.
+ */
+export function logWithFlair(message: string, ...args: any[]): void {
+  console.info(
+    `%c💫 ${message}`,
+    'background: #0e0f15; color: #af98e6; border-radius: 4px; padding: 6px 10px;',
+    ...args
+  )
+}
+
 export const logger: EventFnSuccess = function ({
   payload,
   actionName,
@@ -23,9 +34,5 @@ export const logger: EventFnSuccess = function ({
   const _limit = !isNumber(limit) ? [] : [`limit(${limit})`]
   const message = ['db', docOrCollection, ..._where, ..._orderBy, ..._limit].join('.')
   const action = payload === undefined ? [`${actionName}()`] : [`${actionName}(`, payload, `)`]
-  console.info(
-    `%c💫 ${message}`,
-    'background: #0e0f15; color: #af98e6; border-radius: 4px; padding: 6px 10px;',
-    ...action
-  )
+  logWithFlair(message, ...action)
 }

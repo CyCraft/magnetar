@@ -6,7 +6,7 @@ Here you will find more information on each official store plugin for Magnetar.
 
 ## Firestore
 
-Use the Firestore plugin if you use Cloud Firestore.
+Use the Firestore plugin if you use Cloud Firestore. This plugin wraps the `firebase` JS SDK for use in the browser.
 
 > documentation WIP
 
@@ -24,6 +24,39 @@ const db = getFirestore(firebaseApp)
 const remote = PluginFirestore.CreatePlugin({ db })
 ```
 <!-- prettier-ignore-end -->
+
+You can enable console logging by adding `debug: true` when you set up the plugin:
+
+```ts
+const remote = PluginFirestore.CreatePlugin({ db, debug: true })
+```
+
+## Firebase Admin (for Firestore)
+
+Use the Firestore Admin plugin if you use Cloud Firestore and you want to use Magnetar in NodeJS (eg. Cloud Functions). This plugin wraps the `firebase-admin` NodeJS SDK.
+
+> documentation WIP
+
+Example setup:
+
+<!-- prettier-ignore-start -->
+```js
+import { CreatePlugin as PluginFirestoreAdmin } from '@magnetarjs/plugin-firestore-admin'
+import { initializeApp } from 'firebase-admin/app'
+import { getFirestore } from 'firebase-admin/firestore'
+
+const firebaseApp = initializeApp({ /* pass your config... */ })
+const db = getFirestore(firebaseApp)
+
+const remote = PluginFirestoreAdmin({ db })
+```
+<!-- prettier-ignore-end -->
+
+You can enable console logging by adding `debug: true` when you set up the plugin:
+
+```ts
+const remote = PluginFirestore.CreatePlugin({ db, debug: true })
+```
 
 ## Vue 3
 

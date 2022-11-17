@@ -2,6 +2,7 @@ import { isEmptyObject, isNumber } from 'is-what'
 import { merge as mergeObjects } from 'merge-anything'
 import { removeProp } from 'remove-anything'
 import { mapGetOrSet } from 'getorset-anything'
+import { logWithFlair } from '@magnetarjs/utils'
 import { SyncBatch } from '@magnetarjs/types'
 import { Countdown, CountdownInstance } from './Countdown'
 import { FirestorePluginOptions, Firestore, ApplySyncBatch, CreateWriteBatch } from './types'
@@ -119,7 +120,7 @@ export function batchSyncFactory(
     }
 
     if (debug) {
-      console.log('[magnetar] Syncing to firestore...', stack.batch)
+      logWithFlair('[magnetar] Syncing to firestore...', stack.batch)
     }
 
     writeBatch
