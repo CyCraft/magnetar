@@ -2,7 +2,11 @@
   "hosting": {
     "target": "magnetar",
     "public": "docs/.vitepress/dist",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
     "rewrites": [
       {
         "source": "**",
