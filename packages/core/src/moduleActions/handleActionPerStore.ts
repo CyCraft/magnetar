@@ -161,6 +161,10 @@ export function handleActionPerStore(
          * each each time a store returns a `FetchResponse` then all `doOnFetchFns` need to be executed
          */
         const doOnFetchFns: DoOnFetch[] = modifyReadResponseMap.added
+        /**
+         * Fetching on a collection should return a map with just the fetched records for that API call
+         */
+        const collectionFetchResult = new Map<string, Record<string, any>>()
 
         /**
          * All possible results from the plugins.
@@ -259,7 +263,10 @@ export function handleActionPerStore(
               const { docs, reachedEnd, cursor } = resultFromPlugin
               if (isBoolean(reachedEnd)) setLastFetched?.({ reachedEnd, cursor })
               for (const docMetaData of docs) {
-                executeOnFns(doOnFetchFns, docMetaData.data, [docMetaData])
+                const docResult = executeOnFns(doOnFetchFns, docMetaData.data, [docMetaData])
+                // after doing all `doOnFetchFns` (adding it to the local store, modifying the read result)
+                // we still have a record, so must return it when resolving the fetch action
+                if (docResult) collectionFetchResult.set(docMetaData.id, docResult)
               }
             }
           }
@@ -286,8 +293,7 @@ export function handleActionPerStore(
         }
 
         // all other actions triggered on collections ('fetch' is the only possibility left)
-        // 'fetch' should return `Map<string, DocDataType>` or `DocDataType`
-        resolve(collectionFn(modulePath, moduleConfig).data)
+        resolve(collectionFetchResult)
         if (actionName === 'fetch') fetchPromises.delete(fetchPromiseKey)
       } catch (error) {
         reject(error)

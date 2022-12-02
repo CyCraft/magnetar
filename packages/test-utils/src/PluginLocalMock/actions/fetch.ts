@@ -68,7 +68,7 @@ export function fetchActionFactory(
       }
     }
 
-    const doOnFetchAction: DoOnFetch = (_payload, meta): void => {
+    const doOnFetchAction: DoOnFetch = (_payload, meta) => {
       // abort updating local state if the payload was set to undefined
       if (_payload === undefined) return
 
@@ -82,6 +82,8 @@ export function fetchActionFactory(
         docId: docId || (isFullString(meta.id) || isNumber(meta.id) ? `${meta.id}` : undefined),
         pluginModuleConfig,
       })
+
+      return _payload
     }
     return doOnFetchAction
   }
