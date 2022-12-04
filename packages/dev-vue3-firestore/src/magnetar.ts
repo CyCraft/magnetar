@@ -1,5 +1,5 @@
 // ---------------------------------------
-// plugin vue2 for local data store
+// plugin vue3 for local data store
 // ---------------------------------------
 import { db } from './initFirebase'
 import { collection, doc } from 'firebase/firestore'
