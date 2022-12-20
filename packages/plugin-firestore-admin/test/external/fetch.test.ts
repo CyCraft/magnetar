@@ -22,6 +22,25 @@ import { pokedex } from '@magnetarjs/test-utils'
   })
 }
 {
+  const testName = 'fetch (collection count)'
+  test(testName, async (t) => {
+    /// 'fetchCount' resolves once all stores have given a response with data
+    const { pokedexModule } = await createMagnetarInstance('read')
+    t.deepEqual(pokedexModule.doc('1').data, undefined)
+    t.deepEqual(pokedexModule.data.size, 0)
+    t.deepEqual(pokedexModule.count, 0)
+
+    try {
+      await pokedexModule.fetchCount()
+    } catch (error) {
+      t.fail(JSON.stringify(error))
+    }
+    t.deepEqual(pokedexModule.doc('1').data, undefined)
+    t.deepEqual(pokedexModule.data.size, 0)
+    t.deepEqual(pokedexModule.count, 151)
+  })
+}
+{
   const testName = 'fetch (document)'
   test(testName, async (t) => {
     /// get resolves once all stores have given a response with data

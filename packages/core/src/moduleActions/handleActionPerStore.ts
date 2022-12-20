@@ -24,8 +24,15 @@ import {
   DocFn,
   WriteLock,
   FetchMetaData,
+  MagnetarFetchCountAction,
+  DoOnFetchCount,
 } from '@magnetarjs/types'
-import { isDoOnFetch, isFetchResponse } from '../helpers/pluginHelpers'
+import {
+  isDoOnFetch,
+  isDoOnFetchCount,
+  isFetchCountResponse,
+  isFetchResponse,
+} from '../helpers/pluginHelpers'
 import { getModifyPayloadFnsMap } from '../helpers/modifyPayload'
 import { getModifyReadResponseFnsMap } from '../helpers/modifyReadResponse'
 import { executeOnFns } from '../helpers/executeOnFns'
@@ -55,6 +62,7 @@ export function handleActionPerStore(
   actionName: Exclude<ActionName, 'stream'>,
   actionType: ActionType
 ):
+  | MagnetarFetchCountAction
   | MagnetarFetchAction<any>
   | MagnetarWriteAction<any>
   | MagnetarInsertAction<any>
@@ -143,8 +151,10 @@ export function handleActionPerStore(
           []
         throwIfNoFnsToExecute(storesToExecute)
         // update the payload
-        for (const modifyFn of modifyPayloadFnsMap[actionName]) {
-          payload = modifyFn(payload, docId)
+        if (actionName !== 'fetchCount') {
+          for (const modifyFn of modifyPayloadFnsMap[actionName]) {
+            payload = modifyFn(payload, docId)
+          }
         }
 
         // create the abort mechanism
@@ -162,9 +172,17 @@ export function handleActionPerStore(
          */
         const doOnFetchFns: DoOnFetch[] = modifyReadResponseMap.added
         /**
+         * each each time a store returns a `FetchResponse` then all `doOnFetchFns` need to be executed
+         */
+        const doOnFetchCountFns: DoOnFetchCount[] = []
+        /**
          * Fetching on a collection should return a map with just the fetched records for that API call
          */
         const collectionFetchResult = new Map<string, Record<string, any>>()
+        /**
+         * the result of fetchCount
+         */
+        let fetchCount: number = NaN
 
         /**
          * All possible results from the plugins.
@@ -270,8 +288,29 @@ export function handleActionPerStore(
               }
             }
           }
+
+          // special handling for 'fetch' (resultFromPlugin will always be `FetchResponse | OnAddedFn`)
+          if (actionName === 'fetchCount') {
+            if (isDoOnFetchCount(resultFromPlugin)) {
+              doOnFetchCountFns.push(resultFromPlugin)
+            }
+            if (isFetchCountResponse(resultFromPlugin)) {
+              for (const doOnFetchCountFn of doOnFetchCountFns) {
+                doOnFetchCountFn(resultFromPlugin)
+              }
+              if (isNaN(fetchCount) || resultFromPlugin.count > fetchCount) {
+                fetchCount = resultFromPlugin.count
+              }
+            }
+          }
         }
         // all the stores resolved their actions
+
+        // return fetchCount
+        if (actionName === 'fetchCount') {
+          resolve(fetchCount)
+          return
+        }
 
         // start the writeLock countdown
         if (actionName !== 'fetch' && !writeLock.countdown) {

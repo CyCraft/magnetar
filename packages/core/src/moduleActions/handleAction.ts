@@ -11,6 +11,10 @@ import {
   PluginInsertAction,
   FetchResponse,
   OnAddedFn,
+  PluginFetchCountAction,
+  FetchCountResponse,
+  DoOnFetch,
+  DoOnFetchCount,
 } from '@magnetarjs/types'
 
 /**
@@ -23,7 +27,7 @@ export async function handleAction(args: {
   docId: string | undefined
   modulePath: string
   pluginModuleConfig: PluginModuleConfig
-  pluginAction: PluginFetchAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction // prettier-ignore
+  pluginAction: PluginFetchCountAction | PluginFetchAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction // prettier-ignore
   payload: void | Record<string, unknown> | Record<string, unknown>[] | string | string[]
   actionConfig: ActionConfig
   eventNameFnsMap: EventNameFnsMap
@@ -31,7 +35,18 @@ export async function handleAction(args: {
   actionName: Exclude<ActionName, 'stream'>
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
   storeName: string
-}): Promise<void | string | FetchResponse | OnAddedFn | SyncBatch | [string, SyncBatch] | unknown> {
+}): Promise<
+  | void
+  | string
+  | FetchCountResponse
+  | DoOnFetchCount
+  | FetchResponse
+  | DoOnFetch
+  | OnAddedFn
+  | SyncBatch
+  | [string, SyncBatch]
+  | unknown
+> {
   const {
     collectionPath,
     docId,
@@ -60,7 +75,7 @@ export async function handleAction(args: {
     stopExecutionAfterAction()
     return
   }
-  let result: void | string | FetchResponse | OnAddedFn | SyncBatch | [string, SyncBatch]
+  let result: void | string | FetchCountResponse | DoOnFetchCount | FetchResponse | DoOnFetch | OnAddedFn | SyncBatch | [string, SyncBatch] // prettier-ignore
   try {
     // triggering the action provided by the plugin
     result = await pluginAction({

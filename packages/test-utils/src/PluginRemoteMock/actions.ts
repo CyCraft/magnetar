@@ -23,7 +23,11 @@ import {
 import { filterDataPerClauses } from '@magnetarjs/utils'
 import { StorePluginModuleConfig, RemoteStoreOptions } from './index'
 import { throwIfEmulatedError, waitMs, pokedexMap, generateRandomId } from '../helpers'
-import { isFullArray, isPromise } from 'is-what'
+import { isFullArray, isFullString, isNumber, isPromise } from 'is-what'
+import { PluginFetchCountActionPayload } from '@magnetarjs/types'
+import { DoOnFetchCount } from '@magnetarjs/types'
+import { FetchCountResponse } from '@magnetarjs/types'
+import { PluginFetchCountAction } from '@magnetarjs/types'
 
 export function writeActionFactory(
   storePluginOptions: RemoteStoreOptions,
@@ -139,10 +143,42 @@ export function fetchActionFactory(storePluginOptions: RemoteStoreOptions): Plug
         const dataRetrieved = mockDataRetrieval(collectionPath, docId, pluginModuleConfig)
         // we must trigger `mustExecuteOnGet.added` for each document that was retrieved and return whatever that returns
         const results = dataRetrieved.map((_data: Record<string, any>) => {
-          const _metaData = { data: _data, exists: true, id: _data.id || docId }
+          const _metaData = {
+            data: _data,
+            exists: true,
+            id: isFullString(_data.id)
+              ? _data.id
+              : isNumber(_data.id)
+              ? `${_data.id}`
+              : docId || '',
+          }
           return _metaData
         })
         resolve({ docs: results })
+      }, 1)
+    })
+  }
+}
+
+export function fetchCountActionFactory(
+  storePluginOptions: RemoteStoreOptions
+): PluginFetchCountAction {
+  return async function ({
+    collectionPath,
+    pluginModuleConfig,
+  }: PluginFetchCountActionPayload<StorePluginModuleConfig>): Promise<
+    DoOnFetchCount | FetchCountResponse
+  > {
+    // this is custom logic to be implemented by the plugin author
+
+    // this mocks an error during execution
+    // throwIfEmulatedError(payload, storePluginOptions)
+    // fetch from cache/or from a remote store with logic you implement here
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        // this mocks an error during execution
+        const dataRetrieved = mockDataRetrieval(collectionPath, undefined, pluginModuleConfig)
+        resolve({ count: dataRetrieved.length })
       }, 1)
     })
   }

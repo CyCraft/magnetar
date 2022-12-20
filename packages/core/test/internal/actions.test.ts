@@ -2,7 +2,7 @@ import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex, PokedexEntry } from '@magnetarjs/test-utils'
 import { merge } from 'merge-anything'
-import { DocInstance } from '../../src'
+import { DocInstance } from '@magnetarjs/types'
 
 test('write: insert (document)', async (t) => {
   const { pokedexModule, magnetar } = createMagnetarInstance()

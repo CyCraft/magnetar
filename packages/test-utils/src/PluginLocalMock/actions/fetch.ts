@@ -79,7 +79,8 @@ export function fetchActionFactory(
         payload: _payload,
         actionConfig,
         collectionPath,
-        docId: docId || (isFullString(meta.id) || isNumber(meta.id) ? `${meta.id}` : undefined),
+        docId:
+          docId || (isFullString(meta.id) ? meta.id : isNumber(meta.id) ? `${meta.id}` : undefined),
         pluginModuleConfig,
       })
 

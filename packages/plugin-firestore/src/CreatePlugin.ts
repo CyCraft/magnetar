@@ -11,6 +11,7 @@ import { deleteActionFactory } from './actions/delete'
 import { fetchActionFactory } from './actions/fetch'
 import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
+import { fetchCountActionFactory } from './actions/fetchCount'
 
 export type FirestorePluginOptions = PluginOptions<Firestore>
 export type { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'
@@ -72,6 +73,7 @@ export const CreatePlugin: MagnetarPlugin<FirestorePluginOptions> = (
 
   // the plugin must try to implement logic for every `ActionName`
   const fetch = fetchActionFactory(pluginOptions)
+  const fetchCount = fetchCountActionFactory(pluginOptions)
   const stream = streamActionFactory(pluginOptions)
   const insert = insertActionFactory(batchSyncMap, pluginOptions)
   const _merge = writeActionFactory(batchSyncMap, pluginOptions, 'merge')
@@ -82,6 +84,7 @@ export const CreatePlugin: MagnetarPlugin<FirestorePluginOptions> = (
 
   const actions = {
     fetch,
+    fetchCount,
     stream,
     insert,
     merge: _merge,

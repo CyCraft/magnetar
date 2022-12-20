@@ -13,6 +13,7 @@ import {
   fetchActionFactory,
   streamActionFactory,
   revertActionFactory,
+  fetchCountActionFactory,
 } from './actions'
 
 // there are two interfaces to be defined & exported by each plugin: `StoreOptions` and `StoreModuleConfig`
@@ -37,6 +38,7 @@ export const CreatePlugin: MagnetarPlugin<RemoteStoreOptions> = (
 ): PluginInstance => {
   // the plugin must try to implement logic for every `ActionName`
   const fetch = fetchActionFactory(storePluginOptions)
+  const fetchCount = fetchCountActionFactory(storePluginOptions)
   const stream = streamActionFactory(storePluginOptions)
   const insert = insertActionFactory(storePluginOptions)
   const _merge = writeActionFactory(storePluginOptions, 'merge')
@@ -51,6 +53,7 @@ export const CreatePlugin: MagnetarPlugin<RemoteStoreOptions> = (
     revert,
     actions: {
       fetch,
+      fetchCount,
       stream,
       insert,
       merge: _merge,

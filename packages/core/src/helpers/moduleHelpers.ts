@@ -2,50 +2,6 @@ import { isFunction, isPlainObject } from 'is-what'
 import { GlobalConfig, ModuleConfig, PluginModuleConfig } from '@magnetarjs/types'
 import { throwIfNolocalStoreName } from './throwFns'
 
-export const MODULE_IDENTIFIER_SPLIT = ' /// '
-
-/**
- * Saved as enum, just to enforce usage of `getPathFilterIdentifier()`
- */
-export enum PathFilterIdentifier {
-  'KEY' = 'modulePath + JSON.stringify({ where, orderBy, startAfter, limit })',
-}
-
-/**
- * Creates the `key` for the Maps used to cache certain values throughout the lifecycle of an instance.
- * @returns `modulePath + ' /// ' + JSON.stringify({ where, orderBy, startAfter, limit })`
- */
-export function getPathFilterIdentifier(
-  modulePath: string,
-  moduleConfig: ModuleConfig
-): PathFilterIdentifier {
-  const { where, orderBy, startAfter, limit } = moduleConfig
-  const config = JSON.stringify({ where, orderBy, startAfter, limit })
-
-  return `${modulePath}${MODULE_IDENTIFIER_SPLIT}${config}` as unknown as PathFilterIdentifier.KEY
-}
-
-/**
- * Saved as enum, just to enforce usage of `getPathWhereOrderByIdentifier()`
- */
-export enum PathWhereOrderByIdentifier {
-  'KEY' = 'modulePath + JSON.stringify({ where, orderBy })',
-}
-
-/**
- * Creates the `key` for the Maps used to cache the FetchMetaData throughout the lifecycle of an instance.
- * @returns `modulePath + ' /// ' + JSON.stringify({ where, orderBy })`
- */
-export function getPathWhereOrderByIdentifier(
-  modulePath: string,
-  moduleConfig: ModuleConfig
-): PathWhereOrderByIdentifier {
-  const { where, orderBy } = moduleConfig
-  const config = JSON.stringify({ where, orderBy })
-
-  return `${modulePath}${MODULE_IDENTIFIER_SPLIT}${config}` as unknown as PathWhereOrderByIdentifier.KEY
-}
-
 /**
  * Extracts the PluginModuleConfig from the ModuleConfig
  *
@@ -105,6 +61,23 @@ export function getDataFromDataStore(
   const pluginModuleConfig = getPluginModuleConfig(moduleConfig, localStoreName)
 
   return getModuleData({ collectionPath, docId, pluginModuleConfig })
+}
+
+/** Executes the `getModuleCount` function from the store specified as 'localStoreName' */
+export function getCountFromDataStore(
+  moduleConfig: ModuleConfig,
+  globalConfig: GlobalConfig,
+  collectionPath: string
+): number {
+  const localStoreName = globalConfig.localStoreName
+  throwIfNolocalStoreName(localStoreName)
+  const getModuleCount = globalConfig.stores[localStoreName].getModuleCount
+  if (!getModuleCount) {
+    throw new Error('The data store did not provide a getModuleCount function!')
+  }
+  const pluginModuleConfig = getPluginModuleConfig(moduleConfig, localStoreName)
+
+  return getModuleCount({ collectionPath, pluginModuleConfig })
 }
 
 /**

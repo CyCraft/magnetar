@@ -6,6 +6,8 @@ import {
   DoOnFetch,
   PluginModuleConfig,
   SyncBatch,
+  FetchCountResponse,
+  DoOnFetchCount,
 } from './plugins'
 import { MergeDeep } from './utils/MergeDeep'
 
@@ -60,6 +62,8 @@ type EventPayloadPropResult = {
   result:
     | void
     | string
+    | FetchCountResponse
+    | DoOnFetchCount
     | FetchResponse
     | DoOnFetch
     | StreamResponse

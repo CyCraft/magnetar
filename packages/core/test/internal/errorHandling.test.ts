@@ -1,11 +1,14 @@
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex, pokedexEntryDefaults } from '@magnetarjs/test-utils'
-import { FetchResponse } from '../../src'
+import { FetchResponse } from '@magnetarjs/types'
 
 test('write + onError: stop -- emits fail events & aborts execution by default', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
-  const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'local' })
+  const insertPayload = {
+    ...pokedexEntryDefaults({ name: 'this should fail' }),
+    shouldFail: 'local',
+  }
   try {
     await pokedexModule.doc('testid').insert(insertPayload, {
       onError: 'stop',
@@ -28,7 +31,10 @@ test('write + onError: stop -- emits fail events & aborts execution by default',
 
 test('write + onError: stop -- fail in second store plugin does not prevent execution first store plugin', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
-  const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'remote' })
+  const insertPayload = {
+    ...pokedexEntryDefaults({ name: 'this should fail' }),
+    shouldFail: 'remote',
+  }
   try {
     await pokedexModule.doc('testid').insert(insertPayload, {
       onError: 'stop',
@@ -49,7 +55,10 @@ test('write + onError: stop -- fail in second store plugin does not prevent exec
 
 test('write + onError: continue', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
-  const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'local' })
+  const insertPayload = {
+    ...pokedexEntryDefaults({ name: 'this should fail' }),
+    shouldFail: 'local',
+  }
   try {
     await pokedexModule.doc('testid').insert(insertPayload, {
       onError: 'continue',
@@ -75,7 +84,10 @@ test('write + onError: continue', async (t) => {
 
 test('write + onError: revert', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
-  const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'remote' })
+  const insertPayload = {
+    ...pokedexEntryDefaults({ name: 'this should fail' }),
+    shouldFail: 'remote',
+  }
   try {
     await pokedexModule.doc('testid').insert(insertPayload, {
       onError: 'revert',
@@ -104,7 +116,10 @@ test('write + onError: revert', async (t) => {
 
 test('write + onError: revert - will not go to next store', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
-  const insertPayload = pokedexEntryDefaults({ name: 'this should fail', shouldFail: 'local' })
+  const insertPayload = {
+    ...pokedexEntryDefaults({ name: 'this should fail' }),
+    shouldFail: 'local',
+  }
   try {
     await pokedexModule.doc('testid').insert(insertPayload, {
       onError: 'revert',
@@ -178,7 +193,7 @@ test('fetch + onError: stop -- fail in second store plugin does not prevent exec
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
 })
 
-test('fetch + onError: continue', async (t) => {
+test('only:fetch + onError: continue', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   const fetchPayload = { shouldFail: 'local', force: true }
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
@@ -202,7 +217,7 @@ test('fetch + onError: continue', async (t) => {
       },
     })
     t.deepEqual(result.get('1'), pokedex(1))
-    t.deepEqual(result.get('136'), undefined)
+    t.deepEqual(result.get('136'), pokedex(136)) // the remote store result is returned no matter what
   } catch (error) {
     t.fail(JSON.stringify(error))
   }

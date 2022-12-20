@@ -27,6 +27,7 @@ export type MagnetarPlugin<PluginOptions> = (pluginOptions: PluginOptions) => Pl
  */
 export interface PluginInstance {
   actions: {
+    fetchCount?: PluginFetchCountAction
     fetch?: PluginFetchAction
     stream?: PluginStreamAction
     insert?: PluginInsertAction
@@ -45,11 +46,15 @@ export interface PluginInstance {
    */
   setupModule?: (pluginModuleSetupPayload: PluginModuleSetupPayload) => void
   /**
-   * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
+   * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's `.data` is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
    */
   getModuleData?: (
     pluginModuleSetupPayload: PluginModuleSetupPayload
   ) => Record<string, any> | Map<string, Record<string, any>>
+  /**
+   * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's `.count` is accessed. The `modulePath` will always be that of a "collection". It must return the fetched doc count, or fall back to `.data.size` in case it hasn't fetched the doc count yet.
+   */
+  getModuleCount?: (pluginModuleSetupPayload: Omit<PluginModuleSetupPayload, 'docId'>) => number
   /**
    * This is an optional function that some "remote" Store Plugins can provide to sync any pending writes that might have stacked because of a `syncDebounceMs`.
    */
@@ -141,6 +146,18 @@ export type PluginFetchActionPayload<SpecificPluginModuleConfig = PluginModuleCo
 export type PluginFetchAction = (
   payload: PluginFetchActionPayload
 ) => FetchResponse | DoOnFetch | Promise<FetchResponse | DoOnFetch>
+
+export type PluginFetchCountActionPayload<T = PluginModuleConfig> = Omit<
+  PluginActionPayloadBase<T>,
+  'docId'
+>
+
+/**
+ * Should handle 'fetchCount' for collections. Should return `FetchCountResponse` when acting as a "remote" Store Plugin, and `DoOnFetchCount` when acting as "local" Store Plugin.
+ */
+export type PluginFetchCountAction = (
+  payload: PluginFetchCountActionPayload
+) => FetchCountResponse | DoOnFetchCount | Promise<FetchCountResponse | DoOnFetchCount>
 
 export type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = MergeDeep<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
@@ -330,3 +347,12 @@ export type FetchResponse = {
  * Plugin's response to a 'fetch' action, when acting as a "local" Store Plugin.
  */
 export type DoOnFetch = OnAddedFn
+
+/**
+ * The remote store should document count after retrieving it from the server
+ */
+export type FetchCountResponse = { count: number }
+/**
+ * The local store should provide a function that will store the fetchCount when it comes in from the remote store.
+ */
+export type DoOnFetchCount = (payload: FetchCountResponse) => void

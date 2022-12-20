@@ -1,6 +1,6 @@
 import { copy } from 'copy-anything'
 import { pick } from 'filter-anything'
-import { isArray, isPlainObject } from 'is-what'
+import { isArray, isNumber, isPlainObject } from 'is-what'
 import { mapGetOrSet } from 'getorset-anything'
 import { reactive } from 'vue'
 import {
@@ -8,6 +8,8 @@ import {
   MagnetarPlugin,
   Clauses,
   PluginModuleSetupPayload,
+  getPathWhereIdentifier,
+  PathWhereIdentifier,
 } from '@magnetarjs/types'
 import { filterDataPerClauses } from '@magnetarjs/utils'
 import { writeActionFactory } from './actions/mergeAssignReplace'
@@ -17,6 +19,7 @@ import { deleteActionFactory } from './actions/delete'
 import { fetchActionFactory } from './actions/fetch'
 import { streamActionFactory } from './actions/stream'
 import { revertActionFactory } from './actions/revert'
+import { fetchCountActionFactory } from './actions/fetchCount'
 
 // there are two interfaces to be defined & exported by each plugin: `StoreOptions` and `StoreModuleConfig`
 // for this plugin we use:
@@ -49,6 +52,7 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
   // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
   const data: { [collectionPath: string]: Map<string, Record<string, unknown>> } = {}
+  const pathCountDic = reactive<{ [collectionPath in PathWhereIdentifier]?: number }>({})
 
   const dataBackups: { [collectionPath: string]: Map<string, Record<string, unknown>[]> } = {}
   const makeBackup: MakeRestoreBackup = (collectionPath, docId) => {
@@ -129,8 +133,28 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
     return filterDataPerClauses(dataCollectionMap, clauses)
   }
 
+  /**
+   * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's count is accessed.
+   */
+  const getModuleCount = ({
+    collectionPath,
+    pluginModuleConfig = {},
+  }: Omit<PluginModuleSetupPayload<Vue3StoreModuleConfig>, 'docId'>): number => {
+    const pathId = getPathWhereIdentifier(collectionPath, pluginModuleConfig)
+    const count = pathCountDic[pathId]
+    if (isNumber(count)) return count
+
+    // if we didn't have any cached count yet, we must return the size of the collectionDB but with applied query clauses
+    const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit', 'startAfter'])
+
+    const collectionDB = data[collectionPath]
+    const dataFiltered = filterDataPerClauses(collectionDB, clauses)
+    return dataFiltered.size
+  }
+
   // the plugin must try to implement logic for every `ActionName`
   const fetch = fetchActionFactory(data, vue3StoreOptions)
+  const fetchCount = fetchCountActionFactory(pathCountDic, vue3StoreOptions)
   const stream = streamActionFactory(data, vue3StoreOptions)
   const insert = insertActionFactory(data, vue3StoreOptions, makeBackup)
   const _merge = writeActionFactory(data, vue3StoreOptions, 'merge', makeBackup)
@@ -146,6 +170,7 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
     revert,
     actions: {
       fetch,
+      fetchCount,
       stream,
       insert,
       merge: _merge,
@@ -156,6 +181,7 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
     },
     setupModule,
     getModuleData,
+    getModuleCount,
   }
   return instance
 }

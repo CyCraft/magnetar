@@ -25,10 +25,11 @@ export function insertActionFactory(
     let _docId = docId
     if (!_docId) {
       // we don't have a _docId, so we need to retrieve it from the payload or generate one
-      _docId =
-        isFullString(payload.id) || isNumber(payload.id)
-          ? String(payload.id)
-          : db.collection('random').doc().id
+      _docId = isFullString(payload.id)
+        ? payload.id
+        : isNumber(payload.id)
+        ? `${payload.id}`
+        : db.collection('random').doc().id
     }
     const documentPath = getFirestoreDocPath(collectionPath, _docId as string, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
     const syncDebounceMs = isNumber(actionConfig.syncDebounceMs)

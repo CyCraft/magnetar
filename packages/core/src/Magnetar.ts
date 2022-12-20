@@ -5,13 +5,6 @@ import { defaultsGlobalConfig } from './helpers/configHelpers'
 import { createDocWithContext } from './Doc'
 import { getCollectionPathDocIdEntry } from './helpers/pathHelpers'
 import {
-  getPathFilterIdentifier,
-  PathFilterIdentifier,
-  MODULE_IDENTIFIER_SPLIT,
-  PathWhereOrderByIdentifier,
-  getPathWhereOrderByIdentifier,
-} from './helpers/moduleHelpers'
-import {
   MagnetarInstance,
   CollectionInstance,
   DocInstance,
@@ -23,6 +16,11 @@ import {
   CollectionFn,
   FetchMetaData,
   CollectionName,
+  getPathFilterIdentifier,
+  PathFilterIdentifier,
+  MODULE_IDENTIFIER_SPLIT,
+  PathWhereOrderByIdentifier,
+  getPathWhereOrderByIdentifier,
 } from '@magnetarjs/types'
 import { throwIfInvalidModulePath } from './helpers/throwFns'
 

@@ -9,7 +9,7 @@ import { PartialDeep } from './utils/PartialDeep'
  * these are all the actions that Magnetar streamlines, whichever plugin is used
  * these actions are executable from a `MagnetarModule` and handled by each plugin individually
  */
-export type ActionName = 'fetch' | 'stream' | 'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp' | 'delete' // prettier-ignore
+export type ActionName = 'fetch' | 'fetchCount' | 'stream' | 'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp' | 'delete' // prettier-ignore
 
 /**
  * You can pass options to this action specifically;
@@ -77,6 +77,18 @@ export type MagnetarFetchAction<
    */
   actionConfig?: ActionConfig<DocDataType>
 ) => Promise<calledFrom extends 'collection' ? Map<string, DocDataType> : DocDataType | undefined>
+
+/**
+ * Fetches a collection's document count and caches this count to your local store's state.
+ * @returns the document count that was fetched.
+ * @example
+ * magnetar.collection('pokedex').count // 0
+ *
+ * const count = await magnetar.collection('pokedex').fetchCount()
+ * count // 151
+ * magnetar.collection('pokedex').count // 151
+ */
+export type MagnetarFetchCountAction = () => Promise<number>
 
 /**
  * @returns The new `doc()` instance after inserting. You can access the inserted `id` by checking this returned instance.

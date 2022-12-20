@@ -1,10 +1,5 @@
-import {
-  Magnetar,
-  MagnetarInstance,
-  CollectionInstance,
-  DocInstance,
-  GlobalConfig,
-} from '../../src'
+import { Magnetar } from '../../src'
+import { MagnetarInstance, CollectionInstance, DocInstance, GlobalConfig } from '@magnetarjs/types'
 import {
   pokedex,
   generateRandomId,

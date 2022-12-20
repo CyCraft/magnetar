@@ -15,13 +15,19 @@ import {
   actionNameTypeMap,
   CollectionInstance,
   FetchMetaData,
+  MagnetarFetchCountAction,
 } from '@magnetarjs/types'
 import {
   handleActionPerStore,
   HandleActionSharedParams,
 } from './moduleActions/handleActionPerStore'
 import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
-import { executeSetupModulePerStore, getDataFromDataStore, proxify } from './helpers/moduleHelpers'
+import {
+  executeSetupModulePerStore,
+  getDataFromDataStore,
+  getCountFromDataStore,
+  proxify,
+} from './helpers/moduleHelpers'
 
 export function createCollectionWithContext(
   collectionPath: string,
@@ -62,9 +68,10 @@ export function createCollectionWithContext(
   const insert = handleActionPerStore(sharedParams, 'insert', actionNameTypeMap.insert) as MagnetarInsertAction //prettier-ignore
   const _delete = handleActionPerStore(sharedParams, 'delete', actionNameTypeMap.delete) as MagnetarDeleteAction //prettier-ignore
   const fetch = handleActionPerStore(sharedParams, 'fetch', actionNameTypeMap.fetch) as MagnetarFetchAction<Record<string, unknown>, 'collection'> //prettier-ignore
+  const fetchCount = handleActionPerStore(sharedParams, 'fetchCount', actionNameTypeMap.fetchCount) as MagnetarFetchCountAction // prettier-ignore
   const stream = handleStreamPerStore([collectionPath, undefined], moduleConfig, globalConfig, actionNameTypeMap.stream, streaming, cacheStream, writeLockMap) // prettier-ignore
 
-  const actions = { stream, fetch, insert, delete: _delete }
+  const actions = { stream, fetch, fetchCount, insert, delete: _delete }
 
   // Every store will have its 'setupModule' function executed
   executeSetupModulePerStore(globalConfig.stores, [collectionPath, undefined], moduleConfig)
@@ -97,7 +104,7 @@ export function createCollectionWithContext(
 
   const queryFns = { where, orderBy, limit, startAfter }
 
-  const moduleInstance: Omit<CollectionInstance, 'data' | 'fetched'> = {
+  const moduleInstance: Omit<CollectionInstance, 'data' | 'fetched' | 'count'> = {
     doc,
     id,
     path,
@@ -109,6 +116,7 @@ export function createCollectionWithContext(
   }
 
   return proxify(moduleInstance, {
+    count: () => getCountFromDataStore(moduleConfig, globalConfig, collectionPath),
     data: () => getDataFromDataStore(moduleConfig, globalConfig, collectionPath),
     fetched: fetchMeta.get,
   })

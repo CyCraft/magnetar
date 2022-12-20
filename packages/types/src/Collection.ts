@@ -4,6 +4,7 @@ import {
   MagnetarInsertAction,
   MagnetarDeleteAction,
   FetchMetaData,
+  MagnetarFetchCountAction,
 } from './types/actions'
 import { DocFn } from './Magnetar'
 import { WhereFilterOp } from './types/clauses'
@@ -17,6 +18,10 @@ export type CollectionInstance<
    * The cached data that was written or read so far
    */
   data: Map<string, DocDataType>
+  /**
+   * Represents `data.size` of your collection, however, calling `fetchCount()` will update just this `count`, from where on it will no longer be linked to `data.size`.
+   */
+  count: number
   /**
    * `doc` is available on every collection for chaining
    * @see {@link DocFn}
@@ -56,6 +61,10 @@ export type CollectionInstance<
   closeAllStreams: () => void
 
   // actions
+  /**
+   * @see {@link MagnetarFetchCountAction}
+   */
+  fetchCount: MagnetarFetchCountAction
   /**
    * @see {@link MagnetarFetchAction}
    */

@@ -17,8 +17,10 @@ export function insertActionFactory(
 
     const _docId =
       docId ||
-      (isFullString(payload.id) || isNumber(payload.id)
-        ? String(payload.id)
+      (isFullString(payload.id)
+        ? payload.id
+        : isNumber(payload.id)
+        ? `${payload.id}`
         : simpleStoreOptions.generateRandomId())
 
     if (makeBackup) makeBackup(collectionPath, _docId)

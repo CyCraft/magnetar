@@ -17,8 +17,10 @@ export function insertActionFactory(
 
     const _docId =
       docId ||
-      (isFullString(payload.id) || isNumber(payload.id)
-        ? String(payload.id)
+      (isFullString(payload.id)
+        ? payload.id
+        : isNumber(payload.id)
+        ? `${payload.id}`
         : Vue3StoreOptions.generateRandomId())
 
     if (makeBackup) makeBackup(collectionPath, _docId)
