@@ -8,6 +8,7 @@
     "dev:nuxt-firestore": "pnpm --filter dev-nuxt-firestore dev",
     "dev:vue2-firestore": "pnpm --filter dev-vue2-firestore dev",
     "dev:vue3-firestore": "pnpm --filter dev-vue3-firestore dev",
+    "dep:del-all": "npm exec --workspaces -- npx rimraf node_modules && npx rimraf node_modules",
     "dep:update-minor": "ncu --target minor -u && pnpm --parallel exec ncu --target minor -u && echo \"review git changes and install with ni\"",
     "dep:update-major": "ncu -u && pnpm --parallel exec ncu -u && echo \"review git changes and install with ni\"",
     "docs:dev": "vitepress dev docs",
