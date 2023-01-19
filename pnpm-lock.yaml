@@ -65,7 +65,16 @@ importers:
 
   packages/dev-nuxt-firestore:
     specifiers:
+      '@magnetarjs/core': workspace:*
+      '@magnetarjs/plugin-firestore': workspace:*
+      '@magnetarjs/plugin-vue3': workspace:*
+      firebase: ^9.14.0
       nuxt: ^3.0.0
+    dependencies:
+      '@magnetarjs/core': link:../core
+      '@magnetarjs/plugin-firestore': link:../plugin-firestore
+      '@magnetarjs/plugin-vue3': link:../plugin-vue3
+      firebase: 9.14.0
     devDependencies:
       nuxt: 3.0.0
 

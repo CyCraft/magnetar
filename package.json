@@ -76,6 +76,7 @@
     "ignorePatterns": [
       "node_modules",
       "dist",
+      "/packages/dev-nuxt-firestore",
       "/packages/dev-firestore",
       "/packages/dev-vue2",
       "/packages/dev-vue2-firestore",
