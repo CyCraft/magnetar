@@ -5,6 +5,7 @@
     "packages/*"
   ],
   "scripts": {
+    "dev:nuxt-firestore": "pnpm --filter dev-nuxt-firestore dev",
     "dev:vue2-firestore": "pnpm --filter dev-vue2-firestore dev",
     "dev:vue3-firestore": "pnpm --filter dev-vue3-firestore dev",
     "dep:update-minor": "ncu --target minor -u && pnpm --parallel exec ncu --target minor -u && echo \"review git changes and install with ni\"",
