@@ -29,7 +29,7 @@ const showAll = ref(true)
 const alphabetically = ref(false)
 
 /** The items shown based on the filter */
-const items = computed(() => {
+const items = computed<Item[]>(() => {
   const _showAll = showAll.value
   const _alphabetically = alphabetically.value
 
