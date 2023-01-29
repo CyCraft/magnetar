@@ -27,6 +27,16 @@ export default defineNuxtPlugin((nuxtApp) => {
     },
   })
 
+  /**
+   * TODO: hydration for SSR
+   */
+  if (process.server) {
+    // collect the initial state
+    nuxtApp.payload.magnetar = {}
+  } else if (nuxtApp.payload?.magnetar) {
+    // ... hydrate the state
+  }
+
   return {
     provide: {
       magnetar,
