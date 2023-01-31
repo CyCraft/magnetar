@@ -286,12 +286,12 @@ importers:
   packages/utils:
     specifiers:
       '@magnetarjs/types': workspace:*
-      fast-sort: ^3.2.0
+      fast-sort: ^3.2.1
       is-what: ^4.1.7
       path-to-prop: ^2.0.2
     dependencies:
       '@magnetarjs/types': link:../types
-      fast-sort: 3.2.0
+      fast-sort: 3.2.1
       is-what: 4.1.7
       path-to-prop: 2.0.2
 
@@ -5131,8 +5131,8 @@ packages:
     resolution: {integrity: sha512-Ue0LwpDYErFbmNnZSF0UH6eImUwDmogUO1jyE+JbN2gsQz/jICm1Ve7t9QT0rNSsfJt+Hs4/S3GnsDVjL4HVrw==}
     dev: true
 
-  /fast-sort/3.2.0:
-    resolution: {integrity: sha512-EgQtkmWo2Icq6uei57fTrZAKayL9b4OISU1613737AuLcIbAZ57tcOtGaK2A7zO54kk97wOnSw6INDA++rjMAQ==}
+  /fast-sort/3.2.1:
+    resolution: {integrity: sha512-ECGwVH57yCv3C8v+4BQkQf65bNR4nFetxfGRRLYmzFEAK3oZBr7zCakBjOY/AptmmoU3ffMPJLLN1rdKdMHoUA==}
     dev: false
 
   /fast-text-encoding/1.0.6:

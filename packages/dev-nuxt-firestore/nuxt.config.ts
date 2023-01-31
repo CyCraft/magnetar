@@ -15,4 +15,13 @@ export default defineNuxtConfig({
       projectId: 'tests-firestore',
     },
   },
+  /**
+   * NOTE:
+   *  'fast-sort' is provided by CommonJS module as default.
+   *  Nuxt 3 need to require ES Modules.
+   *  https://nuxt.com/docs/guide/concepts/esm#troubleshooting-esm-issues
+   */
+  build: {
+    transpile: ['fast-sort'],
+  },
 })
