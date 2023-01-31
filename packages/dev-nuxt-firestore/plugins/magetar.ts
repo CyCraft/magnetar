@@ -40,6 +40,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   return {
     provide: {
       magnetar,
+      generateRandomId,
     },
   }
 })
