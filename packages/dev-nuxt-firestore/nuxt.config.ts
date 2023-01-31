@@ -15,6 +15,7 @@ export default defineNuxtConfig({
       projectId: 'tests-firestore',
     },
   },
+  css: ['~/assets/style.css'],
   /**
    * NOTE:
    *  'fast-sort' is provided by CommonJS module as default.
