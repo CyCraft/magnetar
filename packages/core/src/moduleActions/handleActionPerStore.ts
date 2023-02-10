@@ -84,7 +84,7 @@ export function handleActionPerStore(
       return { promise: null, resolve: () => {}, countdown: null }
     })
 
-    if (actionName !== 'fetch') {
+    if (actionName !== 'fetch' && actionName !== 'fetchCount') {
       // we need to create a promise we'll resolve later to prevent any incoming docs from being written to the local state during this time
       if (writeLock.promise === null) {
         writeLock.promise = new Promise<void>((resolve) => {

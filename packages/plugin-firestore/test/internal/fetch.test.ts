@@ -38,6 +38,24 @@ import { pokedex, waitMs } from '@magnetarjs/test-utils'
   })
 }
 {
+  const testName = 'fetchCount() then right after do fetch()'
+  test(testName, async (t) => {
+    /// 'fetchCount' resolves once all stores have given a response with data
+    const { pokedexModule } = await createMagnetarInstance('read')
+    t.deepEqual(pokedexModule.data.size, 0)
+    t.deepEqual(pokedexModule.count, 0)
+
+    try {
+      await pokedexModule.fetchCount()
+      await pokedexModule.fetch({ force: true })
+    } catch (error) {
+      t.fail(JSON.stringify(error))
+    }
+    t.deepEqual(pokedexModule.data.size, 151)
+    t.deepEqual(pokedexModule.count, 151)
+  })
+}
+{
   const testName = 'fetch (doc) edit right before opening'
   test(testName, async (t) => {
     const { trainerModule } = await createMagnetarInstance(testName, {
