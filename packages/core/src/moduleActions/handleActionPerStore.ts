@@ -182,7 +182,7 @@ export function handleActionPerStore(
         /**
          * the result of fetchCount
          */
-        let fetchCount: number = NaN
+        let fetchCount = NaN
 
         /**
          * All possible results from the plugins.
