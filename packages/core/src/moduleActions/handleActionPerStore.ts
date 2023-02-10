@@ -87,7 +87,7 @@ export function handleActionPerStore(
     if (actionName !== 'fetch') {
       // we need to create a promise we'll resolve later to prevent any incoming docs from being written to the local state during this time
       if (writeLock.promise === null) {
-        writeLock.promise = new Promise((resolve) => {
+        writeLock.promise = new Promise<void>((resolve) => {
           writeLock.resolve = () => {
             resolve()
             writeLock.resolve = () => {}
