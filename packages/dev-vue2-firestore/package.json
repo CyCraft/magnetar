@@ -1,6 +1,6 @@
 {
   "name": "dev-vue2-firestore",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",
