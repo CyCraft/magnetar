@@ -18,7 +18,12 @@ import {
   HandleActionSharedParams,
 } from './moduleActions/handleActionPerStore'
 import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
-import { executeSetupModulePerStore, getDataFromDataStore, proxify } from './helpers/moduleHelpers'
+import {
+  executeSetupModulePerStore,
+  getDataFromDataStore,
+  getExistsFromDataStore,
+  proxify,
+} from './helpers/moduleHelpers'
 
 export function createDocWithContext(
   [collectionPath, docId]: [string, string],
@@ -76,5 +81,6 @@ export function createDocWithContext(
 
   return proxify(moduleInstance, {
     data: () => getDataFromDataStore(moduleConfig, globalConfig, collectionPath, docId),
+    exists: () => getExistsFromDataStore(globalConfig, collectionPath, docId),
   })
 }

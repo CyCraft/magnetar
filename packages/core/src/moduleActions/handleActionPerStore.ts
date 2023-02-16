@@ -23,7 +23,7 @@ import {
   CollectionFn,
   DocFn,
   WriteLock,
-  FetchMetaData,
+  FetchMetaDataCollection,
   MagnetarFetchCountAction,
   DoOnFetchCount,
 } from '@magnetarjs/types'
@@ -49,7 +49,7 @@ export type HandleActionSharedParams = {
   writeLockMap: Map<string, WriteLock>
   docFn: DocFn // actions executed on a "doc" will always return `doc()`
   collectionFn?: CollectionFn // actions executed on a "collection" will return `collection()` or `doc()`
-  setLastFetched?: (payload: FetchMetaData) => void
+  setLastFetched?: (payload: FetchMetaDataCollection) => void
 }
 
 export function handleActionPerStore<TActionName extends Exclude<ActionName, 'stream'>>(
@@ -168,11 +168,15 @@ export function handleActionPerStore(
         }
 
         /**
-         * each each time a store returns a `FetchResponse` then all `doOnFetchFns` need to be executed
+         * each each time a store returns a `FetchResponse` then it must first go through all on added fns to potentially modify the retuned payload before writing locally
          */
-        const doOnFetchFns: DoOnFetch[] = modifyReadResponseMap.added
+        const doOnAddedFns: OnAddedFn[] = modifyReadResponseMap.added
         /**
          * each each time a store returns a `FetchResponse` then all `doOnFetchFns` need to be executed
+         */
+        const doOnFetchFns: DoOnFetch[] = []
+        /**
+         * each each time a store returns a `FetchCountResponse` then all `doOnFetchCount` need to be executed
          */
         const doOnFetchCountFns: DoOnFetchCount[] = []
         /**
@@ -242,6 +246,10 @@ export function handleActionPerStore(
                 await fn({ payload, result: resultFromPlugin, actionName, storeName, collectionPath, docId, path: modulePath, pluginModuleConfig }) // prettier-ignore
               }
             }
+            // we must update the `exists` prop for fetch calls
+            if (actionName === 'fetch' && docId) {
+              doOnFetchFns.forEach((fn) => fn(undefined, 'error'))
+            }
             // now we must throw the error
             throw resultFromPlugin
           }
@@ -281,8 +289,13 @@ export function handleActionPerStore(
               const { docs, reachedEnd, cursor } = resultFromPlugin
               if (isBoolean(reachedEnd)) setLastFetched?.({ reachedEnd, cursor })
               for (const docMetaData of docs) {
-                const docResult = executeOnFns(doOnFetchFns, docMetaData.data, [docMetaData])
-                // after doing all `doOnFetchFns` (adding it to the local store, modifying the read result)
+                const docResult = executeOnFns(
+                  [...doOnAddedFns, ...doOnFetchFns],
+                  docMetaData.data,
+                  [docMetaData]
+                )
+                // after doing all `doOnAddedFns` (modifying the read result)
+                // and all `doOnFetchFns` (adding it to the local store)
                 // we still have a record, so must return it when resolving the fetch action
                 if (docResult) collectionFetchResult.set(docMetaData.id, docResult)
               }

@@ -14,7 +14,7 @@ import {
   OrderByClause,
   actionNameTypeMap,
   CollectionInstance,
-  FetchMetaData,
+  FetchMetaDataCollection,
   MagnetarFetchCountAction,
 } from '@magnetarjs/types'
 import {
@@ -43,7 +43,7 @@ export function createCollectionWithContext(
     closeStream: () => void
     closeAllStreams: () => void
   },
-  fetchMeta: { get: () => FetchMetaData; set: (payload: FetchMetaData) => void }
+  fetchMeta: { get: () => FetchMetaDataCollection; set: (payload: FetchMetaDataCollection) => void }
 ): CollectionInstance {
   const { writeLockMap, fetchPromises, cacheStream, streaming, closeStream, closeAllStreams } = streamAndFetchPromises // prettier-ignore
 

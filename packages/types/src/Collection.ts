@@ -3,7 +3,7 @@ import {
   MagnetarStreamAction,
   MagnetarInsertAction,
   MagnetarDeleteAction,
-  FetchMetaData,
+  FetchMetaDataCollection,
   MagnetarFetchCountAction,
 } from './types/actions'
 import { DocFn } from './Magnetar'
@@ -110,5 +110,5 @@ export type CollectionInstance<
   /**
    * Meta data from the last fetch call
    */
-  fetched: FetchMetaData
+  fetched: FetchMetaDataCollection
 }

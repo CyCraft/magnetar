@@ -32,6 +32,19 @@ export type DocInstance<
    */
   path: string
   /**
+   * Meta data on the doc's existence
+   * ```js
+   * await magnetar.db('users/abc123').fetch() // this will update the `exists` metadata
+   * console.log(`magnetar.db('users/abc123').exists → `, magnetar.db('users/abc123').exists)
+   * ```
+   * This way you can easily display in your UI if a document exists or not without having to manage that state yourself
+   * - `undefined` at first
+   * - `'error'` when fetched but the API call returned an error
+   * - `false` when fetched once and the document does not exist
+   * - `true` when successfully fetched
+   */
+  exists: undefined | 'error' | boolean
+  /**
    * Returns the open stream promise of this doc.
    *
    * Returns `null` when there is no open stream.

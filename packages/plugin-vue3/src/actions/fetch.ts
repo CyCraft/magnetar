@@ -12,6 +12,7 @@ import { insertActionFactory } from './insert'
 
 export function fetchActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
+  exists: { [docPath: string]: undefined | 'error' | boolean },
   Vue3StoreOptions: Vue3StoreOptions
 ): PluginFetchAction {
   return function ({
@@ -64,6 +65,16 @@ export function fetchActionFactory(
       }
     }
     const doOnFetchAction: DoOnFetch = (_payload, meta) => {
+      // set `exists`
+      const docPath = `${collectionPath}/${docId}`
+      if (meta === 'error') {
+        exists[docPath] = 'error'
+        return
+      }
+      if (meta?.exists !== 'unknown') {
+        exists[`${collectionPath}/${docId}`] = meta.exists
+      }
+
       // abort updating local state if the payload is undefined
       if (_payload === undefined) return
 
@@ -74,7 +85,8 @@ export function fetchActionFactory(
         payload: _payload,
         collectionPath,
         docId:
-          docId || (isFullString(meta.id) ? meta.id : isNumber(meta.id) ? `${meta.id}` : undefined),
+          docId ||
+          (isFullString(meta?.id) ? meta.id : isNumber(meta?.id) ? `${meta.id}` : undefined),
         actionConfig,
         pluginModuleConfig,
       })

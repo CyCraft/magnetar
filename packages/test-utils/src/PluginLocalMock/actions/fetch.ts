@@ -13,6 +13,7 @@ import { throwIfEmulatedError } from '../../helpers'
 
 export function fetchActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
+  exists: { [docPath: string]: undefined | 'error' | boolean },
   storePluginOptions: StorePluginOptions
 ): PluginFetchAction {
   return function ({
@@ -69,6 +70,16 @@ export function fetchActionFactory(
     }
 
     const doOnFetchAction: DoOnFetch = (_payload, meta) => {
+      // set `exists`
+      const docPath = `${collectionPath}/${docId}`
+      if (meta === 'error') {
+        exists[docPath] = 'error'
+        return
+      }
+      if (meta?.exists !== 'unknown') {
+        exists[`${collectionPath}/${docId}`] = meta.exists
+      }
+
       // abort updating local state if the payload was set to undefined
       if (_payload === undefined) return
 
@@ -77,10 +88,11 @@ export function fetchActionFactory(
         storePluginOptions
       )({
         payload: _payload,
-        actionConfig,
         collectionPath,
         docId:
-          docId || (isFullString(meta.id) ? meta.id : isNumber(meta.id) ? `${meta.id}` : undefined),
+          docId ||
+          (isFullString(meta?.id) ? meta.id : isNumber(meta?.id) ? `${meta.id}` : undefined),
+        actionConfig,
         pluginModuleConfig,
       })
 

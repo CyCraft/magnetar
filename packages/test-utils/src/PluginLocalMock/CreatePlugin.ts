@@ -45,6 +45,7 @@ export const CreatePlugin: MagnetarPlugin<StorePluginOptions> = (
   // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
   const data: { [collectionPath: string]: Map<string, Record<string, unknown>> } = {}
+  const exists: { [docPath: string]: undefined | 'error' | boolean } = {}
   const pathCountDic: { [collectionPath in PathWhereIdentifier]?: number } = {}
 
   const dataBackups: { [collectionPath: string]: Map<string, Record<string, unknown>[]> } = {}
@@ -127,6 +128,16 @@ export const CreatePlugin: MagnetarPlugin<StorePluginOptions> = (
   }
 
   /**
+   * This must be provided by Store Plugins that have "local" data. It should signify wether or not the document exists. Must return `undefined` when not sure (if the document was never fetched). It is triggered EVERY TIME the module's `.data` is accessed.
+   */
+  const getModuleExists = ({
+    collectionPath,
+    docId,
+  }: Pick<PluginModuleSetupPayload<StorePluginModuleConfig>, 'collectionPath' | 'docId'>): any => {
+    return exists[`${collectionPath}/${docId}`]
+  }
+
+  /**
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's count is accessed.
    */
   const getModuleCount = ({
@@ -146,7 +157,7 @@ export const CreatePlugin: MagnetarPlugin<StorePluginOptions> = (
   }
 
   // the plugin must try to implement logic for every `ActionName`
-  const fetch = fetchActionFactory(data, storePluginOptions)
+  const fetch = fetchActionFactory(data, exists, storePluginOptions)
   const fetchCount = fetchCountActionFactory(pathCountDic, storePluginOptions)
   const stream = streamActionFactory(data, storePluginOptions)
   const insert = insertActionFactory(data, storePluginOptions, makeBackup)
@@ -174,6 +185,7 @@ export const CreatePlugin: MagnetarPlugin<StorePluginOptions> = (
     },
     setupModule,
     getModuleData,
+    getModuleExists,
     getModuleCount,
   }
   return instance

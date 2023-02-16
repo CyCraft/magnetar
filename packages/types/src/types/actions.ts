@@ -153,9 +153,17 @@ export type MagnetarDeleteAction = (
 export type FetchPromises = Map<string, Promise<any>>
 
 /**
- * Stored by plugins to be able to more easily fetch more data with `startAfter(cursor)`
+ * Meta data on the last fetch call for a collection().
+ * - easily fetch more data with:
+ * ```js
+ * dbMyCollection.startAfter(dbMyCollection.fetched.cursor).fetch()`
+ * ```
+ * - easily know if you fetched everything when using `startAfter` fetches:
+ * ```js
+ * if (dbMyCollection.fetched.reachedEnd) alert('fetched everything already')
+ * ```
  */
-export type FetchMetaData = {
+export type FetchMetaDataCollection = {
   /** Wether or not the end was reached, in case there is no `limit` this is always true */
   reachedEnd: boolean
   /** The last fetched doc, in a format defined by the Plugin */
