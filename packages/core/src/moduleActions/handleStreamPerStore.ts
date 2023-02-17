@@ -63,10 +63,15 @@ export function handleStreamPerStore(
 
     const streamInfoPerStore: { [storeName: string]: StreamResponse } = {}
 
-    const doOnStreamFns: DoOnStreamFns = {
+    const modifyReadResponseFns: DoOnStreamFns = {
       added: modifyReadResponseMap.added,
       modified: modifyReadResponseMap.modified,
       removed: modifyReadResponseMap.removed,
+    }
+    const doOnStreamFns: DoOnStreamFns = {
+      added: [],
+      modified: [],
+      removed: [],
     }
 
     /**
@@ -95,7 +100,12 @@ export function handleStreamPerStore(
         // if `undefined` nothing further must be done
         if (!result) return
 
-        return executeOnFns(doOnStreamFns.added, result.payload, [result.meta])
+        return executeOnFns({
+          modifyReadResultFns: modifyReadResponseFns.added,
+          localStoreFns: doOnStreamFns.added,
+          payload: result.payload,
+          docMetaData: result.meta,
+        })
       },
       modified: async (_payload, _meta) => {
         // check if there's a WriteLock for the document:
@@ -111,7 +121,12 @@ export function handleStreamPerStore(
         // if `undefined` nothing further must be done
         if (!result) return
 
-        return executeOnFns(doOnStreamFns.added, result.payload, [result.meta])
+        return executeOnFns({
+          modifyReadResultFns: modifyReadResponseFns.added,
+          localStoreFns: doOnStreamFns.added,
+          payload: result.payload,
+          docMetaData: result.meta,
+        })
       },
       removed: async (_payload, _meta) => {
         // check if there's a WriteLock for the document
@@ -120,7 +135,12 @@ export function handleStreamPerStore(
         lastIncomingDocs.delete(docIdentifier)
         await writeLockPromise(writeLockMap, docIdentifier)
 
-        return executeOnFns(doOnStreamFns.removed, _payload, [_meta])
+        return executeOnFns({
+          modifyReadResultFns: modifyReadResponseFns.removed,
+          localStoreFns: doOnStreamFns.removed,
+          payload: _payload,
+          docMetaData: _meta,
+        })
       },
     }
 

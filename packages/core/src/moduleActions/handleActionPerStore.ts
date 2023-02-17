@@ -288,11 +288,12 @@ export function handleActionPerStore(
               const { docs, reachedEnd, cursor } = resultFromPlugin
               if (isBoolean(reachedEnd)) setLastFetched?.({ reachedEnd, cursor })
               for (const docMetaData of docs) {
-                const docResult = executeOnFns(
-                  [...doOnAddedFns, ...doOnFetchFns],
-                  docMetaData.data,
-                  [docMetaData]
-                )
+                const docResult = executeOnFns({
+                  modifyReadResultFns: doOnAddedFns,
+                  localStoreFns: doOnFetchFns,
+                  payload: docMetaData.data,
+                  docMetaData,
+                })
                 // after doing all `doOnAddedFns` (modifying the read result)
                 // and all `doOnFetchFns` (adding it to the local store)
                 // we still have a record, so must return it when resolving the fetch action
