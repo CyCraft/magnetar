@@ -70,7 +70,7 @@ export function createDocWithContext(
   // Every store will have its 'setupModule' function executed
   executeSetupModulePerStore(globalConfig.stores, [collectionPath, docId], moduleConfig)
 
-  const moduleInstance: Omit<DocInstance, 'data'> = {
+  const moduleInstance: Omit<DocInstance, 'data' | 'exists'> = {
     collection,
     id: docId,
     path,

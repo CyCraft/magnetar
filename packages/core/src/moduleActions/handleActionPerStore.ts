@@ -197,7 +197,6 @@ export function handleActionPerStore(
           | string
           | unknown
           | FetchResponse
-          | OnAddedFn
           | SyncBatch
           | [string, SyncBatch]
         // handle and await each action in sequence

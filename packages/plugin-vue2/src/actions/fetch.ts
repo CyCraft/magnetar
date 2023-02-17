@@ -1,4 +1,4 @@
-import { isNumber, isFullString } from 'is-what'
+import { isNumber, isFullString, isBoolean } from 'is-what'
 import {
   PluginFetchAction,
   FetchResponse,
@@ -70,7 +70,7 @@ export function fetchActionFactory(
         exists[docPath] = 'error'
         return
       }
-      if (meta?.exists !== 'unknown') {
+      if (isBoolean(meta?.exists)) {
         exists[`${collectionPath}/${docId}`] = meta.exists
       }
 
