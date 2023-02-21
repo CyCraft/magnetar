@@ -20,16 +20,18 @@ type Prev = [never, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17
 
 /**
  * All possible Object Paths, branches AND leaves — does NOT go deeper in optional props
- * @example OPaths<{ a: { b: number }, x?: { y?: number } }>
+ * @example OPathsWithoutOptional<{ a: { b: number }, x?: { y?: number } }>
  * // returns 'a' | 'a.b' | 'x'
  */
-export type OPaths<T, D extends number = 10> = [D] extends [never]
+export type OPathsWithoutOptional<T, D extends number = 10> = [D] extends [never]
   ? never
   : EqualsAnyOfUnion<T, null | undefined> extends 1
   ? ''
   : T extends Record<string, any>
   ? {
-      [K in keyof T]-?: K extends string ? `${K}` | Join<K, OPaths<T[K], Prev[D]>> : never
+      [K in keyof T]-?: K extends string
+        ? `${K}` | Join<K, OPathsWithoutOptional<T[K], Prev[D]>>
+        : never
     }[keyof T]
   : ''
 
