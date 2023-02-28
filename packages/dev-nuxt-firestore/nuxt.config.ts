@@ -25,4 +25,7 @@ export default defineNuxtConfig({
   build: {
     transpile: ['fast-sort'],
   },
+  modules: [
+    '@nuxt/devtools'
+  ]
 })
