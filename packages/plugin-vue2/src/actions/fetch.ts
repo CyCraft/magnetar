@@ -1,4 +1,4 @@
-import { isNumber, isFullString } from 'is-what'
+import { isNumber, isFullString, isBoolean } from 'is-what'
 import {
   PluginFetchAction,
   FetchResponse,
@@ -12,6 +12,7 @@ import { insertActionFactory } from './insert'
 
 export function fetchActionFactory(
   data: { [collectionPath: string]: Record<string, Record<string, unknown>> },
+  exists: { [docPath: string]: undefined | 'error' | boolean },
   vue2StoreOptions: Vue2StoreOptions
 ): PluginFetchAction {
   return function ({
@@ -63,6 +64,16 @@ export function fetchActionFactory(
       }
     }
     const doOnFetchAction: DoOnFetch = (_payload, meta) => {
+      // set `exists`
+      const docPath = `${collectionPath}/${docId}`
+      if (meta === 'error') {
+        exists[docPath] = 'error'
+        return
+      }
+      if (isBoolean(meta?.exists)) {
+        exists[`${collectionPath}/${docId}`] = meta.exists
+      }
+
       // abort updating local state if the payload is undefined
       if (_payload === undefined) return
 
@@ -72,7 +83,9 @@ export function fetchActionFactory(
       )({
         payload: _payload,
         collectionPath,
-        docId: docId || (isFullString(meta.id) || isNumber(meta.id) ? `${meta.id}` : undefined),
+        docId:
+          docId ||
+          (isFullString(meta?.id) ? meta.id : isNumber(meta?.id) ? `${meta.id}` : undefined),
         actionConfig,
         pluginModuleConfig,
       })

@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/plugin-firestore",
-  "version": "0.10.0",
+  "version": "0.11.3",
   "sideEffects": false,
   "description": "Magnetar plugin firestore",
   "main": "dist/index.js",
@@ -20,7 +20,7 @@
     "dev": "pnpm build --watch",
     "test-and-build": "npm run test && npm run build",
     "test": "firebase emulators:exec \"node -r esbuild-register ./test/helpers/scripts/execAllTests.ts\"",
-    "test--only": "firebase emulators:exec \"node -r esbuild-register ./test/helpers/scripts/execAllTestsOnly.ts\""
+    "test:only": "firebase emulators:exec \"node -r esbuild-register ./test/helpers/scripts/execAllTestsOnly.ts\""
   },
   "author": "Luca Ban - Mesqueeb",
   "funding": "https://github.com/sponsors/mesqueeb",

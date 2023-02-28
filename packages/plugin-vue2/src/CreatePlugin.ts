@@ -58,6 +58,7 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
   const data: { [collectionPath: string]: Record<string, Record<string, unknown>> } =
     vue.observable({})
+  const exists: { [docPath: string]: undefined | 'error' | boolean } = vue.observable({})
   const pathCountDic: { [collectionPath in PathWhereIdentifier]?: number } = vue.observable({})
 
   const dataBackups: { [collectionPath: string]: Map<string, Record<string, unknown>[]> } = {}
@@ -144,6 +145,16 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
   }
 
   /**
+   * This must be provided by Store Plugins that have "local" data. It should signify wether or not the document exists. Must return `undefined` when not sure (if the document was never fetched). It is triggered EVERY TIME the module's `.data` is accessed.
+   */
+  const getModuleExists = ({
+    collectionPath,
+    docId,
+  }: Pick<PluginModuleSetupPayload<Vue2StoreModuleConfig>, 'collectionPath' | 'docId'>): any => {
+    return exists[`${collectionPath}/${docId}`]
+  }
+
+  /**
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's count is accessed.
    */
   const getModuleCount = ({
@@ -163,7 +174,7 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
   }
 
   // the plugin must try to implement logic for every `ActionName`
-  const fetch = fetchActionFactory(data, vue2StoreOptions)
+  const fetch = fetchActionFactory(data, exists, vue2StoreOptions)
   const fetchCount = fetchCountActionFactory(pathCountDic, vue2StoreOptions)
   const stream = streamActionFactory(data, vue2StoreOptions)
   const insert = insertActionFactory(data, vue2StoreOptions, makeBackup)
@@ -191,6 +202,7 @@ export const CreatePlugin: MagnetarPlugin<Vue2StoreOptions> = (
     },
     setupModule,
     getModuleData,
+    getModuleExists,
     getModuleCount,
   }
   return instance

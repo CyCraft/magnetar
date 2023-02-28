@@ -63,6 +63,22 @@ export function getDataFromDataStore(
   return getModuleData({ collectionPath, docId, pluginModuleConfig })
 }
 
+/** Executes the `getModuleData` function from the store specified as 'localStoreName' */
+export function getExistsFromDataStore(
+  globalConfig: GlobalConfig,
+  collectionPath: string,
+  docId: string
+): undefined | 'error' | boolean {
+  const localStoreName = globalConfig.localStoreName
+  throwIfNolocalStoreName(localStoreName)
+  const getModuleExists = globalConfig.stores[localStoreName].getModuleExists
+  if (!getModuleExists) {
+    throw new Error('The data store did not provide a getModuleExists function!')
+  }
+
+  return getModuleExists({ collectionPath, docId })
+}
+
 /** Executes the `getModuleCount` function from the store specified as 'localStoreName' */
 export function getCountFromDataStore(
   moduleConfig: ModuleConfig,

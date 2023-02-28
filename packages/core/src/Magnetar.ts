@@ -14,7 +14,7 @@ import {
   WriteLock,
   DocFn,
   CollectionFn,
-  FetchMetaData,
+  FetchMetaDataCollection,
   CollectionName,
   getPathFilterIdentifier,
   PathFilterIdentifier,
@@ -56,9 +56,9 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
    */
   const fetchPromiseMap: Map<PathFilterIdentifier, FetchPromises> = new Map() // apply type upon get/set
   /**
-   * the global storage for FetchMetaData
+   * the global storage for FetchMetaDataCollection
    */
-  const fetchMetaMap: Map<PathWhereOrderByIdentifier, FetchMetaData> = new Map()
+  const fetchMetaMap: Map<PathWhereOrderByIdentifier, FetchMetaDataCollection> = new Map()
 
   async function clearAllData(options?: { exclude?: CollectionName[] }): Promise<void> {
     for (const collectionName of collectionNames) {
@@ -97,10 +97,14 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     )
     // Create the FetchMeta helpers for this module
     const pathWhereOrderByIdentifier = getPathWhereOrderByIdentifier(modulePath, moduleConfig)
-    const fetchMeta: { get: () => FetchMetaData; set: (payload: FetchMetaData) => void } = {
+    const fetchMeta: {
+      get: () => FetchMetaDataCollection
+      set: (payload: FetchMetaDataCollection) => void
+    } = {
       get: () =>
         fetchMetaMap.get(pathWhereOrderByIdentifier) || { reachedEnd: false, cursor: undefined },
-      set: (payload: FetchMetaData) => fetchMetaMap.set(pathWhereOrderByIdentifier, payload),
+      set: (payload: FetchMetaDataCollection) =>
+        fetchMetaMap.set(pathWhereOrderByIdentifier, payload),
     }
 
     // grab the stream related functions

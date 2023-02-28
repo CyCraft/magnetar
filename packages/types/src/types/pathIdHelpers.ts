@@ -31,7 +31,7 @@ export enum PathWhereOrderByIdentifier {
 }
 
 /**
- * Creates the `key` for the Maps used to cache the FetchMetaData throughout the lifecycle of an instance.
+ * Creates the `key` for the Maps used to cache the FetchMetaDataCollection throughout the lifecycle of an instance.
  * @returns `modulePath + ' /// ' + JSON.stringify({ where, orderBy })`
  */
 export function getPathWhereOrderByIdentifier(
@@ -52,7 +52,7 @@ export enum PathWhereIdentifier {
 }
 
 /**
- * Creates the `key` for the Maps used to cache the FetchMetaData throughout the lifecycle of an instance.
+ * Creates the `key` for the Maps used to cache the FetchMetaDataCollection throughout the lifecycle of an instance.
  * @returns `modulePath + ' /// ' + JSON.stringify({ where, orderBy })`
  */
 export function getPathWhereIdentifier(

@@ -3,7 +3,7 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex, waitMs } from '@magnetarjs/test-utils'
 
 {
-  const testName = 'only:stream (doc) edit right before opening'
+  const testName = 'stream (doc) edit right before opening'
   test(testName, async (t) => {
     const { trainerModule } = await createMagnetarInstance(testName, {
       insertDocs: { '': { age: 10, name: 'Luca' } },

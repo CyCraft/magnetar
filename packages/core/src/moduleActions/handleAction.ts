@@ -75,7 +75,7 @@ export async function handleAction(args: {
     stopExecutionAfterAction()
     return
   }
-  let result: void | string | FetchCountResponse | DoOnFetchCount | FetchResponse | DoOnFetch | OnAddedFn | SyncBatch | [string, SyncBatch] // prettier-ignore
+  let result: void | string | FetchCountResponse | DoOnFetchCount | FetchResponse | DoOnFetch | SyncBatch | [string, SyncBatch] // prettier-ignore
   try {
     // triggering the action provided by the plugin
     result = await pluginAction({
