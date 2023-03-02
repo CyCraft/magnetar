@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-
 type Item = { title: string; id: string; isDone: boolean }
 
 const props = defineProps<{
