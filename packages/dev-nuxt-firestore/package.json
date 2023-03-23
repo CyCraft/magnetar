@@ -2,7 +2,7 @@
   "name": "dev-nuxt-firestore",
   "private": true,
   "scripts": {
-    "build": "nuxt build",
+    "build": "echo temporarily removed",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
