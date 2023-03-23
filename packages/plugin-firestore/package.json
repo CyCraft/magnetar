@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@magnetarjs/types": "workspace:*",
+    "@magnetarjs/utils": "workspace:*",
     "@magnetarjs/utils-firestore": "workspace:*",
     "flatten-anything": "^3.0.2",
     "getorset-anything": "^0.0.3",

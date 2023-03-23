@@ -124,6 +124,7 @@ importers:
       '@magnetarjs/core': workspace:*
       '@magnetarjs/test-utils': workspace:*
       '@magnetarjs/types': workspace:*
+      '@magnetarjs/utils': workspace:*
       '@magnetarjs/utils-firestore': workspace:*
       array-shuffle: ^3.0.0
       firebase: ^9.14.0
@@ -134,6 +135,7 @@ importers:
       remove-anything: ^1.0.3
     dependencies:
       '@magnetarjs/types': link:../types
+      '@magnetarjs/utils': link:../utils
       '@magnetarjs/utils-firestore': link:../utils-firestore
       flatten-anything: 3.0.3
       getorset-anything: 0.0.3
