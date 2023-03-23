@@ -193,7 +193,7 @@ test('fetch + onError: stop -- fail in second store plugin does not prevent exec
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
 })
 
-test('only:fetch + onError: continue', async (t) => {
+test('fetch + onError: continue', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   const fetchPayload = { shouldFail: 'local', force: true }
   t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
