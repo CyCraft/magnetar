@@ -1,5 +1,6 @@
-import type { DocumentSnapshot, QueryDocumentSnapshot } from 'firebase/firestore'
+import { DocumentSnapshot, QueryDocumentSnapshot } from 'firebase/firestore'
 import { doc, getDoc, getDocs } from 'firebase/firestore'
+import { logWithFlair } from '@magnetarjs/utils'
 import {
   PluginFetchAction,
   FetchResponse,
@@ -23,20 +24,29 @@ export function fetchActionFactory(
     docId,
     pluginModuleConfig,
   }: PluginFetchActionPayload<FirestoreModuleConfig>): Promise<FetchResponse> {
-    const { db } = firestorePluginOptions
+    const { db, debug } = firestorePluginOptions
     // in case of a doc module
     let snapshots: (DocumentSnapshot | QueryDocumentSnapshot)[] | undefined
     if (docId) {
       const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
-      const docSnapshot = await getDoc(doc(db, documentPath))
+      const query = doc(db, documentPath)
+      const warnNoResponse = debug
+        ? setTimeout(() => logWithFlair(`no response after 5 seconds on \`await getDocs(query)\``, 'query:', query), 5_000) // prettier-ignore
+        : undefined
+      const docSnapshot = await getDoc(query)
+      clearTimeout(warnNoResponse)
       snapshots = [docSnapshot]
     }
     // in case of a collection module
     else if (!docId) {
       const _collectionPath = getFirestoreCollectionPath(collectionPath, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
 
-      const queryInstance = getQueryInstance(_collectionPath, pluginModuleConfig, db)
-      const querySnapshot = await getDocs(queryInstance)
+      const query = getQueryInstance(_collectionPath, pluginModuleConfig, db)
+      const warnNoResponse = debug
+        ? setTimeout(() => logWithFlair(`no response after 5 seconds on \`await getDocs(query)\``, 'query:', query), 5_000) // prettier-ignore
+        : undefined
+      const querySnapshot = await getDocs(query)
+      clearTimeout(warnNoResponse)
       snapshots = querySnapshot.docs
     }
 

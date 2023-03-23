@@ -6,7 +6,7 @@ import { EventFnSuccess } from '@magnetarjs/types'
  */
 export function logWithFlair(message: string, ...args: any[]): void {
   console.info(
-    `%c💫 ${message}`,
+    `%c💫 [magnetar] ${message}`,
     'background: #0e0f15; color: #af98e6; border-radius: 4px; padding: 6px 10px;',
     ...args
   )

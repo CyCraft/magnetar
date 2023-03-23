@@ -120,7 +120,7 @@ export function batchSyncFactory(
     }
 
     if (debug) {
-      logWithFlair('[magnetar] Syncing to firestore...', stack.batch)
+      logWithFlair('Syncing to firestore...', stack.batch)
     }
 
     writeBatch
