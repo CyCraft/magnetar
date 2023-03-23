@@ -249,6 +249,9 @@ export function handleActionPerStore(
             if (actionName === 'fetch' && docId) {
               doOnFetchFns.forEach((fn) => fn(undefined, 'error'))
             }
+            if (actionName !== 'fetch' && actionName !== 'fetchCount') {
+              writeLock.resolve()
+            }
             // now we must throw the error
             throw resultFromPlugin
           }
