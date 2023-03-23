@@ -1,6 +1,6 @@
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { pokedex } from '@magnetarjs/test-utils'
+import { pokedex, waitMs } from '@magnetarjs/test-utils'
 
 test('fetch (collection)', async (t) => {
   /// 'fetch' resolves once all stores have given a response with data
@@ -55,6 +55,21 @@ test('fetch (collection) where-filter: ==', async (t) => {
   const { pokedexModule } = createMagnetarInstance()
   try {
     const queryModuleRef = pokedexModule.where('name', '==', 'Flareon')
+    await queryModuleRef.fetch({ force: true })
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [pokedex(136)]
+    t.deepEqual(actual, expected as any)
+  } catch (error) {
+    t.fail(JSON.stringify(error))
+  }
+})
+
+test('fetch with different where-filters after opening a stream', async (t) => {
+  const { pokedexModule } = createMagnetarInstance()
+  try {
+    pokedexModule.where('name', '==', 'Flareon').stream()
+    await waitMs(1000)
+    const queryModuleRef = pokedexModule.where('name', '==', 'Flareon').where('id', '==', 136)
     await queryModuleRef.fetch({ force: true })
     const actual = [...queryModuleRef.data.values()]
     const expected = [pokedex(136)]
