@@ -293,8 +293,20 @@ export function batchSyncFactory(
 
   async function _delete(documentPath: string, debounceMsOverwrite?: number): Promise<SyncBatch> {
     const operationCount = 1
-    const stack = await prepareStack(operationCount)
+    let stack = await prepareStack(operationCount)
     const promise = prepareReturnPromise(stack)
+
+    if (stack.batch.insert.has(documentPath)) {
+      // flush! Because these writes cannot be combined
+      await forceSyncEarly()
+      stack = await prepareStack(operationCount)
+    }
+
+    // all these changes don't matter anymore, so let's remove them from the stack.batch
+    stack.batch.merge.delete(documentPath)
+    stack.batch.assign.delete(documentPath)
+    stack.batch.replace.delete(documentPath)
+    stack.batch.deleteProp.delete(documentPath)
 
     stack.batch.delete.add(documentPath)
 
