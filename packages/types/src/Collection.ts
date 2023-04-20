@@ -9,6 +9,15 @@ import {
 import { DocFn } from './Magnetar'
 import { WhereFilterOp } from './types/clauses'
 import { OPathsWithOptional } from './types/utils/Paths'
+import { ArrayValues } from './types/utils/ArrayValues'
+import { DeepPropType } from './types/utils/DeepPropType'
+import { DefaultTo } from './types/utils/DefaultTo'
+
+type WhereFilterValue<WFO extends WhereFilterOp, V> = WFO extends 'in' | 'not-in'
+  ? V[]
+  : WFO extends `array-contains`
+  ? ArrayValues<V>
+  : V
 
 export type CollectionInstance<
   DocDataType extends Record<string, any> = Record<string, any>,
@@ -97,10 +106,10 @@ export type CollectionInstance<
   /**
    * Chainable filter. Returns {@link CollectionInstance} with filter applied.
    */
-  where: (
-    fieldPath: OPathsWithOptional<DocDataType>,
-    operator: WhereFilterOp,
-    value: any
+  where: <Path extends OPathsWithOptional<DocDataType>, WhereOp extends WhereFilterOp>(
+    fieldPath: Path,
+    operator: WhereOp,
+    value: WhereFilterValue<WhereOp, DefaultTo<DeepPropType<DocDataType, Path>, any>>
   ) => CollectionInstance<DocDataType, GranularTypes>
   /**
    * Chainable filter. Returns {@link CollectionInstance} with filter applied.
