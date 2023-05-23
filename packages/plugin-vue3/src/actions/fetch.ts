@@ -65,28 +65,26 @@ export function fetchActionFactory(
       }
     }
     const doOnFetchAction: DoOnFetch = (_payload, meta) => {
+      const _docId = docId || (isFullString(meta?.id) ? meta.id : isNumber(meta?.id) ? `${meta.id}` : undefined)
       // set `exists`
-      const docPath = `${collectionPath}/${docId}`
+      const docPath = `${collectionPath}/${_docId}`
       if (meta === 'error') {
         exists[docPath] = 'error'
         return
       }
       if (isBoolean(meta?.exists)) {
-        exists[`${collectionPath}/${docId}`] = meta.exists
+        exists[`${collectionPath}/${_docId}`] = meta.exists
       }
 
       // abort updating local state if the payload is undefined
       if (_payload === undefined) return
 
-      insertActionFactory(
-        data,
+      insertActionFactory(data,
         Vue3StoreOptions
       )({
         payload: _payload,
         collectionPath,
-        docId:
-          docId ||
-          (isFullString(meta?.id) ? meta.id : isNumber(meta?.id) ? `${meta.id}` : undefined),
+        docId: _docId,
         actionConfig,
         pluginModuleConfig,
       })
