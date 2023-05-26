@@ -70,14 +70,23 @@ export function fetchActionFactory(
     }
 
     const doOnFetchAction: DoOnFetch = (_payload, meta) => {
+      const _docId = docId
+        ? docId
+        : meta === 'error'
+        ? undefined
+        : isFullString(meta?.id)
+        ? meta.id
+        : isNumber(meta?.id)
+        ? `${meta.id}`
+        : undefined
       // set `exists`
-      const docPath = `${collectionPath}/${docId}`
+      const docPath = `${collectionPath}/${_docId}`
       if (meta === 'error') {
         exists[docPath] = 'error'
         return
       }
       if (isBoolean(meta?.exists)) {
-        exists[`${collectionPath}/${docId}`] = meta.exists
+        exists[docPath] = meta.exists
       }
 
       // abort updating local state if the payload was set to undefined
@@ -89,9 +98,7 @@ export function fetchActionFactory(
       )({
         payload: _payload,
         collectionPath,
-        docId:
-          docId ||
-          (isFullString(meta?.id) ? meta.id : isNumber(meta?.id) ? `${meta.id}` : undefined),
+        docId: _docId,
         actionConfig,
         pluginModuleConfig,
       })

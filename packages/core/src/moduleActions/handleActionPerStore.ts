@@ -333,7 +333,6 @@ export function handleActionPerStore(
           writeLock.countdown = setTimeout(writeLock.resolve, 5000)
         }
 
-        // anything that's executed from a "collection" module:
         // 'insert' always returns a DocInstance, unless the "abort" action was called, then the modulePath might still be a collection:
         if (actionName === 'insert' && docId) {
           resolve(docFn(modulePath, moduleConfig))
