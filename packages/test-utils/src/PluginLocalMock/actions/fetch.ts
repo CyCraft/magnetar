@@ -47,7 +47,12 @@ export function fetchActionFactory(
           return fetchResponse // if size === 0 fall through to returning DoOnFetch down below
         }
       }
-      if (docId) {
+      /**
+       * when we are fetching a specific doc, let's only return the result if we're sure it exists on the server.
+       * this prevents returning a document that was just inserted.
+       */
+      const itSureExists = exists[`${collectionPath}/${docId}`] === true
+      if (docId && itSureExists) {
         const localDoc = data[collectionPath].get(docId)
         // if already fetched
         if (localDoc) {

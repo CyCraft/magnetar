@@ -37,7 +37,7 @@ import { getModifyPayloadFnsMap } from '../helpers/modifyPayload'
 import { getModifyReadResponseFnsMap } from '../helpers/modifyReadResponse'
 import { executeOnFns } from '../helpers/executeOnFns'
 import { throwIfNoFnsToExecute } from '../helpers/throwFns'
-import { getPluginModuleConfig } from '../helpers/moduleHelpers'
+import { getExistsFromDataStore, getPluginModuleConfig } from '../helpers/moduleHelpers'
 import { getCollectionWriteLocks } from '../helpers/pathHelpers'
 
 export type HandleActionSharedParams = {
@@ -273,17 +273,6 @@ export function handleActionPerStore(
 
           // special handling for 'fetch' (resultFromPlugin will always be `FetchResponse | OnAddedFn`)
           if (actionName === 'fetch') {
-            const optimisticFetch = !force
-            if (optimisticFetch) {
-              // the local store successfully returned a fetch response based on already fetched data
-              if (
-                storeName === globalConfig.localStoreName &&
-                isFetchResponse(resultFromPlugin) &&
-                resultFromPlugin.docs.length
-              ) {
-                stopExecutionAfterAction(true)
-              }
-            }
             if (isDoOnFetch(resultFromPlugin)) {
               doOnFetchFns.push(resultFromPlugin)
             }
@@ -301,6 +290,12 @@ export function handleActionPerStore(
                 // and all `doOnFetchFns` (adding it to the local store)
                 // we still have a record, so must return it when resolving the fetch action
                 if (docResult) collectionFetchResult.set(docMetaData.id, docResult)
+
+                // optimistic fetching can stop the action chain after getting a fetch response for the first time
+                const optimisticFetch = !force
+                if (optimisticFetch) {
+                  stopExecutionAfterAction(true)
+                }
               }
             }
           }
