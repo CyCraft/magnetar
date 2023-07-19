@@ -2,7 +2,17 @@
 import { CollectionInstance, WhereClauseTuple, WhereFilterOp } from '@magnetarjs/types'
 import { isAnyObject, isError, isPlainObject } from 'is-what'
 import { computed, onMounted, ref } from 'vue'
-import { FilterState, MUIColumn, MUIFilter, MUIPagination, OPaths, OrderByState } from '../types'
+import {
+  FilterState,
+  MUIColumn,
+  MUIFilter,
+  MUILabel,
+  muiLabelDic,
+  MUIPagination,
+  MUIParseLabel,
+  OPaths,
+  OrderByState,
+} from '../types'
 import {
   calcCollection,
   columnsToInitialOrderByState,
@@ -20,7 +30,12 @@ const props = defineProps<{
   columns: MUIColumn<any>[]
   pagination: MUIPagination
   filters: MUIFilter<any, any, any>[]
+  parseLabel?: MUIParseLabel
 }>()
+
+function muiLabel(label: MUILabel): string {
+  return props.parseLabel ? props.parseLabel(label) || muiLabelDic[label] : muiLabelDic[label]
+}
 
 // const emit = defineEmits<{}>()
 const fetchState = ref<'ok' | 'fetching' | { error: string }>('ok')
@@ -60,7 +75,7 @@ async function fetchMore() {
     if ((isError(error) || isAnyObject(error)) && 'message' in error) {
       fetchState.value = { error: error.message }
     } else {
-      fetchState.value = { error: 'An error occured, check the console' }
+      fetchState.value = { error: muiLabel('magnetar table info fetch-state error default') }
     }
   }
 }
@@ -117,9 +132,9 @@ async function setOrderBy(
       <table>
         <thead>
           <tr>
-            <td>total</td>
-            <td>filter</td>
-            <td>showing</td>
+            <td>{{ muiLabel('magnetar table info counts total') }}</td>
+            <td>{{ muiLabel('magnetar table info counts filter') }}</td>
+            <td>{{ muiLabel('magnetar table info counts showing') }}</td>
           </tr>
         </thead>
         <tbody>
@@ -135,11 +150,13 @@ async function setOrderBy(
 
       <div v-if="isPlainObject(fetchState)" class="magnetar-fetch-state-error">
         <div><span>⚠️</span> {{ fetchState.error }}</div>
-        <button @click="() => resetState()">reset to defaults</button>
+        <button @click="() => resetState()">
+          {{ muiLabel('magnetar table info fetch-state reset') }}
+        </button>
       </div>
 
       <div v-if="currentFilters.length || currentOrderBy.length" class="magnetar-current-state">
-        <h6>Collection filters</h6>
+        <h6>{{ muiLabel('magnetar table info active filters') }}</h6>
         <div>
           <div v-for="_filter in currentFilters" :key="JSON.stringify(_filter)">
             .where({{ _filter.map((f) => JSON.stringify(f)).join(', ') }})
@@ -157,6 +174,7 @@ async function setOrderBy(
         :filter="filter"
         :filterState="filterState"
         :collection="collection"
+        :parseLabel="parseLabel"
         @setFilter="([where, to]) => setFilter(where, to)"
       />
     </section>
@@ -169,6 +187,7 @@ async function setOrderBy(
             :key="column.fieldPath + 'th' + i"
             :column="column"
             :orderByState="orderByState"
+            :parseLabel="parseLabel"
             @setOrderBy="([fieldPath, direction]) => setOrderBy(fieldPath, direction)"
           />
         </tr>
@@ -186,14 +205,16 @@ async function setOrderBy(
         </tr>
         <slot v-if="!rows.length" name="empty">
           <div>
-            <p class="text-center">No results found</p>
+            <p class="text-center">{{ muiLabel('magnetar table no-results') }}</p>
           </div>
         </slot>
       </tbody>
     </table>
 
     <section class="magnetar-table-controls">
-      <button @click="() => fetchMore()">Fetch More</button>
+      <button @click="() => fetchMore()">
+        {{ muiLabel('magnetar table fetch-more button') }}
+      </button>
     </section>
   </div>
 </template>

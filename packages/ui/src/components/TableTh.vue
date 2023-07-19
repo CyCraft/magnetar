@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { MUIColumn, OPaths, OrderByState } from '../types'
+import { MUIColumn, MUIParseLabel, OPaths, OrderByState } from '../types'
 
 const props = defineProps<{
   column: MUIColumn<any>
   orderByState: OrderByState
+  parseLabel: MUIParseLabel | undefined
 }>()
 
 const emit = defineEmits<{
@@ -42,8 +43,10 @@ function onClick(e: MouseEvent) {
 }
 
 const label = computed<string>(() => {
-  const { fieldPath, label } = props.column
-  return label || fieldPath || ''
+  const { column, parseLabel } = props
+  const { fieldPath, label } = column
+  const text = label || fieldPath || ''
+  return parseLabel ? parseLabel(text) : text
 })
 </script>
 

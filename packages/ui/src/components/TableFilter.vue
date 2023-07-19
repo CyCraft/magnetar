@@ -2,12 +2,13 @@
 import { CollectionInstance, WhereClauseTuple } from '@magnetarjs/types'
 import { isBoolean } from 'is-what'
 import { computed, onMounted } from 'vue'
-import { FilterState, MUIFilter } from '../types'
+import { FilterState, MUIFilter, MUIParseLabel } from '../types'
 
 const props = defineProps<{
   collection: CollectionInstance<any>
   filter: MUIFilter<any>
   filterState: FilterState
+  parseLabel: MUIParseLabel | undefined
 }>()
 
 const emit = defineEmits<{
@@ -39,11 +40,16 @@ onMounted(() => {
     props.collection.where(...option.where).fetchCount()
   }
 })
+
+const filterLabel = computed<string>(() => {
+  const { filter, parseLabel } = props
+  return parseLabel ? parseLabel(filter.label) : filter.label
+})
 </script>
 
 <template>
   <fieldset class="magnetar-table-filter">
-    <legend>{{ filter.label }}</legend>
+    <legend>{{ filterLabel }}</legend>
     <template v-if="filter.type === 'checkboxes'">
       <template v-for="option in filter.options">
         <input
@@ -53,8 +59,8 @@ onMounted(() => {
           @change="(e) => set(option.where, (e.target as HTMLInputElement)?.checked || false)"
         />
         <label :for="JSON.stringify(option.where)"
-          >{{ option.label }}
-          <small>({{ props.collection.where(...option.where).count }})</small></label
+          >{{ parseLabel ? parseLabel(option.label) : option.label }}
+          <small> ({{ props.collection.where(...option.where).count }})</small></label
         >
       </template>
     </template>
@@ -69,16 +75,17 @@ onMounted(() => {
           "
         />
         <label :for="JSON.stringify(option.where)"
-          >{{ option.label }}
-          <small>({{ props.collection.where(...option.where).count }})</small></label
+          >{{ parseLabel ? parseLabel(option.label) : option.label }}
+          <small> ({{ props.collection.where(...option.where).count }})</small></label
         >
       </template>
     </template>
     <template v-if="filter.type === 'select'">
       <select v-model="selectModel">
-        <option>-- ✗ --</option>
+        <option>--</option>
         <option v-for="option in filter.options" :key="option.label" :value="option.where">
-          {{ option.label }} <small>({{ props.collection.where(...option.where).count }})</small>
+          {{ parseLabel ? parseLabel(option.label) : option.label }}
+          <small> ({{ props.collection.where(...option.where).count }})</small>
         </option>
       </select>
     </template>

@@ -2,16 +2,19 @@ import { OPathsWithOptional, WhereClauseTuple, WhereFilterOp } from '@magnetarjs
 
 export type OPaths<T> = OPathsWithOptional<T>
 
-export type MUIItem<T extends Record<string, any>> = T
+/** You can pass a text parser which will be used for any `label` used throughout the table */
+export type MUIParseLabel<LabelType = any> = (label: LabelType) => string
 
-export type MUIColumn<T extends Record<string, any>> = MUIColumnData<T> | MUIColumnHandler<T>
+export type MUIColumn<T extends Record<string, any>, Label extends string = string> =
+  | MUIColumnData<T, Label>
+  | MUIColumnHandler<T, Label>
 
-export type MUIColumnHandler<T extends Record<string, any>> = {
+export type MUIColumnHandler<T extends Record<string, any>, Label extends string = string> = {
   /** defaults to an empty string */
-  label?: string
+  label?: Label
   /** Parses the value to be shown */
   button: {
-    label: string | ((info: { data: T }) => any)
+    label: Label | ((info: { data: T }) => Label)
     handler: (info: { data: T }) => void
   }
   /** not available on a handler column */
@@ -22,12 +25,12 @@ export type MUIColumnHandler<T extends Record<string, any>> = {
   sortable?: undefined
 }
 
-export type MUIColumnData<T extends Record<string, any>> = {
+export type MUIColumnData<T extends Record<string, any>, Label extends string = string> = {
   /**
    * - Defaults to whatever you passed in `fieldPath`.
    * - Pass an empty string if you want to show nothing.
    */
-  label?: string
+  label?: Label
   /**
    * Represents the path to the prop that should be shown in this column for each data item.
    * @example 'name' // would show `data.name`
@@ -65,15 +68,16 @@ export type MUIPagination = {
 
 export type MUIFilter<
   T extends Record<string, any>,
+  Label extends string = string,
   Path extends OPaths<T> = OPaths<T>,
   WhereOp extends WhereFilterOp = WhereFilterOp
-> = MUIFilterOptions<T, Path, WhereOp> | MUIFilterOther
+> = MUIFilterOptions<T, Label, Path, WhereOp> | MUIFilterOther
 
 /**
  * TODO: not yet implemented!!
  */
-export type MUIFilterOther = {
-  label: string
+export type MUIFilterOther<Label extends string = string> = {
+  label: Label
   /**
    * TODO: not yet implemented!!
    */
@@ -84,13 +88,14 @@ export type MUIFilterOther = {
 
 export type MUIFilterOptions<
   T extends Record<string, any>,
+  Label extends string = string,
   Path extends OPaths<T> = OPaths<T>,
   WhereOp extends WhereFilterOp = WhereFilterOp
 > = {
-  label: string
+  label: Label
   type: 'select' | 'checkboxes' | 'radio'
   options: {
-    label: string
+    label: Label
     where: WhereClauseTuple<T, Path, WhereOp>
     checked?: boolean
   }[]
@@ -103,3 +108,24 @@ export type FilterState = Map<WhereClauseTuple<any, any, any>, boolean>
  * This map is order-sensitive. `orderBy(...)` is applied in the insert order of this map
  */
 export type OrderByState = Map<OPaths<any>, 'asc' | 'desc'>
+
+export type MUILabel =
+  | 'magnetar table info fetch-state error default'
+  | 'magnetar table info counts total'
+  | 'magnetar table info counts filter'
+  | 'magnetar table info counts showing'
+  | 'magnetar table info fetch-state reset'
+  | 'magnetar table info active filters'
+  | 'magnetar table no-results'
+  | 'magnetar table fetch-more button'
+
+export const muiLabelDic = {
+  'magnetar table info fetch-state error default': 'An error occured, check the console',
+  'magnetar table info counts total': 'total',
+  'magnetar table info counts filter': 'filter',
+  'magnetar table info counts showing': 'showing',
+  'magnetar table info fetch-state reset': 'reset to defaults',
+  'magnetar table no-results': 'No results found',
+  'magnetar table info active filters': 'Active Filters',
+  'magnetar table fetch-more button': 'Fetch More',
+}
