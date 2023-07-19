@@ -204,7 +204,7 @@ async function setOrderBy(
             :key="column.fieldPath + 'td' + row.id"
           >
             <slot :name="`cell-${column.fieldPath || `${columnIndex}`}`">
-              <TableTd :row="row" :column="column" />
+              <TableTd :row="row" :column="column" :parseLabel="parseLabel" />
             </slot>
           </template>
         </tr>

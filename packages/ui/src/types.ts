@@ -5,27 +5,13 @@ export type OPaths<T> = OPathsWithOptional<T>
 /** You can pass a text parser which will be used for any `label` used throughout the table */
 export type MUIParseLabel<LabelType = any> = (label: LabelType) => string
 
-export type MUIColumn<T extends Record<string, any>, Label extends string = string> =
-  | MUIColumnData<T, Label>
-  | MUIColumnHandler<T, Label>
-
-export type MUIColumnHandler<T extends Record<string, any>, Label extends string = string> = {
-  /** defaults to an empty string */
-  label?: Label
-  /** Parses the value to be shown */
-  button: {
-    label: Label | ((info: { data: T }) => Label)
-    handler: (info: { data: T }) => void
-  }
-  /** not available on a handler column */
-  fieldPath?: undefined
-  /** not available on a handler column */
-  parseValue?: undefined
-  /** not available on a handler column */
-  sortable?: undefined
+export type MUIButton<T extends Record<string, any>, Label extends string = string> = {
+  label: Label | ((info: { data: T }) => Label)
+  handler: (info: { data: T }) => void | Promise<void>
+  disabled?: (info: { data: T }) => boolean | undefined
 }
 
-export type MUIColumnData<T extends Record<string, any>, Label extends string = string> = {
+export type MUIColumn<T extends Record<string, any>, Label extends string = string> = {
   /**
    * - Defaults to whatever you passed in `fieldPath`.
    * - Pass an empty string if you want to show nothing.
@@ -33,12 +19,12 @@ export type MUIColumnData<T extends Record<string, any>, Label extends string = 
   label?: Label
   /**
    * Represents the path to the prop that should be shown in this column for each data item.
+   * No need to pass if the value doesn't matter for a column, because you want to show a combination of 2 columns with the `parseValue` function
    * @example 'name' // would show `data.name`
    * @example 'name.family' // would show `data.name.family`
-   *
-   * If the value doesn't matter for a column, because you want to show a combination of 2 columns with the `parseValue` function, you can just default to `'id'`.
+   * @example undefined // an empty column, you can use `parseValue` to show something else
    */
-  fieldPath: OPaths<T>
+  fieldPath?: OPaths<T>
   /**
    * Parses the value to be shown
    * @example ({ value }) => value > 10 ? 'lg' : 'sm'
@@ -58,8 +44,8 @@ export type MUIColumnData<T extends Record<string, any>, Label extends string = 
   suffix?: string
   /** When `true` this column will become sortable as per the Magnetar orderBy feature */
   sortable?: boolean | { orderBy: 'asc' | 'desc'; position: number }
-  /** not available on a data column */
-  button?: undefined
+  /** Shows action buttons next to the cell value */
+  buttons?: MUIButton<T, Label>[]
 }
 
 export type MUIPagination = {
