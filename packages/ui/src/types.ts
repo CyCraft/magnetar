@@ -110,22 +110,24 @@ export type FilterState = Map<WhereClauseTuple<any, any, any>, boolean>
 export type OrderByState = Map<OPaths<any>, 'asc' | 'desc'>
 
 export type MUILabel =
-  | 'magnetar table info fetch-state error default'
+  | 'magnetar table fetch-state error default'
   | 'magnetar table info counts total'
   | 'magnetar table info counts filter'
   | 'magnetar table info counts showing'
-  | 'magnetar table info fetch-state reset'
-  | 'magnetar table info active filters'
+  | 'magnetar table fetch-state reset'
+  | 'magnetar table active filters'
+  | 'magnetar table clear filters button'
   | 'magnetar table no-results'
   | 'magnetar table fetch-more button'
 
 export const muiLabelDic = {
-  'magnetar table info fetch-state error default': 'An error occured, check the console',
+  'magnetar table fetch-state error default': 'An error occured, check the console',
   'magnetar table info counts total': 'total',
   'magnetar table info counts filter': 'filter',
   'magnetar table info counts showing': 'showing',
-  'magnetar table info fetch-state reset': 'reset to defaults',
+  'magnetar table fetch-state reset': 'reset to defaults',
+  'magnetar table active filters': 'Active Filters',
+  'magnetar table clear filters button': 'Clear All',
   'magnetar table no-results': 'No results found',
-  'magnetar table info active filters': 'Active Filters',
   'magnetar table fetch-more button': 'Fetch More',
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { MUIColumn, MUIFilter } from 'src/types'
 import { magnetar } from '../magnetar'
+import { MUIColumn, MUIFilter } from '../types'
 import MagnetarTable from './MagnetarTable.vue'
 
 type Item = { title: string; id: string; isDone: boolean }

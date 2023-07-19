@@ -1,6 +1,6 @@
 import { CollectionInstance, WhereClauseTuple } from '@magnetarjs/types'
 import { sort } from 'fast-sort'
-import { isPlainObject } from 'is-what'
+import { isArray, isPlainObject } from 'is-what'
 import { FilterState, MUIColumn, MUIFilter, OPaths, OrderByState } from './types'
 
 export function filtersToInitialState(filters: MUIFilter<any, any, any>[]): FilterState {
@@ -33,8 +33,42 @@ export function columnsToInitialOrderByState(columns: MUIColumn<any>[]): OrderBy
   )
 }
 
+/** Clears JavaScript reference pointers */
+function carbonCopyWhere(where: WhereClauseTuple<any, any, any>): WhereClauseTuple<any, any, any> {
+  return where.map((w) => (isArray(w) ? [...w] : w)) as any
+}
+
 export function filterStateToClauses(state: FilterState): WhereClauseTuple<any, any, any>[] {
-  return [...state.entries()].filter(([clause, state]) => !!state).map(([clause]) => clause)
+  const whereClauses = [...state.entries()]
+    .filter(([clause, state]) => !!state)
+    .map(([clause]) => carbonCopyWhere(clause))
+
+  return whereClauses.reduce<WhereClauseTuple<any, any, any>[]>((result, whereArr) => {
+    const [fieldPath, op, value] = whereArr
+
+    const addToPreviousWhere = result.find(
+      (w) => w[0] === fieldPath && (w[1] === op || w[1] === 'in' || w[1] === 'not-in')
+    )
+
+    if (!addToPreviousWhere) {
+      result.push(whereArr)
+      return result
+    }
+
+    const currentOp = addToPreviousWhere[1]
+    if (currentOp === 'in' || currentOp === 'not-in') {
+      addToPreviousWhere[2] = [...new Set([...addToPreviousWhere[2], value])]
+    }
+    if (currentOp === '==') {
+      addToPreviousWhere[1] = 'in'
+      addToPreviousWhere[2] = [...new Set([addToPreviousWhere[2], value])]
+    }
+    if (currentOp === '!=') {
+      addToPreviousWhere[1] = 'not-in'
+      addToPreviousWhere[2] = [...new Set([addToPreviousWhere[2], value])]
+    }
+    return result
+  }, [])
 }
 
 export function orderByStateToClauses(

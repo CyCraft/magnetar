@@ -46,10 +46,11 @@ const orderByState = ref<OrderByState>(columnsToInitialOrderByState(props.column
 const currentFilters = computed(() => filterStateToClauses(filterState.value))
 const currentOrderBy = computed(() => orderByStateToClauses(orderByState.value))
 
-function resetState(): void {
+function resetState(resetFetchState?: boolean): void {
   filterState.value = filtersToInitialState(props.filters)
   orderByState.value = columnsToInitialOrderByState(props.columns)
-  fetchMore()
+  collectionInstance.value = calcCollection(props.collection, filterState.value, orderByState.value)
+  if (resetFetchState) fetchState.value = 'ok'
 }
 
 /** This instance is not computed so that we can delay setting it after fetching the relevant records */
@@ -75,7 +76,7 @@ async function fetchMore() {
     if ((isError(error) || isAnyObject(error)) && 'message' in error) {
       fetchState.value = { error: error.message }
     } else {
-      fetchState.value = { error: muiLabel('magnetar table info fetch-state error default') }
+      fetchState.value = { error: muiLabel('magnetar table fetch-state error default') }
     }
   }
 }
@@ -150,21 +151,9 @@ async function setOrderBy(
 
       <div v-if="isPlainObject(fetchState)" class="magnetar-fetch-state-error">
         <div><span>⚠️</span> {{ fetchState.error }}</div>
-        <button @click="() => resetState()">
-          {{ muiLabel('magnetar table info fetch-state reset') }}
+        <button @click="() => resetState(true)">
+          {{ muiLabel('magnetar table fetch-state reset') }}
         </button>
-      </div>
-
-      <div v-if="currentFilters.length || currentOrderBy.length" class="magnetar-current-state">
-        <h6>{{ muiLabel('magnetar table info active filters') }}</h6>
-        <div>
-          <div v-for="_filter in currentFilters" :key="JSON.stringify(_filter)">
-            .where({{ _filter.map((f) => JSON.stringify(f)).join(', ') }})
-          </div>
-          <div v-for="_orderBy in currentOrderBy" :key="JSON.stringify(_orderBy)">
-            .orderBy({{ _orderBy.map((o) => JSON.stringify(o)).join(', ') }})
-          </div>
-        </div>
       </div>
     </section>
 
@@ -177,6 +166,22 @@ async function setOrderBy(
         :parseLabel="parseLabel"
         @setFilter="([where, to]) => setFilter(where, to)"
       />
+      <div v-if="currentFilters.length || currentOrderBy.length" class="magnetar-current-state">
+        <h6>{{ muiLabel('magnetar table active filters') }}</h6>
+        <div>
+          <div v-for="_filter in currentFilters" :key="JSON.stringify(_filter)">
+            <!-- TODO: @click="() => filterState.delete(_filter)" -->
+            .where({{ _filter.map((f) => JSON.stringify(f)).join(', ') }})
+          </div>
+          <div v-for="_orderBy in currentOrderBy" :key="JSON.stringify(_orderBy)">
+            <!-- TODO: @click="() => orderByState.delete(_orderBy[0])" -->
+            .orderBy({{ _orderBy.map((o) => JSON.stringify(o)).join(', ') }})
+          </div>
+        </div>
+        <button @click="() => resetState()">
+          {{ muiLabel('magnetar table clear filters button') }}
+        </button>
+      </div>
     </section>
 
     <table>
@@ -242,6 +247,9 @@ async function setOrderBy(
   display: flex
   flex-direction: column
   align-items: flex-start
+  gap: 0.5rem
+  > h6
+    margin: 0
   > div
     display: flex
     flex-wrap: wrap
