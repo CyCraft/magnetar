@@ -6,9 +6,9 @@ export type OPaths<T> = OPathsWithOptional<T>
 export type MUIParseLabel<LabelType = any> = (label: LabelType) => string
 
 export type MUIButton<T extends Record<string, any>, Label extends string = string> = {
-  label: Label | ((info: { data: T }) => Label)
-  handler: (info: { data: T }) => void | Promise<void>
-  disabled?: (info: { data: T }) => boolean | undefined
+  label: Label | ((info: { value: any; data: T }) => Label)
+  handler: (info: { value: any; data: T }) => void | Promise<void>
+  disabled?: (info: { value: any; data: T }) => boolean | undefined
 }
 
 export type MUIColumn<T extends Record<string, any>, Label extends string = string> = {
@@ -105,15 +105,17 @@ export type MUILabel =
   | 'magnetar table clear filters button'
   | 'magnetar table no-results'
   | 'magnetar table fetch-more button'
+  | 'magnetar table fetch-more button end'
 
 export const muiLabelDic = {
   'magnetar table fetch-state error default': 'An error occured, check the console',
   'magnetar table info counts total': 'total',
   'magnetar table info counts filter': 'filter',
   'magnetar table info counts showing': 'showing',
-  'magnetar table fetch-state reset': 'reset to defaults',
+  'magnetar table fetch-state reset': 'Reset to Defaults',
   'magnetar table active filters': 'Active Filters',
   'magnetar table clear filters button': 'Clear All',
   'magnetar table no-results': 'No results found',
   'magnetar table fetch-more button': 'Fetch More',
+  'magnetar table fetch-more button end': 'Fetched Everything!',
 }

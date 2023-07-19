@@ -34,14 +34,20 @@ export function columnsToInitialOrderByState(columns: MUIColumn<any>[]): OrderBy
 }
 
 /** Clears JavaScript reference pointers */
-function carbonCopyWhere(where: WhereClauseTuple<any, any, any>): WhereClauseTuple<any, any, any> {
-  return where.map((w) => (isArray(w) ? [...w] : w)) as any
+export function carbonCopyMap<T extends Map<any, any>>(map: T): T {
+  let newMap = new Map() as T
+  for (let [key, value] of map) {
+    const _key = isArray(key) ? [...key] : key
+    const _value = isArray(value) ? [...value] : value
+    newMap.set(_key, _value)
+  }
+  return newMap
 }
 
 export function filterStateToClauses(state: FilterState): WhereClauseTuple<any, any, any>[] {
-  const whereClauses = [...state.entries()]
+  const whereClauses = [...carbonCopyMap(state).entries()]
     .filter(([clause, state]) => !!state)
-    .map(([clause]) => carbonCopyWhere(clause))
+    .map(([clause]) => clause)
 
   return whereClauses.reduce<WhereClauseTuple<any, any, any>[]>((result, whereArr) => {
     const [fieldPath, op, value] = whereArr

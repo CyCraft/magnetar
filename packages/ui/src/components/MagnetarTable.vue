@@ -38,7 +38,7 @@ function muiLabel(label: MUILabel): string {
 }
 
 // const emit = defineEmits<{}>()
-const fetchState = ref<'ok' | 'fetching' | { error: string }>('ok')
+const fetchState = ref<'ok' | 'end' | 'fetching' | { error: string }>('ok')
 
 const filterState = ref<FilterState>(filtersToInitialState(props.filters))
 const orderByState = ref<OrderByState>(columnsToInitialOrderByState(props.columns))
@@ -46,18 +46,31 @@ const orderByState = ref<OrderByState>(columnsToInitialOrderByState(props.column
 const currentFilters = computed(() => filterStateToClauses(filterState.value))
 const currentOrderBy = computed(() => orderByStateToClauses(orderByState.value))
 
-function resetState(resetFetchState?: boolean): void {
-  filterState.value = filtersToInitialState(props.filters)
-  orderByState.value = columnsToInitialOrderByState(props.columns)
-  collectionInstance.value = calcCollection(props.collection, filterState.value, orderByState.value)
-  if (resetFetchState) fetchState.value = 'ok'
-}
-
 /** This instance is not computed so that we can delay setting it after fetching the relevant records */
 const collectionInstance = ref(
   calcCollection(props.collection, filterState.value, orderByState.value)
 )
 
+function clearAllRecords(): void {
+  props.collection.data.clear()
+  collectionInstance.value.fetched.cursor = undefined
+}
+
+function resetState(): void {
+  filterState.value = filtersToInitialState(props.filters)
+  orderByState.value = columnsToInitialOrderByState(props.columns)
+  clearAllRecords()
+  fetchMore()
+}
+
+function clearState(): void {
+  filterState.value = new Map()
+  orderByState.value = new Map()
+  clearAllRecords()
+  fetchMore()
+}
+
+/** never throws */
 async function fetchMore() {
   fetchState.value = 'fetching'
   const collection = calcCollection(props.collection, filterState.value, orderByState.value)
@@ -68,8 +81,8 @@ async function fetchMore() {
       .startAfter(collection.fetched.cursor)
       .fetch({ force: true })
     await collection.fetchCount()
-    if (collection.fetched.reachedEnd) console.log(`that's all!`)
-    fetchState.value = 'ok'
+    fetchState.value = collection.fetched.reachedEnd ? 'end' : 'ok'
+    // set new state
     collectionInstance.value = collection
   } catch (error: unknown) {
     console.error(`fetchMore error:`, error)
@@ -82,6 +95,7 @@ async function fetchMore() {
 }
 
 onMounted(() => {
+  clearAllRecords()
   props.collection.fetchCount()
   fetchMore()
 })
@@ -92,6 +106,7 @@ const rows = computed(() => {
 })
 
 async function setFilter(where: WhereClauseTuple<any, any, any>, to: boolean): Promise<void> {
+  clearAllRecords()
   filterState.value.set(where, to)
 
   const op: WhereFilterOp = where[1]
@@ -119,6 +134,7 @@ async function setOrderBy(
   fieldPath: OPaths<any>,
   direction: 'asc' | 'desc' | undefined
 ): Promise<void> {
+  clearAllRecords()
   if (!direction) orderByState.value.delete(fieldPath)
   if (direction) orderByState.value.set(fieldPath, direction)
   // it looks better UI wise to delay the actual fetch to prevent UI components from freezing
@@ -148,13 +164,6 @@ async function setOrderBy(
       </table>
 
       <LoadingSpinner v-if="fetchState === 'fetching'" class="magnetar-fetch-state-loading" />
-
-      <div v-if="isPlainObject(fetchState)" class="magnetar-fetch-state-error">
-        <div><span>⚠️</span> {{ fetchState.error }}</div>
-        <button @click="() => resetState(true)">
-          {{ muiLabel('magnetar table fetch-state reset') }}
-        </button>
-      </div>
     </section>
 
     <section class="magnetar-table-filters">
@@ -178,9 +187,17 @@ async function setOrderBy(
             .orderBy({{ _orderBy.map((o) => JSON.stringify(o)).join(', ') }})
           </div>
         </div>
-        <button @click="() => resetState()">
-          {{ muiLabel('magnetar table clear filters button') }}
-        </button>
+        <div v-if="isPlainObject(fetchState)" class="magnetar-fetch-state-error">
+          {{ fetchState.error }}
+        </div>
+        <div>
+          <button @click="() => resetState()">
+            {{ muiLabel('magnetar table fetch-state reset') }}
+          </button>
+          <button @click="() => clearState()">
+            {{ muiLabel('magnetar table clear filters button') }}
+          </button>
+        </div>
       </div>
     </section>
 
@@ -210,15 +227,19 @@ async function setOrderBy(
         </tr>
         <slot v-if="!rows.length" name="empty">
           <div>
-            <p class="text-center">{{ muiLabel('magnetar table no-results') }}</p>
+            <p>{{ muiLabel('magnetar table no-results') }}</p>
           </div>
         </slot>
       </tbody>
     </table>
 
     <section class="magnetar-table-controls">
-      <button @click="() => fetchMore()">
-        {{ muiLabel('magnetar table fetch-more button') }}
+      <button :disabled="fetchState === 'end'" @click="() => fetchMore()">
+        {{
+          fetchState === 'end'
+            ? muiLabel('magnetar table fetch-more button end')
+            : muiLabel('magnetar table fetch-more button')
+        }}
       </button>
     </section>
   </div>
@@ -238,11 +259,10 @@ async function setOrderBy(
   h6
     margin: 0
 .magnetar-fetch-state-error
-  display: flex
-  flex-direction: column
-  gap: 0.5rem
   white-space: pre-line
   word-break: break-word
+  text-align: left
+  color: var(--c-error, indianred)
 .magnetar-current-state
   display: flex
   flex-direction: column
@@ -255,7 +275,7 @@ async function setOrderBy(
     flex-wrap: wrap
     gap: .5rem
     align-items: center
-    > *
+    > div
       background: var(--c-primary-extra-light, whitesmoke)
       border-radius: 0.25rem
       padding: 0.25rem 0.5rem

@@ -27,14 +27,18 @@ const buttonsLoading = ref<boolean[]>(props.column.buttons?.map(() => false) || 
 
 const buttonStates = computed<{ label: string; disabled: boolean | undefined }[]>(() => {
   const { column, row, parseLabel } = props
+  const rawValue = cellValueRaw.value
+
   return (column.buttons || []).map((button, index) => {
-    const text = isFunction(button.label) ? button.label({ data: row }) : button.label
+    const text = isFunction(button.label)
+      ? button.label({ data: row, value: rawValue })
+      : button.label
     const label = parseLabel ? parseLabel(text) : text
 
     const disabled = buttonsLoading.value[index]
       ? true
       : isFunction(button.disabled)
-      ? button.disabled({ data: row })
+      ? button.disabled({ data: row, value: rawValue })
       : button.disabled
 
     return { label, disabled }
@@ -43,11 +47,12 @@ const buttonStates = computed<{ label: string; disabled: boolean | undefined }[]
 
 async function handleClick(index: number): Promise<void> {
   const { row, column } = props
+  const rawValue = cellValueRaw.value
   const button = column.buttons?.[index]
   if (!button) return
   buttonsLoading.value[index] = true
   try {
-    await button.handler?.({ data: row })
+    await button.handler?.({ data: row, value: rawValue })
   } catch (error: unknown) {
     console.error(error)
   }

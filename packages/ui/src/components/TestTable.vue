@@ -12,12 +12,17 @@ window.itemsModuleT = itemsModuleT
 
 const columns: MUIColumn<Item>[] = [
   {
-    button: {
-      label: 'Edit',
-      handler: ({ data }) => alert(`edit ${data.id} (you have to implement this yourself)`),
-    },
+    buttons: [
+      {
+        label: 'Edit',
+        handler: ({ data }) => alert(`edit ${data.id} (you have to implement this yourself)`),
+      },
+    ],
   },
-  { fieldPath: 'id' },
+  {
+    fieldPath: 'id',
+    buttons: [{ label: 'Copy', handler: ({ value }) => alert(`copied to clipboard ${value}`) }],
+  },
   { label: 'Title', fieldPath: 'title', sortable: true },
   {
     label: 'Is it done?',
