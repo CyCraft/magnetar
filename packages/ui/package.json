@@ -10,9 +10,9 @@
       "import": "./dist/index.mjs",
       "default": "./dist/index.js"
     },
-    "./src/components/*": {
-      "import": "./src/components/*",
-      "default": "./src/components/*"
+    "./src/*": {
+      "import": "./src/*",
+      "default": "./src/*"
     }
   },
   "files": [
