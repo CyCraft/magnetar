@@ -70,8 +70,8 @@ async function handleClick(index: number): Promise<void> {
 </script>
 
 <template>
-  <td class="magnetar-table-td" :class="cellAttrs.class" :style="cellAttrs.style">
-    <div>
+  <td class="magnetar-table-td">
+    <div :class="cellAttrs.class" :style="cellAttrs.style">
       <div>{{ cellValueParsed }}</div>
       <button
         v-for="(button, i) in buttonAttrArr"

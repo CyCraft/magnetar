@@ -32,9 +32,9 @@ export type MUIColumn<T extends Record<string, any>, Label extends string = stri
    * @example ({ data }) => data.name.family + ' ' + data.name.given
    */
   parseValue?: (info: { value: any; data: T }) => string
-  /** Applied to the `<td>` row cell of this column */
+  /** Applied to `td > div` */
   class?: string | ((info: { value: any; data: T }) => string)
-  /** Applied to the `<td>` row cell of this column */
+  /** Applied to `td > div` */
   style?: string | ((info: { value: any; data: T }) => string)
   /** When `true` this column will become sortable as per the Magnetar orderBy feature */
   sortable?: boolean | { orderBy: 'asc' | 'desc'; position: number }
