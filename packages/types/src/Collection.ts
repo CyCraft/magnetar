@@ -7,17 +7,10 @@ import {
   MagnetarFetchCountAction,
 } from './types/actions'
 import { DocFn } from './Magnetar'
-import { WhereFilterOp } from './types/clauses'
+import { WhereFilterOp, WhereFilterValue } from './types/clauses'
 import { OPathsWithOptional } from './types/utils/Paths'
-import { ArrayValues } from './types/utils/ArrayValues'
 import { DeepPropType } from './types/utils/DeepPropType'
 import { DefaultTo } from './types/utils/DefaultTo'
-
-type WhereFilterValue<WFO extends WhereFilterOp, V> = WFO extends 'in' | 'not-in'
-  ? V[]
-  : WFO extends `array-contains`
-  ? ArrayValues<V>
-  : V
 
 export type CollectionInstance<
   DocDataType extends Record<string, any> = Record<string, any>,

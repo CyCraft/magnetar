@@ -7,6 +7,7 @@
   "scripts": {
     "dev:nuxt-firestore": "pnpm --filter dev-nuxt-firestore dev",
     "dev:vue3-firestore": "pnpm --filter dev-vue3-firestore dev",
+    "dev:ui": "pnpm --filter @magnetarjs/ui dev",
     "dep:del-all": "npm exec --workspaces -- npx rimraf node_modules && npx rimraf node_modules",
     "dep:update-minor": "ncu --target minor -u && pnpm --parallel exec ncu --target minor -u && echo \"review git changes and install with ni\"",
     "dep:update-major": "ncu -u && pnpm --parallel exec ncu -u && echo \"review git changes and install with ni\"",
@@ -36,6 +37,7 @@
     "@types/node": "^18.11.9",
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "@typescript-eslint/parser": "^5.49.0",
+    "@volar/vue-typescript": "^1.6.5",
     "ava": "^4.3.3",
     "bumpp": "^8.2.1",
     "copyfiles": "^2.4.1",
@@ -47,6 +49,7 @@
     "exec-sh": "^0.4.0",
     "npm-check-updates": "^16.3.25",
     "prettier": "^2.8.3",
+    "prettier-plugin-organize-imports": "^3.2.3",
     "rimraf": "^3.0.2",
     "tslib": "^2.4.1",
     "tsup": "^6.4.0",
@@ -86,6 +89,7 @@
       "/packages/dev-vue3",
       "/packages/dev-vue3-firestore",
       "/packages/docs",
+      "/packages/ui",
       "test"
     ],
     "extends": [

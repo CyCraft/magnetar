@@ -1,0 +1,78 @@
+{
+  "name": "@magnetarjs/ui",
+  "version": "0.11.10",
+  "description": "A fully functional table that automatically connects to your database powered by Magnetar 🌟",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.js"
+    },
+    "./src/components/*": {
+      "import": "./src/components/*",
+      "default": "./src/components/*"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "author": "Luca Ban - Mesqueeb",
+  "funding": "https://github.com/sponsors/mesqueeb",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@magnetarjs/core": "workspace:*",
+    "@magnetarjs/types": "workspace:*",
+    "@magnetarjs/utils": "workspace:*",
+    "fast-sort": "^3.2.1",
+    "is-what": "^4.1.7",
+    "path-to-prop": "^2.0.4",
+    "vue": "^3.2.45"
+  },
+  "devDependencies": {
+    "@magnetarjs/plugin-firestore": "workspace:*",
+    "@magnetarjs/plugin-vue3": "workspace:*",
+    "@vitejs/plugin-vue": "^4.0.0",
+    "sass": "^1.57.1",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.4",
+    "vue-tsc": "^1.0.24"
+  },
+  "homepage": "https://github.com/cycraft/magnetar#readme",
+  "keywords": [
+    "vuex-easy-firestore",
+    "magnetar",
+    "magnetarjs",
+    "state-management",
+    "syncing-solution",
+    "db-sync",
+    "auto-sync",
+    "framework-agnostic",
+    "optimistic-ui",
+    "vuejs",
+    "vuex",
+    "vue-sync",
+    "vue-state",
+    "vue-db",
+    "vue-store",
+    "firestore",
+    "data-store",
+    "local-store",
+    "remote-store",
+    "global-store",
+    "database-sync",
+    "database-management",
+    "database"
+  ],
+  "bugs": "https://github.com/cycraft/magnetar/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cycraft/magnetar.git"
+  }
+}
