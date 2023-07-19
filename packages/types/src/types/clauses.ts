@@ -1,3 +1,8 @@
+import { ArrayValues } from './utils/ArrayValues'
+import { DeepPropType } from './utils/DeepPropType'
+import { DefaultTo } from './utils/DefaultTo'
+import { OPathsWithOptional } from './utils/Paths'
+
 /**
  * The operator of a where filter.
  */
@@ -37,3 +42,20 @@ export type Clauses = {
   limit?: Limit
   startAfter?: unknown[] | any
 }
+
+export type WhereFilterValue<WFO extends WhereFilterOp, V> = WFO extends 'in' | 'not-in'
+  ? V[]
+  : WFO extends `array-contains`
+  ? ArrayValues<V>
+  : V
+
+/** TODO: replace `WhereClause` with this one */
+export type WhereClauseTuple<
+  T extends Record<string, any>,
+  Path extends OPathsWithOptional<T>,
+  WhereOp extends WhereFilterOp
+> = [
+  fieldPath: Path,
+  operator: WhereOp,
+  value: WhereFilterValue<WhereOp, DefaultTo<DeepPropType<T, Path>, any>>
+]

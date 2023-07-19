@@ -15,8 +15,7 @@
   "emmet.triggerExpansionOnTab": true,
   "emmet.includeLanguages": {
     "javascript": "javascriptreact",
-    "vue-html": "html",
-    "vue": "html"
+    "vue-html": "html"
   },
   // global important defaults
   "editor.tabSize": 2, // make sure this is the same as .prettierrc
