@@ -1,31 +1,30 @@
 {
   "name": "@magnetarjs/ui",
-  "version": "0.12.3",
+  "version": "0.12.4",
+  "type": "module",
+  "sideEffects": false,
   "description": "A fully functional table that automatically connects to your database powered by Magnetar 🌟",
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "module": "dist/index.js",
+  "types": "dist/types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "default": "./dist/index.js"
-    },
-    "./src/*": {
-      "import": "./src/*",
-      "default": "./src/*"
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js"
     }
   },
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "author": "Luca Ban - Mesqueeb",
   "funding": "https://github.com/sponsors/mesqueeb",
   "license": "MIT",
   "scripts": {
+    "build": "del-cli dist && npm run typecheck && vite build && npm run gen:types:ts",
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit",
+    "gen:types:ts": "vue-tsc --declaration --emitDeclarationOnly"
   },
   "dependencies": {
     "@magnetarjs/core": "workspace:*",
