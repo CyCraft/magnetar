@@ -31,17 +31,11 @@ export type MUIColumn<T extends Record<string, any>, Label extends string = stri
    * @example ({ value }) => !!value ? '✅' : '❌'
    * @example ({ data }) => data.name.family + ' ' + data.name.given
    */
-  parseValue?: (info: { value: any; data: T }) => any
-  /**
-   * A simple prefix that will be shown as part of the cell value
-   * @example '¥'
-   */
-  prefix?: string
-  /**
-   * A simple suffix that will be shown as part of the cell value
-   * @example 'kg'
-   */
-  suffix?: string
+  parseValue?: (info: { value: any; data: T }) => string
+  /** Applied to the `<td>` row cell of this column */
+  class?: string | ((info: { value: any; data: T }) => string)
+  /** Applied to the `<td>` row cell of this column */
+  style?: string | ((info: { value: any; data: T }) => string)
   /** When `true` this column will become sortable as per the Magnetar orderBy feature */
   sortable?: boolean | { orderBy: 'asc' | 'desc'; position: number }
   /** Shows action buttons next to the cell value */

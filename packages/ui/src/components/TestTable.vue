@@ -96,4 +96,10 @@ const filters: MUIFilter<Item>[] = [
     border: 1px solid #dfe2e5
     padding: 0.6em 1em
     white-space: nowrap
+    > div
+      display: flex
+      align-items: center
+      justify-content: center
+      > button
+        margin-left: auto
 </style>

@@ -52,54 +52,54 @@ const label = computed<string>(() => {
 
 <template>
   <th :class="`magnetar-table-th _direction-${direction}`" @click="(e) => onClick(e)">
-    {{ label }}
-    <i v-if="direction !== 'unsortable'" class="_sort-arrows"></i>
+    <div>
+      <div>{{ label }}</div>
+      <i v-if="direction !== 'unsortable'" class="_sort-arrows"></i>
+    </div>
   </th>
 </template>
 
-<style scoped>
-._sort-arrows {
-  float: right;
-  box-sizing: border-box;
-  position: relative;
-  display: block;
-  transform: scale(1);
-  width: 22px;
-  height: 22px;
-}
+<style scoped lang="sass">
+.magnetar-table-th
+  > div
+    display: flex
+    gap: 0.25rem
+    align-items: center
+._sort-arrows
+  float: right
+  box-sizing: border-box
+  position: relative
+  display: block
+  transform: scale(1)
+  width: 22px
+  height: 22px
 ._sort-arrows::after,
-._sort-arrows::before {
-  content: '';
-  display: block;
-  box-sizing: border-box;
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  left: 7px;
-  transform: rotate(-45deg);
-}
-._sort-arrows::before {
-  border-left: 2px solid;
-  border-bottom: 2px solid;
-  bottom: 4px;
-  opacity: 0.3;
-}
-._sort-arrows::after {
-  border-right: 2px solid;
-  border-top: 2px solid;
-  top: 4px;
-  opacity: 0.3;
-}
+._sort-arrows::before
+  content: ''
+  display: block
+  box-sizing: border-box
+  position: absolute
+  width: 8px
+  height: 8px
+  left: 7px
+  transform: rotate(-45deg)
+._sort-arrows::before
+  border-left: 2px solid
+  border-bottom: 2px solid
+  bottom: 4px
+  opacity: 0.3
+._sort-arrows::after
+  border-right: 2px solid
+  border-top: 2px solid
+  top: 4px
+  opacity: 0.3
 ._direction-asc,
 ._direction-desc,
-._direction-sortable {
-  cursor: pointer;
-  user-select: none;
-}
-._direction-asc ._sort-arrows::after {
-  opacity: 1;
-}
-._direction-desc ._sort-arrows::before {
-  opacity: 1;
-}
+._direction-sortable
+  cursor: pointer
+  user-select: none
+._direction-asc ._sort-arrows::after
+  opacity: 1
+._direction-desc ._sort-arrows::before
+  opacity: 1
 </style>

@@ -23,9 +23,18 @@ const cellValueParsed = computed<string>(() => {
   return parseValue ? parseValue({ value: rawValue, data: props.row }) : rawValue
 })
 
-const buttonsLoading = ref<boolean[]>(props.column.buttons?.map(() => false) || [])
+const cellAttrs = computed<{ class: string | undefined; style: string | undefined }>(() => {
+  const { column, row } = props
+  const rawValue = cellValueRaw.value
+  return {
+    class: isFunction(column.class) ? column.class({ data: row, value: rawValue }) : column.class,
+    style: isFunction(column.style) ? column.style({ data: row, value: rawValue }) : column.style,
+  }
+})
 
-const buttonStates = computed<{ label: string; disabled: boolean | undefined }[]>(() => {
+const buttonLoadingArr = ref<boolean[]>(props.column.buttons?.map(() => false) || [])
+
+const buttonAttrArr = computed<{ label: string; disabled: boolean | undefined }[]>(() => {
   const { column, row, parseLabel } = props
   const rawValue = cellValueRaw.value
 
@@ -35,7 +44,7 @@ const buttonStates = computed<{ label: string; disabled: boolean | undefined }[]
       : button.label
     const label = parseLabel ? parseLabel(text) : text
 
-    const disabled = buttonsLoading.value[index]
+    const disabled = buttonLoadingArr.value[index]
       ? true
       : isFunction(button.disabled)
       ? button.disabled({ data: row, value: rawValue })
@@ -50,27 +59,29 @@ async function handleClick(index: number): Promise<void> {
   const rawValue = cellValueRaw.value
   const button = column.buttons?.[index]
   if (!button) return
-  buttonsLoading.value[index] = true
+  buttonLoadingArr.value[index] = true
   try {
     await button.handler?.({ data: row, value: rawValue })
   } catch (error: unknown) {
     console.error(error)
   }
-  buttonsLoading.value[index] = false
+  buttonLoadingArr.value[index] = false
 }
 </script>
 
 <template>
-  <td class="magnetar-table-td">
-    {{ cellValueParsed }}
-    <button
-      v-for="(button, i) in buttonStates"
-      :key="button?.label"
-      :disabled="button.disabled || undefined"
-      @click.stop="() => handleClick(i)"
-    >
-      {{ button.label }}
-    </button>
+  <td class="magnetar-table-td" :class="cellAttrs.class" :style="cellAttrs.style">
+    <div>
+      <div>{{ cellValueParsed }}</div>
+      <button
+        v-for="(button, i) in buttonAttrArr"
+        :key="button?.label"
+        :disabled="button.disabled || undefined"
+        @click.stop="() => handleClick(i)"
+      >
+        {{ button.label }}
+      </button>
+    </div>
   </td>
 </template>
 
