@@ -40,6 +40,23 @@ export type MUIColumn<T extends Record<string, any>, Label extends string = stri
   sortable?: boolean | { orderBy: 'asc' | 'desc'; position: number }
   /** Shows action buttons next to the cell value */
   buttons?: MUIButton<T, Label>[]
+  /**
+   * You can define a function as your markdown parser. Whatever value will be parsed as markdown content, and shows inside the cell with `v-html`.
+   * - first executes `parseValue` if defined
+   * - if your value is not a string, you need to define `parseValue` which MUST convert it to a string
+   * ```html
+   * <div v-html="starkdown(parseValue({ value, data }))" />
+   * ```
+   * @example
+   * ```
+   * import { starkdown } from 'starkdown'
+   * const column: MUIColumn<Record<string, any>> = {
+   *   // ...
+   *   parseMarkdown: starkdown
+   * }
+   * ```
+   */
+  parseMarkdown?: (text: string) => string
 }
 
 export type MUIPagination = {
