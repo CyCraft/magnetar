@@ -41,25 +41,29 @@ export type MUIColumn<T extends Record<string, any>, Label extends string = stri
   /** Shows action buttons next to the cell value */
   buttons?: MUIButton<T, Label>[]
   /**
-   * You can define a function as your markdown parser. Whatever value will be parsed as markdown content, and shows inside the cell with `v-html`.
-   * - first executes `parseValue` if defined
-   * - if your value is not a string, you need to define `parseValue` which MUST convert it to a string
-   * ```html
-   * <div v-html="starkdown(parseValue({ value, data }))" />
-   * ```
+   * When `true` it will bind the `value` to the `innerHTML` of the `td > div > div` instead of the `innerText`.
+   * You can still pass `buttons: []` as well which will render next to your html.
+   *
    * @example
+   * ```js
+   * const column = {
+   *   fieldPath: 'url',
+   *   parseValue: ({ value }) => `<a href="${value}">${value}</a>`,
+   *   html: true,
+   * }
    * ```
-   * import { starkdown } from 'starkdown'
-   * const column: MUIColumn<Record<string, any>> = {
-   *   // ...
-   *   parseMarkdown: starkdown
+   *
+   * @example
+   * ```js
+   * const column = {
+   *   fieldPath: 'imgUrl',
+   *   parseValue: ({ value }) => `<img src="${value}" />`,
+   *   html: true,
    * }
    * ```
    */
-  parseMarkdown?: (text: string) => string
-  /**
-   * When set this will be the name of the slot you can use to edit the column cells via Vue slots.
-   */
+  html?: boolean
+  /** When set this will be the name of the slot you can use to edit the column cells via Vue slots. */
   slot?: string
 }
 
@@ -72,17 +76,60 @@ export type MUIFilter<
   Label extends string = string,
   Path extends OPaths<T> = OPaths<T>,
   WhereOp extends WhereFilterOp = WhereFilterOp
-> = MUIFilterOptions<T, Label, Path, WhereOp> | MUIFilterOther
+> = MUIFilterOptions<T, Label, Path, WhereOp> | MUIFilterOptions<T, Label, Path, WhereOp>
 
 /**
  * TODO: not yet implemented!!
  */
-export type MUIFilterOther<Label extends string = string> = {
+export type MUIFilterOther<T extends Record<string, any>, Label extends string = string> = {
   label: Label
   /**
-   * TODO: not yet implemented!!
+   * The `type` is passed to the `<input>` element
    */
-  type: 'text' | 'date' | 'dateRange' | 'number'
+  type: 'text' | 'date' | 'number'
+  /**
+   * An array of where clauses, which will be combined with `||` (OR).
+   *
+   * The value of the where clause is what the user typed in the input field.
+   * You must pass a function which parses the user input to the correct type as per your needs.
+   * Usually applying `.trim()` as per the examples is a good idea.
+   *
+   * @example
+   * ```js
+   * const filter = {
+   *   label: 'username',
+   *   type: 'text',
+   *   orWhere: [['username', '==', (userInput) => userInput.trim()]],
+   * }
+   * ```
+   * @example
+   * ```js
+   * const filter = {
+   *   label: 'amount',
+   *   type: 'number',
+   *   orWhere: [
+   *     ['amountVAT', '>=', (userInput) => Number(userInput.trim())],
+   *     ['profit', '>=', (userInput) => Number(userInput.trim())],
+   *   ]
+   * }
+   * ```
+   * @example
+   * ```js
+   * const filter = {
+   *   label: 'date',
+   *   type: 'date',
+   *   orWhere: [
+   *     ['dateCreated', '>=', (userInput) => new Date(userInput.trim())],
+   *     ['dateUpdated', '>=', (userInput) => new Date(userInput.trim())],
+   *   ]
+   * }
+   * ```
+   */
+  orWhere: [fieldPath: OPaths<T>, operator: WhereFilterOp, parseInput: (userInput: string) => any][]
+  /** Applied to `<fieldset>` */
+  class?: string
+  /** Applied to `<fieldset>` */
+  style?: string
   /** not available */
   options?: undefined
 }
@@ -100,6 +147,12 @@ export type MUIFilterOptions<
     where: WhereClauseTuple<T, Path, WhereOp>
     checked?: boolean
   }[]
+  /** Applied to `<fieldset>` */
+  class?: string
+  /** Applied to `<fieldset>` */
+  style?: string
+  /** not available */
+  orWhere?: undefined
 }
 
 export type MUIRows<T extends Record<string, any>> = T[]

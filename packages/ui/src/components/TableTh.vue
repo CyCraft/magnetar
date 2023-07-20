@@ -51,20 +51,17 @@ const label = computed<string>(() => {
 </script>
 
 <template>
-  <th :class="`magnetar-table-th _direction-${direction}`" @click="(e) => onClick(e)">
-    <div>
-      <div>{{ label }}</div>
-      <i v-if="direction !== 'unsortable'" class="_sort-arrows"></i>
-    </div>
-  </th>
+  <div :class="`magnetar-table-th _direction-${direction}`" @click="(e) => onClick(e)">
+    <div>{{ label }}</div>
+    <i v-if="direction !== 'unsortable'" class="_sort-arrows"></i>
+  </div>
 </template>
 
 <style scoped lang="sass">
 .magnetar-table-th
-  > div
-    display: flex
-    gap: 0.25rem
-    align-items: center
+  display: flex
+  gap: 0.25rem
+  align-items: center
 ._sort-arrows
   float: right
   box-sizing: border-box

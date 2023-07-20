@@ -15,16 +15,17 @@ import {
 } from '../types'
 import {
   calcCollection,
+  carbonCopyMap,
   columnsToInitialOrderByState,
   filterStateToClauses,
   filtersToInitialState,
   orderByStateToClauses,
-  splitOnLink,
 } from '../utils'
 import LoadingSpinner from './LoadingSpinner.vue'
 import TableFilter from './TableFilter.vue'
 import TableTd from './TableTd.vue'
 import TableTh from './TableTh.vue'
+import TextWithAnchorTags from './TextWithAnchorTags.vue'
 
 const props = defineProps<{
   collection: CollectionInstance<any>
@@ -41,11 +42,29 @@ function muiLabel(label: MUILabel): string {
 // const emit = defineEmits<{}>()
 const fetchState = ref<'ok' | 'end' | 'fetching' | { error: string }>('ok')
 
-const filterState = ref<FilterState>(filtersToInitialState(props.filters))
-const orderByState = ref<OrderByState>(columnsToInitialOrderByState(props.columns))
+const initialFilterState: FilterState = filtersToInitialState(props.filters)
+const initialOrderByState: OrderByState = columnsToInitialOrderByState(props.columns)
+
+const filterState = ref<FilterState>(carbonCopyMap(initialFilterState))
+const orderByState = ref<OrderByState>(carbonCopyMap(initialOrderByState))
 
 const currentFilters = computed(() => filterStateToClauses(filterState.value))
 const currentOrderBy = computed(() => orderByStateToClauses(orderByState.value))
+
+const initialStateActive = computed<boolean>(
+  () =>
+    filterState.value.size === initialFilterState.size &&
+    orderByState.value.size === initialOrderByState.size &&
+    [...filterState.value.entries()].every(
+      ([key, value]) => initialFilterState.get(key) === value
+    ) &&
+    [...orderByState.value.entries()].every(
+      ([key, value]) => initialOrderByState.get(key) === value
+    )
+)
+const hasSomeFilterOrOrderby = computed<boolean>(
+  () => !!filterState.value.size || !!orderByState.value.size
+)
 
 /** This instance is not computed so that we can delay setting it after fetching the relevant records */
 const collectionInstance = ref(
@@ -58,8 +77,8 @@ function clearAllRecords(): void {
 }
 
 function resetState(): void {
-  filterState.value = filtersToInitialState(props.filters)
-  orderByState.value = columnsToInitialOrderByState(props.columns)
+  filterState.value = carbonCopyMap(initialFilterState)
+  orderByState.value = carbonCopyMap(initialOrderByState)
   clearAllRecords()
   fetchMore()
 }
@@ -145,8 +164,8 @@ async function setOrderBy(
 </script>
 
 <template>
-  <div class="magnetar-table">
-    <section class="magnetar-table-info">
+  <div class="magnetar-table magnetar-column magnetar-gap-md">
+    <section class="magnetar-row magnetar-gap-md">
       <table>
         <thead>
           <tr>
@@ -167,7 +186,7 @@ async function setOrderBy(
       <LoadingSpinner v-if="fetchState === 'fetching'" class="magnetar-fetch-state-loading" />
     </section>
 
-    <section class="magnetar-table-filters">
+    <section class="magnetar-row magnetar-gap-md">
       <TableFilter
         v-for="filter in filters"
         :filter="filter"
@@ -176,9 +195,9 @@ async function setOrderBy(
         :parseLabel="parseLabel"
         @setFilter="([where, to]) => setFilter(where, to)"
       />
-      <div v-if="currentFilters.length || currentOrderBy.length" class="magnetar-current-state">
+      <div v-if="hasSomeFilterOrOrderby" class="magnetar-column magnetar-gap-sm">
         <h6>{{ muiLabel('magnetar table active filters') }}</h6>
-        <div>
+        <div class="magnetar-row magnetar-gap-sm magnetar-active-filters">
           <div v-for="_filter in currentFilters" :key="JSON.stringify(_filter)">
             <!-- TODO: @click="() => filterState.delete(_filter)" -->
             .where({{ _filter.map((f) => JSON.stringify(f)).join(', ') }})
@@ -188,53 +207,50 @@ async function setOrderBy(
             .orderBy({{ _orderBy.map((o) => JSON.stringify(o)).join(', ') }})
           </div>
         </div>
-        <div v-if="isPlainObject(fetchState)" class="magnetar-fetch-state-error">
-          <template v-for="(part, i) of splitOnLink(fetchState.error)" :key="i">
-            <span v-if="part.kind === 'text'">
-              <template v-for="(line, _i) of part.content.split(/[\n\r]/)" :key="_i"
-                ><br v-if="_i !== 0" />{{ line }}</template
-              >
-            </span>
-            <a v-if="part.kind === 'link'" :href="part.content" target="_blank">{{
-              part.content
-            }}</a>
-          </template>
-        </div>
-        <div>
-          <button @click="() => resetState()">
-            {{ muiLabel('magnetar table fetch-state reset') }}
-          </button>
-          <button @click="() => clearState()">
-            {{ muiLabel('magnetar table clear filters button') }}
-          </button>
-        </div>
       </div>
+    </section>
+
+    <TextWithAnchorTags
+      v-if="isPlainObject(fetchState)"
+      class="magnetar-fetch-state-error"
+      :text="fetchState.error"
+    />
+
+    <section
+      v-if="hasSomeFilterOrOrderby || !initialStateActive"
+      class="magnetar-row magnetar-gap-sm"
+    >
+      <button v-if="!initialStateActive" @click="() => resetState()">
+        {{ muiLabel('magnetar table fetch-state reset') }}
+      </button>
+      <button v-if="hasSomeFilterOrOrderby" @click="() => clearState()">
+        {{ muiLabel('magnetar table clear filters button') }}
+      </button>
     </section>
 
     <table>
       <thead>
         <tr>
-          <TableTh
-            v-for="(column, i) in columns"
-            :key="column.fieldPath + 'th' + i"
-            :column="column"
-            :orderByState="orderByState"
-            :parseLabel="parseLabel"
-            @setOrderBy="([fieldPath, direction]) => setOrderBy(fieldPath, direction)"
-          />
+          <th v-for="(column, i) in columns" :key="column.fieldPath + 'th' + i">
+            <TableTh
+              :column="column"
+              :orderByState="orderByState"
+              :parseLabel="parseLabel"
+              @setOrderBy="([fieldPath, direction]) => setOrderBy(fieldPath, direction)"
+            />
+          </th>
         </tr>
       </thead>
-
       <tbody>
         <tr v-for="row in rows" :key="row.id">
-          <template
+          <td
             v-for="(column, columnIndex) in columns"
             :key="(column.fieldPath || column.slot) + 'td' + row.id"
           >
             <slot :name="column.slot || columnIndex" v-bind="{ data: row }">
               <TableTd :row="row" :column="column" :parseLabel="parseLabel"> </TableTd>
             </slot>
-          </template>
+          </td>
         </tr>
         <slot v-if="!rows.length" name="empty">
           <tr>
@@ -259,41 +275,28 @@ async function setOrderBy(
 </template>
 
 <style lang="sass" scoped>
-.magnetar-table
+.magnetar-row
+  display: flex
+  flex-direction: row
+  flex-wrap: wrap
+  align-items: center
+.magnetar-column
   display: flex
   flex-direction: column
+.magnetar-gap-sm
+  gap: 0.5rem
+.magnetar-gap-md
   gap: 1rem
-.magnetar-table-info
-  display: flex
-  flex-wrap: wrap
-  gap: 1rem
-  align-items: center
-  min-height: 26px
+.magnetar-table
   h6
     margin: 0
+.magnetar-table-info
+  min-height: 26px
 .magnetar-fetch-state-error
-  white-space: pre-line
-  word-break: break-word
-  text-align: left
   color: var(--c-error, indianred)
-.magnetar-current-state
-  display: flex
-  flex-direction: column
-  align-items: flex-start
-  gap: 0.5rem
-  > h6
-    margin: 0
+.magnetar-active-filters
   > div
-    display: flex
-    flex-wrap: wrap
-    gap: .5rem
-    align-items: center
-    > div
-      background: var(--c-primary-extra-light, whitesmoke)
-      border-radius: 0.25rem
-      padding: 0.25rem 0.5rem
-.magnetar-table-filters
-  display: flex
-  flex-wrap: wrap
-  gap: 1rem
+    background: var(--c-primary-extra-light, whitesmoke)
+    border-radius: 0.25rem
+    padding: 0.25rem 0.5rem
 </style>

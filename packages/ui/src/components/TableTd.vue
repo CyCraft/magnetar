@@ -18,10 +18,9 @@ const cellValueRaw = computed<any>(() => {
 })
 
 const cellValueParsed = computed<string>(() => {
-  const { parseValue, parseMarkdown } = props.column
+  const { parseValue } = props.column
   const rawValue = cellValueRaw.value
-  const parsed = parseValue ? parseValue({ value: rawValue, data: props.row }) : rawValue
-  return parseMarkdown ? parseMarkdown(parsed) : parsed
+  return parseValue ? parseValue({ value: rawValue, data: props.row }) : rawValue
 })
 
 const cellAttrs = computed<{ class: string | undefined; style: string | undefined }>(() => {
@@ -71,20 +70,18 @@ async function handleClick(index: number): Promise<void> {
 </script>
 
 <template>
-  <td class="magnetar-table-td">
-    <div :class="cellAttrs.class" :style="cellAttrs.style">
-      <div v-if="column.parseMarkdown" v-html="cellValueParsed" />
-      <div v-if="!column.parseMarkdown">{{ cellValueParsed }}</div>
-      <button
-        v-for="(button, i) in buttonAttrArr"
-        :key="button?.label"
-        :disabled="button.disabled || undefined"
-        @click.stop="() => handleClick(i)"
-      >
-        {{ button.label }}
-      </button>
-    </div>
-  </td>
+  <div :class="cellAttrs.class" :style="cellAttrs.style">
+    <div v-if="column.html" v-html="cellValueParsed" />
+    <div v-if="!column.html">{{ cellValueParsed }}</div>
+    <button
+      v-for="(button, i) in buttonAttrArr"
+      :key="button?.label"
+      :disabled="button.disabled || undefined"
+      @click.stop="() => handleClick(i)"
+    >
+      {{ button.label }}
+    </button>
+  </div>
 </template>
 
 <style scoped></style>

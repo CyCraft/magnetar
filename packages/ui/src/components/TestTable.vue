@@ -23,7 +23,7 @@ const columns: MUIColumn<Item>[] = [
     fieldPath: 'id',
     buttons: [{ label: 'Copy', handler: ({ value }) => alert(`copied to clipboard ${value}`) }],
   },
-  { label: 'Title', fieldPath: 'title', sortable: true },
+  { label: 'Title', fieldPath: 'title', sortable: { orderBy: 'asc', position: 0 } },
   { label: 'Custom Slot', slot: 'somecolumn' },
   {
     label: 'Is it done?',

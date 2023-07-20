@@ -48,10 +48,10 @@ const filterLabel = computed<string>(() => {
 </script>
 
 <template>
-  <fieldset class="magnetar-table-filter">
+  <fieldset class="magnetar-table-filter" :class="filter.class" :style="filter.style">
     <legend>{{ filterLabel }}</legend>
     <template v-if="filter.type === 'checkboxes'">
-      <template v-for="option in filter.options">
+      <div v-for="option in filter.options" class="magnetar-inline-block">
         <input
           :id="JSON.stringify(option.where)"
           type="checkbox"
@@ -62,10 +62,10 @@ const filterLabel = computed<string>(() => {
           >{{ parseLabel ? parseLabel(option.label) : option.label }}
           <small> ({{ props.collection.where(...option.where).count }})</small></label
         >
-      </template>
+      </div>
     </template>
     <template v-if="filter.type === 'radio'">
-      <template v-for="option in filter.options">
+      <div v-for="option in filter.options" class="magnetar-inline-block">
         <input
           :id="JSON.stringify(option.where)"
           type="radio"
@@ -78,7 +78,7 @@ const filterLabel = computed<string>(() => {
           >{{ parseLabel ? parseLabel(option.label) : option.label }}
           <small> ({{ props.collection.where(...option.where).count }})</small></label
         >
-      </template>
+      </div>
     </template>
     <template v-if="filter.type === 'select'">
       <select v-model="selectModel">
@@ -94,6 +94,9 @@ const filterLabel = computed<string>(() => {
 
 <style lang="sass" scoped>
 .magnetar-table-filter
-  > label
-    margin: 0.25rem
+  border: thin solid
+  .magnetar-inline-block
+    display: inline-block
+    > label
+      margin: 0.25rem
 </style>
