@@ -57,6 +57,10 @@ export type MUIColumn<T extends Record<string, any>, Label extends string = stri
    * ```
    */
   parseMarkdown?: (text: string) => string
+  /**
+   * When set this will be the name of the slot you can use to edit the column cells via Vue slots.
+   */
+  slot?: string
 }
 
 export type MUIPagination = {

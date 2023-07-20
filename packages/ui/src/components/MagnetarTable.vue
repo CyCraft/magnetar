@@ -229,10 +229,10 @@ async function setOrderBy(
         <tr v-for="row in rows" :key="row.id">
           <template
             v-for="(column, columnIndex) in columns"
-            :key="column.fieldPath + 'td' + row.id"
+            :key="(column.fieldPath || column.slot) + 'td' + row.id"
           >
-            <slot :name="`cell-${column.fieldPath || `${columnIndex}`}`">
-              <TableTd :row="row" :column="column" :parseLabel="parseLabel" />
+            <slot :name="column.slot || columnIndex" v-bind="{ data: row }">
+              <TableTd :row="row" :column="column" :parseLabel="parseLabel"> </TableTd>
             </slot>
           </template>
         </tr>

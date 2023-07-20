@@ -24,6 +24,7 @@ const columns: MUIColumn<Item>[] = [
     buttons: [{ label: 'Copy', handler: ({ value }) => alert(`copied to clipboard ${value}`) }],
   },
   { label: 'Title', fieldPath: 'title', sortable: true },
+  { label: 'Custom Slot', slot: 'somecolumn' },
   {
     label: 'Is it done?',
     fieldPath: 'isDone',
@@ -76,7 +77,11 @@ const filters: MUIFilter<Item>[] = [
       :columns="columns"
       :filters="filters"
       :pagination="{ limit: 10 }"
-    />
+    >
+      <template #somecolumn="{ data }">
+        <pre>{{ data }}</pre>
+      </template>
+    </MagnetarTable>
   </div>
 </template>
 
