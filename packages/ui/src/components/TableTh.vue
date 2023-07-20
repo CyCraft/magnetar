@@ -29,14 +29,14 @@ function onClick(e: MouseEvent) {
   e.stopPropagation()
 
   if (direction.value === 'sortable') {
-    emit('setOrderBy', [fieldPath, 'asc'])
-    return
-  }
-  if (direction.value === 'asc') {
     emit('setOrderBy', [fieldPath, 'desc'])
     return
   }
   if (direction.value === 'desc') {
+    emit('setOrderBy', [fieldPath, 'asc'])
+    return
+  }
+  if (direction.value === 'asc') {
     emit('setOrderBy', [fieldPath, undefined])
     return
   }

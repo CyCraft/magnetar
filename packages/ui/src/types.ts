@@ -6,9 +6,9 @@ export type OPaths<T> = OPathsWithOptional<T>
 export type MUIParseLabel<LabelType = any> = (label: LabelType) => string
 
 export type MUIButton<T extends Record<string, any>, Label extends string = string> = {
-  label: Label | ((info: { value: any; data: T }) => Label)
-  handler: (info: { value: any; data: T }) => void | Promise<void>
-  disabled?: (info: { value: any; data: T }) => boolean | undefined
+  label: Label | (<Value>(info: { value: Value; data: T }) => Label)
+  handler: <Value>(info: { value: Value; data: T }) => void | Promise<void>
+  disabled?: <Value>(info: { value: Value; data: T }) => boolean | undefined
 }
 
 export type MUIColumn<T extends Record<string, any>, Label extends string = string> = {
@@ -31,11 +31,11 @@ export type MUIColumn<T extends Record<string, any>, Label extends string = stri
    * @example ({ value }) => !!value ? '✅' : '❌'
    * @example ({ data }) => data.name.family + ' ' + data.name.given
    */
-  parseValue?: (info: { value: any; data: T }) => string
+  parseValue?: <Value>(info: { value: Value; data: T }) => string
   /** Applied to `td > div` */
-  class?: string | ((info: { value: any; data: T }) => string)
+  class?: string | (<Value>(info: { value: Value; data: T }) => string)
   /** Applied to `td > div` */
-  style?: string | ((info: { value: any; data: T }) => string)
+  style?: string | (<Value>(info: { value: Value; data: T }) => string)
   /** When `true` this column will become sortable as per the Magnetar orderBy feature */
   sortable?: boolean | { orderBy: 'asc' | 'desc'; position: number }
   /** Shows action buttons next to the cell value */

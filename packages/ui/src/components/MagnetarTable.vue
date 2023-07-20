@@ -19,6 +19,7 @@ import {
   filterStateToClauses,
   filtersToInitialState,
   orderByStateToClauses,
+  splitOnLink,
 } from '../utils'
 import LoadingSpinner from './LoadingSpinner.vue'
 import TableFilter from './TableFilter.vue'
@@ -188,7 +189,16 @@ async function setOrderBy(
           </div>
         </div>
         <div v-if="isPlainObject(fetchState)" class="magnetar-fetch-state-error">
-          {{ fetchState.error }}
+          <template v-for="(part, i) of splitOnLink(fetchState.error)" :key="i">
+            <span v-if="part.kind === 'text'">
+              <template v-for="(line, _i) of part.content.split(/[\n\r]/)" :key="_i"
+                ><br v-if="_i !== 0" />{{ line }}</template
+              >
+            </span>
+            <a v-if="part.kind === 'link'" :href="part.content" target="_blank">{{
+              part.content
+            }}</a>
+          </template>
         </div>
         <div>
           <button @click="() => resetState()">
@@ -214,6 +224,7 @@ async function setOrderBy(
           />
         </tr>
       </thead>
+
       <tbody>
         <tr v-for="row in rows" :key="row.id">
           <template
@@ -226,9 +237,11 @@ async function setOrderBy(
           </template>
         </tr>
         <slot v-if="!rows.length" name="empty">
-          <div>
-            <p>{{ muiLabel('magnetar table no-results') }}</p>
-          </div>
+          <tr>
+            <td :colspan="columns.length">
+              <div style="min-height: 100px">{{ muiLabel('magnetar table no-results') }}</div>
+            </td>
+          </tr>
         </slot>
       </tbody>
     </table>

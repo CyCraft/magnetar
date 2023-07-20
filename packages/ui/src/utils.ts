@@ -96,3 +96,65 @@ export function calcCollection(
   }
   return collection
 }
+
+/**
+ * Splits a string on links and returns an array of objects
+ */
+export function splitOnLink(text: string): { kind: 'text' | 'link'; content: string }[] {
+  /** this regex checks for links */
+  const regex = new RegExp(
+    /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/gi
+  )
+
+  const matches = text.matchAll(regex)
+
+  const links: { text: string; start: number; end: number }[] = []
+
+  for (const match of matches) {
+    links.push({
+      text: match[0],
+      start: match.index || 0,
+      end: (match.index || 0) + match[0].length,
+    })
+  }
+
+  const returnArray: { kind: 'text' | 'link'; content: string }[] = []
+
+  if (links.length > 0) {
+    let lastIndex = 0
+
+    links.forEach((link, index) => {
+      if (link.start === 0) {
+        returnArray.push({
+          kind: 'link',
+          content: link.text,
+        })
+        lastIndex = link.end
+      }
+      if (link.start !== 0) {
+        // is there gap between link start and lastindex?
+        if (link.start > lastIndex) {
+          returnArray.push({
+            kind: 'text',
+            content: text.substring(lastIndex, link.start),
+          })
+        }
+        returnArray.push({
+          kind: 'link',
+          content: link.text,
+        })
+        lastIndex = link.end
+      }
+      if (index === links.length - 1 && lastIndex < text.length) {
+        returnArray.push({
+          kind: 'text',
+          content: text.substring(link.end, text.length),
+        })
+      }
+    })
+  }
+
+  if (returnArray.length) return returnArray.filter((p) => p.content)
+
+  return [{ kind: 'text' as const, content: text }].filter((p) => p.content)
+}
