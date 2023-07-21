@@ -23,8 +23,15 @@ const columns: MUIColumn<Item>[] = [
     fieldPath: 'id',
     buttons: [{ label: 'Copy', handler: ({ value }) => alert(`copied to clipboard ${value}`) }],
   },
-  { label: 'Title', fieldPath: 'title', sortable: { orderBy: 'asc', position: 0 } },
-  { label: 'Custom Slot', slot: 'somecolumn' },
+  {
+    label: 'Title',
+    fieldPath: 'title',
+    sortable: { orderBy: 'asc', position: 0 },
+  },
+  {
+    label: 'Custom Slot',
+    slot: 'somecolumn',
+  },
   {
     label: 'Is it done?',
     fieldPath: 'isDone',
@@ -34,6 +41,17 @@ const columns: MUIColumn<Item>[] = [
 ]
 
 const filters: MUIFilter<Item>[] = [
+  {
+    label: 'Search',
+    placeholder: 'search something...',
+    type: 'text',
+    where: {
+      or: [
+        ['title', '==', (userInput) => userInput.trim()],
+        ['id', '==', (userInput) => userInput.trim()],
+      ],
+    },
+  },
   {
     label: 'Done or not',
     type: 'checkboxes',

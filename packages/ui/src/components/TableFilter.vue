@@ -68,23 +68,29 @@ const selectModel = computed({
  */
 const inputModel = ref<any>('')
 
-watch(inputModel, (userInput: any) => {
-  const { filter } = props
-  if (filter.type !== 'text' && filter.type !== 'number' && filter.type !== 'date') return undefined
-  if (!userInput) {
-    // remove filter
-    emit('setFilter', null)
-    return
-  }
+let timeout: any
 
-  const whereClauseSpecs = isArray(filter.where) ? [filter.where] : filter.where.or
-  const whereClauses: WhereClause[] =
-    whereClauseSpecs?.map<WhereClause>((spec) => {
-      const [fieldPath, op, parseInput] = spec
-      return [fieldPath, op, parseInput(userInput)]
-    }) || []
-  emit('setFilter', { or: new Set<WhereClause>(whereClauses) })
-  return
+watch(inputModel, (userInput: any) => {
+  clearTimeout(timeout)
+  timeout = setTimeout(() => {
+    const { filter } = props
+    if (filter.type !== 'text' && filter.type !== 'number' && filter.type !== 'date')
+      return undefined
+    if (!userInput) {
+      // remove filter
+      emit('setFilter', null)
+      return
+    }
+
+    const whereClauseSpecs = isArray(filter.where) ? [filter.where] : filter.where.or
+    const whereClauses: WhereClause[] =
+      whereClauseSpecs?.map<WhereClause>((spec) => {
+        const [fieldPath, op, parseInput] = spec
+        return [fieldPath, op, parseInput(userInput)]
+      }) || []
+    emit('setFilter', { or: new Set<WhereClause>(whereClauses) })
+    return
+  }, 300)
 })
 
 const filterAttrs = computed<{
@@ -155,7 +161,11 @@ const filterAttrs = computed<{
       <!-- INPUT (text, number, date) -->
       <div class="magnetar-row magnetar-gap-sm">
         <span v-if="filterAttrs.prefix">{{ filterAttrs.prefix }}</span>
-        <input v-model="inputModel" :type="filter.type" :placeholder="filterAttrs.placeholder" />
+        <input
+          v-model="inputModel"
+          :type="filter.type === 'text' ? 'search' : filter.type"
+          :placeholder="filterAttrs.placeholder"
+        />
         <span v-if="filterAttrs.suffix">{{ filterAttrs.suffix }}</span>
       </div>
     </template>
