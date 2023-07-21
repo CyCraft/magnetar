@@ -1,16 +1,16 @@
-import {
-  MagnetarFetchAction,
-  MagnetarStreamAction,
-  MagnetarInsertAction,
-  MagnetarDeleteAction,
-  FetchMetaDataCollection,
-  MagnetarFetchCountAction,
-} from './types/actions'
 import { DocFn } from './Magnetar'
-import { WhereFilterOp, WhereFilterValue } from './types/clauses'
-import { OPathsWithOptional } from './types/utils/Paths'
+import {
+  FetchMetaDataCollection,
+  MagnetarDeleteAction,
+  MagnetarFetchAction,
+  MagnetarFetchCountAction,
+  MagnetarInsertAction,
+  MagnetarStreamAction,
+} from './types/actions'
+import { Query, WhereFilterOp, WhereFilterValue } from './types/clauses'
 import { DeepPropType } from './types/utils/DeepPropType'
 import { DefaultTo } from './types/utils/DefaultTo'
+import { OPathsWithOptional } from './types/utils/Paths'
 
 export type CollectionInstance<
   DocDataType extends Record<string, any> = Record<string, any>,
@@ -42,7 +42,7 @@ export type CollectionInstance<
    */
   path: string
   /**
-   * Returns the open stream promise of this collection, dependant on which `where`/`limit`/`orderBy` filters was used.
+   * Returns the open stream promise of this collection, dependant on which `where`/`query`/`limit`/`orderBy` filters was used.
    *
    * Returns `null` when there is no open stream.
    *
@@ -50,13 +50,13 @@ export type CollectionInstance<
    */
   streaming: () => Promise<void> | null
   /**
-   * Close the stream of this collection, dependant on which `where`/`limit`/`orderBy` filters was used.
+   * Close the stream of this collection, dependant on which `where`/`query`/`limit`/`orderBy` filters was used.
    *
    * Does nothing if there is no open stream.
    */
   closeStream: () => void
   /**
-   * Close all streams of this collection, no matter which `where`/`limit`/`orderBy` filters were used.
+   * Close all streams of this collection, no matter which `where`/`query`/`limit`/`orderBy` filters were used.
    *
    * Does nothing if there are no open streams.
    */
@@ -104,6 +104,10 @@ export type CollectionInstance<
     operator: WhereOp,
     value: WhereFilterValue<WhereOp, DefaultTo<DeepPropType<DocDataType, Path>, any>>
   ) => CollectionInstance<DocDataType, GranularTypes>
+  /**
+   * Chainable filter. Returns {@link CollectionInstance} with filter applied.
+   */
+  query: (query: Query<DocDataType>) => CollectionInstance<DocDataType, GranularTypes>
   /**
    * Chainable filter. Returns {@link CollectionInstance} with filter applied.
    */

@@ -1,22 +1,40 @@
+import { DocMetadata, QueryClause } from '@magnetarjs/types'
+import type { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'
 import type {
-  Firestore,
-  Query,
   CollectionReference,
   DocumentSnapshot,
+  Firestore,
+  Query,
   QueryDocumentSnapshot,
 } from 'firebase/firestore'
 import {
+  and,
   collection,
   collectionGroup,
-  query,
-  where,
-  orderBy,
   limit,
+  or,
+  orderBy,
+  query,
   startAfter,
+  where,
 } from 'firebase/firestore'
-import { isNumber } from 'is-what'
-import type { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'
-import { DocMetadata } from '@magnetarjs/types'
+import { isArray, isNumber } from 'is-what'
+
+function applyQuery(q: CollectionReference | Query, queryClause: QueryClause): Query {
+  if ('and' in queryClause) {
+    if (isArray(queryClause.and)) {
+      return query(q, and(...queryClause.and.map((whereClause) => where(...whereClause))))
+    }
+    return applyQuery(q, queryClause.and)
+  }
+  if ('or' in queryClause) {
+    if (isArray(queryClause.or)) {
+      return query(q, or(...queryClause.or.map((whereClause) => where(...whereClause))))
+    }
+    return applyQuery(q, queryClause.or)
+  }
+  return q
+}
 
 /**
  * If the collectionPath includes a `*` it will use a collectionQuery for the part beyond that point
@@ -30,6 +48,9 @@ export function getQueryInstance(
   q = collectionPath.includes('*/')
     ? collectionGroup(db, collectionPath.split('*/')[1])
     : collection(db, collectionPath)
+  for (const queryClause of config.query || []) {
+    q = applyQuery(q, queryClause)
+  }
   for (const whereClause of config.where || []) {
     q = query(q, where(...whereClause))
   }

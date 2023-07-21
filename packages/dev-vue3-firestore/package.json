@@ -3,12 +3,13 @@
   "version": "0.12.13",
   "private": true,
   "scripts": {
+    "typecheck": "echo na",
     "dev": "vite",
     "build": "vue-tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "firebase": "^9.14.0",
+    "firebase": "^10.1.0",
     "magnetar": "workspace:*",
     "vue": "^3.2.45"
   },

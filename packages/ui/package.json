@@ -24,10 +24,10 @@
   "funding": "https://github.com/sponsors/mesqueeb",
   "license": "MIT",
   "scripts": {
+    "typecheck": "vue-tsc --noEmit",
     "build": "del-cli dist && npm run typecheck && vite build && npm run gen:types:ts",
     "dev": "vite",
     "preview": "vite preview",
-    "typecheck": "vue-tsc --noEmit",
     "gen:types:ts": "vue-tsc --declaration --emitDeclarationOnly"
   },
   "dependencies": {
@@ -35,6 +35,7 @@
     "@magnetarjs/types": "workspace:*",
     "@magnetarjs/utils": "workspace:*",
     "fast-sort": "^3.2.1",
+    "getorset-anything": "^0.0.3",
     "is-what": "^4.1.7",
     "path-to-prop": "^2.0.4",
     "vue": "^3.2.45"

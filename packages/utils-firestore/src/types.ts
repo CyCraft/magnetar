@@ -1,6 +1,6 @@
-import type Client from 'firebase/firestore'
+import type { Limit, OrderByClause, QueryClause, SyncBatch, WhereClause } from '@magnetarjs/types'
 import type Admin from 'firebase-admin/firestore'
-import type { WhereClause, OrderByClause, Limit, SyncBatch } from '@magnetarjs/types'
+import type Client from 'firebase/firestore'
 
 export type Firestore = Client.Firestore | Admin.Firestore
 export type DocumentSnapshot<T> = Client.DocumentSnapshot<T> | Admin.DocumentSnapshot<T>
@@ -81,6 +81,7 @@ export type FirestorePluginOptions<Firestore extends Client.Firestore | Admin.Fi
 
 export type FirestoreModuleConfig = {
   firestorePath?: string
+  query?: QueryClause[]
   where?: WhereClause[]
   orderBy?: OrderByClause[]
   limit?: Limit

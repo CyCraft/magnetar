@@ -2,6 +2,7 @@
   "name": "dev-nuxt-firestore",
   "private": true,
   "scripts": {
+    "typecheck": "echo temporarily removed",
     "build": "echo temporarily removed",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
@@ -12,7 +13,7 @@
     "@magnetarjs/core": "workspace:*",
     "@magnetarjs/plugin-firestore": "workspace:*",
     "@magnetarjs/plugin-vue3": "workspace:*",
-    "firebase": "^9.14.0"
+    "firebase": "^10.1.0"
   },
   "devDependencies": {
     "nuxt": "^3.2.3",

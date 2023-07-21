@@ -1,24 +1,24 @@
-import { copy } from 'copy-anything'
-import { pick } from 'filter-anything'
-import { isArray, isNumber, isPlainObject } from 'is-what'
-import { mapGetOrSet } from 'getorset-anything'
 import {
-  PluginInstance,
-  MagnetarPlugin,
   Clauses,
-  PluginModuleSetupPayload,
   getPathWhereIdentifier,
+  MagnetarPlugin,
   PathWhereIdentifier,
+  PluginInstance,
+  PluginModuleSetupPayload,
 } from '@magnetarjs/types'
 import { filterDataPerClauses } from '@magnetarjs/utils'
-import { writeActionFactory } from './actions/mergeAssignReplace'
-import { insertActionFactory } from './actions/insert'
-import { deletePropActionFactory } from './actions/deleteProp'
+import { copy } from 'copy-anything'
+import { pick } from 'filter-anything'
+import { mapGetOrSet } from 'getorset-anything'
+import { isArray, isNumber, isPlainObject } from 'is-what'
 import { deleteActionFactory } from './actions/delete'
+import { deletePropActionFactory } from './actions/deleteProp'
 import { fetchActionFactory } from './actions/fetch'
-import { streamActionFactory } from './actions/stream'
-import { revertActionFactory } from './actions/revert'
 import { fetchCountActionFactory } from './actions/fetchCount'
+import { insertActionFactory } from './actions/insert'
+import { writeActionFactory } from './actions/mergeAssignReplace'
+import { revertActionFactory } from './actions/revert'
+import { streamActionFactory } from './actions/stream'
 
 // there are two interfaces to be defined & exported by each plugin: `StoreOptions` and `StoreModuleConfig`
 // for this plugin we use:
@@ -122,7 +122,13 @@ export const CreatePlugin: MagnetarPlugin<StorePluginOptions> = (
     if (docId) return collectionDB.get(docId)
     // if it's a collection, we must return the collectionDB but with applied query clauses
     // but remember, the return type MUST be a map with id as keys and the docs as value
-    const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit', 'startAfter'])
+    const clauses: Clauses = pick(pluginModuleConfig, [
+      'query',
+      'where',
+      'orderBy',
+      'limit',
+      'startAfter',
+    ])
 
     return filterDataPerClauses(collectionDB, clauses)
   }
@@ -149,7 +155,13 @@ export const CreatePlugin: MagnetarPlugin<StorePluginOptions> = (
     if (isNumber(count)) return count
 
     // if we didn't have any cached count yet, we must return the size of the collectionDB but with applied query clauses
-    const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit', 'startAfter'])
+    const clauses: Clauses = pick(pluginModuleConfig, [
+      'query',
+      'where',
+      'orderBy',
+      'limit',
+      'startAfter',
+    ])
 
     const collectionDB = data[collectionPath]
     const dataFiltered = filterDataPerClauses(collectionDB, clauses)

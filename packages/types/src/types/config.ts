@@ -1,9 +1,9 @@
+import { Limit, OrderByClause, QueryClause, WhereClause } from './clauses'
+import { StoreName } from './core'
+import { EventNameFnMap } from './events'
 import { ModifyPayloadFnMap } from './modifyPayload'
 import { ModifyReadResponseFnMap } from './modifyReadResponse'
-import { EventNameFnMap } from './events'
 import { PluginInstance } from './plugins'
-import { StoreName } from './core'
-import { Limit, OrderByClause, WhereClause } from './clauses'
 
 /**
  * Execution order per action or action type.
@@ -41,6 +41,7 @@ export type GlobalConfig = {
  * Extra options the dev can pass when creating a module with collection() or doc(). These will take precedence over the global config.
  */
 export type ModuleConfig<DocDataType extends Record<string, any> = Record<string, any>> = {
+  query?: QueryClause[]
   where?: WhereClause[]
   orderBy?: OrderByClause[]
   limit?: Limit

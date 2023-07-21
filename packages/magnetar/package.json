@@ -18,6 +18,7 @@
   "funding": "https://github.com/sponsors/mesqueeb",
   "license": "MIT",
   "scripts": {
+    "typecheck": "tsc --noEmit",
     "build": "tsup src/index.ts --clean --format esm,cjs --dts",
     "dev": "pnpm build --watch"
   },

@@ -1,24 +1,24 @@
+import type { DocMetadata, QueryClause } from '@magnetarjs/types'
+import type { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'
 import type {
+  CollectionReference,
+  DocumentReference,
+  DocumentSnapshot,
   Firestore,
   Query,
-  CollectionReference,
-  DocumentSnapshot,
   QueryDocumentSnapshot,
-  DocumentReference,
   WriteBatch,
 } from 'firebase-admin/firestore'
+import { FieldValue, Filter } from 'firebase-admin/firestore'
+import { isArray, isNumber } from 'is-what'
 export type {
-  DocumentSnapshot,
-  QueryDocumentSnapshot,
-  DocumentReference,
   CollectionReference,
+  DocumentReference,
+  DocumentSnapshot,
   Firestore,
+  QueryDocumentSnapshot,
   WriteBatch,
 } from 'firebase-admin/firestore'
-import { isNumber } from 'is-what'
-import type { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'
-import type { DocMetadata } from '@magnetarjs/types'
-import { FieldValue } from 'firebase-admin/firestore'
 
 export function doc(db: Firestore, path: string): DocumentReference<Record<string, unknown>> {
   return db.doc(path)
@@ -30,6 +30,22 @@ export function createWriteBatch(db: Firestore): WriteBatch {
 
 export function deleteField(): FieldValue {
   return FieldValue.delete()
+}
+
+function queryToFilter(
+  queryClause: QueryClause
+): ReturnType<(typeof Filter)['or']> | ReturnType<(typeof Filter)['and']> {
+  if ('and' in queryClause) {
+    if (isArray(queryClause.and)) {
+      return Filter.and(...queryClause.and.map((whereClause) => Filter.where(...whereClause)))
+    }
+    return queryToFilter(queryClause.and)
+  }
+  // if ('or' in queryClause)
+  if (isArray(queryClause.or)) {
+    return Filter.or(...queryClause.or.map((whereClause) => Filter.where(...whereClause)))
+  }
+  return queryToFilter(queryClause.or)
 }
 
 /**
@@ -44,6 +60,9 @@ export function getQueryInstance(
   q = collectionPath.includes('*/')
     ? db.collectionGroup(collectionPath.split('*/')[1])
     : db.collection(collectionPath)
+  for (const queryClause of config.query || []) {
+    q = q.where(queryToFilter(queryClause))
+  }
   for (const whereClause of config.where || []) {
     q = q.where(...whereClause)
   }

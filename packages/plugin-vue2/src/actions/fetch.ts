@@ -1,12 +1,12 @@
-import { isNumber, isFullString, isBoolean } from 'is-what'
 import {
-  PluginFetchAction,
-  FetchResponse,
-  DoOnFetch,
-  PluginFetchActionPayload,
   DocMetadata,
+  DoOnFetch,
+  FetchResponse,
+  PluginFetchAction,
+  PluginFetchActionPayload,
 } from '@magnetarjs/types'
 import { filterDataPerClauses } from '@magnetarjs/utils'
+import { isBoolean, isFullString, isNumber } from 'is-what'
 import { Vue2StoreModuleConfig, Vue2StoreOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
 
@@ -26,8 +26,9 @@ export function fetchActionFactory(
     const optimisticFetch = !force
     if (optimisticFetch) {
       if (!docId) {
-        const { where, orderBy, limit } = pluginModuleConfig
+        const { query, where, orderBy, limit } = pluginModuleConfig
         const collectionData = filterDataPerClauses(new Map(Object.entries(data[collectionPath])), {
+          query,
           where,
           orderBy,
           limit,

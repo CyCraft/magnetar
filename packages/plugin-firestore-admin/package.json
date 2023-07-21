@@ -16,6 +16,7 @@
     "dist"
   ],
   "scripts": {
+    "typecheck": "tsc --noEmit",
     "build": "tsup src/index.ts --clean --format esm,cjs --dts",
     "dev": "pnpm build --watch",
     "test-and-build": "npm run test && npm run build",
@@ -28,7 +29,7 @@
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "peerDependencies": {
-    "firebase-admin": "^11.2.1"
+    "firebase-admin": "^11.10.1"
   },
   "dependencies": {
     "@magnetarjs/types": "workspace:*",
@@ -43,7 +44,7 @@
     "@magnetarjs/core": "workspace:*",
     "@magnetarjs/test-utils": "workspace:*",
     "array-shuffle": "^3.0.0",
-    "firebase-admin": "^11.2.1"
+    "firebase-admin": "^11.10.1"
   },
   "keywords": [
     "magnetar-plugin",

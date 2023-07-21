@@ -17,6 +17,7 @@
     "dist"
   ],
   "scripts": {
+    "typecheck": "tsc --noEmit",
     "build": "tsup src/index.ts --clean --format esm,cjs --dts",
     "dev": "pnpm build --watch",
     "test-and-build": "npm run test && npm run build",
@@ -37,8 +38,8 @@
     "remove-anything": "^1.0.3"
   },
   "devDependencies": {
-    "firebase": "^9.14.0",
-    "firebase-admin": "^11.2.1"
+    "firebase": "^10.1.0",
+    "firebase-admin": "^11.10.1"
   },
   "keywords": [
     "magnetar-utils",

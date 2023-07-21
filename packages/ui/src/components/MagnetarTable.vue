@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { CollectionInstance, WhereClauseTuple, WhereFilterOp } from '@magnetarjs/types'
-import { isAnyObject, isError, isPlainObject } from 'is-what'
+import { CollectionInstance, WhereFilterOp } from '@magnetarjs/types'
+import { isAnyObject, isArray, isError, isPlainObject } from 'is-what'
 import { computed, onMounted, ref } from 'vue'
 import {
+  FiltersState,
   FilterState,
   MUIColumn,
   MUIFilter,
@@ -31,7 +32,7 @@ const props = defineProps<{
   collection: CollectionInstance<any>
   columns: MUIColumn<any>[]
   pagination: MUIPagination
-  filters: MUIFilter<any, any, any>[]
+  filters: MUIFilter<Record<string, any>>[]
   parseLabel?: MUIParseLabel
 }>()
 
@@ -42,20 +43,20 @@ function muiLabel(label: MUILabel): string {
 // const emit = defineEmits<{}>()
 const fetchState = ref<'ok' | 'end' | 'fetching' | { error: string }>('ok')
 
-const initialFilterState: FilterState = filtersToInitialState(props.filters)
+const initialFilterState: FiltersState = filtersToInitialState(props.filters)
 const initialOrderByState: OrderByState = columnsToInitialOrderByState(props.columns)
 
-const filterState = ref<FilterState>(carbonCopyMap(initialFilterState))
+const filtersState = ref<FiltersState>(carbonCopyMap(initialFilterState))
 const orderByState = ref<OrderByState>(carbonCopyMap(initialOrderByState))
 
-const currentFilters = computed(() => filterStateToClauses(filterState.value))
+const currentFilters = computed(() => filterStateToClauses(filtersState.value))
 const currentOrderBy = computed(() => orderByStateToClauses(orderByState.value))
 
 const initialStateActive = computed<boolean>(
   () =>
-    filterState.value.size === initialFilterState.size &&
+    filtersState.value.size === initialFilterState.size &&
     orderByState.value.size === initialOrderByState.size &&
-    [...filterState.value.entries()].every(
+    [...filtersState.value.entries()].every(
       ([key, value]) => initialFilterState.get(key) === value
     ) &&
     [...orderByState.value.entries()].every(
@@ -63,12 +64,12 @@ const initialStateActive = computed<boolean>(
     )
 )
 const hasSomeFilterOrOrderby = computed<boolean>(
-  () => !!filterState.value.size || !!orderByState.value.size
+  () => !!filtersState.value.size || !!orderByState.value.size
 )
 
 /** This instance is not computed so that we can delay setting it after fetching the relevant records */
 const collectionInstance = ref(
-  calcCollection(props.collection, filterState.value, orderByState.value)
+  calcCollection(props.collection, filtersState.value, orderByState.value)
 )
 
 function clearAllRecords(): void {
@@ -77,14 +78,14 @@ function clearAllRecords(): void {
 }
 
 function resetState(): void {
-  filterState.value = carbonCopyMap(initialFilterState)
+  filtersState.value = carbonCopyMap(initialFilterState)
   orderByState.value = carbonCopyMap(initialOrderByState)
   clearAllRecords()
   fetchMore()
 }
 
 function clearState(): void {
-  filterState.value = new Map()
+  filtersState.value = new Map()
   orderByState.value = new Map()
   clearAllRecords()
   fetchMore()
@@ -93,7 +94,7 @@ function clearState(): void {
 /** never throws */
 async function fetchMore() {
   fetchState.value = 'fetching'
-  const collection = calcCollection(props.collection, filterState.value, orderByState.value)
+  const collection = calcCollection(props.collection, filtersState.value, orderByState.value)
 
   try {
     await collection
@@ -125,24 +126,34 @@ const rows = computed(() => {
   return [...collection.data.values()]
 })
 
-async function setFilter(where: WhereClauseTuple<any, any, any>, to: boolean): Promise<void> {
+async function setFilter(filterIndex: number, payload: null | FilterState): Promise<void> {
   clearAllRecords()
-  filterState.value.set(where, to)
+  if (!payload) {
+    filtersState.value.delete(filterIndex)
+  } else {
+    filtersState.value.set(filterIndex, payload)
 
-  const op: WhereFilterOp = where[1]
-  /**
-   * Optionally an `orderBy` might need to be set for a certain where filter
-   *
-   * An example error from firestore:
-   * > Invalid query. You have a where filter with an inequality (<, <=, !=, not-in, >, or >=) on field 'title' and so you must also use 'title' as your first argument to orderBy(), but your first orderBy() is on field 'isDone' instead.
-   */
-  const setOrderBy =
-    op === '!=' || op === '<' || op === '<=' || op === '>' || op === '>=' || op === 'not-in'
-  if (setOrderBy) {
-    const fieldPath = where[0]
-    const direction = 'asc'
-    // must be inserted at position 0
-    orderByState.value = new Map([[fieldPath, direction], ...orderByState.value.entries()])
+    const whereClauses = isArray(payload) ? [payload] : [...payload.or]
+    // : 'and' in payload
+    // ? [...payload.and]
+    // : [...payload.or]
+    const firstWhereClause = whereClauses[0]
+
+    const op: WhereFilterOp = firstWhereClause?.[1]
+    /**
+     * Optionally an `orderBy` might need to be set for a certain where filter
+     *
+     * An example error from firestore:
+     * > Invalid query. You have a where filter with an inequality (<, <=, !=, not-in, >, or >=) on field 'title' and so you must also use 'title' as your first argument to orderBy(), but your first orderBy() is on field 'isDone' instead.
+     */
+    const alsoApplyOrderBy =
+      op === '!=' || op === '<' || op === '<=' || op === '>' || op === '>=' || op === 'not-in'
+    if (firstWhereClause && alsoApplyOrderBy) {
+      const fieldPath = firstWhereClause[0]
+      const direction = 'asc'
+      // must be inserted at position 0
+      orderByState.value = new Map([[fieldPath, direction], ...orderByState.value.entries()])
+    }
   }
 
   // it looks better UI wise to delay the actual fetch to prevent UI components from freezing
@@ -188,19 +199,22 @@ async function setOrderBy(
 
     <section class="magnetar-row magnetar-gap-md">
       <TableFilter
-        v-for="filter in filters"
+        v-for="(filter, filterIndex) in filters"
         :filter="filter"
-        :filterState="filterState"
+        :filterState="filtersState.get(filterIndex)"
         :collection="collection"
         :parseLabel="parseLabel"
-        @setFilter="([where, to]) => setFilter(where, to)"
+        @setFilter="(payload) => setFilter(filterIndex, payload)"
       />
       <div v-if="hasSomeFilterOrOrderby" class="magnetar-column magnetar-gap-sm">
         <h6>{{ muiLabel('magnetar table active filters') }}</h6>
         <div class="magnetar-row magnetar-gap-sm magnetar-active-filters">
-          <div v-for="_filter in currentFilters" :key="JSON.stringify(_filter)">
-            <!-- TODO: @click="() => filterState.delete(_filter)" -->
-            .where({{ _filter.map((f) => JSON.stringify(f)).join(', ') }})
+          <div v-for="whereOrQuery in currentFilters" :key="JSON.stringify(filters)">
+            {{
+              isArray(whereOrQuery)
+                ? `.where(${whereOrQuery.map((chunk) => JSON.stringify(chunk)).join(', ')})`
+                : `.query(${JSON.stringify(whereOrQuery)})`
+            }}
           </div>
           <div v-for="_orderBy in currentOrderBy" :key="JSON.stringify(_orderBy)">
             <!-- TODO: @click="() => orderByState.delete(_orderBy[0])" -->

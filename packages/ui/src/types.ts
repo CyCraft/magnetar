@@ -1,14 +1,28 @@
-import { OPathsWithOptional, WhereClauseTuple, WhereFilterOp } from '@magnetarjs/types'
+import { OPathsWithOptional, WhereClause, WhereClauseTuple, WhereFilterOp } from '@magnetarjs/types'
 
 export type OPaths<T> = OPathsWithOptional<T>
 
 /** You can pass a text parser which will be used for any `label` used throughout the table */
 export type MUIParseLabel<LabelType = any> = (label: LabelType) => string
 
+export type Codable<DataType, ReturnType> = (info: { value: any; data: DataType }) => ReturnType
+
 export type MUIButton<T extends Record<string, any>, Label extends string = string> = {
-  label: Label | ((info: { value: any; data: T }) => Label)
+  /** Executed on button click */
   handler: (info: { value: any; data: T }) => void | Promise<void>
-  disabled?: (info: { value: any; data: T }) => boolean | undefined
+  /** Applied to the innerText of the `<button>` */
+  label: string | Label | Codable<T, string> | Codable<T, Label>
+  /**
+   * When `true` it will bind the `label` to the `innerHTML` of the `<button>` instead of the `innerText`.
+   * Useful to pass SVGs as buttons or a bit more complex HTML to confine to some button CSS you use throughout your project.
+   */
+  html?: boolean
+  /** Applied to the `<button>` */
+  class?: string | Codable<T, string>
+  /** Applied to the `<button>` */
+  style?: string | Codable<T, string>
+  /** Applied to the `<button>` */
+  disabled?: boolean | undefined | Codable<T, boolean | undefined>
 }
 
 export type MUIColumn<T extends Record<string, any>, Label extends string = string> = {
@@ -33,9 +47,9 @@ export type MUIColumn<T extends Record<string, any>, Label extends string = stri
    */
   parseValue?: (info: { value: any; data: T }) => string
   /** Applied to `td > div` */
-  class?: string | ((info: { value: any; data: T }) => string)
+  class?: string | Codable<T, string>
   /** Applied to `td > div` */
-  style?: string | ((info: { value: any; data: T }) => string)
+  style?: string | Codable<T, string>
   /** When `true` this column will become sortable as per the Magnetar orderBy feature */
   sortable?: boolean | { orderBy: 'asc' | 'desc'; position: number }
   /** Shows action buttons next to the cell value */
@@ -71,20 +85,17 @@ export type MUIPagination = {
   limit: number
 }
 
-export type MUIFilter<
-  T extends Record<string, any>,
-  Label extends string = string,
-  Path extends OPaths<T> = OPaths<T>,
-  WhereOp extends WhereFilterOp = WhereFilterOp
-> = MUIFilterOptions<T, Label, Path, WhereOp> | MUIFilterOptions<T, Label, Path, WhereOp>
+export type MUIFilter<T extends Record<string, any>, Label extends string = string> =
+  | MUIFilterOptions<T, Label>
+  | MUIFilterOther<T, Label>
 
-/**
- * TODO: not yet implemented!!
- */
 export type MUIFilterOther<T extends Record<string, any>, Label extends string = string> = {
+  /**
+   * The filter label, will also be piped through `parseLabel` if you passed it to the table.
+   */
   label: Label
   /**
-   * The `type` is passed to the `<input>` element
+   * The `type` is passed to the `<input>` element.
    */
   type: 'text' | 'date' | 'number'
   /**
@@ -125,39 +136,116 @@ export type MUIFilterOther<T extends Record<string, any>, Label extends string =
    * }
    * ```
    */
-  orWhere: [fieldPath: OPaths<T>, operator: WhereFilterOp, parseInput: (userInput: string) => any][]
-  /** Applied to `<fieldset>` */
+  where:
+    | [fieldPath: OPaths<T>, operator: WhereFilterOp, parseInput: (userInput: string) => any]
+    | {
+        or?: [
+          fieldPath: OPaths<T>,
+          operator: WhereFilterOp,
+          parseInput: (userInput: string) => any
+        ][]
+      }
+  /**
+   * some text shown leading in front of the `<input>` field.
+   * @example '>='
+   * @example 'starts with'
+   * @example '€'
+   */
+  prefix?: string | Label
+  /**
+   * some text shown trailing behind the `<input>` field.
+   * @example 'kg'
+   * @example 'JPY'
+   */
+  suffix?: string | Label
+  /**
+   * Applied to `<fieldset>`
+   * @example 'flex-column'
+   */
   class?: string
-  /** Applied to `<fieldset>` */
+  /**
+   * Applied to `<fieldset>`
+   * @example 'display: flex; flex-direction: column;'
+   */
   style?: string
-  /** not available */
+  /**
+   * Text placeholder which will be displayed inside the input field.
+   * @example 'search...'
+   */
+  placeholder?: Label
+  /**
+   * Not available for `type: 'text' | 'date' | 'number'`.
+   */
   options?: undefined
 }
 
-export type MUIFilterOptions<
-  T extends Record<string, any>,
-  Label extends string = string,
-  Path extends OPaths<T> = OPaths<T>,
-  WhereOp extends WhereFilterOp = WhereFilterOp
-> = {
+export type MUIFilterOptions<T extends Record<string, any>, Label extends string = string> = {
+  /**
+   * The filter label, will also be piped through `parseLabel` if you passed it to the table.
+   */
   label: Label
   type: 'select' | 'checkboxes' | 'radio'
   options: {
     label: Label
-    where: WhereClauseTuple<T, Path, WhereOp>
+    where: WhereClauseTuple<T>
     checked?: boolean
   }[]
-  /** Applied to `<fieldset>` */
+  /**
+   * Applied to `<fieldset>`
+   * @example 'flex-column'
+   */
   class?: string
-  /** Applied to `<fieldset>` */
+  /**
+   * Applied to `<fieldset>`
+   * @example 'display: flex; flex-direction: column;'
+   */
   style?: string
-  /** not available */
+  /**
+   * Text placeholder which will be displayed inside the `<select>` field.
+   * @example 'select...'
+   */
+  placeholder?: Label
+  /** not available for `'select' | 'checkboxes' | 'radio'`. */
   orWhere?: undefined
+  /** not available for `'select' | 'checkboxes' | 'radio'`. */
+  prefix?: undefined
+  /** not available for `'select' | 'checkboxes' | 'radio'`. */
+  suffix?: undefined
 }
 
 export type MUIRows<T extends Record<string, any>> = T[]
 
-export type FilterState = Map<WhereClauseTuple<any, any, any>, boolean>
+export type FilterStateOr = { or: Set<WhereClause> }
+export type FilterStateSingle = WhereClause
+export type FilterState = FilterStateOr | FilterStateSingle
+
+/**
+ * A map of the filter index with the where clauses to be applied.
+ *
+ * - `type: 'checkboxes' | 'text' | 'number' | 'date'` needs to save its state as `{ or: Set<WhereClause> }`
+ * - `type: 'select' | 'radio'` needs to save its state as `WhereClause`
+ */
+export type FiltersState = Map<number, FilterState>
+
+export function usesFilterStateOr(
+  filter: MUIFilter<any>,
+  state?: FilterState
+): state is FilterStateOr | undefined {
+  return (
+    filter.type === 'checkboxes' ||
+    filter.type === 'text' ||
+    filter.type === 'number' ||
+    filter.type === 'date'
+  )
+}
+
+export function usesFilterStateSingle(
+  filter: MUIFilter<any>,
+  state?: FilterState
+): state is FilterStateSingle | undefined {
+  return filter.type === 'select' || filter.type === 'radio'
+}
+
 /**
  * This map is order-sensitive. `orderBy(...)` is applied in the insert order of this map
  */

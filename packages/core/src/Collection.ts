@@ -1,33 +1,34 @@
-import { merge, mergeAndConcat } from 'merge-anything'
 import {
-  MagnetarFetchAction,
-  MagnetarInsertAction,
-  MagnetarDeleteAction,
-  FetchPromises,
-  ModuleConfig,
-  GlobalConfig,
-  DocFn,
+  actionNameTypeMap,
   CollectionFn,
-  WriteLock,
+  CollectionInstance,
+  DocFn,
+  FetchMetaDataCollection,
+  FetchPromises,
+  GlobalConfig,
+  MagnetarDeleteAction,
+  MagnetarFetchAction,
+  MagnetarFetchCountAction,
+  MagnetarInsertAction,
+  ModuleConfig,
+  OrderByClause,
+  QueryClause,
   WhereClause,
   WhereFilterOp,
-  OrderByClause,
-  actionNameTypeMap,
-  CollectionInstance,
-  FetchMetaDataCollection,
-  MagnetarFetchCountAction,
+  WriteLock,
 } from '@magnetarjs/types'
+import { merge, mergeAndConcat } from 'merge-anything'
+import {
+  executeSetupModulePerStore,
+  getCountFromDataStore,
+  getDataFromDataStore,
+  proxify,
+} from './helpers/moduleHelpers'
 import {
   handleActionPerStore,
   HandleActionSharedParams,
 } from './moduleActions/handleActionPerStore'
 import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
-import {
-  executeSetupModulePerStore,
-  getDataFromDataStore,
-  getCountFromDataStore,
-  proxify,
-} from './helpers/moduleHelpers'
 
 export function createCollectionWithContext(
   collectionPath: string,
@@ -76,6 +77,11 @@ export function createCollectionWithContext(
   // Every store will have its 'setupModule' function executed
   executeSetupModulePerStore(globalConfig.stores, [collectionPath, undefined], moduleConfig)
 
+  function query(query: QueryClause): CollectionInstance {
+    const moduleConfigWithClause = mergeAndConcat(moduleConfig, { query: [query] })
+    return collectionFn(path, moduleConfigWithClause)
+  }
+
   function where(fieldPath: string, operator: WhereFilterOp, value: any): CollectionInstance {
     const whereClause: WhereClause = [fieldPath, operator, value]
     const moduleConfigWithClause = mergeAndConcat(moduleConfig, { where: [whereClause] })
@@ -102,7 +108,7 @@ export function createCollectionWithContext(
     })
   }
 
-  const queryFns = { where, orderBy, limit, startAfter }
+  const queryFns = { query, where, orderBy, limit, startAfter }
 
   const moduleInstance: Omit<CollectionInstance, 'data' | 'fetched' | 'count'> = {
     doc,

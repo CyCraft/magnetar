@@ -1,15 +1,15 @@
-import { isNumber, isFullString, isBoolean } from 'is-what'
 import {
-  PluginFetchAction,
-  FetchResponse,
-  DoOnFetch,
-  PluginFetchActionPayload,
   DocMetadata,
+  DoOnFetch,
+  FetchResponse,
+  PluginFetchAction,
+  PluginFetchActionPayload,
 } from '@magnetarjs/types'
 import { filterDataPerClauses } from '@magnetarjs/utils'
+import { isBoolean, isFullString, isNumber } from 'is-what'
+import { throwIfEmulatedError } from '../../helpers'
 import { StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin'
 import { insertActionFactory } from './insert'
-import { throwIfEmulatedError } from '../../helpers'
 
 export function fetchActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
@@ -30,8 +30,9 @@ export function fetchActionFactory(
     const optimisticFetch = !force
     if (optimisticFetch) {
       if (!docId) {
-        const { where, orderBy, limit, startAfter } = pluginModuleConfig
+        const { query, where, orderBy, limit, startAfter } = pluginModuleConfig
         const collectionData = filterDataPerClauses(data[collectionPath], {
+          query,
           where,
           orderBy,
           limit,

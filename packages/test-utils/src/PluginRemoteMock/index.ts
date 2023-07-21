@@ -1,19 +1,20 @@
 import {
-  PluginInstance,
-  MagnetarPlugin,
-  WhereClause,
-  OrderByClause,
   Limit,
+  MagnetarPlugin,
+  OrderByClause,
+  PluginInstance,
+  QueryClause,
+  WhereClause,
 } from '@magnetarjs/types'
 import {
-  writeActionFactory,
-  insertActionFactory,
-  deletePropActionFactory,
   deleteActionFactory,
+  deletePropActionFactory,
   fetchActionFactory,
-  streamActionFactory,
-  revertActionFactory,
   fetchCountActionFactory,
+  insertActionFactory,
+  revertActionFactory,
+  streamActionFactory,
+  writeActionFactory,
 } from './actions'
 
 // there are two interfaces to be defined & exported by each plugin: `StoreOptions` and `StoreModuleConfig`
@@ -25,6 +26,7 @@ export type RemoteStoreOptions = { storeName: string }
 export interface StorePluginModuleConfig {
   path?: string
   initialData?: Record<string, unknown> | [string, Record<string, unknown>][]
+  query?: QueryClause[]
   where?: WhereClause[]
   orderBy?: OrderByClause[]
   limit?: Limit

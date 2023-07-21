@@ -1,17 +1,39 @@
-import { CollectionInstance, WhereClauseTuple } from '@magnetarjs/types'
+import { CollectionInstance, WhereClause } from '@magnetarjs/types'
 import { sort } from 'fast-sort'
+import { mapGetOrSet } from 'getorset-anything'
 import { isArray, isPlainObject } from 'is-what'
-import { FilterState, MUIColumn, MUIFilter, OPaths, OrderByState } from './types'
+import { FiltersState, MUIColumn, MUIFilter, OPaths, OrderByState } from './types'
 
-export function filtersToInitialState(filters: MUIFilter<any, any, any>[]): FilterState {
-  return filters.reduce<FilterState>((map, f) => {
+export function isEqual(a: any | any[], b: any | any[]): boolean {
+  if (isArray(a) && isArray(b)) {
+    return a.length === b.length && a.every((item, index) => item === b[index])
+  }
+  return a === b
+}
+
+export function whereClausesEqual(where1?: WhereClause, where2?: WhereClause): boolean {
+  return (
+    !!where1 &&
+    !!where2 &&
+    isEqual(where1[0], where2[0]) &&
+    isEqual(where1[1], where2[1]) &&
+    isEqual(where1[2], where2[2])
+  )
+}
+
+export function filtersToInitialState(filters: MUIFilter<Record<string, any>>[]): FiltersState {
+  // remember, see `FiltersState` for instructions how to save the state.
+  return filters.reduce<FiltersState>((map, f, i) => {
     if (f.type === 'radio' || f.type === 'select') {
       const firstChecked = f.options.find((o) => o.checked)
-      if (firstChecked) map.set(firstChecked.where, true)
+      if (firstChecked) map.set(i, firstChecked.where)
     }
     if (f.type === 'checkboxes') {
       for (const option of f.options) {
-        if (option.checked) map.set(option.where, true)
+        if (option.checked) {
+          const state = mapGetOrSet(map, i, () => ({ or: new Set() }))
+          state.or.add(option.where)
+        }
       }
     }
     return map
@@ -44,35 +66,86 @@ export function carbonCopyMap<T extends Map<any, any>>(map: T): T {
   return newMap
 }
 
-export function filterStateToClauses(state: FilterState): WhereClauseTuple<any, any, any>[] {
-  const whereClauses = [...carbonCopyMap(state).entries()]
-    .filter(([clause, state]) => !!state)
-    .map(([clause]) => clause)
+/** Clears JavaScript reference pointers */
+export function carbonCopyState<T extends Set<any>>(set: T): T {
+  let newSet = new Set() as T
+  for (let value of set) {
+    const _value = isArray(value) ? [...value] : value
+    newSet.add(_value)
+  }
+  return newSet
+}
 
-  return whereClauses.reduce<WhereClauseTuple<any, any, any>[]>((result, whereArr) => {
-    const [fieldPath, op, value] = whereArr
+function combineWhereClausesWherePossible(whereClauses: WhereClause[]): WhereClause[] {
+  return whereClauses.reduce<WhereClause[]>((result, whereClause) => {
+    const [fieldPath, op, value] = whereClause
 
     const addToPreviousWhere = result.find(
       (w) => w[0] === fieldPath && (w[1] === op || w[1] === 'in' || w[1] === 'not-in')
     )
 
     if (!addToPreviousWhere) {
-      result.push(whereArr)
+      result.push([...whereClause])
       return result
     }
 
-    const currentOp = addToPreviousWhere[1]
-    if (currentOp === 'in' || currentOp === 'not-in') {
+    const opFound = addToPreviousWhere[1]
+    if (opFound === 'in' || opFound === 'not-in') {
       addToPreviousWhere[2] = [...new Set([...addToPreviousWhere[2], value])]
     }
-    if (currentOp === '==') {
+    if (opFound === '==') {
       addToPreviousWhere[1] = 'in'
       addToPreviousWhere[2] = [...new Set([addToPreviousWhere[2], value])]
     }
-    if (currentOp === '!=') {
+    if (opFound === '!=') {
       addToPreviousWhere[1] = 'not-in'
       addToPreviousWhere[2] = [...new Set([addToPreviousWhere[2], value])]
     }
+    return result
+  }, [])
+}
+
+export function filterStateToClauses(state: FiltersState): (WhereClause | { or: WhereClause[] })[] {
+  return [...state.entries()].reduce<(WhereClause | { or: WhereClause[] })[]>((result, entry) => {
+    const [filterIndex, filters] = entry
+
+    if (isArray(filters)) {
+      result.push(filters)
+      return result
+    }
+
+    // TODO: not yet implemented
+    // if ('and' in filters) {
+    //   const set = filters.and
+    //   if (set.size === 0) return result
+    //   if (set.size === 1) {
+    //     result.push([...set][0])
+    //     return result
+    //   }
+    //   const combinedWheres = combineWhereClausesWherePossible([...set])
+    //   result.push(...combinedWheres)
+    //   return result
+    // }
+
+    if ('or' in filters) {
+      const set = filters.or
+      if (set.size === 0) return result
+      if (set.size === 1) {
+        result.push([...set][0])
+        return result
+      }
+      /**
+       * Perhaps we can combine all of these into 1?
+       */
+      const combinedWheres = combineWhereClausesWherePossible([...set])
+      if (combinedWheres.length === 1) {
+        result.push(combinedWheres[0])
+        return result
+      }
+      result.push({ or: combinedWheres })
+      return result
+    }
+
     return result
   }, [])
 }
@@ -85,11 +158,15 @@ export function orderByStateToClauses(
 
 export function calcCollection(
   collection: CollectionInstance<any>,
-  filterState: FilterState,
+  filtersState: FiltersState,
   orderByState: OrderByState
 ): CollectionInstance<any> {
-  for (const where of filterStateToClauses(filterState)) {
-    collection = collection.where(...where)
+  for (const whereOrQuery of filterStateToClauses(filtersState)) {
+    if (isArray(whereOrQuery)) {
+      collection = collection.where(...whereOrQuery)
+    } else {
+      collection = collection.query(whereOrQuery)
+    }
   }
   for (const orderBy of orderByStateToClauses(orderByState)) {
     collection = collection.orderBy(...orderBy)

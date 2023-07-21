@@ -1,33 +1,33 @@
-import { pick } from 'filter-anything'
 import {
-  PluginWriteAction,
-  PluginDeleteAction,
-  PluginStreamAction,
-  StreamResponse,
-  DoOnStream,
-  PluginFetchAction,
-  PluginRevertAction,
-  PluginDeletePropAction,
-  PluginInsertAction,
-  DoOnFetch,
-  FetchResponse,
-  PluginStreamActionPayload,
-  PluginRevertActionPayload,
-  PluginFetchActionPayload,
-  PluginDeleteActionPayload,
-  PluginDeletePropActionPayload,
-  PluginInsertActionPayload,
-  PluginWriteActionPayload,
   Clauses,
+  DoOnFetch,
+  DoOnFetchCount,
+  DoOnStream,
+  FetchCountResponse,
+  FetchResponse,
+  PluginDeleteAction,
+  PluginDeleteActionPayload,
+  PluginDeletePropAction,
+  PluginDeletePropActionPayload,
+  PluginFetchAction,
+  PluginFetchActionPayload,
+  PluginFetchCountAction,
+  PluginFetchCountActionPayload,
+  PluginInsertAction,
+  PluginInsertActionPayload,
+  PluginRevertAction,
+  PluginRevertActionPayload,
+  PluginStreamAction,
+  PluginStreamActionPayload,
+  PluginWriteAction,
+  PluginWriteActionPayload,
+  StreamResponse,
 } from '@magnetarjs/types'
 import { filterDataPerClauses } from '@magnetarjs/utils'
-import { StorePluginModuleConfig, RemoteStoreOptions } from './index'
-import { throwIfEmulatedError, waitMs, pokedexMap, generateRandomId } from '../helpers'
+import { pick } from 'filter-anything'
 import { isFullArray, isFullString, isNumber, isPromise } from 'is-what'
-import { PluginFetchCountActionPayload } from '@magnetarjs/types'
-import { DoOnFetchCount } from '@magnetarjs/types'
-import { FetchCountResponse } from '@magnetarjs/types'
-import { PluginFetchCountAction } from '@magnetarjs/types'
+import { generateRandomId, pokedexMap, throwIfEmulatedError, waitMs } from '../helpers'
+import { RemoteStoreOptions, StorePluginModuleConfig } from './index'
 
 export function writeActionFactory(
   storePluginOptions: RemoteStoreOptions,
@@ -118,7 +118,13 @@ function mockDataRetrieval(
       return result ? [result] : []
     }
 
-    const clauses: Clauses = pick(pluginModuleConfig, ['where', 'orderBy', 'limit', 'startAfter'])
+    const clauses: Clauses = pick(pluginModuleConfig, [
+      'query',
+      'where',
+      'orderBy',
+      'limit',
+      'startAfter',
+    ])
     const filteredMap = filterDataPerClauses(_pokedexMap, clauses)
     return [...filteredMap.values()]
   }

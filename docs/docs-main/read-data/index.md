@@ -220,11 +220,12 @@ console.log('The stream was opened!')
 
 ## Query Data (filter, order by, limit...)
 
-There are three methods to query more specific data in a collection:
+There are founr methods to query more specific data in a collection:
 
 - `where`
 - `orderBy`
 - `limit`
+- `query`
 
 You can execute and chain these methods on collections to create a _queried module_ that is just like a regular module but with your query applied.
 
@@ -275,9 +276,41 @@ magnetar
 ```
 <!-- prettier-ignore-end -->
 
-For now read the Firestore documentation on [Simple and Compound Queries](https://firebase.google.com/docs/firestore/query-data/queries#array_membership). The concept is inspired by Firestore, but with Magnetar _every_ local and remote store plugin implements the proper logic to work with these kind of queries!
+For now read the Firestore documentation on [Simple and Compound Queries](https://firebase.google.com/docs/firestore/query-data/queries). The concept is inspired by Firestore, but with Magnetar _every_ local and remote store plugin implements the proper logic to work with these kind of queries!
 
 More Magnetar specific information on this will come soon.
+
+### Query
+
+If you need `OR` in your `where` queries, you need to use `.query`:
+
+<!-- prettier-ignore-start -->
+```js
+magnetar
+  .collection('pokedex')
+  .query({
+    or: [
+      ['name', '==', 'flareon'],
+      ['evolution', '==', 'flareon']
+    ]
+  })
+```
+<!-- prettier-ignore-end -->
+
+You can also combine `or`s and `and`s:
+
+<!-- prettier-ignore-start -->
+```js
+magnetar
+  .collection('pokedex')
+  .query({
+    or: [
+      { and: [['type', '==', 'fire'], ['level', '>', 16]] },
+      { and: [['type', '==', 'water'], ['level', '<', 16]] }
+    ]
+  })
+```
+<!-- prettier-ignore-end -->
 
 ### Order by
 

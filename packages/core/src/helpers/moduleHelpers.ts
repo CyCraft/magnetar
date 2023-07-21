@@ -1,5 +1,5 @@
-import { isFunction, isPlainObject } from 'is-what'
 import { GlobalConfig, ModuleConfig, PluginModuleConfig } from '@magnetarjs/types'
+import { isFunction, isPlainObject } from 'is-what'
 import { throwIfNolocalStoreName } from './throwFns'
 
 /**
@@ -14,9 +14,9 @@ export function getPluginModuleConfig(
   moduleConfig: ModuleConfig,
   storeName: string
 ): PluginModuleConfig {
-  const { where, orderBy, limit, startAfter, configPerStore = {} } = moduleConfig
+  const { query, where, orderBy, limit, startAfter, configPerStore = {} } = moduleConfig
   const extraStoreConfig = isPlainObject(configPerStore[storeName]) ? configPerStore[storeName] : {}
-  return { ...extraStoreConfig, where, orderBy, limit, startAfter }
+  return { ...extraStoreConfig, query, where, orderBy, limit, startAfter }
 }
 
 /**
