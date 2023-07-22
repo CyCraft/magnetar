@@ -47,10 +47,13 @@ const buttonAttrArr = computed<
   const { column, parseLabel } = props
 
   return (column.buttons || []).map((button, index) => {
-    const text = evaluateCodableProp(button.label)
     return {
       html: button.html,
-      label: parseLabel ? parseLabel(text) : text,
+      label: isFunction(button.label)
+        ? evaluateCodableProp(button.label)
+        : parseLabel
+        ? parseLabel(button.label)
+        : button.label,
       class: evaluateCodableProp(button.class),
       style: evaluateCodableProp(button.style),
       disabled: buttonLoadingArr.value[index] ? true : evaluateCodableProp(button.disabled),
