@@ -105,7 +105,7 @@ const filterAttrs = computed<{
 
 <template>
   <fieldset class="magnetar-table-filter" :class="filter.class" :style="filter.style">
-    <legend>
+    <legend class="magnetar-row magnetar-gap-sm">
       {{ filterAttrs.label }}
       <button v-if="filterState" @click="() => emit('setFilter', null)">✕</button>
     </legend>

@@ -215,7 +215,11 @@ const showingFiltersCode = ref(false)
 
       <div v-if="showingFiltersCode" class="magnetar-row magnetar-gap-sm magnetar-active-filters">
         <div v-if="!hasSomeFilterOrOrderby">{{ muiLabel('magnetar table no active filters') }}</div>
-        <div v-for="info in currentFilters" :key="JSON.stringify(filters)">
+        <div
+          v-for="info in currentFilters"
+          :key="JSON.stringify(filters)"
+          class="magnetar-filter-code"
+        >
           {{
             isArray(info.result)
               ? `.where(${info.result.map((chunk) => JSON.stringify(chunk)).join(', ')})`
@@ -223,7 +227,11 @@ const showingFiltersCode = ref(false)
           }}
           <button @click="() => setFilter(info.filterIndex, null)">✕</button>
         </div>
-        <div v-for="_orderBy in currentOrderBy" :key="JSON.stringify(_orderBy)">
+        <div
+          v-for="_orderBy in currentOrderBy"
+          :key="JSON.stringify(_orderBy)"
+          class="magnetar-filter-code"
+        >
           .orderBy({{ _orderBy.map((o) => JSON.stringify(o)).join(', ') }})
           <button @click="() => setOrderBy(_orderBy[0], null)">✕</button>
         </div>
@@ -320,9 +328,11 @@ const showingFiltersCode = ref(false)
   min-height: 26px
 .magnetar-fetch-state-error
   color: var(--c-error, indianred)
-.magnetar-active-filters
-  > div
-    background: var(--c-primary-extra-light, whitesmoke)
-    border-radius: 0.25rem
-    padding: 0.25rem 0.5rem
+.magnetar-filter-code
+  background: var(--c-primary-extra-light, whitesmoke)
+  border-radius: 0.25rem
+  padding: 0.25rem 0.5rem
+  display: flex
+  align-items: center
+  gap: 0.25rem
 </style>
