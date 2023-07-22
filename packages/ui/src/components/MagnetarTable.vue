@@ -161,10 +161,7 @@ async function setFilter(filterIndex: number, payload: null | FilterState): Prom
   await fetchMore()
 }
 
-async function setOrderBy(
-  fieldPath: OPaths<any>,
-  direction: 'asc' | 'desc' | undefined
-): Promise<void> {
+async function setOrderBy(fieldPath: OPaths<any>, direction: 'asc' | 'desc' | null): Promise<void> {
   clearAllRecords()
   if (!direction) orderByState.value.delete(fieldPath)
   if (direction) orderByState.value.set(fieldPath, direction)
@@ -172,54 +169,63 @@ async function setOrderBy(
   await new Promise((resolve) => setTimeout(resolve, 200))
   await fetchMore()
 }
+
+const showingFiltersCode = ref(false)
 </script>
 
 <template>
   <div class="magnetar-table magnetar-column magnetar-gap-md">
-    <section class="magnetar-row magnetar-gap-md">
-      <table>
-        <thead>
-          <tr>
-            <td>{{ muiLabel('magnetar table info counts total') }}</td>
-            <td>{{ muiLabel('magnetar table info counts filter') }}</td>
-            <td>{{ muiLabel('magnetar table info counts showing') }}</td>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>{{ collection.count }}</td>
-            <td>{{ collectionInstance.count }}</td>
-            <td>{{ rows.length }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <section
+      v-if="filters.length || hasSomeFilterOrOrderby"
+      class="magnetar-column magnetar-gap-sm"
+    >
+      <div class="magnetar-row magnetar-gap-sm">
+        <h6>
+          {{
+            showingFiltersCode
+              ? muiLabel('magnetar table active filters')
+              : muiLabel('magnetar table filters')
+          }}
+        </h6>
+        <input v-model="showingFiltersCode" type="checkbox" id="showingFiltersCode" />
+        <label for="showingFiltersCode">{{ muiLabel('magnetar table show filters code') }}</label>
+        <div
+          v-if="hasSomeFilterOrOrderby || !initialStateActive"
+          class="magnetar-ml-auto magnetar-row magnetar-gap-sm"
+        >
+          <button v-if="!initialStateActive" @click="() => resetState()">
+            {{ muiLabel('magnetar table fetch-state reset') }}
+          </button>
+          <button v-if="hasSomeFilterOrOrderby" @click="() => clearState()">
+            {{ muiLabel('magnetar table clear filters button') }}
+          </button>
+        </div>
+      </div>
 
-      <LoadingSpinner v-if="fetchState === 'fetching'" class="magnetar-fetch-state-loading" />
-    </section>
+      <div v-if="!showingFiltersCode" class="magnetar-row magnetar-gap-sm">
+        <TableFilter
+          v-for="(filter, filterIndex) in filters"
+          :filter="filter"
+          :filterState="filtersState.get(filterIndex)"
+          :collection="collection"
+          :parseLabel="parseLabel"
+          @setFilter="(payload) => setFilter(filterIndex, payload)"
+        />
+      </div>
 
-    <section class="magnetar-row magnetar-gap-md">
-      <TableFilter
-        v-for="(filter, filterIndex) in filters"
-        :filter="filter"
-        :filterState="filtersState.get(filterIndex)"
-        :collection="collection"
-        :parseLabel="parseLabel"
-        @setFilter="(payload) => setFilter(filterIndex, payload)"
-      />
-      <div v-if="hasSomeFilterOrOrderby" class="magnetar-column magnetar-gap-sm">
-        <h6>{{ muiLabel('magnetar table active filters') }}</h6>
-        <div class="magnetar-row magnetar-gap-sm magnetar-active-filters">
-          <div v-for="whereOrQuery in currentFilters" :key="JSON.stringify(filters)">
-            {{
-              isArray(whereOrQuery)
-                ? `.where(${whereOrQuery.map((chunk) => JSON.stringify(chunk)).join(', ')})`
-                : `.query(${JSON.stringify(whereOrQuery)})`
-            }}
-          </div>
-          <div v-for="_orderBy in currentOrderBy" :key="JSON.stringify(_orderBy)">
-            <!-- TODO: @click="() => orderByState.delete(_orderBy[0])" -->
-            .orderBy({{ _orderBy.map((o) => JSON.stringify(o)).join(', ') }})
-          </div>
+      <div v-if="showingFiltersCode" class="magnetar-row magnetar-gap-sm magnetar-active-filters">
+        <div v-if="!hasSomeFilterOrOrderby">{{ muiLabel('magnetar table no active filters') }}</div>
+        <div v-for="info in currentFilters" :key="JSON.stringify(filters)">
+          {{
+            isArray(info.result)
+              ? `.where(${info.result.map((chunk) => JSON.stringify(chunk)).join(', ')})`
+              : `.query(${JSON.stringify(info.result)})`
+          }}
+          <button @click="() => setFilter(info.filterIndex, null)">✕</button>
+        </div>
+        <div v-for="_orderBy in currentOrderBy" :key="JSON.stringify(_orderBy)">
+          .orderBy({{ _orderBy.map((o) => JSON.stringify(o)).join(', ') }})
+          <button @click="() => setOrderBy(_orderBy[0], null)">✕</button>
         </div>
       </div>
     </section>
@@ -230,16 +236,14 @@ async function setOrderBy(
       :text="fetchState.error"
     />
 
-    <section
-      v-if="hasSomeFilterOrOrderby || !initialStateActive"
-      class="magnetar-row magnetar-gap-sm"
-    >
-      <button v-if="!initialStateActive" @click="() => resetState()">
-        {{ muiLabel('magnetar table fetch-state reset') }}
-      </button>
-      <button v-if="hasSomeFilterOrOrderby" @click="() => clearState()">
-        {{ muiLabel('magnetar table clear filters button') }}
-      </button>
+    <section class="magnetar-column magnetar-gap-sm magnetar-items-end">
+      <h6>{{ muiLabel('magnetar table record counts') }}</h6>
+      <div class="magnetar-row magnetar-gap-md">
+        <LoadingSpinner v-if="fetchState === 'fetching'" />
+        {{ collection.count }} {{ muiLabel('magnetar table info counts total') }} /
+        {{ collectionInstance.count }} {{ muiLabel('magnetar table info counts filtered') }} /
+        {{ rows.length }} {{ muiLabel('magnetar table info counts showing') }}
+      </div>
     </section>
 
     <table>
@@ -256,6 +260,15 @@ async function setOrderBy(
         </tr>
       </thead>
       <tbody>
+        <slot v-if="!rows.length && fetchState !== 'fetching'" name="empty">
+          <tr>
+            <td :colspan="columns.length">
+              <div class="magnetar-row magnetar-justify-center" style="min-height: 100px">
+                {{ muiLabel('magnetar table no-results') }}
+              </div>
+            </td>
+          </tr>
+        </slot>
         <tr v-for="row in rows" :key="row.id">
           <td
             v-for="(column, columnIndex) in columns"
@@ -266,13 +279,6 @@ async function setOrderBy(
             </slot>
           </td>
         </tr>
-        <slot v-if="!rows.length" name="empty">
-          <tr>
-            <td :colspan="columns.length">
-              <div style="min-height: 100px">{{ muiLabel('magnetar table no-results') }}</div>
-            </td>
-          </tr>
-        </slot>
       </tbody>
     </table>
 
@@ -301,6 +307,12 @@ async function setOrderBy(
   gap: 0.5rem
 .magnetar-gap-md
   gap: 1rem
+.magnetar-items-end
+  align-items: flex-end
+.magnetar-justify-center
+  justify-content: center
+.magnetar-ml-auto
+  margin-left: auto
 .magnetar-table
   h6
     margin: 0

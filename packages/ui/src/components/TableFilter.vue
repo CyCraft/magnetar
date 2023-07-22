@@ -22,11 +22,6 @@ const emit = defineEmits<{
   (e: 'setFilter', payload: FilterState | null): void
 }>()
 
-/** Used for being able to type guard in the DOM */
-const filterAndState = computed<[filter: MUIFilter<any>, state?: FilterState]>(() => {
-  return [props.filter, props.filterState]
-})
-
 onMounted(() => {
   // filters with options will fetch the "record count" for each where filter in the option
   for (const option of props.filter.options || []) {
@@ -110,11 +105,14 @@ const filterAttrs = computed<{
 
 <template>
   <fieldset class="magnetar-table-filter" :class="filter.class" :style="filter.style">
-    <legend>{{ filterAttrs.label }}</legend>
+    <legend>
+      {{ filterAttrs.label }}
+      <button v-if="filterState" @click="() => emit('setFilter', null)">✕</button>
+    </legend>
 
     <template v-if="filter.type === 'checkboxes' && usesFilterStateOr(filter, filterState)">
       <!-- CHECKBOXES -->
-      <div v-for="option in filterAndState[0].options" class="magnetar-inline-block">
+      <div v-for="option in filter.options" class="magnetar-inline-block">
         <input
           :id="JSON.stringify(option.where)"
           type="checkbox"

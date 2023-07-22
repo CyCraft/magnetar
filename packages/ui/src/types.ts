@@ -252,24 +252,32 @@ export function usesFilterStateSingle(
 export type OrderByState = Map<OPaths<any>, 'asc' | 'desc'>
 
 export type MUILabel =
+  | 'magnetar table record counts'
   | 'magnetar table fetch-state error default'
   | 'magnetar table info counts total'
-  | 'magnetar table info counts filter'
+  | 'magnetar table info counts filtered'
   | 'magnetar table info counts showing'
   | 'magnetar table fetch-state reset'
+  | 'magnetar table filters'
   | 'magnetar table active filters'
+  | 'magnetar table show filters code'
   | 'magnetar table clear filters button'
+  | 'magnetar table no active filters'
   | 'magnetar table no-results'
   | 'magnetar table fetch-more button'
   | 'magnetar table fetch-more button end'
 
-export const muiLabelDic = {
+export const muiLabelDic: Record<MUILabel, string> = {
+  'magnetar table record counts': 'Found Record Counts',
   'magnetar table fetch-state error default': 'An error occured, check the console',
   'magnetar table info counts total': 'total',
-  'magnetar table info counts filter': 'filter',
+  'magnetar table info counts filtered': 'filtered',
   'magnetar table info counts showing': 'showing',
   'magnetar table fetch-state reset': 'Reset to Defaults',
+  'magnetar table filters': 'Filters',
+  'magnetar table show filters code': 'Show Code',
   'magnetar table active filters': 'Active Filters',
+  'magnetar table no active filters': 'No Filters Active',
   'magnetar table clear filters button': 'Clear All',
   'magnetar table no-results': 'No results found',
   'magnetar table fetch-more button': 'Fetch More',

@@ -105,48 +105,62 @@ function combineWhereClausesWherePossible(whereClauses: WhereClause[]): WhereCla
   }, [])
 }
 
-export function filterStateToClauses(state: FiltersState): (WhereClause | { or: WhereClause[] })[] {
-  return [...state.entries()].reduce<(WhereClause | { or: WhereClause[] })[]>((result, entry) => {
+export function filterStateToClauses(
+  state: FiltersState
+): { filterIndex: number; result: WhereClause | { or: WhereClause[] } }[] {
+  return [...state.entries()].reduce<
+    { filterIndex: number; result: WhereClause | { or: WhereClause[] } }[]
+  >((results, entry) => {
     const [filterIndex, filters] = entry
 
     if (isArray(filters)) {
-      result.push(filters)
-      return result
+      results.push({ filterIndex, result: filters })
+      return results
     }
 
     // TODO: not yet implemented
     // if ('and' in filters) {
     //   const set = filters.and
-    //   if (set.size === 0) return result
+    //   if (set.size === 0) return results
     //   if (set.size === 1) {
-    //     result.push([...set][0])
-    //     return result
+    //     const result = ([...set][0])
+    //     results.push({ filterIndex, result })
+    //     return results
     //   }
     //   const combinedWheres = combineWhereClausesWherePossible([...set])
-    //   result.push(...combinedWheres)
-    //   return result
+    //   if (combinedWheres.length === 1) {
+    //     const result = (combinedWheres[0])
+    //     results.push({ filterIndex, result })
+    //     return results
+    //   }
+    //   const result = ({ and: combinedWheres })
+    //   results.push({ filterIndex, result })
+    //   return results
     // }
 
     if ('or' in filters) {
       const set = filters.or
-      if (set.size === 0) return result
+      if (set.size === 0) return results
       if (set.size === 1) {
-        result.push([...set][0])
-        return result
+        const result = [...set][0]
+        results.push({ filterIndex, result })
+        return results
       }
       /**
        * Perhaps we can combine all of these into 1?
        */
       const combinedWheres = combineWhereClausesWherePossible([...set])
       if (combinedWheres.length === 1) {
-        result.push(combinedWheres[0])
-        return result
+        const result = combinedWheres[0]
+        results.push({ filterIndex, result })
+        return results
       }
-      result.push({ or: combinedWheres })
-      return result
+      const result = { or: combinedWheres }
+      results.push({ filterIndex, result })
+      return results
     }
 
-    return result
+    return results
   }, [])
 }
 
@@ -161,7 +175,8 @@ export function calcCollection(
   filtersState: FiltersState,
   orderByState: OrderByState
 ): CollectionInstance<any> {
-  for (const whereOrQuery of filterStateToClauses(filtersState)) {
+  const clauses = filterStateToClauses(filtersState).map(({ result }) => result)
+  for (const whereOrQuery of clauses) {
     if (isArray(whereOrQuery)) {
       collection = collection.where(...whereOrQuery)
     } else {

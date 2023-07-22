@@ -9,7 +9,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'setOrderBy', payload: [OPaths<any>, 'asc' | 'desc' | undefined]): void
+  (e: 'setOrderBy', payload: [OPaths<any>, 'asc' | 'desc' | null]): void
 }>()
 
 const direction = computed<'asc' | 'desc' | 'sortable' | 'unsortable'>(() => {
@@ -37,7 +37,7 @@ function onClick(e: MouseEvent) {
     return
   }
   if (direction.value === 'asc') {
-    emit('setOrderBy', [fieldPath, undefined])
+    emit('setOrderBy', [fieldPath, null])
     return
   }
 }

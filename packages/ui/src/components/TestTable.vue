@@ -108,7 +108,6 @@ const filters: MUIFilter<Item>[] = [
   table
     display: block
     border-collapse: collapse
-    margin: 1rem 0
     overflow-x: auto
   tr
     border-top: 1px solid #dfe2e5
