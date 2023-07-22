@@ -9,7 +9,7 @@ import {
   usesFilterStateOr,
   usesFilterStateSingle,
 } from '../types'
-import { carbonCopyState, whereClausesEqual } from '../utils'
+import { whereClausesEqual } from '../utils'
 
 const props = defineProps<{
   collection: CollectionInstance<any>
@@ -29,21 +29,23 @@ onMounted(() => {
   }
 })
 
-function setCheckbox(whereClause: WhereClause, to: boolean) {
+function setCheckbox(whereClause: WhereClause, to: boolean): void {
   const { filter, filterState } = props
-  if (!usesFilterStateOr(filter, filterState)) return undefined
-  const newState = !filterState
-    ? { or: new Set<WhereClause>() }
-    : { or: carbonCopyState(filterState.or) }
+  if (!usesFilterStateOr(filter, filterState)) return
+  const or = !filterState ? new Set<WhereClause>() : filterState.or
   if (!to) {
-    newState.or.delete(whereClause)
+    or.delete(whereClause)
   } else {
-    newState.or.add(whereClause)
+    or.add(whereClause)
   }
-  return emit('setFilter', newState)
+  if (or.size === 0) {
+    emit('setFilter', null)
+  } else {
+    emit('setFilter', { or })
+  }
 }
 
-function setRadioTo(whereClause: WhereClause | null) {
+function setRadioTo(whereClause: WhereClause | null): void {
   if (!whereClause) return emit('setFilter', null)
   return emit('setFilter', whereClause)
 }
