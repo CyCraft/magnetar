@@ -146,6 +146,14 @@ export type MUIFilterOther<T extends Record<string, any>, Label extends string =
         ][]
       }
   /**
+   * If set to `true`, any interaction with this filter will first clear out _other_ filters state.
+   */
+  clearOtherFilters?: boolean
+  /**
+   * If set to `true`, any interaction with this filter will first clear out the orderBy state.
+   */
+  clearOrderBy?: boolean
+  /**
    * some text shown leading in front of the `<input>` field.
    * @example '>='
    * @example 'starts with'
@@ -190,6 +198,14 @@ export type MUIFilterOptions<T extends Record<string, any>, Label extends string
     where: WhereClauseTuple<T>
     checked?: boolean
   }[]
+  /**
+   * If set to `true`, any interaction with this filter will first clear out _other_ filters state.
+   */
+  clearOtherFilters?: boolean
+  /**
+   * If set to `true`, any interaction with this filter will first clear out the orderBy state.
+   */
+  clearOrderBy?: boolean
   /**
    * Applied to `<fieldset>`
    * @example 'flex-column'

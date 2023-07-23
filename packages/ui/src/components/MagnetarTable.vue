@@ -128,6 +128,13 @@ const rows = computed(() => {
 
 async function setFilter(filterIndex: number, payload: null | FilterState): Promise<void> {
   clearAllRecords()
+  const filterConfig = props.filters[filterIndex]
+  if (filterConfig.clearOtherFilters) {
+    filtersState.value = new Map()
+  }
+  if (filterConfig.clearOrderBy) {
+    orderByState.value = new Map()
+  }
   if (!payload) {
     filtersState.value.delete(filterIndex)
   } else {
