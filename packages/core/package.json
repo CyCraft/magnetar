@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/core",
-  "version": "0.13.2",
+  "version": "0.13.3",
   "sideEffects": false,
   "description": "Magnetar core library.",
   "main": "dist/index.js",
