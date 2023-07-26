@@ -309,25 +309,9 @@ const showingFiltersCode = ref(false)
   </div>
 </template>
 
+<style lang="sass" src="./styles.sass" />
+
 <style lang="sass" scoped>
-.magnetar-row
-  display: flex
-  flex-direction: row
-  flex-wrap: wrap
-  align-items: center
-.magnetar-column
-  display: flex
-  flex-direction: column
-.magnetar-gap-sm
-  gap: 0.5rem
-.magnetar-gap-md
-  gap: 1rem
-.magnetar-items-end
-  align-items: flex-end
-.magnetar-justify-center
-  justify-content: center
-.magnetar-ml-auto
-  margin-left: auto
 .magnetar-table
   h6
     margin: 0
