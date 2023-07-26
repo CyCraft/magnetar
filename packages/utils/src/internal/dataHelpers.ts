@@ -83,12 +83,12 @@ export function filterDataPerClauses(
   // all other cases we need to create a new Map() with the results
   let entries: [string, Record<string, unknown>][] = []
   collectionDB.forEach((docData, docId) => {
-    const passesQuery = queryClauses.every((queryClause) => passesQuery(docData, queryClause))
-    if (!passesQuery) return
-    const passesWhereFilters = whereClauses.every((whereClause) =>
+    const passedQuery = queryClauses.every((queryClause) => passesQuery(docData, queryClause))
+    if (!passedQuery) return
+    const passedWhereFilters = whereClauses.every((whereClause) =>
       passesWhere(docData, whereClause)
     )
-    if (!passesWhereFilters) return
+    if (!passedWhereFilters) return
     entries.push([docId, docData])
   })
   // orderBy
