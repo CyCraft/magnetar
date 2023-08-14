@@ -7,7 +7,7 @@ export type MUIParseLabel<LabelType = any> = (label: LabelType) => string
 
 export type Codable<DataType, ReturnType> = (info: { value: any; data: DataType }) => ReturnType
 
-export type MUIButton<T extends Record<string, any>, Label extends string = string> = {
+export type MUIButton<T extends Record<string, any>, Label = string> = {
   /** Executed on button click */
   handler: (info: { value: any; data: T }) => void | Promise<void>
   /** Applied to the innerText of the `<button>` */
@@ -25,7 +25,7 @@ export type MUIButton<T extends Record<string, any>, Label extends string = stri
   disabled?: boolean | undefined | Codable<T, boolean | undefined>
 }
 
-export type MUIColumn<T extends Record<string, any>, Label extends string = string> = {
+export type MUIColumn<T extends Record<string, any>, Label = string> = {
   /**
    * - Defaults to whatever you passed in `fieldPath`.
    * - Pass an empty string if you want to show nothing.
@@ -108,11 +108,11 @@ export type MUIPagination = {
   limit: number
 }
 
-export type MUIFilter<T extends Record<string, any>, Label extends string = string> =
+export type MUIFilter<T extends Record<string, any>, Label = string> =
   | MUIFilterOptions<T, Label>
   | MUIFilterOther<T, Label>
 
-export type MUIFilterOther<T extends Record<string, any>, Label extends string = string> = {
+export type MUIFilterOther<T extends Record<string, any>, Label = string> = {
   /**
    * The filter label, will also be piped through `parseLabel` if you passed it to the table.
    */
@@ -210,7 +210,7 @@ export type MUIFilterOther<T extends Record<string, any>, Label extends string =
   options?: undefined
 }
 
-export type MUIFilterOptions<T extends Record<string, any>, Label extends string = string> = {
+export type MUIFilterOptions<T extends Record<string, any>, Label = string> = {
   /**
    * The filter label, will also be piped through `parseLabel` if you passed it to the table.
    */
