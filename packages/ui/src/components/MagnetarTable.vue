@@ -30,9 +30,9 @@ import TextWithAnchorTags from './TextWithAnchorTags.vue'
 
 const props = defineProps<{
   collection: CollectionInstance<any>
-  columns: MUIColumn<any>[]
+  columns: MUIColumn<any, any>[]
   pagination: MUIPagination
-  filters: MUIFilter<Record<string, any>>[]
+  filters: MUIFilter<any, any>[]
   parseLabel?: MUIParseLabel
 }>()
 
