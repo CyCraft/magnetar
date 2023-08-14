@@ -1,6 +1,6 @@
 {
   "name": "magnetar",
-  "version": "0.13.6",
+  "version": "0.13.7",
   "description": "State-management done right with automatic sync to remote databases and services. Framework-agnostic & optimistic-UI built-in 🌟",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
