@@ -168,8 +168,17 @@ async function setFilter(filterIndex: number, payload: null | FilterState): Prom
   await fetchMore()
 }
 
-async function setOrderBy(fieldPath: OPaths<any>, direction: 'asc' | 'desc' | null): Promise<void> {
+async function setOrderBy(
+  fieldPath: OPaths<any>,
+  direction: 'asc' | 'desc' | null,
+  clearOtherOrderBy?: boolean
+): Promise<void> {
   clearAllRecords()
+  if (clearOtherOrderBy) {
+    for (const key of orderByState.value.keys()) {
+      if (key !== fieldPath) orderByState.value.delete(key)
+    }
+  }
   if (!direction) orderByState.value.delete(fieldPath)
   if (direction) orderByState.value.set(fieldPath, direction)
   // it looks better UI wise to delay the actual fetch to prevent UI components from freezing
@@ -269,7 +278,14 @@ const showingFiltersCode = ref(false)
               :column="column"
               :orderByState="orderByState"
               :parseLabel="parseLabel"
-              @setOrderBy="([fieldPath, direction]) => setOrderBy(fieldPath, direction)"
+              @setOrderBy="
+                ([fieldPath, direction]) =>
+                  setOrderBy(
+                    fieldPath,
+                    direction,
+                    isPlainObject(column.sortable) ? column.sortable.clearOtherOrderBy : false
+                  )
+              "
             />
           </th>
         </tr>

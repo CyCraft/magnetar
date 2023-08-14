@@ -62,6 +62,7 @@ const label = computed<string>(() => {
   display: flex
   gap: 0.25rem
   align-items: center
+  white-space: pre
 ._sort-arrows
   float: right
   box-sizing: border-box

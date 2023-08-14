@@ -51,7 +51,23 @@ export type MUIColumn<T extends Record<string, any>, Label extends string = stri
   /** Applied to `td > div` */
   style?: string | Codable<T, string>
   /** When `true` this column will become sortable as per the Magnetar orderBy feature */
-  sortable?: boolean | { orderBy: 'asc' | 'desc'; position: number }
+  sortable?:
+    | boolean
+    | {
+        /**
+         * If set to `true`, any interaction ordering this column will first clear out the orderBy state of other columns.
+         */
+        clearOtherOrderBy: boolean
+      }
+    | {
+        /**
+         * If set to `true`, any interaction ordering this column will first clear out the orderBy state of other columns.
+         */
+        clearOtherOrderBy?: boolean
+        /** The initial orderBy state */
+        orderBy: 'asc' | 'desc'
+        position: number
+      }
   /** Shows action buttons next to the cell value */
   buttons?: MUIButton<T, Label>[]
   /**
