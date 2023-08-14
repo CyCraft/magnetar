@@ -50,23 +50,30 @@ export type MUIColumn<T extends Record<string, any>, Label extends string = stri
   class?: string | Codable<T, string>
   /** Applied to `td > div` */
   style?: string | Codable<T, string>
-  /** When `true` this column will become sortable as per the Magnetar orderBy feature */
+  /**
+   * The column can be made sortable which will use the Magnetar orderBy feature under the hood
+   *
+   * In most cases you'll want to set `{ clearOtherOrderBy: true }` to make sure only 1 column is sorted at a time:
+   * @example
+   * ```js
+   * sortable: { clearOtherOrderBy: true }
+   * ```
+   *
+   * You can have a column have an initial sort state:
+   * @example
+   * ```js
+   * sortable: { orderBy: 'desc', position: 0, clearOtherOrderBy: true }
+   * ```
+   */
   sortable?:
     | boolean
     | {
-        /**
-         * If set to `true`, any interaction ordering this column will first clear out the orderBy state of other columns.
-         */
-        clearOtherOrderBy: boolean
-      }
-    | {
-        /**
-         * If set to `true`, any interaction ordering this column will first clear out the orderBy state of other columns.
-         */
+        /** If set to `true`, any interaction ordering this column will first clear out the orderBy state of other columns */
         clearOtherOrderBy?: boolean
-        /** The initial orderBy state */
-        orderBy: 'asc' | 'desc'
-        position: number
+        /** The initial orderBy state, can be left unset if no initial orderBy state is needed */
+        orderBy?: 'asc' | 'desc'
+        /** The position of the orderBy state, required in case there are more columns with initial orderBy state set */
+        position?: number
       }
   /** Shows action buttons next to the cell value */
   buttons?: MUIButton<T, Label>[]

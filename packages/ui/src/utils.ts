@@ -47,7 +47,7 @@ export function columnsToInitialOrderByState(columns: MUIColumn<any>[]): OrderBy
       .asc((c) => (isPlainObject(c.sortable) ? c.sortable.position : -1))
       // then grab each column's sortable.orderBy and save as "direction" in a map
       .reduce<OrderByState>((map, column) => {
-        if (isPlainObject(column.sortable) && column.fieldPath) {
+        if (isPlainObject(column.sortable) && column.sortable.orderBy && column.fieldPath) {
           map.set(column.fieldPath, column.sortable.orderBy)
         }
         return map
