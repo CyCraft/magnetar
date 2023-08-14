@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { CollectionInstance, WhereClause } from '@magnetarjs/types'
 import { isArray } from 'is-what'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import {
   FilterState,
   MUIFilter,
@@ -22,12 +22,17 @@ const emit = defineEmits<{
   (e: 'setFilter', payload: FilterState | null): void
 }>()
 
-onMounted(() => {
-  // filters with options will fetch the "record count" for each where filter in the option
-  for (const option of props.filter.options || []) {
-    props.collection.where(...option.where).fetchCount()
-  }
-})
+watch(
+  () => props.filter.options?.length,
+  () => {
+    const options = props.filter.options || []
+    // filters with options will fetch the "record count" for each where filter in the option
+    for (const option of options) {
+      props.collection.where(...option.where).fetchCount()
+    }
+  },
+  { immediate: true }
+)
 
 function setCheckbox(whereClause: WhereClause, to: boolean): void {
   const { filter, filterState } = props
