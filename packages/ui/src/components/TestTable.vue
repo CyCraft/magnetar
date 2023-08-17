@@ -86,7 +86,7 @@ const filters: MUIFilter<Item>[] = [
 
 const urlParams = new URLSearchParams(window.location.search)
 const sValue = urlParams.get('s')
-const filterState = sValue ? new Map([[0, sValue]]) : undefined
+const filtersState = sValue ? new Map([[0, sValue]]) : undefined
 </script>
 
 <template>
@@ -99,7 +99,7 @@ const filterState = sValue ? new Map([[0, sValue]]) : undefined
       :columns="columns"
       :filters="filters"
       :pagination="{ limit: 10 }"
-      :filtersState="filterState"
+      :filtersState="filtersState"
     >
       <template #somecolumn="{ data }">
         <pre>{{ data }}</pre>
