@@ -44,7 +44,15 @@ function muiLabel(label: MUILabel): string {
 // const emit = defineEmits<{}>()
 const fetchState = ref<'ok' | 'end' | 'fetching' | { error: string }>('ok')
 
-const initialFilterState: FiltersState = props.filtersState || filtersToInitialState(props.filters)
+const initialFilterState: FiltersState = (() => {
+  const map = filtersToInitialState(props.filters)
+  if (props.filtersState) {
+    for (const [index, state] of props.filtersState) {
+      map.set(index, state)
+    }
+  }
+  return map
+})()
 const initialOrderByState: OrderByState = columnsToInitialOrderByState(props.columns)
 
 const filtersState = ref<FiltersState>(carbonCopyMap(initialFilterState))
