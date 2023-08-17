@@ -114,6 +114,8 @@ export function filterStateToClauses(
   >((results, entry) => {
     const [filterIndex, state] = entry
 
+    if (!state) return results
+
     if (isArray(state)) {
       results.push({ filterIndex, result: state })
       return results

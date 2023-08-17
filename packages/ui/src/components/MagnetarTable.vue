@@ -34,7 +34,7 @@ const props = defineProps<{
   pagination: MUIPagination
   filters: MUIFilter<any, any>[]
   parseLabel?: MUIParseLabel
-  filtersState?: Map<number, FilterState>
+  filtersState?: FiltersState
 }>()
 
 function muiLabel(label: MUILabel): string {

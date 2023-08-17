@@ -288,7 +288,7 @@ export type FilterState = FilterStateCheckboxes | FilterStateOption | FilterStat
  * A map of the filter index with the where clauses to be applied.
  * @see {@link FilterState} for more info.
  */
-export type FiltersState = Map<number, FilterState>
+export type FiltersState = Map<number, FilterState | undefined>
 
 export function usesFilterStateInputValue(
   filter: MUIFilter<any>,
