@@ -1,7 +1,7 @@
 import { CollectionInstance, WhereClause } from '@magnetarjs/types'
 import { sort } from 'fast-sort'
 import { mapGetOrSet } from 'getorset-anything'
-import { isArray, isPlainObject } from 'is-what'
+import { isArray, isPlainObject, isString } from 'is-what'
 import { FiltersState, MUIColumn, MUIFilter, OPaths, OrderByState } from './types'
 
 export function isEqual(a: any | any[], b: any | any[]): boolean {
@@ -106,21 +106,22 @@ function combineWhereClausesWherePossible(whereClauses: WhereClause[]): WhereCla
 }
 
 export function filterStateToClauses(
-  state: FiltersState
+  state: FiltersState,
+  filters: MUIFilter<any, any>[]
 ): { filterIndex: number; result: WhereClause | { or: WhereClause[] } }[] {
   return [...state.entries()].reduce<
     { filterIndex: number; result: WhereClause | { or: WhereClause[] } }[]
   >((results, entry) => {
-    const [filterIndex, filters] = entry
+    const [filterIndex, state] = entry
 
-    if (isArray(filters)) {
-      results.push({ filterIndex, result: filters })
+    if (isArray(state)) {
+      results.push({ filterIndex, result: state })
       return results
     }
 
     // TODO: not yet implemented
-    // if ('and' in filters) {
-    //   const set = filters.and
+    // if ('and' in state) {
+    //   const set = state.and
     //   if (set.size === 0) return results
     //   if (set.size === 1) {
     //     const result = ([...set][0])
@@ -138,8 +139,28 @@ export function filterStateToClauses(
     //   return results
     // }
 
-    if ('or' in filters) {
-      const set = filters.or
+    if (isString(state) || 'or' in state) {
+      const set = isString(state)
+        ? (() => {
+            // we need to convert the string to a where clause as per the filter spec
+            const filter = filters[filterIndex]
+            if (
+              !filter ||
+              (filter.type !== 'text' && filter.type !== 'number' && filter.type !== 'date')
+            ) {
+              return new Set<WhereClause>()
+            }
+
+            const whereClauseSpecs = isArray(filter.where) ? [filter.where] : filter.where.or
+            const whereClauses: WhereClause[] =
+              whereClauseSpecs?.map<WhereClause>((spec) => {
+                const [fieldPath, op, parseInput] = spec
+                return [fieldPath, op, parseInput(state)]
+              }) || []
+            return new Set<WhereClause>(whereClauses)
+          })()
+        : state.or
+
       if (set.size === 0) return results
       if (set.size === 1) {
         const result = [...set][0]
@@ -173,9 +194,10 @@ export function orderByStateToClauses(
 export function calcCollection(
   collection: CollectionInstance<any>,
   filtersState: FiltersState,
-  orderByState: OrderByState
+  orderByState: OrderByState,
+  filters: MUIFilter<any, any>[]
 ): CollectionInstance<any> {
-  const clauses = filterStateToClauses(filtersState).map(({ result }) => result)
+  const clauses = filterStateToClauses(filtersState, filters).map(({ result }) => result)
   for (const whereOrQuery of clauses) {
     if (isArray(whereOrQuery)) {
       collection = collection.where(...whereOrQuery)

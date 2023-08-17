@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CollectionInstance, WhereFilterOp } from '@magnetarjs/types'
-import { isAnyObject, isArray, isError, isPlainObject } from 'is-what'
+import { isAnyObject, isArray, isError, isPlainObject, isString } from 'is-what'
 import { computed, onMounted, ref } from 'vue'
 import {
   FiltersState,
@@ -34,6 +34,7 @@ const props = defineProps<{
   pagination: MUIPagination
   filters: MUIFilter<any, any>[]
   parseLabel?: MUIParseLabel
+  filtersState?: Map<number, FilterState>
 }>()
 
 function muiLabel(label: MUILabel): string {
@@ -43,13 +44,13 @@ function muiLabel(label: MUILabel): string {
 // const emit = defineEmits<{}>()
 const fetchState = ref<'ok' | 'end' | 'fetching' | { error: string }>('ok')
 
-const initialFilterState: FiltersState = filtersToInitialState(props.filters)
+const initialFilterState: FiltersState = props.filtersState || filtersToInitialState(props.filters)
 const initialOrderByState: OrderByState = columnsToInitialOrderByState(props.columns)
 
 const filtersState = ref<FiltersState>(carbonCopyMap(initialFilterState))
 const orderByState = ref<OrderByState>(carbonCopyMap(initialOrderByState))
 
-const currentFilters = computed(() => filterStateToClauses(filtersState.value))
+const currentFilters = computed(() => filterStateToClauses(filtersState.value, props.filters))
 const currentOrderBy = computed(() => orderByStateToClauses(orderByState.value))
 
 const initialStateActive = computed<boolean>(
@@ -69,7 +70,7 @@ const hasSomeFilterOrOrderby = computed<boolean>(
 
 /** This instance is not computed so that we can delay setting it after fetching the relevant records */
 const collectionInstance = ref(
-  calcCollection(props.collection, filtersState.value, orderByState.value)
+  calcCollection(props.collection, filtersState.value, orderByState.value, props.filters)
 )
 
 function clearAllRecords(): void {
@@ -94,7 +95,12 @@ function clearState(): void {
 /** never throws */
 async function fetchMore() {
   fetchState.value = 'fetching'
-  const collection = calcCollection(props.collection, filtersState.value, orderByState.value)
+  const collection = calcCollection(
+    props.collection,
+    filtersState.value,
+    orderByState.value,
+    props.filters
+  )
 
   try {
     await collection
@@ -140,7 +146,7 @@ async function setFilter(filterIndex: number, payload: null | FilterState): Prom
   } else {
     filtersState.value.set(filterIndex, payload)
 
-    const whereClauses = isArray(payload) ? [payload] : [...payload.or]
+    const whereClauses = isString(payload) ? [] : isArray(payload) ? [payload] : [...payload.or]
     // : 'and' in payload
     // ? [...payload.and]
     // : [...payload.or]

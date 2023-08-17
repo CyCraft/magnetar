@@ -254,34 +254,60 @@ export type MUIFilterOptions<T extends Record<string, any>, Label = string> = {
 
 export type MUIRows<T extends Record<string, any>> = T[]
 
-export type FilterStateOr = { or: Set<WhereClause> }
-export type FilterStateSingle = WhereClause
-export type FilterState = FilterStateOr | FilterStateSingle
+/**
+ * - used for filters with `type: 'checkboxes'`.
+ * - this value is used to apply which of the checkboxes are checked.
+ */
+export type FilterStateCheckboxes = { or: Set<WhereClause> }
+/**
+ * - used for filters with `type: 'select' | 'radio'`.
+ * - this value is used to apply which of the radio/select options are checked.
+ */
+export type FilterStateOption = WhereClause
+/**
+ * - used for filters with `type: 'text' | 'date' | 'number'`.
+ * - this value will be converted to whatever you defined as the `where` clause of the filter.
+ */
+export type FilterStateInputValue = string
+/**
+ * ### FilterStateCheckboxes
+ * - used for filters with `type: 'checkboxes'`.
+ * - this value is used to apply which of the checkboxes are checked.
+ *
+ * ### FilterStateOption
+ * - used for filters with `type: 'select' | 'radio'`.
+ * - this value is used to apply which of the radio/select options are checked.
+ *
+ * ### FilterStateInputValue
+ * - used for filters with `type: 'text' | 'date' | 'number'`.
+ * - this value will be converted to whatever you defined as the `where` clause of the filter.
+ */
+export type FilterState = FilterStateCheckboxes | FilterStateOption | FilterStateInputValue
 
 /**
  * A map of the filter index with the where clauses to be applied.
- *
- * - `type: 'checkboxes' | 'text' | 'number' | 'date'` needs to save its state as `{ or: Set<WhereClause> }`
- * - `type: 'select' | 'radio'` needs to save its state as `WhereClause`
+ * @see {@link FilterState} for more info.
  */
 export type FiltersState = Map<number, FilterState>
 
-export function usesFilterStateOr(
+export function usesFilterStateInputValue(
   filter: MUIFilter<any>,
   state?: FilterState
-): state is FilterStateOr | undefined {
-  return (
-    filter.type === 'checkboxes' ||
-    filter.type === 'text' ||
-    filter.type === 'number' ||
-    filter.type === 'date'
-  )
+): state is FilterStateInputValue | undefined {
+  return filter.type === 'text' || filter.type === 'number' || filter.type === 'date'
 }
 
-export function usesFilterStateSingle(
+export function usesFilterStateCheckboxes(
   filter: MUIFilter<any>,
   state?: FilterState
-): state is FilterStateSingle | undefined {
+): state is FilterStateCheckboxes | undefined {
+  return filter.type === 'checkboxes'
+}
+
+export function usesFilterStateOption(
+  filter: MUIFilter<any>,
+  state?: FilterState
+): state is FilterStateOption | undefined {
   return filter.type === 'select' || filter.type === 'radio'
 }
 

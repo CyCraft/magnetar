@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { CollectionInstance, WhereClause } from '@magnetarjs/types'
-import { isArray } from 'is-what'
-import { computed, ref, watch } from 'vue'
+import { computed, watch } from 'vue'
 import {
   FilterState,
   MUIFilter,
   MUIParseLabel,
-  usesFilterStateOr,
-  usesFilterStateSingle,
+  usesFilterStateCheckboxes,
+  usesFilterStateInputValue,
+  usesFilterStateOption,
 } from '../types'
 import { whereClausesEqual } from '../utils'
 
@@ -36,7 +36,7 @@ watch(
 
 function setCheckbox(whereClause: WhereClause, to: boolean): void {
   const { filter, filterState } = props
-  if (!usesFilterStateOr(filter, filterState)) return
+  if (!usesFilterStateCheckboxes(filter, filterState)) return
   const or = !filterState ? new Set<WhereClause>() : filterState.or
   if (!to) {
     or.delete(whereClause)
@@ -58,41 +58,34 @@ function setRadioTo(whereClause: WhereClause | null): void {
 const selectModel = computed({
   get: (): WhereClause | undefined => {
     const { filter, filterState } = props
-    if (!usesFilterStateSingle(filter, filterState)) return undefined
+    if (!usesFilterStateOption(filter, filterState)) return undefined
     return filter.options?.find((o) => whereClausesEqual(o.where, filterState))?.where
   },
   set: (where: WhereClause | undefined) => setRadioTo(where || null),
 })
 
+let timeoutDebounce: any
+
 /**
  * For filter `type: 'text' | 'number' | 'date'`.
  * Bound to `<input v-model="inputModel" />`
  */
-const inputModel = ref<any>('')
-
-let timeout: any
-
-watch(inputModel, (userInput: any) => {
-  clearTimeout(timeout)
-  timeout = setTimeout(() => {
-    const { filter } = props
-    if (filter.type !== 'text' && filter.type !== 'number' && filter.type !== 'date')
-      return undefined
-    if (!userInput) {
-      // remove filter
-      emit('setFilter', null)
-      return
-    }
-
-    const whereClauseSpecs = isArray(filter.where) ? [filter.where] : filter.where.or
-    const whereClauses: WhereClause[] =
-      whereClauseSpecs?.map<WhereClause>((spec) => {
-        const [fieldPath, op, parseInput] = spec
-        return [fieldPath, op, parseInput(userInput)]
-      }) || []
-    emit('setFilter', { or: new Set<WhereClause>(whereClauses) })
-    return
-  }, 300)
+const inputModel = computed<string | null>({
+  get: (): string | null => {
+    const { filter, filterState } = props
+    if (!usesFilterStateInputValue(filter, filterState)) return null
+    return filterState || null
+  },
+  set: (userInput: string | null): void => {
+    clearTimeout(timeoutDebounce)
+    timeoutDebounce = setTimeout(() => {
+      const { filter } = props
+      if (filter.type !== 'text' && filter.type !== 'number' && filter.type !== 'date') {
+        return
+      }
+      emit('setFilter', userInput || null)
+    }, 300)
+  },
 })
 
 const filterAttrs = computed<{
@@ -117,7 +110,7 @@ const filterAttrs = computed<{
       <button v-if="filterState" @click="() => emit('setFilter', null)">✕</button>
     </legend>
 
-    <template v-if="filter.type === 'checkboxes' && usesFilterStateOr(filter, filterState)">
+    <template v-if="filter.type === 'checkboxes' && usesFilterStateCheckboxes(filter, filterState)">
       <!-- CHECKBOXES -->
       <div v-for="option in filter.options" class="magnetar-inline-block">
         <input
@@ -133,7 +126,7 @@ const filterAttrs = computed<{
       </div>
     </template>
 
-    <template v-if="filter.type === 'radio' && usesFilterStateSingle(filter, filterState)">
+    <template v-if="filter.type === 'radio' && usesFilterStateOption(filter, filterState)">
       <!-- RADIO -->
       <div v-for="option in filter.options" class="magnetar-inline-block">
         <input
@@ -151,7 +144,7 @@ const filterAttrs = computed<{
       </div>
     </template>
 
-    <template v-if="filter.type === 'select' && usesFilterStateSingle(filter, filterState)">
+    <template v-if="filter.type === 'select' && usesFilterStateOption(filter, filterState)">
       <!-- SELECT -->
       <select v-model="selectModel">
         <option>{{ filterAttrs.placeholder || '--' }}</option>
