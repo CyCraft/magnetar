@@ -34,7 +34,10 @@ const props = defineProps<{
   pagination: MUIPagination
   filters: MUIFilter<any, any>[]
   parseLabel?: MUIParseLabel
+  /** Passing this will apple those filters on top of the filter state that will be derived based on the `filters` prop */
   filtersState?: FiltersState
+  /** Passing this will replace any orderBy state that is derived based on the `columns` prop */
+  orderByState?: OrderByState
 }>()
 
 function muiLabel(label: MUILabel): string {
@@ -44,7 +47,7 @@ function muiLabel(label: MUILabel): string {
 // const emit = defineEmits<{}>()
 const fetchState = ref<'ok' | 'end' | 'fetching' | { error: string }>('ok')
 
-const initialFilterState: FiltersState = (() => {
+const initialFilterState = ((): FiltersState => {
   const map = filtersToInitialState(props.filters)
   if (props.filtersState) {
     for (const [index, state] of props.filtersState) {
@@ -53,7 +56,8 @@ const initialFilterState: FiltersState = (() => {
   }
   return map
 })()
-const initialOrderByState: OrderByState = columnsToInitialOrderByState(props.columns)
+const initialOrderByState: OrderByState =
+  props.orderByState || columnsToInitialOrderByState(props.columns)
 
 const filtersState = ref<FiltersState>(carbonCopyMap(initialFilterState))
 const orderByState = ref<OrderByState>(carbonCopyMap(initialOrderByState))
