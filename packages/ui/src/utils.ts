@@ -25,11 +25,11 @@ export function filtersToInitialState(filters: MUIFilter<Record<string, any>>[])
   // remember, see `FiltersState` for instructions how to save the state.
   return filters.reduce<FiltersState>((map, f, i) => {
     if (f.type === 'radio' || f.type === 'select') {
-      const firstChecked = f.options.find((o) => o.checked)
+      const firstChecked = f.options?.find((o) => o.checked)
       if (firstChecked) map.set(i, firstChecked.where)
     }
     if (f.type === 'checkboxes') {
-      for (const option of f.options) {
+      for (const option of f.options || []) {
         if (option.checked) {
           const state = mapGetOrSet(map, i, () => ({ or: new Set() }))
           state.or.add(option.where)
@@ -153,7 +153,11 @@ export function filterStateToClauses(
               return new Set<WhereClause>()
             }
 
-            const whereClauseSpecs = isArray(filter.where) ? [filter.where] : filter.where.or
+            const whereClauseSpecs = isArray(filter.where)
+              ? [filter.where]
+              : isArray(filter.query)
+              ? filter.query.or
+              : []
             const whereClauses: WhereClause[] =
               whereClauseSpecs?.map<WhereClause>((spec) => {
                 const [fieldPath, op, parseInput] = spec

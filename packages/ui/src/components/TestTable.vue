@@ -106,7 +106,7 @@ const filters: MUIFilter<Item>[] = [
     label: 'Search',
     placeholder: 'search something...',
     type: 'text',
-    where: {
+    query: {
       or: [
         ['title', '==', (userInput) => userInput.trim()],
         ['id', '==', (userInput) => userInput.trim()],
@@ -147,8 +147,6 @@ const filters: MUIFilter<Item>[] = [
     ],
   },
 ]
-
-const filtersState = sValue ? new Map([[0, sValue]]) : undefined
 </script>
 
 <template>
@@ -161,7 +159,6 @@ const filtersState = sValue ? new Map([[0, sValue]]) : undefined
       :columns="columns"
       :filters="filters"
       :pagination="{ limit: 10 }"
-      :filtersState="filtersState"
       :parseLabel="parseLabel"
     >
       <template #nakashima="{ data }">

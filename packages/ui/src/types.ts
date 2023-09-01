@@ -147,21 +147,43 @@ export type MUIPagination = {
   limit: number
 }
 
-export type MUIFilter<T extends Record<string, any>, Label = string> =
-  | MUIFilterOptions<T, Label>
-  | MUIFilterOther<T, Label>
-
-export type MUIFilterOther<T extends Record<string, any>, Label = string> = {
+export type MUIFilter<T extends Record<string, any>, Label = string> = {
   /**
    * The filter label, will also be piped through `parseLabel` if you passed it to the table.
+   *
+   * The filter label will be rendered as the `<legend />` element of the filter <fieldset />.
    */
   label: Label
   /**
-   * The `type` is passed to the `<input>` element.
+   * The type of filter.
+   * - `'radio'` — renders radio buttons via `<input type="radio" />`
+   * - `'checkboxes'` — renders checkboxes via `<input type="checkbox" />`
+   * - `'select'` — renders a `<select />` element
+   * - `'text'` — renders a `<input type="text" />` element
+   * - `'date'` — renders a `<input type="date" />` element
+   * - `'number'` — renders a `<input type="number" />` element
+   *
+   * The filter will be rendered inside a `<fieldset />` element.
    */
-  type: 'text' | 'date' | 'number'
+  type: 'radio' | 'checkboxes' | 'select' | 'text' | 'date' | 'number'
   /**
-   * An array of where clauses, which will be combined with `||` (OR).
+   * The options to be rendered for the radio/select/checkboxes filter.
+   *
+   * - `type: 'select' | 'checkboxes' | 'radio'`
+   *   - available
+   * - `type: 'text' | 'date' | 'number'`
+   *   - not available
+   */
+  options?: {
+    label: Label
+    where: WhereClauseTuple<T>
+    checked?: boolean
+  }[]
+  /**
+   * - `type: 'text' | 'date' | 'number'`
+   *   - available
+   * - `type: 'select' | 'checkboxes' | 'radio'`
+   *   - not available
    *
    * The value of the where clause is what the user typed in the input field.
    * You must pass a function which parses the user input to the correct type as per your needs.
@@ -170,9 +192,53 @@ export type MUIFilterOther<T extends Record<string, any>, Label = string> = {
    * @example
    * ```js
    * const filter = {
-   *   label: 'username',
+   *   label: 'Search',
+   *   placeholder: 'user ID',
    *   type: 'text',
-   *   orWhere: [['username', '==', (userInput) => userInput.trim()]],
+   *   where: ['id', '==', (userInput) => userInput.trim()],
+   * }
+   * ```
+   * @example
+   * ```js
+   * const filter = {
+   *   label: 'amountVAT',
+   *   type: 'number',
+   *   where: ['amountVAT', '>=', (userInput) => Number(userInput.trim())],
+   * }
+   * ```
+   * @example
+   * ```js
+   * const filter = {
+   *   label: 'dateCreated',
+   *   type: 'date',
+   *   where: ['dateCreated', '>=', (userInput) => new Date(userInput.trim())],
+   * }
+   * ```
+   */
+  where?: [fieldPath: OPaths<T>, operator: WhereFilterOp, parseInput: (userInput: string) => any]
+  /**
+   * - `type: 'text' | 'date' | 'number'`
+   *   - available
+   * - `type: 'select' | 'checkboxes' | 'radio'`
+   *   - not available
+   *
+   * The value of the where clause is what the user typed in the input field.
+   * You must pass a function which parses the user input to the correct type as per your needs.
+   * Usually applying `.trim()` as per the examples is a good idea.
+   *
+   * @example
+   * ```js
+   * const filter = {
+   *   label: 'Search',
+   *   placeholder: 'user ID, username, ...',
+   *   type: 'text',
+   *   query: {
+   *     or: [
+   *       ['username', '>=', (userInput) => Number(userInput.trim())],
+   *       ['username', '>=', (userInput) => Number(userInput.toLowerCase().trim())],
+   *       ['id', '>=', (userInput) => Number(userInput.trim())],
+   *     ]
+   *   }
    * }
    * ```
    * @example
@@ -180,10 +246,12 @@ export type MUIFilterOther<T extends Record<string, any>, Label = string> = {
    * const filter = {
    *   label: 'amount',
    *   type: 'number',
-   *   orWhere: [
-   *     ['amountVAT', '>=', (userInput) => Number(userInput.trim())],
-   *     ['profit', '>=', (userInput) => Number(userInput.trim())],
-   *   ]
+   *   query: {
+   *     or: [
+   *       ['amountVAT', '>=', (userInput) => Number(userInput.trim())],
+   *       ['profit', '>=', (userInput) => Number(userInput.trim())],
+   *     ]
+   *   }
    * }
    * ```
    * @example
@@ -191,22 +259,18 @@ export type MUIFilterOther<T extends Record<string, any>, Label = string> = {
    * const filter = {
    *   label: 'date',
    *   type: 'date',
-   *   orWhere: [
-   *     ['dateCreated', '>=', (userInput) => new Date(userInput.trim())],
-   *     ['dateUpdated', '>=', (userInput) => new Date(userInput.trim())],
-   *   ]
+   *   query: {
+   *     or: [
+   *       ['dateCreated', '>=', (userInput) => new Date(userInput.trim())],
+   *       ['dateUpdated', '>=', (userInput) => new Date(userInput.trim())],
+   *     ]
+   *   }
    * }
    * ```
    */
-  where:
-    | [fieldPath: OPaths<T>, operator: WhereFilterOp, parseInput: (userInput: string) => any]
-    | {
-        or?: [
-          fieldPath: OPaths<T>,
-          operator: WhereFilterOp,
-          parseInput: (userInput: string) => any
-        ][]
-      }
+  query?: {
+    or: [fieldPath: OPaths<T>, operator: WhereFilterOp, parseInput: (userInput: string) => any][]
+  }
   /**
    * If set to `true`, any interaction with this filter will first clear out _other_ filters state.
    */
@@ -217,6 +281,10 @@ export type MUIFilterOther<T extends Record<string, any>, Label = string> = {
   clearOrderBy?: boolean
   /**
    * some text shown leading in front of the `<input>` field.
+   * - `type: 'text' | 'date' | 'number'`
+   *   - available
+   * - `type: 'select' | 'checkboxes' | 'radio'`
+   *   - not available
    * @example '>='
    * @example 'starts with'
    * @example '€'
@@ -224,71 +292,36 @@ export type MUIFilterOther<T extends Record<string, any>, Label = string> = {
   prefix?: string | Label
   /**
    * some text shown trailing behind the `<input>` field.
+   * - `type: 'text' | 'date' | 'number'`
+   *   - available
+   * - `type: 'select' | 'checkboxes' | 'radio'`
+   *   - not available
    * @example 'kg'
    * @example 'JPY'
    */
   suffix?: string | Label
   /**
-   * Applied to `<fieldset>`
+   * Applied to the `<fieldset />` element
    * @example 'flex-column'
    */
   class?: string
   /**
-   * Applied to `<fieldset>`
+   * Applied to the `<fieldset />` element
    * @example 'display: flex; flex-direction: column;'
    */
   style?: string
   /**
-   * Text placeholder which will be displayed inside the input field.
+   * A Placeholder available for some filter types:
+   * - `type: 'text' | 'date' | 'number'`
+   *   - Text placeholder which will be displayed inside the <input /> field.
+   * - `type: 'select'`
+   *   - Text placeholder which will be displayed inside the `<select />` field.
+   * - `type: 'checkboxes' | 'radio'`
+   *   - not available
    * @example 'search...'
-   */
-  placeholder?: Label
-  /**
-   * Not available for `type: 'text' | 'date' | 'number'`.
-   */
-  options?: undefined
-}
-
-export type MUIFilterOptions<T extends Record<string, any>, Label = string> = {
-  /**
-   * The filter label, will also be piped through `parseLabel` if you passed it to the table.
-   */
-  label: Label
-  type: 'select' | 'checkboxes' | 'radio'
-  options: {
-    label: Label
-    where: WhereClauseTuple<T>
-    checked?: boolean
-  }[]
-  /**
-   * If set to `true`, any interaction with this filter will first clear out _other_ filters state.
-   */
-  clearOtherFilters?: boolean
-  /**
-   * If set to `true`, any interaction with this filter will first clear out the orderBy state.
-   */
-  clearOrderBy?: boolean
-  /**
-   * Applied to `<fieldset>`
-   * @example 'flex-column'
-   */
-  class?: string
-  /**
-   * Applied to `<fieldset>`
-   * @example 'display: flex; flex-direction: column;'
-   */
-  style?: string
-  /**
-   * Text placeholder which will be displayed inside the `<select>` field.
    * @example 'select...'
    */
   placeholder?: Label
-  /** not available for `'select' | 'checkboxes' | 'radio'`. */
-  orWhere?: undefined
-  /** not available for `'select' | 'checkboxes' | 'radio'`. */
-  prefix?: undefined
-  /** not available for `'select' | 'checkboxes' | 'radio'`. */
-  suffix?: undefined
 }
 
 export type MUIRows<T extends Record<string, any>> = T[]
