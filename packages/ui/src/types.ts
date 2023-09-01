@@ -33,48 +33,55 @@ export type MUIColumn<T extends Record<string, any>, Label = string> = {
   label?: Label
   /**
    * Represents the path to the prop that should be shown in this column for each data item.
-   * No need to pass if the value doesn't matter for a column, because you want to show a combination of 2 columns with the `parseValue` function
+   * No need to pass if the value doesn't matter for a column, because you want to show a combination of 2 columns with the `parseValue` function.
+   *
+   * The data to be shown in a cell is calculated by any of the following props. They cannot be combined, choose only 1 of:
+   * - `slot`
+   * - `fetchValue`
+   * - `fieldPath`
+   *
    * @example 'name' // would show `data.name`
    * @example 'name.family' // would show `data.name.family`
    * @example undefined // an empty column, you can use `parseValue` to show something else
    */
   fieldPath?: OPaths<T>
   /**
-   * Parses the value to be shown
+   * A function that parses the value to be shown.
+   * The function will receive an object with these props:
+   * - `data` — the row data
+   * - `value` —
+   *   - if `fieldPath` it provided, the value found at that `fieldPath`
+   *   - if `fetchValue` it provided, the value that was fetched
+   *   - else `undefined`
+   *
    * @example ({ value }) => value > 10 ? 'lg' : 'sm'
    * @example ({ value }) => !!value ? '✅' : '❌'
    * @example ({ data }) => data.name.family + ' ' + data.name.given
    */
   parseValue?: (info: { value: any; data: T }) => string
+  /**
+   * Fetches a value to be shown. When passing this, the `fieldPath` prop will be ignored.
+   *
+   * Under the hood this uses `computedAsync` from [vueuse](https://vueuse.org/core/computedAsync/).
+   *
+   * The data to be shown in a cell is calculated by any of the following props. They cannot be combined, choose only 1 of:
+   * - `slot`
+   * - `fetchValue`
+   * - `fieldPath`
+   *
+   * @example
+   * ```js
+   * async ({ data }) => {
+   *   const user = await magnetar.collection('users').doc(data.userIdCreated).fetch()
+   *   return user.name
+   * }
+   * ```
+   */
+  fetchValue?: (info: { data: T }) => Promise<any>
   /** Applied to `td > div` */
   class?: string | Codable<T, string>
   /** Applied to `td > div` */
   style?: string | Codable<T, string>
-  /**
-   * The column can be made sortable which will use the Magnetar orderBy feature under the hood
-   *
-   * In most cases you'll want to set `{ clearOtherOrderBy: true }` to make sure only 1 column is sorted at a time:
-   * @example
-   * ```js
-   * sortable: { clearOtherOrderBy: true }
-   * ```
-   *
-   * You can have a column have an initial sort state:
-   * @example
-   * ```js
-   * sortable: { orderBy: 'desc', position: 0, clearOtherOrderBy: true }
-   * ```
-   */
-  sortable?:
-    | boolean
-    | {
-        /** If set to `true`, any interaction ordering this column will first clear out the orderBy state of other columns */
-        clearOtherOrderBy?: boolean
-        /** The initial orderBy state, can be left unset if no initial orderBy state is needed */
-        orderBy?: 'asc' | 'desc'
-        /** The position of the orderBy state, required in case there are more columns with initial orderBy state set */
-        position?: number
-      }
   /** Shows action buttons next to the cell value */
   buttons?: MUIButton<T, Label>[]
   /**
@@ -100,8 +107,40 @@ export type MUIColumn<T extends Record<string, any>, Label = string> = {
    * ```
    */
   html?: boolean
-  /** When set this will be the name of the slot you can use to edit the column cells via Vue slots. */
+  /**
+   * When set this will be the name of the slot you can use to edit the column cells via Vue slots.
+   *
+   * The data to be shown in a cell is calculated by any of the following props. They cannot be combined, choose only 1 of:
+   * - `slot`
+   * - `fetchValue`
+   * - `fieldPath`
+   */
   slot?: string
+  /**
+   * The column can be made sortable which will use the Magnetar orderBy feature under the hood
+   *
+   * In most cases you'll want to set `{ clearOtherOrderBy: true }` to make sure only 1 column is sorted at a time:
+   * @example
+   * ```js
+   * sortable: { clearOtherOrderBy: true }
+   * ```
+   *
+   * You can have a column have an initial sort state:
+   * @example
+   * ```js
+   * sortable: { orderBy: 'desc', position: 0, clearOtherOrderBy: true }
+   * ```
+   */
+  sortable?:
+    | boolean
+    | {
+        /** If set to `true`, any interaction ordering this column will first clear out the orderBy state of other columns */
+        clearOtherOrderBy?: boolean
+        /** The initial orderBy state, can be left unset if no initial orderBy state is needed */
+        orderBy?: 'asc' | 'desc'
+        /** The position of the orderBy state, required in case there are more columns with initial orderBy state set */
+        position?: number
+      }
 }
 
 export type MUIPagination = {

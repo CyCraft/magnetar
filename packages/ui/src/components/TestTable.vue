@@ -1,16 +1,48 @@
 <script setup lang="ts">
+import { PokedexEntry } from '@magnetarjs/test-utils'
+import { roll } from 'roll-anything'
 import { magnetar } from '../magnetar'
-import { MUIColumn, MUIFilter } from '../types'
+import { MUIColumn, MUIFilter, MUIParseLabel } from '../types'
 import MagnetarTable from './MagnetarTable.vue'
 
-type Item = { title: string; id: string; isDone: boolean }
+type Item = { title: string; id: string; isDone: boolean; name: { family: string } }
 
 const itemsModuleT = magnetar.collection<Item>('magnetarTests/dev-firestore/itemsF')
+const dbPokedex = magnetar.collection<PokedexEntry>('magnetarTests/read/pokedex')
 
 // @ts-ignore — added to window to be able to play around in the console
 window.itemsModuleT = itemsModuleT
 
-const columns: MUIColumn<Item>[] = [
+type Label = string[] | string
+
+const magnetarLabelDic = {
+  'magnetar table record counts': 'レコード件数',
+  'magnetar table fetch-state error default': 'エラーが出ました',
+  'magnetar table info counts total': '件 全レコード数',
+  'magnetar table info counts filtered': '件 有効フィルター',
+  'magnetar table info counts showing': '件 表示中',
+  'magnetar table fetch-state reset': 'フィルターを初期値に戻す',
+  'magnetar table filters': 'フィルター',
+  'magnetar table active filters': '有効なフィルター',
+  'magnetar table show filters code': 'フィルターのコードを表示する',
+  'magnetar table clear filters button': 'すべてのフィルターを消す',
+  'magnetar table no active filters': '有効なフィルターがありません',
+  'magnetar table no-results': '結果がありません',
+  'magnetar table fetch-more button': '追加取得する',
+  'magnetar table fetch-more button end': 'すべて取得しました',
+}
+
+const parseLabel: MUIParseLabel<Label> = (label) => {
+  if (Array.isArray(label)) {
+    const key = label[0]
+    const dic = { th_label: 'Title' }
+    return dic[key]
+  }
+
+  return magnetarLabelDic[label] || label
+}
+
+const columns: MUIColumn<Item, Label>[] = [
   {
     buttons: [
       {
@@ -21,24 +53,53 @@ const columns: MUIColumn<Item>[] = [
   },
   {
     fieldPath: 'id',
-    buttons: [{ label: 'Copy', handler: ({ value }) => alert(`copied to clipboard ${value}`) }],
+    buttons: [
+      {
+        label: 'Copy',
+        handler: ({ value }) => alert(`copied to clipboard ${value}`),
+        disabled: ({ data }) => (data.isDone ? undefined : true),
+      },
+    ],
   },
   {
-    label: 'Title',
+    label: ['th_label'],
     fieldPath: 'title',
-    sortable: { orderBy: 'asc', position: 0 },
+    sortable: { clearOtherOrderBy: true, orderBy: 'asc', position: 0 },
   },
   {
     label: 'Custom Slot',
-    slot: 'somecolumn',
+    slot: 'nakashima',
+  },
+  {
+    label: 'random pokemon name',
+    fetchValue: async () => {
+      const nr = roll(1, 151)
+      const pokemon = await dbPokedex.doc(`${nr}`).fetch()
+      return pokemon?.name || '...'
+    },
   },
   {
     label: 'Is it done?',
     fieldPath: 'isDone',
     parseValue: ({ value }) => (value ? '✅' : '❌'),
-    sortable: true,
+    sortable: { clearOtherOrderBy: true },
+  },
+  {
+    label: 'Is it done? (clickable)',
+    buttons: [
+      {
+        style: 'all: unset',
+        label: ({ data }) => (data.isDone ? '✅' : '❌'),
+        handler: async ({ data }) => {
+          await itemsModuleT.doc(data.id).merge({ isDone: !data.isDone })
+        },
+      },
+    ],
   },
 ]
+
+const urlParams = new URLSearchParams(window.location.search)
+const sValue = urlParams.get('s') || undefined
 
 const filters: MUIFilter<Item>[] = [
   {
@@ -51,6 +112,9 @@ const filters: MUIFilter<Item>[] = [
         ['id', '==', (userInput) => userInput.trim()],
       ],
     },
+    clearOtherFilters: true,
+    clearOrderBy: true,
+    // initialValue: sValue,
   },
   {
     label: 'Done or not',
@@ -84,14 +148,12 @@ const filters: MUIFilter<Item>[] = [
   },
 ]
 
-const urlParams = new URLSearchParams(window.location.search)
-const sValue = urlParams.get('s')
 const filtersState = sValue ? new Map([[0, sValue]]) : undefined
 </script>
 
 <template>
   <div class="test">
-    <h6>plugin-vue3 + plugin-firestore Magnetar Table</h6>
+    <!-- <h6>plugin-vue3 + plugin-firestore Magnetar Table</h6> -->
 
     <MagnetarTable
       class="magnetar-table"
@@ -100,9 +162,11 @@ const filtersState = sValue ? new Map([[0, sValue]]) : undefined
       :filters="filters"
       :pagination="{ limit: 10 }"
       :filtersState="filtersState"
+      :parseLabel="parseLabel"
     >
-      <template #somecolumn="{ data }">
-        <pre>{{ data }}</pre>
+      <template #nakashima="{ data }">
+        {{ Object.keys(data).join('、') }}
+        <!-- <pre>{{ data }}</pre> -->
       </template>
     </MagnetarTable>
   </div>

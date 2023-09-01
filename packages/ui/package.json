@@ -34,6 +34,7 @@
     "@magnetarjs/core": "workspace:*",
     "@magnetarjs/types": "workspace:*",
     "@magnetarjs/utils": "workspace:*",
+    "@vueuse/core": "^10.4.1",
     "fast-sort": "^3.2.1",
     "getorset-anything": "^0.0.3",
     "is-what": "^4.1.7",
@@ -43,7 +44,9 @@
   "devDependencies": {
     "@magnetarjs/plugin-firestore": "workspace:*",
     "@magnetarjs/plugin-vue3": "workspace:*",
+    "@magnetarjs/test-utils": "workspace:^",
     "@vitejs/plugin-vue": "^4.0.0",
+    "roll-anything": "^3.0.4",
     "sass": "^1.57.1",
     "typescript": "^4.9.4",
     "vite": "^4.0.4",

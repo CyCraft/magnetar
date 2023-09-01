@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { computedAsync } from '@vueuse/core'
 import { isFunction } from 'is-what'
 import { getProp } from 'path-to-prop'
 import { computed, ref } from 'vue'
@@ -10,12 +11,24 @@ const props = defineProps<{
   parseLabel: MUIParseLabel | undefined
 }>()
 
-const cellValueRaw = computed<any>(() => {
-  const { column, row } = props
-  const { fieldPath } = column
-  if (!fieldPath) return undefined
-  return getProp(row, fieldPath)
-})
+const isFetchingCell = ref(false)
+const cellValueRaw = computedAsync<any>(
+  async () => {
+    const { column, row } = props
+    const { fieldPath, fetchValue } = column
+    if (fetchValue) {
+      const fetchedValue = await fetchValue({ data: row })
+      return fetchedValue
+    }
+    return fieldPath ? getProp(row, fieldPath) : undefined
+  },
+  (() => {
+    const { column, row } = props
+    const { fieldPath } = column
+    return fieldPath ? getProp(row, fieldPath) : undefined
+  })(),
+  isFetchingCell
+)
 
 /** Any `Codable<...>` prop or handler will use this payload, so we prep it here. */
 const codablePayload = computed<{ data: Record<string, any>; value: any }>(() => ({
@@ -29,9 +42,13 @@ function evaluateCodableProp<T>(prop: T | Codable<Record<string, any>, T>): T {
 }
 
 const cellValueParsed = computed<string>(() => {
-  const { parseValue } = props.column
+  const { parseValue, fetchValue } = props.column
   const rawValue = cellValueRaw.value
-  return parseValue ? parseValue(codablePayload.value) : rawValue
+  return !!fetchValue && isFetchingCell.value
+    ? '...'
+    : parseValue
+    ? parseValue(codablePayload.value)
+    : rawValue
 })
 
 const cellAttrs = computed<{ class: string | undefined; style: string | undefined }>(() => ({

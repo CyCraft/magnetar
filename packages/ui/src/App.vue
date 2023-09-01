@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import ButtonToggle from './components/ButtonToggle.vue'
 import TestFirestorePluginFetch from './components/TestFirestorePluginFetch.vue'
 import TestFirestorePluginStream from './components/TestFirestorePluginStream.vue'
 import TestTable from './components/TestTable.vue'
@@ -10,7 +9,7 @@ const example = ref<'stream' | 'fetch' | 'table'>('table')
 
 <template>
   <div>
-    <ButtonToggle
+    <!-- <ButtonToggle
       v-model="example"
       :options="[
         { label: 'Table Example', value: 'table' },
@@ -18,7 +17,7 @@ const example = ref<'stream' | 'fetch' | 'table'>('table')
         { label: 'Fetch Example', value: 'fetch' },
       ]"
       style="margin-bottom: 1rem"
-    />
+    /> -->
 
     <TestFirestorePluginStream v-if="example === 'stream'" />
     <TestFirestorePluginFetch v-if="example === 'fetch'" />
