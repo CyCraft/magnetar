@@ -181,9 +181,9 @@ export type MUIFilter<T extends Record<string, any>, Label = string> = {
   }[]
   /**
    * - `type: 'text' | 'date' | 'number'`
-   *   - available
+   *   - use either `where` OR `query`
    * - `type: 'select' | 'checkboxes' | 'radio'`
-   *   - not available
+   *   - not available, use `options` instead
    *
    * The value of the where clause is what the user typed in the input field.
    * You must pass a function which parses the user input to the correct type as per your needs.
@@ -218,9 +218,9 @@ export type MUIFilter<T extends Record<string, any>, Label = string> = {
   where?: [fieldPath: OPaths<T>, operator: WhereFilterOp, parseInput: (userInput: string) => any]
   /**
    * - `type: 'text' | 'date' | 'number'`
-   *   - available
+   *   - use either `where` OR `query`
    * - `type: 'select' | 'checkboxes' | 'radio'`
-   *   - not available
+   *   - not available, use `options` instead
    *
    * The value of the where clause is what the user typed in the input field.
    * You must pass a function which parses the user input to the correct type as per your needs.
@@ -322,6 +322,14 @@ export type MUIFilter<T extends Record<string, any>, Label = string> = {
    * @example 'select...'
    */
   placeholder?: Label
+  /**
+   * An initial value that will be passed to the `<input />` field.
+   * - `type: 'text' | 'date' | 'number'`
+   *   - available
+   * - `type: 'select' | 'checkboxes' | 'radio'`
+   *   - not available
+   */
+  initialValue?: string | undefined
 }
 
 export type MUIRows<T extends Record<string, any>> = T[]

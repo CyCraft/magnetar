@@ -36,6 +36,11 @@ export function filtersToInitialState(filters: MUIFilter<Record<string, any>>[])
         }
       }
     }
+    if (f.type === 'text' || f.type === 'number' || f.type === 'date') {
+      if (f.initialValue !== undefined) {
+        map.set(i, f.initialValue)
+      }
+    }
     return map
   }, new Map())
 }

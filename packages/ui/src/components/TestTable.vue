@@ -114,7 +114,7 @@ const filters: MUIFilter<Item>[] = [
     },
     clearOtherFilters: true,
     clearOrderBy: true,
-    // initialValue: sValue,
+    initialValue: sValue,
   },
   {
     label: 'Done or not',

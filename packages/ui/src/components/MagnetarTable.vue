@@ -34,9 +34,15 @@ const props = defineProps<{
   pagination: MUIPagination
   filters: MUIFilter<any, any>[]
   parseLabel?: MUIParseLabel
-  /** Passing this will apple those filters on top of the filter state that will be derived based on the `filters` prop */
+  /**
+   * - Only use this in advanced cases. You should set up initial filter state via `filters` instead.
+   * - Passing this will apply those filters on top of the filter state that will be derived based on the `filters` prop
+   */
   filtersState?: FiltersState
-  /** Passing this will replace any orderBy state that is derived based on the `columns` prop */
+  /**
+   * - Only use this in advanced cases. You should set up initial orderBy state via `columns` instead.
+   * - Passing this will replace any orderBy state that is derived based on the `columns` prop
+   */
   orderByState?: OrderByState
 }>()
 
