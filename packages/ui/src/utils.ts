@@ -195,7 +195,6 @@ export function filterStateToClauses(
   return [...state.entries()].reduce<
     { filterIndex: number; result: WhereClause | { or: WhereClause[] } }[]
   >((results, entry) => {
-    debugger
     const [filterIndex, state] = entry
 
     if (!state) return results
