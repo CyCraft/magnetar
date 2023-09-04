@@ -198,7 +198,11 @@ async function setOrderBy(
     }
   }
   if (!direction) orderByState.value.delete(fieldPath)
-  if (direction) orderByState.value.set(fieldPath, direction)
+  if (direction) {
+    orderByState.value.set(fieldPath, direction)
+    const newEntries = getRequiredOrderByBasedOnFilters(filtersState.value)
+    if (newEntries.length) orderByState.value = mapUnshift(orderByState.value, ...newEntries)
+  }
   // it looks better UI wise to delay the actual fetch to prevent UI components from freezing
   await new Promise((resolve) => setTimeout(resolve, 200))
   await fetchMore()
