@@ -290,8 +290,8 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
         })
         .orderBy('base.Speed', 'asc')
       await queryModuleRef.fetch({ force: true }, { onError: 'stop' })
-      const actual = [...queryModuleRef.data.values()].map((p) => p.base.Speed)
-      const expected = [pokedex(6), pokedex(38), pokedex(78)].map((p) => p.base.Speed)
+      const actual = [...queryModuleRef.data.values()]
+      const expected = [pokedex(6), pokedex(38), pokedex(78)]
       t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
@@ -315,8 +315,8 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
         ],
       })
       await queryModuleRef.fetch({ force: true }, { onError: 'stop' })
-      const actual = [...queryModuleRef.data.values()].map((p) => p.base.Speed)
-      const expected = [pokedex(1), pokedex(2), pokedex(3)].map((p) => p.base.Speed)
+      const actual = [...queryModuleRef.data.values()]
+      const expected = [pokedex(1), pokedex(2), pokedex(3)]
       t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
@@ -355,8 +355,8 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
         ],
       })
       await queryModuleRef.fetch({ force: true }, { onError: 'stop' })
-      const actual = [...queryModuleRef.data.values()].map((p) => p.base.Speed)
-      const expected = [pokedex(1), pokedex(2), pokedex(3)].map((p) => p.base.Speed)
+      const actual = [...queryModuleRef.data.values()]
+      const expected = [pokedex(1), pokedex(2), pokedex(3)]
       t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
