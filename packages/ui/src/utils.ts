@@ -12,7 +12,7 @@ import {
 } from './types'
 
 export function mapUnshift<K, V>(map: Map<K, V>, ...newEntries: [K, V][]): Map<K, V> {
-  const oldEntries = [...map.entries()].filter(([key]) => !newEntries.find((e) => e[0] !== key))
+  const oldEntries = [...map.entries()].filter(([key]) => !newEntries.find((e) => e[0] === key))
   return new Map([...newEntries, ...oldEntries])
 }
 
