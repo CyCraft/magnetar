@@ -17,9 +17,8 @@ import {
 import {
   calcCollection,
   carbonCopyMap,
-  columnsToInitialOrderByState,
+  filtersAndColumnsToInitialState,
   filterStateToClauses,
-  filtersToInitialState,
   getRequiredOrderByBasedOnFilters,
   mapUnshift,
   orderByStateToClauses,
@@ -55,35 +54,48 @@ function muiLabel(label: MUILabel): string {
 // const emit = defineEmits<{}>()
 const fetchState = ref<'ok' | 'end' | 'fetching' | { error: string }>('ok')
 
-const initialFilterState = ((): FiltersState => {
-  const map = filtersToInitialState(props.filters)
+const initialState = ((): {
+  filtersState: FiltersState
+  orderByState: OrderByState
+} => {
+  const { filtersState, orderByState } = filtersAndColumnsToInitialState({
+    columns: props.columns,
+    filters: props.filters,
+  })
   if (props.filtersState) {
     for (const [index, state] of props.filtersState) {
-      map.set(index, state)
+      filtersState.set(index, state)
     }
   }
-  return map
+  return {
+    filtersState,
+    orderByState: props.orderByState || orderByState,
+  }
 })()
-const initialOrderByState: OrderByState =
-  props.orderByState || columnsToInitialOrderByState(props.columns, initialFilterState)
 
-const filtersState = ref<FiltersState>(carbonCopyMap(initialFilterState))
-const orderByState = ref<OrderByState>(carbonCopyMap(initialOrderByState))
+const filtersState = ref<FiltersState>(carbonCopyMap(initialState.filtersState))
+const orderByState = ref<OrderByState>(carbonCopyMap(initialState.orderByState))
 
 const currentFilters = computed(() => filterStateToClauses(filtersState.value, props.filters))
 const currentOrderBy = computed(() => orderByStateToClauses(orderByState.value))
 
-const initialStateActive = computed<boolean>(
-  () =>
-    filtersState.value.size === initialFilterState.size &&
-    orderByState.value.size === initialOrderByState.size &&
-    [...filtersState.value.entries()].every(
-      ([key, value]) => initialFilterState.get(key) === value
-    ) &&
-    [...orderByState.value.entries()].every(
-      ([key, value]) => initialOrderByState.get(key) === value
-    )
-)
+/**
+ * This will always be true in case there was no initialState
+ */
+const initialStateActive = computed<boolean>(() => {
+  const initialFilters = initialState.filtersState
+  const initialOrderBy = initialState.orderByState
+  if (!initialFilters.size && !initialOrderBy.size) {
+    return true
+  }
+  return (
+    filtersState.value.size === initialFilters.size &&
+    orderByState.value.size === initialOrderBy.size &&
+    [...filtersState.value.entries()].every(([key, value]) => initialFilters.get(key) === value) &&
+    [...orderByState.value.entries()].every(([key, value]) => initialOrderBy.get(key) === value)
+  )
+})
+
 const hasSomeFilterOrOrderby = computed<boolean>(
   () => !!filtersState.value.size || !!orderByState.value.size
 )
@@ -99,8 +111,8 @@ function clearAllRecords(): void {
 }
 
 function resetState(): void {
-  filtersState.value = carbonCopyMap(initialFilterState)
-  orderByState.value = carbonCopyMap(initialOrderByState)
+  filtersState.value = carbonCopyMap(initialState.filtersState)
+  orderByState.value = carbonCopyMap(initialState.orderByState)
   clearAllRecords()
   fetchMore()
 }

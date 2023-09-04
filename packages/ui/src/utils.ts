@@ -33,9 +33,16 @@ export function whereClausesEqual(where1?: WhereClause, where2?: WhereClause): b
   )
 }
 
-export function filtersToInitialState(filters: MUIFilter<Record<string, any>>[]): FiltersState {
+export function filtersAndColumnsToInitialState(params: {
+  columns: MUIColumn<any>[]
+  filters: MUIFilter<Record<string, any>>[]
+}): {
+  filtersState: FiltersState
+  orderByState: OrderByState
+} {
+  const { columns, filters } = params
   // remember, see `FiltersState` for instructions how to save the state.
-  return filters.reduce<FiltersState>((map, f, i) => {
+  const _filtersState = filters.reduce<FiltersState>((map, f, i) => {
     if (f.type === 'radio' || f.type === 'select') {
       const firstChecked = f.options?.find((o) => o.checked)
       if (firstChecked) map.set(i, firstChecked.where)
@@ -55,6 +62,39 @@ export function filtersToInitialState(filters: MUIFilter<Record<string, any>>[])
     }
     return map
   }, new Map())
+
+  // maybe we needed to clear other filters, let's do that for the first filter we find that needs it
+  const entryThatClearsOtherFilters = [..._filtersState.entries()].find(([filterIndex]) => {
+    const filter = filters[filterIndex]
+    return filter?.clearOtherFilters
+  })
+  const filtersState = entryThatClearsOtherFilters
+    ? new Map([entryThatClearsOtherFilters])
+    : _filtersState
+
+  // maybe we needed to clear other orderBy, let's do that for the first filter we find that needs it
+  const entryThatClearsOtherOrderBy = [...filtersState.entries()].find(([filterIndex]) => {
+    const filter = filters[filterIndex]
+    return filter?.clearOrderBy
+  })
+
+  const _orderByState = entryThatClearsOtherOrderBy
+    ? new Map()
+    : sort(columns)
+        // sort columns by sortable.position
+        .asc((c) => (isPlainObject(c.sortable) ? c.sortable.position : -1))
+        // then grab each column's sortable.orderBy and save as "direction" in a map
+        .reduce<OrderByState>((map, column) => {
+          if (isPlainObject(column.sortable) && column.sortable.orderBy && column.fieldPath) {
+            map.set(column.fieldPath, column.sortable.orderBy)
+          }
+          return map
+        }, new Map())
+
+  const newEntries = getRequiredOrderByBasedOnFilters(filtersState)
+  const orderByState = newEntries.length ? mapUnshift(_orderByState, ...newEntries) : _orderByState
+
+  return { filtersState, orderByState }
 }
 
 /**
@@ -96,26 +136,6 @@ export function getRequiredOrderByBasedOnFilters(
     }
     return orderByEntries
   }, [])
-}
-
-export function columnsToInitialOrderByState(
-  columns: MUIColumn<any>[],
-  initialFilterState: FiltersState
-): OrderByState {
-  const orderByState = sort(columns)
-    // sort columns by sortable.position
-    .asc((c) => (isPlainObject(c.sortable) ? c.sortable.position : -1))
-    // then grab each column's sortable.orderBy and save as "direction" in a map
-    .reduce<OrderByState>((map, column) => {
-      if (isPlainObject(column.sortable) && column.sortable.orderBy && column.fieldPath) {
-        map.set(column.fieldPath, column.sortable.orderBy)
-      }
-      return map
-    }, new Map())
-
-  const newEntries = getRequiredOrderByBasedOnFilters(initialFilterState)
-  if (newEntries.length) return mapUnshift(orderByState, ...newEntries)
-  return orderByState
 }
 
 /** Clears JavaScript reference pointers */
