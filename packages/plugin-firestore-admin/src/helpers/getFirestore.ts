@@ -1,4 +1,5 @@
 import type { DocMetadata, QueryClause } from '@magnetarjs/types'
+import { isWhereClause } from '@magnetarjs/types'
 import type { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'
 import type {
   CollectionReference,
@@ -10,7 +11,7 @@ import type {
   WriteBatch,
 } from 'firebase-admin/firestore'
 import { FieldValue, Filter } from 'firebase-admin/firestore'
-import { isArray, isNumber } from 'is-what'
+import { isNumber } from 'is-what'
 export type {
   CollectionReference,
   DocumentReference,
@@ -36,16 +37,22 @@ function queryToFilter(
   queryClause: QueryClause
 ): ReturnType<(typeof Filter)['or']> | ReturnType<(typeof Filter)['and']> {
   if ('and' in queryClause) {
-    if (isArray(queryClause.and)) {
-      return Filter.and(...queryClause.and.map((whereClause) => Filter.where(...whereClause)))
-    }
-    return queryToFilter(queryClause.and)
+    return Filter.and(
+      ...queryClause.and.map((whereClauseOrQueryClause) =>
+        isWhereClause(whereClauseOrQueryClause)
+          ? Filter.where(...whereClauseOrQueryClause)
+          : queryToFilter(queryClause)
+      )
+    )
   }
   // if ('or' in queryClause)
-  if (isArray(queryClause.or)) {
-    return Filter.or(...queryClause.or.map((whereClause) => Filter.where(...whereClause)))
-  }
-  return queryToFilter(queryClause.or)
+  return Filter.or(
+    ...queryClause.or.map((whereClauseOrQueryClause) =>
+      isWhereClause(whereClauseOrQueryClause)
+        ? Filter.where(...whereClauseOrQueryClause)
+        : queryToFilter(queryClause)
+    )
+  )
 }
 
 /**
