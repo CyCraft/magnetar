@@ -395,6 +395,7 @@ export function usesFilterStateOption(
  * This map is order-sensitive. `orderBy(...)` is applied in the insert order of this map
  */
 export type OrderByState = Map<OPaths<any>, 'asc' | 'desc'>
+export type EntryOfOrderByState = [OPaths<any>, 'asc' | 'desc']
 
 export type MUILabel =
   | 'magnetar table record counts'

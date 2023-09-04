@@ -1,8 +1,20 @@
-import { CollectionInstance, WhereClause } from '@magnetarjs/types'
+import { CollectionInstance, WhereClause, WhereFilterOp } from '@magnetarjs/types'
 import { sort } from 'fast-sort'
 import { mapGetOrSet } from 'getorset-anything'
 import { isArray, isPlainObject, isString } from 'is-what'
-import { FiltersState, MUIColumn, MUIFilter, OPaths, OrderByState } from './types'
+import {
+  EntryOfOrderByState,
+  FiltersState,
+  MUIColumn,
+  MUIFilter,
+  OPaths,
+  OrderByState,
+} from './types'
+
+export function mapUnshift<K, V>(map: Map<K, V>, ...newEntries: [K, V][]): Map<K, V> {
+  const oldEntries = [...map.entries()].filter(([key]) => !newEntries.find((e) => e[0] !== key))
+  return new Map([...newEntries, ...oldEntries])
+}
 
 export function isEqual(a: any | any[], b: any | any[]): boolean {
   if (isArray(a) && isArray(b)) {
@@ -45,19 +57,65 @@ export function filtersToInitialState(filters: MUIFilter<Record<string, any>>[])
   }, new Map())
 }
 
-export function columnsToInitialOrderByState(columns: MUIColumn<any>[]): OrderByState {
-  return (
-    sort(columns)
-      // sort columns by sortable.position
-      .asc((c) => (isPlainObject(c.sortable) ? c.sortable.position : -1))
-      // then grab each column's sortable.orderBy and save as "direction" in a map
-      .reduce<OrderByState>((map, column) => {
-        if (isPlainObject(column.sortable) && column.sortable.orderBy && column.fieldPath) {
-          map.set(column.fieldPath, column.sortable.orderBy)
-        }
-        return map
-      }, new Map())
-  )
+/**
+ * Some might need an extra orderBy query because of Firestore limitations.
+ * @see https://firebase.google.com/docs/firestore/query-data/order-limit-data#limitations
+ */
+export function getRequiredOrderByBasedOnFilters(
+  filtersState?: null | FiltersState
+): EntryOfOrderByState[] {
+  if (!filtersState) return []
+
+  return [...filtersState.values()].reduce<EntryOfOrderByState[]>((orderByEntries, filterState) => {
+    if (!filterState) return orderByEntries
+
+    const whereClauses = isString(filterState)
+      ? []
+      : isArray(filterState)
+      ? [filterState]
+      : [...filterState.or]
+    // : 'and' in filterState
+    // ? [...filterState.and]
+    // : [...filterState.or]
+    const firstWhereClause = whereClauses[0]
+
+    const op: WhereFilterOp = firstWhereClause?.[1]
+    /**
+     * Optionally an `orderBy` might need to be set for a certain where filter
+     *
+     * An example error from firestore:
+     * > Invalid query. You have a where filter with an inequality (<, <=, !=, not-in, >, or >=) on field 'title' and so you must also use 'title' as your first argument to orderBy(), but your first orderBy() is on field 'isDone' instead.
+     */
+    const alsoApplyOrderBy =
+      op === '!=' || op === '<' || op === '<=' || op === '>' || op === '>=' || op === 'not-in'
+    if (firstWhereClause && alsoApplyOrderBy) {
+      const fieldPath = firstWhereClause[0]
+      const direction = 'asc'
+      // must be inserted at position 0
+      orderByEntries.push([fieldPath, direction])
+    }
+    return orderByEntries
+  }, [])
+}
+
+export function columnsToInitialOrderByState(
+  columns: MUIColumn<any>[],
+  initialFilterState: FiltersState
+): OrderByState {
+  const orderByState = sort(columns)
+    // sort columns by sortable.position
+    .asc((c) => (isPlainObject(c.sortable) ? c.sortable.position : -1))
+    // then grab each column's sortable.orderBy and save as "direction" in a map
+    .reduce<OrderByState>((map, column) => {
+      if (isPlainObject(column.sortable) && column.sortable.orderBy && column.fieldPath) {
+        map.set(column.fieldPath, column.sortable.orderBy)
+      }
+      return map
+    }, new Map())
+
+  const newEntries = getRequiredOrderByBasedOnFilters(initialFilterState)
+  if (newEntries.length) return mapUnshift(orderByState, ...newEntries)
+  return orderByState
 }
 
 /** Clears JavaScript reference pointers */

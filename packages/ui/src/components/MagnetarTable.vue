@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { CollectionInstance, WhereFilterOp } from '@magnetarjs/types'
-import { isAnyObject, isArray, isError, isPlainObject, isString } from 'is-what'
+import { CollectionInstance } from '@magnetarjs/types'
+import { isAnyObject, isArray, isError, isPlainObject } from 'is-what'
 import { computed, onMounted, ref } from 'vue'
 import {
   FiltersState,
@@ -20,6 +20,8 @@ import {
   columnsToInitialOrderByState,
   filterStateToClauses,
   filtersToInitialState,
+  getRequiredOrderByBasedOnFilters,
+  mapUnshift,
   orderByStateToClauses,
 } from '../utils'
 import LoadingSpinner from './LoadingSpinner.vue'
@@ -63,7 +65,7 @@ const initialFilterState = ((): FiltersState => {
   return map
 })()
 const initialOrderByState: OrderByState =
-  props.orderByState || columnsToInitialOrderByState(props.columns)
+  props.orderByState || columnsToInitialOrderByState(props.columns, initialFilterState)
 
 const filtersState = ref<FiltersState>(carbonCopyMap(initialFilterState))
 const orderByState = ref<OrderByState>(carbonCopyMap(initialOrderByState))
@@ -163,28 +165,8 @@ async function setFilter(filterIndex: number, payload: null | FilterState): Prom
     filtersState.value.delete(filterIndex)
   } else {
     filtersState.value.set(filterIndex, payload)
-
-    const whereClauses = isString(payload) ? [] : isArray(payload) ? [payload] : [...payload.or]
-    // : 'and' in payload
-    // ? [...payload.and]
-    // : [...payload.or]
-    const firstWhereClause = whereClauses[0]
-
-    const op: WhereFilterOp = firstWhereClause?.[1]
-    /**
-     * Optionally an `orderBy` might need to be set for a certain where filter
-     *
-     * An example error from firestore:
-     * > Invalid query. You have a where filter with an inequality (<, <=, !=, not-in, >, or >=) on field 'title' and so you must also use 'title' as your first argument to orderBy(), but your first orderBy() is on field 'isDone' instead.
-     */
-    const alsoApplyOrderBy =
-      op === '!=' || op === '<' || op === '<=' || op === '>' || op === '>=' || op === 'not-in'
-    if (firstWhereClause && alsoApplyOrderBy) {
-      const fieldPath = firstWhereClause[0]
-      const direction = 'asc'
-      // must be inserted at position 0
-      orderByState.value = new Map([[fieldPath, direction], ...orderByState.value.entries()])
-    }
+    const newEntries = getRequiredOrderByBasedOnFilters(filtersState.value)
+    if (newEntries.length) orderByState.value = mapUnshift(orderByState.value, ...newEntries)
   }
 
   // it looks better UI wise to delay the actual fetch to prevent UI components from freezing
