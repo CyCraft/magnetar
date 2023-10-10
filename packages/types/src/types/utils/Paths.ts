@@ -43,9 +43,14 @@ export type OPathsWithoutOptional<T, D extends number = 10> = [D] extends [never
 export type OPathsWithOptional<T, D extends number = 10> = [D] extends [never]
   ? never
   : T extends Record<string, any>
-  ? {
-      [K in keyof T]: K extends string ? `${K}` | Join<K, OPathsWithOptional<T[K], Prev[D]>> : never
-    }[keyof T]
+  ? Exclude<
+      {
+        [K in keyof T]: K extends string
+          ? `${K}` | Join<K, OPathsWithOptional<T[K], Prev[D]>>
+          : never
+      }[keyof T],
+      undefined
+    >
   : ''
 
 /**
