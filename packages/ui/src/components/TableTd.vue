@@ -9,7 +9,17 @@ const props = defineProps<{
   column: MUIColumn<any>
   row: Record<string, any>
   parseLabel: MUIParseLabel | undefined
+  isExpanded: boolean
 }>()
+
+const emit = defineEmits<{
+  (e: 'update:isExpanded', value: boolean): void
+}>()
+
+const isExpanded = computed<boolean>({
+  get: () => props.isExpanded,
+  set: (newValue) => emit('update:isExpanded', newValue),
+})
 
 const isFetchingCell = ref(false)
 const cellValueRaw = computedAsync<any>(
@@ -31,10 +41,13 @@ const cellValueRaw = computedAsync<any>(
 )
 
 /** Any `Codable<...>` prop or handler will use this payload, so we prep it here. */
-const codablePayload = computed<{ data: Record<string, any>; value: any }>(() => ({
-  data: props.row,
-  value: cellValueRaw.value,
-}))
+const codablePayload = computed<{ data: Record<string, any>; value: any; isExpanded: boolean }>(
+  () => ({
+    data: props.row,
+    value: cellValueRaw.value,
+    isExpanded: isExpanded.value,
+  })
+)
 
 /** Any type that has `Codable<...>` should be piped through this. */
 function evaluateCodableProp<T>(prop: T | Codable<Record<string, any>, T>): T {
@@ -84,7 +97,11 @@ async function handleClick(index: number): Promise<void> {
   if (!button) return
   buttonLoadingArr.value[index] = true
   try {
-    await button.handler?.(codablePayload.value)
+    await button.handler?.({
+      data: props.row,
+      value: cellValueRaw.value,
+      isExpanded,
+    })
   } catch (error: unknown) {
     console.error(error)
   }

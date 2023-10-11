@@ -1,15 +1,22 @@
 import { OPathsWithOptional, WhereClause, WhereClauseTuple, WhereFilterOp } from '@magnetarjs/types'
+import { Ref } from 'vue'
 
 export type OPaths<T> = OPathsWithOptional<T>
+
+export type MUITableSlot<T = any> = { data: T; isExpanded: Ref<boolean> }
 
 /** You can pass a text parser which will be used for any `label` used throughout the table */
 export type MUIParseLabel<LabelType = any> = (label: LabelType) => string
 
-export type Codable<DataType, ReturnType> = (info: { value: any; data: DataType }) => ReturnType
+export type Codable<DataType, ReturnType> = (info: {
+  value: any
+  data: DataType
+  isExpanded: boolean
+}) => ReturnType
 
 export type MUIButton<T extends Record<string, any>, Label = string> = {
   /** Executed on button click */
-  handler: (info: { value: any; data: T }) => void | Promise<void>
+  handler: (info: { value: any; data: T; isExpanded: Ref<boolean> }) => void | Promise<void>
   /** Applied to the innerText of the `<button>` */
   label: string | Label | Codable<T, string> | Codable<T, Label>
   /**

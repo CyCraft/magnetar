@@ -2,7 +2,7 @@
 import { PokedexEntry } from '@magnetarjs/test-utils'
 import { roll } from 'roll-anything'
 import { magnetar } from '../magnetar'
-import { MUIColumn, MUIFilter, MUIParseLabel } from '../types'
+import { MUIColumn, MUIFilter, MUIParseLabel, MUITableSlot } from '../types'
 import MagnetarTable from './MagnetarTable.vue'
 
 type Item = { title: string; id: string; isDone: boolean; name: { family: string } }
@@ -48,6 +48,12 @@ const columns: MUIColumn<Item, Label>[] = [
       {
         label: 'Edit',
         handler: ({ data }) => alert(`edit ${data.id} (you have to implement this yourself)`),
+      },
+      {
+        label: ({ isExpanded }) => (isExpanded ? 'Hide details' : 'Show details'),
+        handler: ({ isExpanded }) => {
+          isExpanded.value = !isExpanded.value
+        },
       },
     ],
   },
@@ -161,9 +167,16 @@ const filters: MUIFilter<Item>[] = [
       :pagination="{ limit: 10 }"
       :parseLabel="parseLabel"
     >
-      <template #nakashima="{ data }">
+      <template #nakashima="{ data, isExpanded }: MUITableSlot<Item>">
         {{ Object.keys(data).join('、') }}
-        <!-- <pre>{{ data }}</pre> -->
+        <button @click="() => (isExpanded.value = !isExpanded.value)">
+          {{ isExpanded.value ? 'Hide' : 'Show' }}
+        </button>
+      </template>
+
+      <template #expansion="{ data, isExpanded }">
+        <pre>{{ data }}</pre>
+        <button @click="() => (isExpanded.value = !isExpanded.value)">Hide</button>
       </template>
     </MagnetarTable>
   </div>
@@ -179,6 +192,9 @@ const filters: MUIFilter<Item>[] = [
     border-top: 1px solid #dfe2e5
   tr:nth-child(2n)
     background-color: #f6f8fa
+  tr.magnetar-expansion
+    background-color: goldenrod
+    color: white
   th,
   td
     border: 1px solid #dfe2e5

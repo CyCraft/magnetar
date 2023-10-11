@@ -25,8 +25,8 @@ import {
 } from '../utils'
 import LoadingSpinner from './LoadingSpinner.vue'
 import TableFilter from './TableFilter.vue'
-import TableTd from './TableTd.vue'
 import TableTh from './TableTh.vue'
+import TableTr from './TableTr.vue'
 import TextWithAnchorTags from './TextWithAnchorTags.vue'
 
 const props = defineProps<{
@@ -322,16 +322,22 @@ const showingFiltersCode = ref(false)
             </td>
           </tr>
         </slot>
-        <tr v-for="row in rows" :key="row.id">
-          <td
+        <TableTr
+          v-for="row in rows"
+          :key="row.id"
+          :row="row"
+          :columns="columns"
+          :parseLabel="parseLabel"
+        >
+          <template
             v-for="(column, columnIndex) in columns"
             :key="(column.fieldPath || column.slot) + 'td' + row.id"
+            #[column.slot??columnIndex]="ctx"
           >
-            <slot :name="column.slot || columnIndex" v-bind="{ data: row }">
-              <TableTd :row="row" :column="column" :parseLabel="parseLabel"> </TableTd>
-            </slot>
-          </td>
-        </tr>
+            <slot :name="column.slot || columnIndex" v-bind="ctx" />
+          </template>
+          <template #expansion="ctx"><slot name="expansion" v-bind="ctx" /></template>
+        </TableTr>
       </tbody>
     </table>
 
