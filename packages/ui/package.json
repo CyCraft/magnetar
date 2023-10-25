@@ -16,7 +16,8 @@
         "types": "./dist/es/index.d.ts",
         "default": "./dist/es/index.js"
       }
-    }
+    },
+    "./dist/*": "./dist/*"
   },
   "files": [
     "dist"
