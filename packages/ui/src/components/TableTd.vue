@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { computedAsync } from '@vueuse/core'
 import { isFunction } from 'is-what'
 import { getProp } from 'path-to-prop'
 import { computed, ref } from 'vue'
 import { Codable, MUIColumn, MUIParseLabel } from '../types'
+import { computedAsync } from '../utils/computedAsync'
 
 const props = defineProps<{
   column: MUIColumn<any>
@@ -28,15 +28,15 @@ const cellValueRaw = computedAsync<any>(
     const { fieldPath, fetchValue } = column
     if (fetchValue) {
       const fetchedValue = await fetchValue({ data: row })
-      return fetchedValue
+      return computed(() => fetchedValue)
     }
-    return fieldPath ? getProp(row, fieldPath) : undefined
+    return computed(() => (fieldPath ? getProp(row, fieldPath) : undefined))
   },
-  (() => {
+  () => {
     const { column, row } = props
     const { fieldPath } = column
     return fieldPath ? getProp(row, fieldPath) : undefined
-  })(),
+  },
   isFetchingCell
 )
 
