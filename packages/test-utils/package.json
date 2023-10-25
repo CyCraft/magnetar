@@ -1,7 +1,7 @@
 {
   "name": "@magnetarjs/test-utils",
   "private": true,
-  "version": "0.15.3",
+  "version": "0.15.4",
   "description": "magnetar test utils",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
