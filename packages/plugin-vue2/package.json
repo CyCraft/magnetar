@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/plugin-vue2",
-  "version": "0.15.8",
+  "version": "0.15.9",
   "sideEffects": false,
   "description": "Magnetar plugin vue2",
   "main": "dist/index.cjs.js",
