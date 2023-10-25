@@ -2,6 +2,7 @@
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
 import { defineConfig } from 'vite'
+// @ts-ignore
 import pkg from './package.json' assert { type: 'json' }
 
 const nameCamel = pkg.name

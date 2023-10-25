@@ -6,15 +6,12 @@
   "description": "A fully functional table that automatically connects to your database powered by Magnetar 🌟",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
-  "types": "dist/types/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
       "import": "./dist/index.mjs",
       "default": "./dist/index.cjs"
     },
     "./dist/*": {
-      "types": "./dist/types/*",
       "import": "./dist/*"
     }
   },
