@@ -32,11 +32,11 @@ const cellValueRaw = computedAsync<any>(
     }
     return computed(() => (fieldPath ? getProp(row, fieldPath) : undefined))
   },
-  () => {
+  (() => {
     const { column, row } = props
     const { fieldPath } = column
     return fieldPath ? getProp(row, fieldPath) : undefined
-  },
+  })(),
   isFetchingCell
 )
 
