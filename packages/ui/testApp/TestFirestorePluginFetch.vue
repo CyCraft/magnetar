@@ -1,28 +1,30 @@
 <script setup lang="ts">
-import { computed, onBeforeMount, onBeforeUnmount, ref } from 'vue'
-import { generateRandomId, magnetar } from '../magnetar'
+import { computed, onBeforeMount, ref } from 'vue'
+import { generateRandomId, magnetar } from './magnetar'
 import TodoApp from './TodoApp.vue'
 
 type Item = { title: string; id: string; isDone: boolean }
 
-const itemsModule = magnetar.collection<Item>('magnetarTests/dev-firestore/items')
+const itemsModuleF = magnetar.collection<Item>('magnetarTests/dev-firestore/itemsF')
 
 // @ts-ignore — added to window to be able to play around in the console
-window.itemsModule = itemsModule
+window.itemsModuleF = itemsModuleF
 
-onBeforeMount(async () => {
+const query = itemsModuleF.orderBy('title', 'desc').limit(10)
+
+async function fetchMore() {
   try {
-    await itemsModule.stream()
+    await query.startAfter(query.fetched.cursor).fetch({ force: true })
+    if (query.fetched.reachedEnd) console.log(`that's all!`)
   } catch (error) {
-    console.error(`stream closed unexpectedly with error:`, error)
+    console.error(`fetchMore error:`, error)
   }
-})
-onBeforeUnmount(() => {
-  itemsModule.closeAllStreams()
-})
+}
+
+onBeforeMount(() => fetchMore())
 
 /** Item count */
-const size = computed(() => itemsModule.data.size)
+const size = computed(() => itemsModuleF.data.size)
 
 /** Options to filter items */
 const showAll = ref(true)
@@ -33,16 +35,16 @@ const items = computed<Item[]>(() => {
   const _showAll = showAll.value
   const _alphabetically = alphabetically.value
 
-  let _module: typeof itemsModule = itemsModule
+  let _module: typeof itemsModuleF = itemsModuleF
 
   if (_showAll && _alphabetically) {
-    _module = itemsModule.orderBy('title')
+    _module = itemsModuleF.orderBy('title')
   }
   if (!_showAll && _alphabetically) {
-    _module = itemsModule.where('isDone', '==', false).orderBy('title')
+    _module = itemsModuleF.where('isDone', '==', false).orderBy('title')
   }
   if (!_showAll && !_alphabetically) {
-    _module = itemsModule.where('isDone', '==', false)
+    _module = itemsModuleF.where('isDone', '==', false)
   }
 
   return [..._module.data.values()]
@@ -51,17 +53,17 @@ const items = computed<Item[]>(() => {
 function addItem(item: Item) {
   item.id = generateRandomId()
   console.log(`add item → `, item)
-  itemsModule.insert(item)
+  itemsModuleF.insert(item)
 }
 
 function editItem(item: Item) {
   console.log(`edit item → `, item)
-  itemsModule.doc(item.id).merge(item)
+  itemsModuleF.doc(item.id).merge(item)
 }
 
 function deleteItem(item: Item) {
   console.log(`delete item → `, item)
-  itemsModule.delete(item.id)
+  itemsModuleF.delete(item.id)
 }
 </script>
 
@@ -75,5 +77,8 @@ function deleteItem(item: Item) {
       <input type="checkbox" name="" v-model="alphabetically" id="order" />
     </div>
     <TodoApp @add="addItem" @edit="editItem" @delete="deleteItem" :items="items" />
+    <div style="margin: 1rem; cursor: pointer" @click="() => fetchMore()">fetch more</div>
+    <div style="margin: 1rem">reached end: {{ query.fetched.reachedEnd }}</div>
   </div>
 </template>
+./magnetar

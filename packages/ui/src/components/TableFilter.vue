@@ -9,7 +9,7 @@ import {
   usesFilterStateInputValue,
   usesFilterStateOption,
 } from '../types'
-import { whereClausesEqual } from '../utils'
+import { whereClausesEqual } from '../utils/tableHelpers'
 
 const props = defineProps<{
   collection: CollectionInstance<any>
@@ -178,3 +178,4 @@ const filterAttrs = computed<{
     > label
       margin: 0.25rem
 </style>
+../tableHelpers

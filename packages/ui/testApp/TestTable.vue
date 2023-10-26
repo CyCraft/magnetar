@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { PokedexEntry } from '@magnetarjs/test-utils'
 import { roll } from 'roll-anything'
-import { magnetar } from '../magnetar'
-import { MUIColumn, MUIFilter, MUIParseLabel, MUITableSlot } from '../types'
-import MagnetarTable from './MagnetarTable.vue'
+import { MagnetarTable, MUIColumn, MUIFilter, MUIParseLabel, MUITableSlot } from '../src/index'
+import { magnetar } from './magnetar'
 
 type Item = { title: string; id: string; isDone: boolean; name: { family: string } }
 
@@ -207,3 +206,4 @@ const filters: MUIFilter<Item>[] = [
       > button
         margin-left: auto
 </style>
+./magnetar

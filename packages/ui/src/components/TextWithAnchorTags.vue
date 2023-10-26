@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { splitOnLink } from '../utils'
+import { splitOnLink } from '../utils/tableHelpers'
 
 const props = defineProps<{
   text: string
@@ -28,3 +28,4 @@ const textChunks = computed(() => splitOnLink(props.text))
   word-break: break-word
   text-align: left
 </style>
+../tableHelpers

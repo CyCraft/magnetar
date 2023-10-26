@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import TestFirestorePluginFetch from './components/TestFirestorePluginFetch.vue'
-import TestFirestorePluginStream from './components/TestFirestorePluginStream.vue'
-import TestTable from './components/TestTable.vue'
+import TestFirestorePluginFetch from './TestFirestorePluginFetch.vue'
+import TestFirestorePluginStream from './TestFirestorePluginStream.vue'
+import TestTable from './TestTable.vue'
 
 const example = ref<'stream' | 'fetch' | 'table'>('table')
 </script>

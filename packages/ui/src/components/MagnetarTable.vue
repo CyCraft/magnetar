@@ -22,7 +22,7 @@ import {
   getRequiredOrderByBasedOnFilters,
   mapUnshift,
   orderByStateToClauses,
-} from '../utils'
+} from '../utils/tableHelpers'
 import LoadingSpinner from './LoadingSpinner.vue'
 import TableFilter from './TableFilter.vue'
 import TableTh from './TableTh.vue'
@@ -371,3 +371,4 @@ const showingFiltersCode = ref(false)
   align-items: center
   gap: 0.25rem
 </style>
+../tableHelpers
