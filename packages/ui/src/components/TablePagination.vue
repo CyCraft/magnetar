@@ -11,6 +11,7 @@ const props = defineProps<{
   labels: {
     'magnetar table fetch-more button end': string
     'magnetar table fetch-more button': string
+    'magnetar table previous-next first-page button': string
     'magnetar table previous-next previous button': string
     'magnetar table previous-next next button': string
     'magnetar table previous-next end': string
@@ -39,6 +40,12 @@ const emit = defineEmits<{
     </template>
 
     <template v-if="kind === 'previous-next'">
+      <button
+        :disabled="pageIndex === 0 || fetchState === 'fetching'"
+        @click="() => emit('update:pageIndex', 0)"
+      >
+        {{ labels['magnetar table previous-next first-page button'] }}
+      </button>
       <button
         :disabled="pageIndex === 0 || fetchState === 'fetching'"
         @click="() => emit('update:pageIndex', pageIndex - 1)"

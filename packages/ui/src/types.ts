@@ -421,6 +421,7 @@ export type MUILabel =
   | 'magnetar table no-results'
   | 'magnetar table fetch-more button'
   | 'magnetar table fetch-more button end'
+  | 'magnetar table previous-next first-page button'
   | 'magnetar table previous-next previous button'
   | 'magnetar table previous-next next button'
   | 'magnetar table previous-next end'
@@ -440,6 +441,7 @@ export const muiLabelDic: Record<MUILabel, string> = {
   'magnetar table no-results': 'No results found',
   'magnetar table fetch-more button': 'Fetch More',
   'magnetar table fetch-more button end': 'Fetched Everything!',
+  'magnetar table previous-next first-page button': 'To first page',
   'magnetar table previous-next previous button': 'Previous',
   'magnetar table previous-next next button': 'Next',
   'magnetar table previous-next end': 'Fetched Everything!',

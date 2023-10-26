@@ -126,6 +126,22 @@ function clearState(): void {
   fetchMore()
 }
 
+const minH = ref(26)
+const minW = ref(26)
+const tableEl = ref(null)
+const { height, width } = useElementSize(tableEl)
+/**
+ * set the min-width and -height once after the first page was fetched
+ * only set it once to prevent the table from growing more when expanding rows etc.
+ */
+async function setMinTableHeight() {
+  await nextTick()
+  if (collectionInstance.value.data.size >= props.pagination.limit) {
+    if (minH.value === 26 && height.value > 26) minH.value = height.value
+    if (minW.value === 26 && width.value > 26) minW.value = width.value
+  }
+}
+
 /** never throws */
 async function fetchMore() {
   fetchState.value = 'fetching'
@@ -145,6 +161,8 @@ async function fetchMore() {
     fetchState.value = collection.fetched.reachedEnd ? 'end' : 'ok'
     // set new state
     collectionInstance.value = collection
+
+    setMinTableHeight()
   } catch (error: unknown) {
     console.error(`fetchMore error:`, error)
     if ((isError(error) || isAnyObject(error)) && 'message' in error) {
@@ -208,7 +226,8 @@ async function setOrderBy(
 const showingFiltersCode = ref(false)
 
 const pageIndex = ref(0)
-const pageCount = computed(() => Math.ceil(allData.value.length / props.pagination.limit))
+const pageCountFetched = computed(() => Math.ceil(allData.value.length / props.pagination.limit))
+const pageCount = computed(() => Math.ceil(collectionInstance.value.count / props.pagination.limit))
 
 const allData = computed(() => [...collectionInstance.value.data.values()])
 const rows = computed(() => {
@@ -223,7 +242,7 @@ const rows = computed(() => {
 })
 
 watch(pageIndex, async (newIndex) => {
-  if (fetchState.value === 'ok' && newIndex === pageCount.value) {
+  if (fetchState.value === 'ok' && newIndex === pageCountFetched.value) {
     await fetchMore()
     await nextTick()
     if (!rows.value.length) {
@@ -233,22 +252,11 @@ watch(pageIndex, async (newIndex) => {
   }
 })
 
-const minH = ref(26)
-const minW = ref(26)
-const tableEl = ref(null)
-const { height, width } = useElementSize(tableEl)
-watch(
-  () => [height.value, width.value],
-  ([h, w]) => {
-    if (h > minH.value) minH.value = h
-    if (w > minW.value) minW.value = w
-  }
-)
-
 // prettier-ignore
 const labelsPagination = computed(() => ({
   'magnetar table fetch-more button end': muiLabel('magnetar table fetch-more button end'),
   'magnetar table fetch-more button': muiLabel('magnetar table fetch-more button'),
+  'magnetar table previous-next first-page button': muiLabel('magnetar table previous-next first-page button'),
   'magnetar table previous-next previous button': muiLabel('magnetar table previous-next previous button'),
   'magnetar table previous-next next button': muiLabel('magnetar table previous-next next button'),
   'magnetar table previous-next end': muiLabel('magnetar table previous-next end'),
