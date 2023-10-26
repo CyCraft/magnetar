@@ -29,6 +29,9 @@ const magnetarLabelDic = {
   'magnetar table no-results': '結果がありません',
   'magnetar table fetch-more button': '追加取得する',
   'magnetar table fetch-more button end': 'すべて取得しました',
+  'magnetar table previous-next previous button': '前へ',
+  'magnetar table previous-next next button': '次へ',
+  'magnetar table previous-next end': 'すべて取得しました',
 }
 
 const parseLabel: MUIParseLabel<Label> = (label) => {
@@ -163,7 +166,7 @@ const filters: MUIFilter<Item>[] = [
       :collection="itemsModuleT"
       :columns="columns"
       :filters="filters"
-      :pagination="{ limit: 10 }"
+      :pagination="{ limit: 30, kind: 'previous-next' }"
       :parseLabel="parseLabel"
     >
       <template #nakashima="{ data, isExpanded }: MUITableSlot<Item>">
@@ -206,4 +209,3 @@ const filters: MUIFilter<Item>[] = [
       > button
         margin-left: auto
 </style>
-./magnetar

@@ -77,4 +77,3 @@ function deleteItem(item: Item) {
     <TodoApp @add="addItem" @edit="editItem" @delete="deleteItem" :items="items" />
   </div>
 </template>
-./magnetar

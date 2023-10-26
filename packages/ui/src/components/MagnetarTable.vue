@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { CollectionInstance } from '@magnetarjs/types'
+import { useElementSize } from '@vueuse/core'
 import { isAnyObject, isArray, isError, isPlainObject } from 'is-what'
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import {
   FiltersState,
   FilterState,
@@ -25,6 +26,7 @@ import {
 } from '../utils/tableHelpers'
 import LoadingSpinner from './LoadingSpinner.vue'
 import TableFilter from './TableFilter.vue'
+import TablePagination from './TablePagination.vue'
 import TableTh from './TableTh.vue'
 import TableTr from './TableTr.vue'
 import TextWithAnchorTags from './TextWithAnchorTags.vue'
@@ -48,7 +50,7 @@ const props = defineProps<{
 }>()
 
 function muiLabel(label: MUILabel): string {
-  return props.parseLabel ? props.parseLabel(label) || muiLabelDic[label] : muiLabelDic[label]
+  return props.parseLabel ? props.parseLabel(label) ?? muiLabelDic[label] : muiLabelDic[label]
 }
 
 // const emit = defineEmits<{}>()
@@ -159,11 +161,6 @@ onMounted(() => {
   fetchMore()
 })
 
-const rows = computed(() => {
-  const collection = collectionInstance.value
-  return [...collection.data.values()]
-})
-
 async function setFilter(filterIndex: number, payload: null | FilterState): Promise<void> {
   clearAllRecords()
   const filterConfig = props.filters[filterIndex]
@@ -209,6 +206,53 @@ async function setOrderBy(
 }
 
 const showingFiltersCode = ref(false)
+
+const pageIndex = ref(0)
+const pageCount = computed(() => Math.ceil(allData.value.length / props.pagination.limit))
+
+const allData = computed(() => [...collectionInstance.value.data.values()])
+const rows = computed(() => {
+  const { pagination } = props
+  if (pagination.kind === 'previous-next') {
+    return allData.value.slice(
+      pagination.limit * pageIndex.value,
+      pagination.limit * (pageIndex.value + 1)
+    )
+  }
+  return allData.value
+})
+
+watch(pageIndex, async (newIndex) => {
+  if (fetchState.value === 'ok' && newIndex === pageCount.value) {
+    await fetchMore()
+    await nextTick()
+    if (!rows.value.length) {
+      // the final page fetched was empty, let's go back one page
+      pageIndex.value = newIndex - 1
+    }
+  }
+})
+
+const minH = ref(26)
+const minW = ref(26)
+const tableEl = ref(null)
+const { height, width } = useElementSize(tableEl)
+watch(
+  () => [height.value, width.value],
+  ([h, w]) => {
+    if (h > minH.value) minH.value = h
+    if (w > minW.value) minW.value = w
+  }
+)
+
+// prettier-ignore
+const labelsPagination = computed(() => ({
+  'magnetar table fetch-more button end': muiLabel('magnetar table fetch-more button end'),
+  'magnetar table fetch-more button': muiLabel('magnetar table fetch-more button'),
+  'magnetar table previous-next previous button': muiLabel('magnetar table previous-next previous button'),
+  'magnetar table previous-next next button': muiLabel('magnetar table previous-next next button'),
+  'magnetar table previous-next end': muiLabel('magnetar table previous-next end'),
+}))
 </script>
 
 <template>
@@ -292,7 +336,7 @@ const showingFiltersCode = ref(false)
       </div>
     </section>
 
-    <table>
+    <table ref="tableEl" :style="`min-height: ${minH}px; min-width: ${minW}px`">
       <thead>
         <tr>
           <th v-for="(column, i) in columns" :key="column.fieldPath + 'th' + i">
@@ -341,15 +385,15 @@ const showingFiltersCode = ref(false)
       </tbody>
     </table>
 
-    <section class="magnetar-table-controls">
-      <button :disabled="fetchState === 'end'" @click="() => fetchMore()">
-        {{
-          fetchState === 'end'
-            ? muiLabel('magnetar table fetch-more button end')
-            : muiLabel('magnetar table fetch-more button')
-        }}
-      </button>
-    </section>
+    <TablePagination
+      v-model:pageIndex="pageIndex"
+      :pageCount="pageCount"
+      :kind="pagination.kind ?? 'fetch-more'"
+      :fetchMore="fetchMore"
+      :fetchState="fetchState"
+      :labels="labelsPagination"
+      class="magnetar-table-controls"
+    />
   </div>
 </template>
 
@@ -370,5 +414,8 @@ const showingFiltersCode = ref(false)
   display: flex
   align-items: center
   gap: 0.25rem
+.magnetar-table-controls
+  display: flex
+  align-items: center
+  gap: 0.5rem
 </style>
-../tableHelpers

@@ -152,6 +152,8 @@ export type MUIColumn<T extends Record<string, any>, Label = string> = {
 
 export type MUIPagination = {
   limit: number
+  /** @default 'fetch-more' */
+  kind?: 'fetch-more' | 'previous-next'
 }
 
 export type MUIFilter<T extends Record<string, any>, Label = string> = {
@@ -419,6 +421,9 @@ export type MUILabel =
   | 'magnetar table no-results'
   | 'magnetar table fetch-more button'
   | 'magnetar table fetch-more button end'
+  | 'magnetar table previous-next previous button'
+  | 'magnetar table previous-next next button'
+  | 'magnetar table previous-next end'
 
 export const muiLabelDic: Record<MUILabel, string> = {
   'magnetar table record counts': 'Found Record Counts',
@@ -435,4 +440,7 @@ export const muiLabelDic: Record<MUILabel, string> = {
   'magnetar table no-results': 'No results found',
   'magnetar table fetch-more button': 'Fetch More',
   'magnetar table fetch-more button end': 'Fetched Everything!',
+  'magnetar table previous-next previous button': 'Previous',
+  'magnetar table previous-next next button': 'Next',
+  'magnetar table previous-next end': 'Fetched Everything!',
 }

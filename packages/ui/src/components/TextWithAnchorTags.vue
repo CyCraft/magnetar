@@ -28,4 +28,3 @@ const textChunks = computed(() => splitOnLink(props.text))
   word-break: break-word
   text-align: left
 </style>
-../tableHelpers

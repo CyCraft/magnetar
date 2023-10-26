@@ -81,4 +81,3 @@ function deleteItem(item: Item) {
     <div style="margin: 1rem">reached end: {{ query.fetched.reachedEnd }}</div>
   </div>
 </template>
-./magnetar

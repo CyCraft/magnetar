@@ -178,4 +178,3 @@ const filterAttrs = computed<{
     > label
       margin: 0.25rem
 </style>
-../tableHelpers
