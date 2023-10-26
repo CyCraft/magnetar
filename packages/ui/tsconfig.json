@@ -6,15 +6,6 @@
     // This must be specified if "paths" is set
     "baseUrl": "."
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "testApp/**/*.ts",
-    "testApp/**/*.d.ts",
-    "testApp/**/*.tsx",
-    "testApp/**/*.vue"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
