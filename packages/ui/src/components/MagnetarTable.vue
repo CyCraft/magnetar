@@ -110,6 +110,7 @@ const collectionInstance = ref(
 function clearAllRecords(): void {
   props.collection.data.clear()
   collectionInstance.value.fetched.cursor = undefined
+  pageIndex.value = 0
 }
 
 function resetState(): void {
