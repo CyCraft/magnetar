@@ -3,25 +3,24 @@ import { ref } from 'vue'
 import TestFirestorePluginFetch from './TestFirestorePluginFetch.vue'
 import TestFirestorePluginStream from './TestFirestorePluginStream.vue'
 import TestTable from './TestTable.vue'
+import TestTableManualFilters from './TestTableManualFilters.vue'
 
-const example = ref<'stream' | 'fetch' | 'table'>('table')
+const example = ref<'stream' | 'fetch' | 'table' | 'table-manual-filters'>('table')
 </script>
 
 <template>
   <div>
-    <!-- <ButtonToggle
-      v-model="example"
-      :options="[
-        { label: 'Table Example', value: 'table' },
-        { label: 'Stream Example', value: 'stream' },
-        { label: 'Fetch Example', value: 'fetch' },
-      ]"
-      style="margin-bottom: 1rem"
-    /> -->
-
+    <TestTable v-if="example === 'table'" />
+    <TestTableManualFilters v-if="example === 'table-manual-filters'" />
     <TestFirestorePluginStream v-if="example === 'stream'" />
     <TestFirestorePluginFetch v-if="example === 'fetch'" />
-    <TestTable v-if="example === 'table'" />
+
+    <select v-model="example" style="margin: 3rem 1rem">
+      <option value="table">Table Example</option>
+      <option value="table-manual-filters">Table Manual Filters</option>
+      <!-- <option name="stream">Stream Example</option> -->
+      <!-- <option name="fetch">Fetch Example</option> -->
+    </select>
   </div>
 </template>
 

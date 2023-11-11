@@ -49,6 +49,11 @@ const props = defineProps<{
   orderByState?: OrderByState
 }>()
 
+const emit = defineEmits<{
+  (e: 'update:filtersState', payload: FiltersState): void
+  (e: 'update:orderByState', payload: OrderByState): void
+}>()
+
 function muiLabel(label: MUILabel): string {
   return props.parseLabel ? props.parseLabel(label) ?? muiLabelDic[label] : muiLabelDic[label]
 }
@@ -76,7 +81,29 @@ const initialState = ((): {
 })()
 
 const filtersState = ref<FiltersState>(carbonCopyMap(initialState.filtersState))
+watch(filtersState, (payload) => emit('update:filtersState', payload), { deep: true })
+watch(
+  () => props.filtersState,
+  async (payload) => {
+    if (!payload) return
+    filtersState.value = payload
+    await new Promise((resolve) => setTimeout(resolve, 200))
+    await fetchMore()
+  },
+  { deep: true }
+)
 const orderByState = ref<OrderByState>(carbonCopyMap(initialState.orderByState))
+watch(orderByState, (payload) => emit('update:orderByState', payload), { deep: true })
+watch(
+  () => props.orderByState,
+  async (payload) => {
+    if (!payload) return
+    orderByState.value = payload
+    await new Promise((resolve) => setTimeout(resolve, 200))
+    await fetchMore()
+  },
+  { deep: true }
+)
 
 const currentFilters = computed(() => filterStateToClauses(filtersState.value, props.filters))
 const currentOrderBy = computed(() => orderByStateToClauses(orderByState.value))

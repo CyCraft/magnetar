@@ -359,15 +359,15 @@ export type FilterStateOption = WhereClause
  */
 export type FilterStateInputValue = string
 /**
- * ### FilterStateCheckboxes
+ * ### {@link FilterStateCheckboxes}
  * - used for filters with `type: 'checkboxes'`.
  * - this value is used to apply which of the checkboxes are checked.
  *
- * ### FilterStateOption
+ * ### {@link FilterStateOption}
  * - used for filters with `type: 'select' | 'radio'`.
  * - this value is used to apply which of the radio/select options are checked.
  *
- * ### FilterStateInputValue
+ * ### {@link FilterStateInputValue}
  * - used for filters with `type: 'text' | 'date' | 'number'`.
  * - this value will be converted to whatever you defined as the `where` clause of the filter.
  */
