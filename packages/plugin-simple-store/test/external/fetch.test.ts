@@ -1,6 +1,6 @@
+import { pokedex } from '@magnetarjs/test-utils'
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { pokedex } from '@magnetarjs/test-utils'
 
 test('fetch (collection)', async (t) => {
   /// 'fetch' resolves once all stores have given a response with data
@@ -209,6 +209,77 @@ test('fetch (collection) where-filter: array-contains-any', async (t) => {
       pokedex(131),
       pokedex(144),
     ]
+    t.deepEqual(actual, expected as any)
+  } catch (error) {
+    t.fail(JSON.stringify(error))
+  }
+})
+
+test('fetch (collection) query-filter: and', async (t) => {
+  const { pokedexModule } = createMagnetarInstance()
+  try {
+    const queryModuleRef = pokedexModule.query({
+      and: [
+        ['type', 'array-contains', 'Fire'],
+        ['base.Speed', '>=', 100],
+      ],
+    })
+    await queryModuleRef.fetch({ force: true })
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [pokedex(6), pokedex(38), pokedex(78)]
+    t.deepEqual(actual, expected as any)
+  } catch (error) {
+    t.fail(JSON.stringify(error))
+  }
+})
+
+test('fetch (collection) query-filter: or', async (t) => {
+  const { pokedexModule } = createMagnetarInstance()
+  try {
+    const queryModuleRef = pokedexModule.query({
+      or: [
+        ['name', '==', 'Bulbasaur'],
+        ['name', '==', 'Ivysaur'],
+        ['name', '==', 'Venusaur'],
+      ],
+    })
+    await queryModuleRef.fetch({ force: true })
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [pokedex(1), pokedex(2), pokedex(3)]
+    t.deepEqual(actual, expected as any)
+  } catch (error) {
+    t.fail(JSON.stringify(error))
+  }
+})
+
+test('fetch (collection) query-filter: combine or, and', async (t) => {
+  const { pokedexModule } = createMagnetarInstance()
+  try {
+    const queryModuleRef = pokedexModule.query({
+      or: [
+        {
+          and: [
+            ['name', '==', 'Bulbasaur'],
+            ['base.Speed', '==', 45],
+          ],
+        },
+        {
+          and: [
+            ['name', '==', 'Ivysaur'],
+            ['base.Speed', '==', 60],
+          ],
+        },
+        {
+          and: [
+            ['name', '==', 'Venusaur'],
+            ['base.Speed', '==', 80],
+          ],
+        },
+      ],
+    })
+    await queryModuleRef.fetch({ force: true })
+    const actual = [...queryModuleRef.data.values()]
+    const expected = [pokedex(1), pokedex(2), pokedex(3)]
     t.deepEqual(actual, expected as any)
   } catch (error) {
     t.fail(JSON.stringify(error))

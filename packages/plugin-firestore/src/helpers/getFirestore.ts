@@ -1,10 +1,11 @@
-import { DocMetadata, QueryClause } from '@magnetarjs/types'
+import { DocMetadata, isWhereClause, QueryClause } from '@magnetarjs/types'
 import type { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'
 import type {
   CollectionReference,
   DocumentSnapshot,
   Firestore,
   Query,
+  QueryCompositeFilterConstraint,
   QueryDocumentSnapshot,
 } from 'firebase/firestore'
 import {
@@ -18,22 +19,26 @@ import {
   startAfter,
   where,
 } from 'firebase/firestore'
-import { isArray, isNumber } from 'is-what'
+import { isNumber } from 'is-what'
 
-function applyQuery(q: CollectionReference | Query, queryClause: QueryClause): Query {
+function applyQuery(queryClause: QueryClause): QueryCompositeFilterConstraint {
   if ('and' in queryClause) {
-    if (isArray(queryClause.and)) {
-      return query(q, and(...queryClause.and.map((whereClause) => where(...whereClause))))
-    }
-    return applyQuery(q, queryClause.and)
+    return and(
+      ...queryClause.and.map((whereClauseOrQueryClause) =>
+        isWhereClause(whereClauseOrQueryClause)
+          ? where(...whereClauseOrQueryClause)
+          : applyQuery(whereClauseOrQueryClause)
+      )
+    )
   }
-  if ('or' in queryClause) {
-    if (isArray(queryClause.or)) {
-      return query(q, or(...queryClause.or.map((whereClause) => where(...whereClause))))
-    }
-    return applyQuery(q, queryClause.or)
-  }
-  return q
+  // if ('or' in queryClause)
+  return or(
+    ...queryClause.or.map((whereClauseOrQueryClause) =>
+      isWhereClause(whereClauseOrQueryClause)
+        ? where(...whereClauseOrQueryClause)
+        : applyQuery(whereClauseOrQueryClause)
+    )
+  )
 }
 
 /**
@@ -49,7 +54,7 @@ export function getQueryInstance(
     ? collectionGroup(db, collectionPath.split('*/')[1])
     : collection(db, collectionPath)
   for (const queryClause of config.query || []) {
-    q = applyQuery(q, queryClause)
+    q = query(q, applyQuery(queryClause))
   }
   for (const whereClause of config.where || []) {
     q = query(q, where(...whereClause))

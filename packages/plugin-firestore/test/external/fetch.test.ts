@@ -1,6 +1,6 @@
+import { pokedex } from '@magnetarjs/test-utils'
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { pokedex } from '@magnetarjs/test-utils'
 
 {
   const testName = 'fetch (collection)'
@@ -266,6 +266,97 @@ import { pokedex } from '@magnetarjs/test-utils'
         pokedex(131),
         pokedex(144),
       ]
+      t.deepEqual(actual, expected as any)
+      // also check the collection without query
+      const actualDocCountWithoutQuery = pokedexModule.data.size
+      const expectedDocCountWithoutQuery = expected.length
+      t.deepEqual(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
+    } catch (error) {
+      t.fail(JSON.stringify(error))
+    }
+  })
+}
+{
+  const testName = 'fetch (collection) query-filter: and'
+  test(testName, async (t) => {
+    const { pokedexModule } = await createMagnetarInstance('read')
+    try {
+      const queryModuleRef = pokedexModule
+        .query({
+          and: [
+            ['type', 'array-contains', 'Fire'],
+            ['base.Speed', '>=', 100],
+          ],
+        })
+        .orderBy('base.Speed', 'asc')
+      await queryModuleRef.fetch({ force: true }, { onError: 'stop' })
+      const actual = [...queryModuleRef.data.values()]
+      const expected = [pokedex(6), pokedex(38), pokedex(78)]
+      t.deepEqual(actual, expected as any)
+      // also check the collection without query
+      const actualDocCountWithoutQuery = pokedexModule.data.size
+      const expectedDocCountWithoutQuery = expected.length
+      t.deepEqual(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
+    } catch (error) {
+      t.fail(JSON.stringify(error))
+    }
+  })
+}
+{
+  const testName = 'fetch (collection) query-filter: or'
+  test(testName, async (t) => {
+    const { pokedexModule } = await createMagnetarInstance('read')
+    try {
+      const queryModuleRef = pokedexModule.query({
+        or: [
+          ['name', '==', 'Bulbasaur'],
+          ['name', '==', 'Ivysaur'],
+          ['name', '==', 'Venusaur'],
+        ],
+      })
+      await queryModuleRef.fetch({ force: true }, { onError: 'stop' })
+      const actual = [...queryModuleRef.data.values()]
+      const expected = [pokedex(1), pokedex(2), pokedex(3)]
+      t.deepEqual(actual, expected as any)
+      // also check the collection without query
+      const actualDocCountWithoutQuery = pokedexModule.data.size
+      const expectedDocCountWithoutQuery = expected.length
+      t.deepEqual(actualDocCountWithoutQuery, expectedDocCountWithoutQuery)
+    } catch (error) {
+      t.fail(JSON.stringify(error))
+    }
+  })
+}
+{
+  const testName = 'fetch (collection) query-filter: combine or, and'
+  test(testName, async (t) => {
+    const { pokedexModule } = await createMagnetarInstance('read')
+    try {
+      const queryModuleRef = pokedexModule.query({
+        or: [
+          {
+            and: [
+              ['name', '==', 'Bulbasaur'],
+              ['base.Speed', '==', 45],
+            ],
+          },
+          {
+            and: [
+              ['name', '==', 'Ivysaur'],
+              ['base.Speed', '==', 60],
+            ],
+          },
+          {
+            and: [
+              ['name', '==', 'Venusaur'],
+              ['base.Speed', '==', 80],
+            ],
+          },
+        ],
+      })
+      await queryModuleRef.fetch({ force: true }, { onError: 'stop' })
+      const actual = [...queryModuleRef.data.values()]
+      const expected = [pokedex(1), pokedex(2), pokedex(3)]
       t.deepEqual(actual, expected as any)
       // also check the collection without query
       const actualDocCountWithoutQuery = pokedexModule.data.size
