@@ -112,7 +112,12 @@ const filterAttrs = computed<{
 
     <template v-if="filter.type === 'checkboxes' && usesFilterStateCheckboxes(filter, filterState)">
       <!-- CHECKBOXES -->
-      <div v-for="option in filter.options" class="magnetar-inline-block">
+      <div
+        v-for="option in filter.options"
+        class="magnetar-inline-block"
+        :class="option.class"
+        :style="option.style"
+      >
         <input
           :id="JSON.stringify(option.where)"
           type="checkbox"
@@ -128,7 +133,12 @@ const filterAttrs = computed<{
 
     <template v-if="filter.type === 'radio' && usesFilterStateOption(filter, filterState)">
       <!-- RADIO -->
-      <div v-for="option in filter.options" class="magnetar-inline-block">
+      <div
+        v-for="option in filter.options"
+        class="magnetar-inline-block"
+        :class="option.class"
+        :style="option.style"
+      >
         <input
           :id="JSON.stringify(option.where)"
           type="radio"
@@ -148,7 +158,13 @@ const filterAttrs = computed<{
       <!-- SELECT -->
       <select v-model="selectModel">
         <option>{{ filterAttrs.placeholder || '--' }}</option>
-        <option v-for="option in filter.options" :key="option.label" :value="option.where">
+        <option
+          v-for="option in filter.options"
+          :key="option.label"
+          :value="option.where"
+          :class="option.class"
+          :style="option.style"
+        >
           {{ parseLabel ? parseLabel(option.label) : option.label }}
           <small> ({{ props.collection.where(...option.where).count }})</small>
         </option>

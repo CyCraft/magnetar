@@ -184,6 +184,16 @@ export type MUIFilter<T extends Record<string, any>, Label = string> = {
    *   - not available
    */
   options?: {
+    /**
+     * Applied to the option
+     * @example 'flex-column'
+     */
+    class?: string
+    /**
+     * Applied to the option
+     * @example 'display: flex; flex-direction: column;'
+     */
+    style?: string
     label: Label
     where: WhereClauseTuple<T>
     checked?: boolean
