@@ -35,7 +35,7 @@ const props = defineProps<{
   collection: CollectionInstance<any>
   columns: MUIColumn<any, any>[]
   pagination: MUIPagination
-  filters: MUIFilter<any, any>[]
+  filters?: MUIFilter<any, any>[]
   parseLabel?: MUIParseLabel
   /**
    * - Only use this in advanced cases. You should set up initial filter state via `filters` instead.
@@ -67,7 +67,7 @@ const initialState = ((): {
 } => {
   const { filtersState, orderByState } = filtersAndColumnsToInitialState({
     columns: props.columns,
-    filters: props.filters,
+    filters: props.filters ?? [],
   })
   if (props.filtersState) {
     for (const [index, state] of props.filtersState) {
@@ -105,7 +105,7 @@ watch(
   { deep: true }
 )
 
-const currentFilters = computed(() => filterStateToClauses(filtersState.value, props.filters))
+const currentFilters = computed(() => filterStateToClauses(filtersState.value, props.filters ?? []))
 const currentOrderBy = computed(() => orderByStateToClauses(orderByState.value))
 
 /**
@@ -131,7 +131,7 @@ const hasSomeFilterOrOrderby = computed<boolean>(
 
 /** This instance is not computed so that we can delay setting it after fetching the relevant records */
 const collectionInstance = ref(
-  calcCollection(props.collection, filtersState.value, orderByState.value, props.filters)
+  calcCollection(props.collection, filtersState.value, orderByState.value, props.filters ?? [])
 )
 
 function clearAllRecords(): void {
@@ -177,7 +177,7 @@ async function fetchMore() {
     props.collection,
     filtersState.value,
     orderByState.value,
-    props.filters
+    props.filters ?? []
   )
 
   try {
@@ -209,11 +209,11 @@ onMounted(() => {
 
 async function setFilter(filterIndex: number, payload: null | FilterState): Promise<void> {
   clearAllRecords()
-  const filterConfig = props.filters[filterIndex]
-  if (filterConfig.clearOtherFilters) {
+  const filterConfig = props.filters?.[filterIndex]
+  if (filterConfig?.clearOtherFilters) {
     filtersState.value = new Map()
   }
-  if (filterConfig.clearOrderBy) {
+  if (filterConfig?.clearOrderBy) {
     orderByState.value = new Map()
   }
   if (!payload) {
@@ -293,10 +293,7 @@ const labelsPagination = computed(() => ({
 
 <template>
   <div class="magnetar-table magnetar-column magnetar-gap-md">
-    <section
-      v-if="filters.length || hasSomeFilterOrOrderby"
-      class="magnetar-column magnetar-gap-sm"
-    >
+    <section v-if="filters?.length" class="magnetar-column magnetar-gap-sm">
       <div class="magnetar-row magnetar-gap-sm">
         <h6>
           {{
