@@ -11730,8 +11730,8 @@ packages:
       strip-json-comments: 2.0.1
     dev: true
 
-  /react-devtools-core@4.28.0:
-    resolution: {integrity: sha512-E3C3X1skWBdBzwpOUbmXG8SgH6BtsluSMe+s6rRcujNKG1DGi8uIfhdhszkgDpAsMoE55hwqRUzeXCmETDBpTg==}
+  /react-devtools-core@4.28.4:
+    resolution: {integrity: sha512-IUZKLv3CimeM07G3vX4H4loxVpByrzq3HvfTX7v9migalwvLs9ZY5D3S3pKR33U+GguYfBBdMMZyToFhsSE/iQ==}
     dependencies:
       shell-quote: 1.8.1
       ws: 7.5.9
@@ -11784,7 +11784,7 @@ packages:
       nullthrows: 1.1.1
       pretty-format: 26.6.2
       promise: 8.3.0
-      react-devtools-core: 4.28.0
+      react-devtools-core: 4.28.4
       react-refresh: 0.4.3
       react-shallow-renderer: 16.15.0
       regenerator-runtime: 0.13.11
@@ -14218,6 +14218,7 @@ packages:
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+    requiresBuild: true
 
   /yocto-queue@1.0.0:
     resolution: {integrity: sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==}
