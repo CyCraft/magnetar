@@ -6,7 +6,6 @@ import { ref, watch } from 'vue'
 import {
   FiltersState,
   FilterStateCheckboxes,
-  FilterStateInputValue,
   FilterStateOption,
   MagnetarTable,
   MUIColumn,
@@ -126,7 +125,7 @@ const sValue = urlParams.get('s') || undefined
  */
 const filtersState = ref<FiltersState>(new Map())
 
-const searchInput = ref<FilterStateInputValue>(sValue || '')
+const searchInput = ref<string>(sValue || '')
 const checkboxesInput = ref<FilterStateCheckboxes>({ or: new Set() })
 const selectInput = ref<FilterStateOption | null>(null)
 
@@ -135,10 +134,21 @@ const INDEX_SEARCH = 0
 const INDEX_CHECKBOXES = 1
 const INDEX_SELECT = 2
 
-// prettier-ignore
 watch(
   searchInput,
-  (newValue) => filtersState.value.set(INDEX_SEARCH, newValue),
+  (newValue) => {
+    if (!newValue) filtersState.value.delete(INDEX_SEARCH)
+    if (newValue) {
+      /** Set it just like checkboxes */
+      const filterState: FilterStateCheckboxes = {
+        or: new Set([
+          ['title', '==', newValue.trim()],
+          ['id', '==', newValue.trim()],
+        ]),
+      }
+      filtersState.value.set(INDEX_SEARCH, filterState)
+    }
+  },
   { immediate: true }
 )
 // prettier-ignore
@@ -155,6 +165,7 @@ watch(selectInput, (newValue) => {
 const optionsCheckboxes: { label: string; where: WhereClause }[] = [
   { label: 'done', where: ['isDone', '==', true] },
   { label: 'not done', where: ['isDone', '==', false] },
+  { label: 'id is 7xmxyIhKeXg1DFY7uS9m', where: ['id', '==', '7xmxyIhKeXg1DFY7uS9m'] },
 ]
 
 const optionsSelect: { label: string; where: WhereClause }[] = [
