@@ -113,7 +113,7 @@
       "@typescript-eslint/ban-ts-comment": "warn"
     }
   },
-  "version": "0.16.3",
+  "version": "0.16.4",
   "pnpm": {
     "peerDependencyRules": {
       "ignoreMissing": [
