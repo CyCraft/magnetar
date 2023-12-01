@@ -1,11 +1,11 @@
-import {
-  PluginFetchCountAction,
-  FetchCountResponse,
+import type {
   DoOnFetchCount,
-  PluginFetchCountActionPayload,
+  FetchCountResponse,
   PathWhereIdentifier,
-  getPathWhereIdentifier,
+  PluginFetchCountAction,
+  PluginFetchCountActionPayload,
 } from '@magnetarjs/types'
+import { getPathWhereIdentifier } from '@magnetarjs/types'
 import { Vue3StoreModuleConfig, Vue3StoreOptions } from '../CreatePlugin'
 
 export function fetchCountActionFactory(

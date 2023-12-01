@@ -1,6 +1,6 @@
-import { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/types'
-import { Vue2StoreModuleConfig, Vue2StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import type { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/types'
 import { isFullString, isNumber } from 'is-what'
+import { MakeRestoreBackup, Vue2StoreModuleConfig, Vue2StoreOptions } from '../CreatePlugin'
 
 export function insertActionFactory(
   data: { [collectionPath: string]: Record<string, Record<string, unknown>> },

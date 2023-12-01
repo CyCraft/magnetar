@@ -1,4 +1,4 @@
-import { GlobalConfig, ModuleConfig, PluginModuleConfig } from '@magnetarjs/types'
+import type { GlobalConfig, ModuleConfig, PluginModuleConfig } from '@magnetarjs/types'
 import { isFunction, isPlainObject } from 'is-what'
 import { throwIfNolocalStoreName } from './throwFns'
 

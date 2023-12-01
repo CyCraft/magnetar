@@ -1,12 +1,17 @@
-import { Magnetar } from '../../src'
-import { MagnetarInstance, CollectionInstance, DocInstance, GlobalConfig } from '@magnetarjs/types'
+import type { PokedexEntry } from '@magnetarjs/test-utils'
 import {
-  pokedex,
   generateRandomId,
   PluginMockLocal,
   PluginMockRemote,
+  pokedex,
 } from '@magnetarjs/test-utils'
-import type { PokedexEntry } from '@magnetarjs/test-utils'
+import type {
+  CollectionInstance,
+  DocInstance,
+  GlobalConfig,
+  MagnetarInstance,
+} from '@magnetarjs/types'
+import { Magnetar } from '../../src'
 
 const CreatePluginLocal = PluginMockLocal.CreatePlugin
 const CreatePluginRemote = PluginMockRemote.CreatePlugin

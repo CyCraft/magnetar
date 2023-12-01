@@ -1,5 +1,5 @@
-import { SyncBatch } from '@magnetarjs/types'
-import { deleteField, WriteBatch, Firestore, doc, writeBatch } from 'firebase/firestore'
+import type { SyncBatch } from '@magnetarjs/types'
+import { deleteField, doc, Firestore, WriteBatch, writeBatch } from 'firebase/firestore'
 
 export function createWriteBatch(db: Firestore): WriteBatch {
   return writeBatch(db)

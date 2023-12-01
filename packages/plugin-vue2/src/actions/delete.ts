@@ -1,6 +1,6 @@
+import type { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/types'
 import { isFullString } from 'is-what'
-import { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/types'
-import { Vue2StoreModuleConfig, Vue2StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { MakeRestoreBackup, Vue2StoreModuleConfig, Vue2StoreOptions } from '../CreatePlugin'
 
 export function deleteActionFactory(
   data: { [collectionPath: string]: Record<string, Record<string, unknown>> },

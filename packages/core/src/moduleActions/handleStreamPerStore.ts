@@ -1,25 +1,25 @@
-import { isPromise } from 'is-what'
-import {
-  StreamResponse,
-  DocMetadata,
-  ModuleConfig,
-  GlobalConfig,
-  DoOnStreamFns,
-  DoOnStream,
-  ActionType,
-  WriteLock,
+import type {
   ActionConfig,
+  ActionType,
+  DocMetadata,
+  DoOnStream,
+  DoOnStreamFns,
+  GlobalConfig,
   MagnetarStreamAction,
+  ModuleConfig,
+  StreamResponse,
+  WriteLock,
 } from '@magnetarjs/types'
-import { handleStream } from './handleStream'
+import { isPromise } from 'is-what'
 import { getEventNameFnsMap } from '../helpers/eventHelpers'
+import { executeOnFns } from '../helpers/executeOnFns'
 import { getModifyPayloadFnsMap } from '../helpers/modifyPayload'
 import { getModifyReadResponseFnsMap } from '../helpers/modifyReadResponse'
-import { executeOnFns } from '../helpers/executeOnFns'
-import { throwOnIncompleteStreamResponses, throwIfNoFnsToExecute } from '../helpers/throwFns'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers'
-import { getDocAfterWritelock, writeLockPromise } from '../helpers/writeLockHelpers'
 import { isDoOnStream } from '../helpers/pluginHelpers'
+import { throwIfNoFnsToExecute, throwOnIncompleteStreamResponses } from '../helpers/throwFns'
+import { getDocAfterWritelock, writeLockPromise } from '../helpers/writeLockHelpers'
+import { handleStream } from './handleStream'
 
 export function handleStreamPerStore(
   [collectionPath, docId]: [string, string | undefined],

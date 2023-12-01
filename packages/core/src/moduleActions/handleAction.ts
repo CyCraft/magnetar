@@ -1,20 +1,20 @@
-import {
+import type {
   ActionConfig,
   ActionName,
-  SyncBatch,
-  EventNameFnsMap,
-  PluginModuleConfig,
-  PluginFetchAction,
-  PluginWriteAction,
-  PluginDeleteAction,
-  PluginDeletePropAction,
-  PluginInsertAction,
-  FetchResponse,
-  OnAddedFn,
-  PluginFetchCountAction,
-  FetchCountResponse,
   DoOnFetch,
   DoOnFetchCount,
+  EventNameFnsMap,
+  FetchCountResponse,
+  FetchResponse,
+  OnAddedFn,
+  PluginDeleteAction,
+  PluginDeletePropAction,
+  PluginFetchAction,
+  PluginFetchCountAction,
+  PluginInsertAction,
+  PluginModuleConfig,
+  PluginWriteAction,
+  SyncBatch,
 } from '@magnetarjs/types'
 
 /**

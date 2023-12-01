@@ -1,14 +1,14 @@
-import { isString } from 'is-what'
-import {
-  PluginStreamAction,
-  StreamResponse,
+import type {
   DoOnStream,
+  PluginStreamAction,
   PluginStreamActionPayload,
+  StreamResponse,
 } from '@magnetarjs/types'
-import { StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin'
-import { insertActionFactory } from './insert'
-import { deleteActionFactory } from './delete'
+import { isString } from 'is-what'
 import { throwIfEmulatedError } from '../../helpers'
+import { StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin'
+import { deleteActionFactory } from './delete'
+import { insertActionFactory } from './insert'
 
 export function streamActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, unknown>> },

@@ -1,5 +1,4 @@
-import {
-  actionNameTypeMap,
+import type {
   CollectionFn,
   CollectionInstance,
   DocFn,
@@ -17,6 +16,7 @@ import {
   WhereFilterOp,
   WriteLock,
 } from '@magnetarjs/types'
+import { actionNameTypeMap } from '@magnetarjs/types'
 import { merge, mergeAndConcat } from 'merge-anything'
 import {
   executeSetupModulePerStore,

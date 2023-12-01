@@ -1,7 +1,7 @@
-import { MagnetarInstance, CollectionInstance, DocInstance } from '@magnetarjs/types'
 import { Magnetar } from '@magnetarjs/core'
+import { generateRandomId, PluginMockRemote, pokedex, PokedexEntry } from '@magnetarjs/test-utils'
+import type { CollectionInstance, DocInstance, MagnetarInstance } from '@magnetarjs/types'
 import { CreatePlugin as CreatePluginLocal } from '../../src'
-import { pokedex, PokedexEntry, generateRandomId, PluginMockRemote } from '@magnetarjs/test-utils'
 
 // @ts-ignore
 import Vue from 'vue/dist/vue.common.js'

@@ -1,14 +1,14 @@
-import { isFullString, isNumber } from 'is-what'
-import { mapGetOrSet } from 'getorset-anything'
-import { PluginDeleteAction, PluginDeleteActionPayload, SyncBatch } from '@magnetarjs/types'
+import type { PluginDeleteAction, PluginDeleteActionPayload, SyncBatch } from '@magnetarjs/types'
 import {
+  BatchSync,
+  batchSyncFactory,
   FirestoreModuleConfig,
   getFirestoreDocPath,
-  batchSyncFactory,
-  BatchSync,
 } from '@magnetarjs/utils-firestore'
+import { mapGetOrSet } from 'getorset-anything'
+import { isFullString, isNumber } from 'is-what'
 import { BatchSyncMap, FirestoreAdminPluginOptions } from '../CreatePlugin'
-import { createWriteBatch, applySyncBatch } from '../helpers/batchHelpers'
+import { applySyncBatch, createWriteBatch } from '../helpers/batchHelpers'
 
 export function deleteActionFactory(
   batchSyncMap: BatchSyncMap,

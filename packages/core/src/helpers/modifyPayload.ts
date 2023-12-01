@@ -1,4 +1,4 @@
-import { ModifyPayloadFnMap, ModifyPayloadFnsMap } from '@magnetarjs/types'
+import type { ModifyPayloadFnMap, ModifyPayloadFnsMap } from '@magnetarjs/types'
 
 export function getModifyPayloadFnsMap(
   ...onMaps: (ModifyPayloadFnMap | void)[]

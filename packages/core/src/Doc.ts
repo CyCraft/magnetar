@@ -1,29 +1,29 @@
-import {
-  MagnetarWriteAction,
-  MagnetarFetchAction,
-  MagnetarDeleteAction,
-  MagnetarDeletePropAction,
-  MagnetarInsertAction,
-  FetchPromises,
-  actionNameTypeMap,
-  ModuleConfig,
-  GlobalConfig,
+import type {
   CollectionFn,
   DocFn,
-  WriteLock,
   DocInstance,
+  FetchPromises,
+  GlobalConfig,
+  MagnetarDeleteAction,
+  MagnetarDeletePropAction,
+  MagnetarFetchAction,
+  MagnetarInsertAction,
+  MagnetarWriteAction,
+  ModuleConfig,
+  WriteLock,
 } from '@magnetarjs/types'
-import {
-  handleActionPerStore,
-  HandleActionSharedParams,
-} from './moduleActions/handleActionPerStore'
-import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
+import { actionNameTypeMap } from '@magnetarjs/types'
 import {
   executeSetupModulePerStore,
   getDataFromDataStore,
   getExistsFromDataStore,
   proxify,
 } from './helpers/moduleHelpers'
+import {
+  handleActionPerStore,
+  HandleActionSharedParams,
+} from './moduleActions/handleActionPerStore'
+import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
 
 export function createDocWithContext(
   [collectionPath, docId]: [string, string],

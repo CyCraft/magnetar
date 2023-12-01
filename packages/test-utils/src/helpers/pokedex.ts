@@ -1,8 +1,8 @@
+import type { PartialDeep } from '@magnetarjs/types'
 import { copy } from 'copy-anything'
 import { merge } from 'merge-anything'
-import type { PartialDeep } from '@magnetarjs/types'
-import type { PokedexEntry } from './types'
 import { allPokemonArray } from './pokemon'
+import type { PokedexEntry } from './types'
 
 export function pokedexEntryDefaults(partial: PartialDeep<PokedexEntry>): PokedexEntry {
   const defaults: PokedexEntry = {

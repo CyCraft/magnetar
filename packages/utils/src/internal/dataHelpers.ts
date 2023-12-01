@@ -1,4 +1,4 @@
-import { Clauses, QueryClause, WhereClause } from '@magnetarjs/types'
+import type { Clauses, QueryClause, WhereClause } from '@magnetarjs/types'
 import { ISortByObjectSorter, sort } from 'fast-sort'
 import { isArray, isNumber } from 'is-what'
 import { getProp } from 'path-to-prop'
@@ -49,14 +49,14 @@ function passesWhere(docData: Record<string, unknown>, whereQuery: WhereClause):
 
 function passesQuery(docData: Record<string, unknown>, queryClause: QueryClause): boolean {
   if ('and' in queryClause) {
-    return isArray(queryClause.and)
-      ? queryClause.and.every((whereClause) => passesWhere(docData, whereClause))
-      : passesQuery(docData, queryClause.and)
+    return queryClause.and.every((clause) =>
+      isArray(clause) ? passesWhere(docData, clause) : passesQuery(docData, clause)
+    )
   }
   // if ('or' in queryClause)
-  return isArray(queryClause.or)
-    ? queryClause.or.some((whereClause) => passesWhere(docData, whereClause))
-    : passesQuery(docData, queryClause.or)
+  return queryClause.or.some((clause) =>
+    isArray(clause) ? passesWhere(docData, clause) : passesQuery(docData, clause)
+  )
 }
 
 /**

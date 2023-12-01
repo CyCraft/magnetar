@@ -1,13 +1,12 @@
-import {
+import type {
+  DoOnFetchCount,
+  FetchCountResponse,
+  PathWhereIdentifier,
   PluginFetchCountAction,
   PluginFetchCountActionPayload,
-  FetchCountResponse,
-  DoOnFetchCount,
-  getPathWhereIdentifier,
-  PathWhereIdentifier,
 } from '@magnetarjs/types'
+import { getPathWhereIdentifier } from '@magnetarjs/types'
 import { StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin'
-import { throwIfEmulatedError } from '../../helpers'
 
 export function fetchCountActionFactory(
   pathCountDic: { [collectionPath in PathWhereIdentifier]?: number },

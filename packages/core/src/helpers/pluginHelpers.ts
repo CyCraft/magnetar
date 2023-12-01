@@ -1,11 +1,11 @@
-import { isPlainObject, isFunction, isArray, isNumber } from 'is-what'
-import {
+import type {
   DoOnFetch,
   DoOnFetchCount,
   DoOnStream,
   FetchCountResponse,
   FetchResponse,
 } from '@magnetarjs/types'
+import { isArray, isFunction, isNumber, isPlainObject } from 'is-what'
 
 /**
  * DoOnStream type guard

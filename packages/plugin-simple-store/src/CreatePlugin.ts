@@ -1,11 +1,11 @@
-import {
+import type {
   Clauses,
-  getPathWhereIdentifier,
   MagnetarPlugin,
   PathWhereIdentifier,
   PluginInstance,
   PluginModuleSetupPayload,
 } from '@magnetarjs/types'
+import { getPathWhereIdentifier } from '@magnetarjs/types'
 import { filterDataPerClauses } from '@magnetarjs/utils'
 import { copy } from 'copy-anything'
 import { pick } from 'filter-anything'

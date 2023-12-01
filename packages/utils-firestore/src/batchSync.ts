@@ -1,11 +1,11 @@
+import type { SyncBatch } from '@magnetarjs/types'
+import { logWithFlair } from '@magnetarjs/utils'
+import { mapGetOrSet } from 'getorset-anything'
 import { isEmptyObject, isNumber } from 'is-what'
 import { merge as mergeObjects } from 'merge-anything'
 import { removeProp } from 'remove-anything'
-import { mapGetOrSet } from 'getorset-anything'
-import { logWithFlair } from '@magnetarjs/utils'
-import { SyncBatch } from '@magnetarjs/types'
 import { Countdown, CountdownInstance } from './Countdown'
-import { FirestorePluginOptions, Firestore, ApplySyncBatch, CreateWriteBatch } from './types'
+import { ApplySyncBatch, CreateWriteBatch, Firestore, FirestorePluginOptions } from './types'
 
 // https://firebase.google.com/docs/firestore/manage-data/transactions#batched-writes
 // A batched write can contain up to 500 operations.

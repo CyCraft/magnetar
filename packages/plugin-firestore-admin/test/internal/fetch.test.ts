@@ -1,7 +1,7 @@
+import { pokedex } from '@magnetarjs/test-utils'
+import type { DocMetadata } from '@magnetarjs/types'
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { DocMetadata } from '@magnetarjs/types'
-import { pokedex, waitMs } from '@magnetarjs/test-utils'
 
 {
   const testName = 'fetch inexistent (document)'

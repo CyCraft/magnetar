@@ -1,14 +1,14 @@
-import { isNumber } from 'is-what'
-import { mapGetOrSet } from 'getorset-anything'
-import { PluginWriteAction, PluginWriteActionPayload, SyncBatch } from '@magnetarjs/types'
+import type { PluginWriteAction, PluginWriteActionPayload, SyncBatch } from '@magnetarjs/types'
 import {
+  BatchSync,
+  batchSyncFactory,
   FirestoreModuleConfig,
   getFirestoreDocPath,
-  batchSyncFactory,
-  BatchSync,
 } from '@magnetarjs/utils-firestore'
+import { mapGetOrSet } from 'getorset-anything'
+import { isNumber } from 'is-what'
 import { BatchSyncMap, FirestoreAdminPluginOptions } from '../CreatePlugin'
-import { createWriteBatch, applySyncBatch } from '../helpers/batchHelpers'
+import { applySyncBatch, createWriteBatch } from '../helpers/batchHelpers'
 
 export function writeActionFactory(
   batchSyncMap: BatchSyncMap,

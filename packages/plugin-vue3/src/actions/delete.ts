@@ -1,6 +1,6 @@
+import type { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/types'
 import { isFullString } from 'is-what'
-import { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/types'
-import { Vue3StoreModuleConfig, Vue3StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { MakeRestoreBackup, Vue3StoreModuleConfig, Vue3StoreOptions } from '../CreatePlugin'
 
 export function deleteActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, unknown>> },

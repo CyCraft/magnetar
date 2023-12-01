@@ -1,44 +1,44 @@
 /* eslint-disable no-inner-declarations */
-import { mapGetOrSet } from 'getorset-anything'
-import { isBoolean, isFullArray, isFullString, isPromise } from 'is-what'
-import { handleAction } from './handleAction'
-import { getEventNameFnsMap } from '../helpers/eventHelpers'
-import {
+import type {
   ActionConfig,
-  MagnetarFetchAction,
-  MagnetarWriteAction,
-  MagnetarDeleteAction,
-  MagnetarDeletePropAction,
-  MagnetarInsertAction,
   ActionName,
-  FetchPromises,
-  DoOnFetch,
-  SyncBatch,
-  FetchResponse,
-  ActionType,
   ActionTernary,
-  OnAddedFn,
-  ModuleConfig,
-  GlobalConfig,
+  ActionType,
   CollectionFn,
   DocFn,
-  WriteLock,
-  FetchMetaDataCollection,
-  MagnetarFetchCountAction,
+  DoOnFetch,
   DoOnFetchCount,
+  FetchMetaDataCollection,
+  FetchPromises,
+  FetchResponse,
+  GlobalConfig,
+  MagnetarDeleteAction,
+  MagnetarDeletePropAction,
+  MagnetarFetchAction,
+  MagnetarFetchCountAction,
+  MagnetarInsertAction,
+  MagnetarWriteAction,
+  ModuleConfig,
+  OnAddedFn,
+  SyncBatch,
+  WriteLock,
 } from '@magnetarjs/types'
+import { mapGetOrSet } from 'getorset-anything'
+import { isBoolean, isFullArray, isFullString, isPromise } from 'is-what'
+import { getEventNameFnsMap } from '../helpers/eventHelpers'
+import { executeOnFns } from '../helpers/executeOnFns'
+import { getModifyPayloadFnsMap } from '../helpers/modifyPayload'
+import { getModifyReadResponseFnsMap } from '../helpers/modifyReadResponse'
+import { getPluginModuleConfig } from '../helpers/moduleHelpers'
+import { getCollectionWriteLocks } from '../helpers/pathHelpers'
 import {
   isDoOnFetch,
   isDoOnFetchCount,
   isFetchCountResponse,
   isFetchResponse,
 } from '../helpers/pluginHelpers'
-import { getModifyPayloadFnsMap } from '../helpers/modifyPayload'
-import { getModifyReadResponseFnsMap } from '../helpers/modifyReadResponse'
-import { executeOnFns } from '../helpers/executeOnFns'
 import { throwIfNoFnsToExecute } from '../helpers/throwFns'
-import { getExistsFromDataStore, getPluginModuleConfig } from '../helpers/moduleHelpers'
-import { getCollectionWriteLocks } from '../helpers/pathHelpers'
+import { handleAction } from './handleAction'
 
 export type HandleActionSharedParams = {
   collectionPath: string

@@ -1,10 +1,11 @@
-import { DocMetadata, QueryClause } from '@magnetarjs/types'
+import type { DocMetadata, QueryClause } from '@magnetarjs/types'
 import type { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'
 import type {
   CollectionReference,
   DocumentSnapshot,
   Firestore,
   Query,
+  QueryCompositeFilterConstraint,
   QueryDocumentSnapshot,
 } from 'firebase/firestore'
 import {
@@ -20,20 +21,22 @@ import {
 } from 'firebase/firestore'
 import { isArray, isNumber } from 'is-what'
 
-function applyQuery(q: CollectionReference | Query, queryClause: QueryClause): Query {
+function applyQueryClause(queryClause: QueryClause): QueryCompositeFilterConstraint {
   if ('and' in queryClause) {
-    if (isArray(queryClause.and)) {
-      return query(q, and(...queryClause.and.map((whereClause) => where(...whereClause))))
-    }
-    return applyQuery(q, queryClause.and)
+    return and(
+      ...queryClause.and.map((clause) =>
+        isArray(clause) ? where(...clause) : applyQueryClause(clause)
+      )
+    )
   }
   if ('or' in queryClause) {
-    if (isArray(queryClause.or)) {
-      return query(q, or(...queryClause.or.map((whereClause) => where(...whereClause))))
-    }
-    return applyQuery(q, queryClause.or)
+    return or(
+      ...queryClause.or.map((clause) =>
+        isArray(clause) ? where(...clause) : applyQueryClause(clause)
+      )
+    )
   }
-  return q
+  throw new Error('invalid query')
 }
 
 /**
@@ -49,7 +52,7 @@ export function getQueryInstance(
     ? collectionGroup(db, collectionPath.split('*/')[1])
     : collection(db, collectionPath)
   for (const queryClause of config.query || []) {
-    q = applyQuery(q, queryClause)
+    q = query(q, applyQueryClause(queryClause))
   }
   for (const whereClause of config.where || []) {
     q = query(q, where(...whereClause))

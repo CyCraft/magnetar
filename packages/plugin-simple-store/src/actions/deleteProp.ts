@@ -1,7 +1,7 @@
+import type { PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetarjs/types'
 import { isArray } from 'is-what'
 import { getProp } from 'path-to-prop'
-import { PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetarjs/types'
-import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { MakeRestoreBackup, SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin'
 
 export function deletePropActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, unknown>> },

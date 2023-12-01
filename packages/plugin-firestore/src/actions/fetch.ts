@@ -1,19 +1,19 @@
-import { DocumentSnapshot, QueryDocumentSnapshot } from 'firebase/firestore'
-import { doc, getDoc, getDocs } from 'firebase/firestore'
-import { logWithFlair } from '@magnetarjs/utils'
-import {
-  PluginFetchAction,
-  FetchResponse,
+import type {
   DocMetadata,
+  FetchResponse,
+  PluginFetchAction,
   PluginFetchActionPayload,
 } from '@magnetarjs/types'
+import { logWithFlair } from '@magnetarjs/utils'
 import {
   FirestoreModuleConfig,
-  getFirestoreDocPath,
   getFirestoreCollectionPath,
+  getFirestoreDocPath,
 } from '@magnetarjs/utils-firestore'
-import { getQueryInstance, docSnapshotToDocMetadata } from '../helpers/getFirestore'
+import type { DocumentSnapshot, QueryDocumentSnapshot } from 'firebase/firestore'
+import { doc, getDoc, getDocs } from 'firebase/firestore'
 import { FirestorePluginOptions } from '../CreatePlugin'
+import { docSnapshotToDocMetadata, getQueryInstance } from '../helpers/getFirestore'
 
 export function fetchActionFactory(
   firestorePluginOptions: Required<FirestorePluginOptions>

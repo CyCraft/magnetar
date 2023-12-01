@@ -1,27 +1,29 @@
+import type {
+  CollectionFn,
+  CollectionInstance,
+  CollectionName,
+  DocFn,
+  DocInstance,
+  FetchMetaDataCollection,
+  FetchPromises,
+  GlobalConfig,
+  MagnetarInstance,
+  ModuleConfig,
+  PathFilterIdentifier,
+  PathWhereOrderByIdentifier,
+  WriteLock,
+} from '@magnetarjs/types'
+import {
+  getPathFilterIdentifier,
+  getPathWhereOrderByIdentifier,
+  MODULE_IDENTIFIER_SPLIT,
+} from '@magnetarjs/types'
 import { mapGetOrSet } from 'getorset-anything'
 import { isString } from 'is-what'
 import { createCollectionWithContext } from './Collection'
-import { defaultsGlobalConfig } from './helpers/configHelpers'
 import { createDocWithContext } from './Doc'
+import { defaultsGlobalConfig } from './helpers/configHelpers'
 import { getCollectionPathDocIdEntry } from './helpers/pathHelpers'
-import {
-  MagnetarInstance,
-  CollectionInstance,
-  DocInstance,
-  FetchPromises,
-  GlobalConfig,
-  ModuleConfig,
-  WriteLock,
-  DocFn,
-  CollectionFn,
-  FetchMetaDataCollection,
-  CollectionName,
-  getPathFilterIdentifier,
-  PathFilterIdentifier,
-  MODULE_IDENTIFIER_SPLIT,
-  PathWhereOrderByIdentifier,
-  getPathWhereOrderByIdentifier,
-} from '@magnetarjs/types'
 import { throwIfInvalidModulePath } from './helpers/throwFns'
 
 /**

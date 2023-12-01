@@ -1,9 +1,9 @@
-import {
+import type {
   ActionConfig,
+  DoOnStream,
   EventNameFnsMap,
   PluginModuleConfig,
   PluginStreamAction,
-  DoOnStream,
   StreamResponse,
 } from '@magnetarjs/types'
 

@@ -1,5 +1,5 @@
-import { isCollectionModule } from '@magnetarjs/utils'
 import type { WriteLock } from '@magnetarjs/types'
+import { isCollectionModule } from '@magnetarjs/utils'
 
 /**
  * Returns a tuple with `[CollectionPath, DocId]` if the `DocId` is `undefined` that means that the `modulePath` passed is a collection!

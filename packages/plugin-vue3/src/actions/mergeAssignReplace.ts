@@ -1,7 +1,7 @@
-import { merge } from 'merge-anything'
+import type { PluginWriteAction, PluginWriteActionPayload } from '@magnetarjs/types'
 import { isPlainObject } from 'is-what'
-import { PluginWriteAction, PluginWriteActionPayload } from '@magnetarjs/types'
-import { Vue3StoreModuleConfig, Vue3StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { merge } from 'merge-anything'
+import { MakeRestoreBackup, Vue3StoreModuleConfig, Vue3StoreOptions } from '../CreatePlugin'
 
 export function writeActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, unknown>> },

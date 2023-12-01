@@ -1,4 +1,10 @@
-import { DocMetadata, DoOnFetch, OnAddedFn, OnModifiedFn, OnRemovedFn } from '@magnetarjs/types'
+import type {
+  DocMetadata,
+  DoOnFetch,
+  OnAddedFn,
+  OnModifiedFn,
+  OnRemovedFn,
+} from '@magnetarjs/types'
 
 /**
  * Executes given function array with given args-array deconstructed, it will always use replace the first param with whatever the response of each function was.

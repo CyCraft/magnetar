@@ -1,8 +1,8 @@
-import test from 'ava'
-import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex, PokedexEntry } from '@magnetarjs/test-utils'
+import type { DocInstance } from '@magnetarjs/types'
+import test from 'ava'
 import { merge } from 'merge-anything'
-import { DocInstance } from '@magnetarjs/types'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 
 test('write: insert (document)', async (t) => {
   const { pokedexModule, magnetar } = createMagnetarInstance()

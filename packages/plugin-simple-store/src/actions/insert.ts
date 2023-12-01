@@ -1,6 +1,6 @@
-import { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/types'
-import { SimpleStoreModuleConfig, SimpleStoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import type { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/types'
 import { isFullString, isNumber } from 'is-what'
+import { MakeRestoreBackup, SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin'
 
 export function insertActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, unknown>> },

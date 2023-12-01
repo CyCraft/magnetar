@@ -1,8 +1,8 @@
+import { pokedex, PokedexEntry, pokedexGetAll, waitMs } from '@magnetarjs/test-utils'
+import type { DocInstance } from '@magnetarjs/types'
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { pokedex, PokedexEntry, pokedexGetAll, waitMs } from '@magnetarjs/test-utils'
 import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
-import { DocInstance } from '@magnetarjs/types'
 
 {
   const testName = 'insert (document)'

@@ -1,18 +1,16 @@
 import type {
-  DocumentSnapshot,
-  QuerySnapshot,
-  DocumentChange,
-  QueryDocumentSnapshot,
-  Firestore,
-} from 'firebase-admin/firestore'
-import { StreamResponse, PluginStreamAction, PluginStreamActionPayload } from '@magnetarjs/types'
+  PluginStreamAction,
+  PluginStreamActionPayload,
+  StreamResponse,
+} from '@magnetarjs/types'
 import {
   FirestoreModuleConfig,
   getFirestoreCollectionPath,
   getFirestoreDocPath,
 } from '@magnetarjs/utils-firestore'
-import { getQueryInstance, docSnapshotToDocMetadata } from '../helpers/getFirestore'
+import type { DocumentChange, DocumentSnapshot, QuerySnapshot } from 'firebase-admin/firestore'
 import { FirestoreAdminPluginOptions } from '../CreatePlugin'
+import { docSnapshotToDocMetadata, getQueryInstance } from '../helpers/getFirestore'
 
 export function streamActionFactory(
   firestorePluginOptions: Required<FirestoreAdminPluginOptions>

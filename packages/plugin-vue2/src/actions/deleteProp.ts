@@ -1,7 +1,7 @@
+import type { PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetarjs/types'
 import { isArray } from 'is-what'
 import { getProp } from 'path-to-prop'
-import { PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetarjs/types'
-import { Vue2StoreModuleConfig, Vue2StoreOptions, MakeRestoreBackup } from '../CreatePlugin'
+import { MakeRestoreBackup, Vue2StoreModuleConfig, Vue2StoreOptions } from '../CreatePlugin'
 
 export function deletePropActionFactory(
   data: { [collectionPath: string]: Record<string, Record<string, unknown>> },

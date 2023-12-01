@@ -1,4 +1,4 @@
-import { SyncBatch } from '@magnetarjs/types'
+import type { SyncBatch } from '@magnetarjs/types'
 import { FieldValue, Firestore, WriteBatch } from 'firebase-admin/firestore'
 
 function deleteField(): FieldValue {

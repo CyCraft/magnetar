@@ -1,4 +1,4 @@
-import { EventFnSuccess, QueryClause, WhereClause } from '@magnetarjs/types'
+import type { EventFnSuccess, QueryClause, WhereClause } from '@magnetarjs/types'
 import { isArray, isFullArray, isNumber } from 'is-what'
 
 /**
@@ -14,16 +14,16 @@ export function logWithFlair(message: string, ...args: any[]): void {
 
 function stringifyQueryClause(q: QueryClause): string {
   return 'or' in q
-    ? `or(${
-        isArray(q.or)
-          ? q.or.map((where) => stringifyWhereClause(where)).join(', ')
-          : stringifyQueryClause(q.or)
-      })`
-    : `and(${
-        isArray(q.and)
-          ? q.and.map((where) => stringifyWhereClause(where)).join(', ')
-          : stringifyQueryClause(q.and)
-      })`
+    ? `or(${q.or
+        .map((clause) =>
+          isArray(clause) ? stringifyWhereClause(clause) : stringifyQueryClause(clause)
+        )
+        .join(', ')})`
+    : `and(${q.and
+        .map((clause) =>
+          isArray(clause) ? stringifyWhereClause(clause) : stringifyQueryClause(clause)
+        )
+        .join(', ')})`
 }
 
 function clean(c: any): string {

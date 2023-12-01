@@ -1,4 +1,8 @@
-import { PluginRevertAction, PluginInstance, PluginRevertActionPayload } from '@magnetarjs/types'
+import type {
+  PluginInstance,
+  PluginRevertAction,
+  PluginRevertActionPayload,
+} from '@magnetarjs/types'
 import { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'
 import { FirestoreAdminPluginOptions } from '../CreatePlugin'
 

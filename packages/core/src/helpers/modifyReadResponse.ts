@@ -1,4 +1,4 @@
-import { ModifyReadResponseFnMap, ModifyReadResponseFnsMap } from '@magnetarjs/types'
+import type { ModifyReadResponseFnMap, ModifyReadResponseFnsMap } from '@magnetarjs/types'
 
 export function getModifyReadResponseFnsMap(
   ...onMaps: (ModifyReadResponseFnMap | void)[]

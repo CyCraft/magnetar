@@ -1,7 +1,7 @@
+import { pokedex, pokedexEntryDefaults } from '@magnetarjs/test-utils'
+import type { FetchResponse } from '@magnetarjs/types'
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { pokedex, pokedexEntryDefaults } from '@magnetarjs/test-utils'
-import { FetchResponse } from '@magnetarjs/types'
 
 test('write + onError: stop -- emits fail events & aborts execution by default', async (t) => {
   const { pokedexModule } = createMagnetarInstance()

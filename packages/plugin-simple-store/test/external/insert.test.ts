@@ -1,7 +1,7 @@
+import { pokedex, PokedexEntry } from '@magnetarjs/test-utils'
+import type { DocInstance } from '@magnetarjs/types'
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { pokedex, PokedexEntry } from '@magnetarjs/test-utils'
-import { DocInstance } from '@magnetarjs/types'
 
 test('insert (document)', async (t) => {
   const { pokedexModule } = createMagnetarInstance()

@@ -36,16 +36,20 @@ function queryToFilter(
   queryClause: QueryClause
 ): ReturnType<(typeof Filter)['or']> | ReturnType<(typeof Filter)['and']> {
   if ('and' in queryClause) {
-    if (isArray(queryClause.and)) {
-      return Filter.and(...queryClause.and.map((whereClause) => Filter.where(...whereClause)))
-    }
-    return queryToFilter(queryClause.and)
+    return Filter.and(
+      ...queryClause.and.map((clause) =>
+        isArray(clause) ? Filter.where(...clause) : queryToFilter(clause)
+      )
+    )
   }
-  // if ('or' in queryClause)
-  if (isArray(queryClause.or)) {
-    return Filter.or(...queryClause.or.map((whereClause) => Filter.where(...whereClause)))
+  if ('or' in queryClause) {
+    return Filter.or(
+      ...queryClause.or.map((clause) =>
+        isArray(clause) ? Filter.where(...clause) : queryToFilter(clause)
+      )
+    )
   }
-  return queryToFilter(queryClause.or)
+  throw new Error('invalid query')
 }
 
 /**

@@ -1,7 +1,7 @@
+import type { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/types'
 import { isFullString } from 'is-what'
-import { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/types'
-import { StorePluginModuleConfig, StorePluginOptions, MakeRestoreBackup } from '../CreatePlugin'
 import { throwIfEmulatedError } from '../../helpers'
+import { MakeRestoreBackup, StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin'
 
 export function deleteActionFactory(
   data: { [collectionPath: string]: Map<string, Record<string, unknown>> },

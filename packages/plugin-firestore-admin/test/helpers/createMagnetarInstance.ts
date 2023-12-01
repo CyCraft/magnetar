@@ -1,7 +1,7 @@
-import { Timestamp } from 'firebase-admin/firestore'
-import { PokedexEntry, generateRandomId, PluginMockLocal, MoveEntry } from '@magnetarjs/test-utils'
-import { MagnetarInstance, CollectionInstance, DocInstance } from '@magnetarjs/types'
 import { Magnetar } from '@magnetarjs/core'
+import { generateRandomId, MoveEntry, PluginMockLocal, PokedexEntry } from '@magnetarjs/test-utils'
+import type { CollectionInstance, DocInstance, MagnetarInstance } from '@magnetarjs/types'
+import type { Timestamp } from 'firebase-admin/firestore'
 import { CreatePlugin as CreatePluginRemote } from '../../src/index'
 import { db } from './initFirebase'
 

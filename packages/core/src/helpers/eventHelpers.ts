@@ -1,4 +1,4 @@
-import { EventNameFnMap, EventNameFnsMap } from '@magnetarjs/types'
+import type { EventNameFnMap, EventNameFnsMap } from '@magnetarjs/types'
 
 export function getEventNameFnsMap(...onMaps: (EventNameFnMap | void)[]): EventNameFnsMap {
   const _onMaps = onMaps.filter(Boolean) as EventNameFnMap[]
