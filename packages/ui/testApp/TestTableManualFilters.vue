@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { PokedexEntry } from '@magnetarjs/test-utils'
-import { WhereClause } from '@magnetarjs/types'
+import type { WhereClause } from '@magnetarjs/types'
 import { roll } from 'roll-anything'
 import { ref, watch } from 'vue'
 import {
@@ -126,7 +126,7 @@ const sValue = urlParams.get('s') || undefined
 const filtersState = ref<FiltersState>(new Map())
 
 const searchInput = ref<string>(sValue || '')
-const checkboxesInput = ref<FilterStateCheckboxes>({ or: new Set() })
+const checkboxesInput = ref<FilterStateCheckboxes>({ or: [] })
 const selectInput = ref<FilterStateOption | null>(null)
 
 // you need any fixed index to be able to save your local filter state to the `filtersState` Map.
@@ -141,10 +141,10 @@ watch(
     if (newValue) {
       /** Set it just like checkboxes */
       const filterState: FilterStateCheckboxes = {
-        or: new Set([
+        or: [
           ['title', '==', newValue.trim()],
           ['id', '==', newValue.trim()],
-        ]),
+        ],
       }
       filtersState.value.set(INDEX_SEARCH, filterState)
     }
@@ -154,12 +154,21 @@ watch(
 // prettier-ignore
 watch(
   checkboxesInput,
-  (newValue) => filtersState.value.set(INDEX_CHECKBOXES, newValue),
+  (newValue) => {
+    if (newValue.or.length) {
+      filtersState.value.set(INDEX_CHECKBOXES, newValue)
+    } else {
+      filtersState.value.delete(INDEX_CHECKBOXES)
+    }
+  },
   { deep: true }
 )
 watch(selectInput, (newValue) => {
-  if (newValue) filtersState.value.set(INDEX_SELECT, newValue)
-  if (!newValue) filtersState.value.delete(INDEX_SELECT)
+  if (newValue) {
+    filtersState.value.set(INDEX_SELECT, newValue)
+  } else {
+    filtersState.value.delete(INDEX_SELECT)
+  }
 })
 
 const optionsCheckboxes: { label: string; where: WhereClause }[] = [
@@ -192,11 +201,14 @@ const optionsSelect: { label: string; where: WhereClause }[] = [
           <label>
             <input
               type="checkbox"
-              :checked="checkboxesInput.or.has(option.where)"
+              :checked="
+                !!checkboxesInput.or.find((o) => JSON.stringify(o) === JSON.stringify(option.where))
+              "
               @change="(e) => {
                 const checked = (e.target as HTMLInputElement)?.checked || false
-                if (checked) checkboxesInput.or.add(option.where)
-                if (!checked) checkboxesInput.or.delete(option.where)
+                const existingIndex = checkboxesInput.or.findIndex(o => JSON.stringify(o) === JSON.stringify(option.where))
+                if (checked && existingIndex === -1) checkboxesInput.or.push(option.where)
+                if (!checked && existingIndex !== -1) checkboxesInput.or.splice(existingIndex, 1)
               }"
             />
             {{ option.label }}

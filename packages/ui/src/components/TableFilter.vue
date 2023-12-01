@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { CollectionInstance, WhereClause } from '@magnetarjs/types'
+import type { CollectionInstance, QueryClause, WhereClause } from '@magnetarjs/types'
+import { isAnyObject, isArray } from 'is-what'
 import { computed, watch } from 'vue'
 import {
   FilterState,
@@ -9,7 +10,7 @@ import {
   usesFilterStateInputValue,
   usesFilterStateOption,
 } from '../types'
-import { whereClausesEqual } from '../utils/tableHelpers'
+import { clausesEqual } from '../utils/tableHelpers'
 
 const props = defineProps<{
   collection: CollectionInstance<any>
@@ -22,46 +23,79 @@ const emit = defineEmits<{
   (e: 'setFilter', payload: FilterState | null): void
 }>()
 
+const ERROR_NO_CLAUSE =
+  '❗️[@magnetarjs/ui] a filter option needs one prop called `where` or `query`, got undefined'
+
+function calcCollection(clause?: WhereClause | QueryClause): CollectionInstance<any> {
+  if (isArray(clause)) {
+    return props.collection.where(...clause)
+  }
+  if (isAnyObject(clause)) {
+    return props.collection.query(clause)
+  }
+  console.error(ERROR_NO_CLAUSE)
+  return props.collection
+}
+
 watch(
   () => props.filter.options?.length,
   () => {
     const options = props.filter.options || []
     // filters with options will fetch the "record count" for each where filter in the option
     for (const option of options) {
-      props.collection.where(...option.where).fetchCount()
+      calcCollection(option.where || option.query).fetchCount()
     }
   },
   { immediate: true }
 )
 
-function setCheckbox(whereClause: WhereClause, to: boolean): void {
+function setCheckbox(clause: WhereClause | QueryClause | undefined, enabled: boolean): void {
+  if (!clause) return
+
   const { filter, filterState } = props
   if (!usesFilterStateCheckboxes(filter, filterState)) return
-  const or = !filterState ? new Set<WhereClause>() : filterState.or
-  if (!to) {
-    or.delete(whereClause)
-  } else {
-    or.add(whereClause)
+
+  let or = !filterState ? [] : filterState.or
+
+  const existingIndex = or.findIndex((_clause) => clausesEqual(_clause, clause))
+  if (!enabled && existingIndex !== -1) {
+    or.splice(existingIndex, 1)
   }
-  if (or.size === 0) {
+  if (enabled && existingIndex === -1) {
+    or.push(clause)
+  }
+
+  if (or.length === 0) {
     emit('setFilter', null)
   } else {
     emit('setFilter', { or })
   }
 }
 
-function setRadioTo(whereClause: WhereClause | null): void {
-  if (!whereClause) return emit('setFilter', null)
-  return emit('setFilter', whereClause)
+function setOptionTo(clause: WhereClause | QueryClause | null | undefined): void {
+  if (clause === undefined) {
+    console.error(ERROR_NO_CLAUSE)
+    return
+  }
+  if (clause === null) {
+    emit('setFilter', null)
+    return
+  }
+  if (isArray(clause)) {
+    emit('setFilter', { and: [clause] })
+  } else {
+    emit('setFilter', clause)
+  }
 }
 
-const selectModel = computed({
-  get: (): WhereClause | undefined => {
+const selectModel = computed<WhereClause | QueryClause | undefined>({
+  get: () => {
     const { filter, filterState } = props
     if (!usesFilterStateOption(filter, filterState)) return undefined
-    return filter.options?.find((o) => whereClausesEqual(o.where, filterState))?.where
+    const clause = filter.options?.find((o) => clausesEqual(o.where, filterState))
+    return clause?.where || clause?.query
   },
-  set: (where: WhereClause | undefined) => setRadioTo(where || null),
+  set: (clause) => setOptionTo(clause),
 })
 
 let timeoutDebounce: any
@@ -119,14 +153,18 @@ const filterAttrs = computed<{
         :style="option.style"
       >
         <input
-          :id="JSON.stringify(option.where)"
+          :id="JSON.stringify(option.where || option.query)"
           type="checkbox"
-          :checked="filterState?.or?.has(option.where) || false"
-          @change="(e) => setCheckbox(option.where, (e.target as HTMLInputElement)?.checked || false)"
+          :checked="
+            !!filterState?.or?.find((_clause) =>
+              clausesEqual(_clause, option.where || option.query)
+            )
+          "
+          @change="(e) => setCheckbox(option.where || option.query, (e.target as HTMLInputElement)?.checked || false)"
         />
-        <label :for="JSON.stringify(option.where)"
+        <label :for="JSON.stringify(option.where || option.query)"
           >{{ parseLabel ? parseLabel(option.label) : option.label }}
-          <small> ({{ props.collection.where(...option.where).count }})</small></label
+          <small> ({{ calcCollection(option.where || option.query).count }})</small></label
         >
       </div>
     </template>
@@ -140,16 +178,16 @@ const filterAttrs = computed<{
         :style="option.style"
       >
         <input
-          :id="JSON.stringify(option.where)"
+          :id="JSON.stringify(option.where || option.query)"
           type="radio"
-          :checked="whereClausesEqual(filterState, option.where)"
+          :checked="clausesEqual(filterState, option.where || option.query)"
           @change="(e) =>
-              setRadioTo((e.target as HTMLInputElement)?.checked ? option.where : null)
+              setOptionTo((e.target as HTMLInputElement)?.checked ? (option.where || option.query) : null)
             "
         />
-        <label :for="JSON.stringify(option.where)"
+        <label :for="JSON.stringify(option.where || option.query)"
           >{{ parseLabel ? parseLabel(option.label) : option.label }}
-          <small> ({{ props.collection.where(...option.where).count }})</small></label
+          <small> ({{ calcCollection(option.where || option.query).count }})</small></label
         >
       </div>
     </template>
@@ -157,16 +195,16 @@ const filterAttrs = computed<{
     <template v-if="filter.type === 'select' && usesFilterStateOption(filter, filterState)">
       <!-- SELECT -->
       <select v-model="selectModel">
-        <option>{{ filterAttrs.placeholder || '--' }}</option>
+        <option :value="null">{{ filterAttrs.placeholder || '--' }}</option>
         <option
           v-for="option in filter.options"
           :key="option.label"
-          :value="option.where"
+          :value="option.where || option.query"
           :class="option.class"
           :style="option.style"
         >
           {{ parseLabel ? parseLabel(option.label) : option.label }}
-          <small> ({{ props.collection.where(...option.where).count }})</small>
+          <small> ({{ calcCollection(option.where || option.query).count }})</small>
         </option>
       </select>
     </template>

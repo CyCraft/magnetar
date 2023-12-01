@@ -1,4 +1,11 @@
-import { OPathsWithOptional, WhereClause, WhereClauseTuple, WhereFilterOp } from '@magnetarjs/types'
+import type {
+  OPathsWithOptional,
+  Query,
+  QueryClause,
+  WhereClause,
+  WhereClauseTuple,
+  WhereFilterOp,
+} from '@magnetarjs/types'
 import { Ref } from 'vue'
 
 export type OPaths<T> = OPathsWithOptional<T>
@@ -195,7 +202,10 @@ export type MUIFilter<T extends Record<string, any>, Label = string> = {
      */
     style?: string
     label: Label
-    where: WhereClauseTuple<T>
+    /** Choose either `where` or `query` for an option */
+    where?: WhereClauseTuple<T>
+    /** Choose either `query` or `where` for an option */
+    query?: Query<T>
     checked?: boolean
   }[]
   /**
@@ -357,15 +367,17 @@ export type MUIRows<T extends Record<string, any>> = T[]
  * - used for filters with `type: 'checkboxes'`.
  * - this value is used to apply which of the checkboxes are checked.
  */
-export type FilterStateCheckboxes = { or: Set<WhereClause> }
+export type FilterStateCheckboxes = { or: (WhereClause | QueryClause)[] }
 /**
  * - used for filters with `type: 'select' | 'radio'`.
  * - this value is used to apply which of the radio/select options are checked.
  */
-export type FilterStateOption = WhereClause
+export type FilterStateOption = QueryClause
 /**
  * - used for filters with `type: 'text' | 'date' | 'number'`.
  * - this value will be converted to whatever you defined as the `where` clause of the filter.
+ * - the reason it can only be a string is because it will be connected to an `<input />` element.
+ *   its value needs to be parsed via the Filter settings. See {@link MUIFilter} `where` / `query` props.
  */
 export type FilterStateInputValue = string
 /**

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CollectionInstance } from '@magnetarjs/types'
+import type { CollectionInstance } from '@magnetarjs/types'
 import { useElementSize } from '@vueuse/core'
 import { isAnyObject, isArray, isError, isPlainObject } from 'is-what'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'

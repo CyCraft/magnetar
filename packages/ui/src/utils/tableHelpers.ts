@@ -1,10 +1,10 @@
-import { CollectionInstance, WhereClause, WhereFilterOp } from '@magnetarjs/types'
+import type { CollectionInstance, QueryClause, WhereClause, WhereFilterOp } from '@magnetarjs/types'
 import { sort } from 'fast-sort'
-import { mapGetOrSet } from 'getorset-anything'
 import { isArray, isPlainObject, isString } from 'is-what'
 import {
   EntryOfOrderByState,
   FiltersState,
+  FilterStateCheckboxes,
   MUIColumn,
   MUIFilter,
   OPaths,
@@ -23,14 +23,11 @@ export function isEqual(a: any | any[], b: any | any[]): boolean {
   return a === b
 }
 
-export function whereClausesEqual(where1?: WhereClause, where2?: WhereClause): boolean {
-  return (
-    !!where1 &&
-    !!where2 &&
-    isEqual(where1[0], where2[0]) &&
-    isEqual(where1[1], where2[1]) &&
-    isEqual(where1[2], where2[2])
-  )
+export function clausesEqual(
+  clause1?: WhereClause | QueryClause,
+  clause2?: WhereClause | QueryClause
+): boolean {
+  return !!clause1 && !!clause2 && JSON.stringify(clause1) === JSON.stringify(clause2)
 }
 
 export function filtersAndColumnsToInitialState(params: {
@@ -42,35 +39,44 @@ export function filtersAndColumnsToInitialState(params: {
 } {
   const { columns, filters } = params
   // remember, see `FiltersState` for instructions how to save the state.
-  const _filtersState = filters.reduce<FiltersState>((map, f, i) => {
+  const newFiltersState = filters.reduce<FiltersState>((_filtersState, f, i) => {
     if (f.type === 'radio' || f.type === 'select') {
       const firstChecked = f.options?.find((o) => o.checked)
-      if (firstChecked) map.set(i, firstChecked.where)
-    }
-    if (f.type === 'checkboxes') {
-      for (const option of f.options || []) {
-        if (option.checked) {
-          const state = mapGetOrSet(map, i, () => ({ or: new Set() }))
-          state.or.add(option.where)
+      if (firstChecked) {
+        if (firstChecked.where) {
+          _filtersState.set(i, { and: firstChecked.where })
+        }
+        if (firstChecked.query) {
+          _filtersState.set(i, firstChecked.query)
         }
       }
     }
+    if (f.type === 'checkboxes') {
+      const state: FilterStateCheckboxes = { or: [] }
+      for (const option of f.options || []) {
+        if (option.checked) {
+          if (option.where) state.or.push(option.where)
+          if (option.query) state.or.push(option.query)
+        }
+      }
+      if (state.or.length) _filtersState.set(i, state)
+    }
     if (f.type === 'text' || f.type === 'number' || f.type === 'date') {
       if (f.initialValue !== undefined) {
-        map.set(i, f.initialValue)
+        _filtersState.set(i, f.initialValue)
       }
     }
-    return map
+    return _filtersState
   }, new Map())
 
   // maybe we needed to clear other filters, let's do that for the first filter we find that needs it
-  const entryThatClearsOtherFilters = [..._filtersState.entries()].find(([filterIndex]) => {
+  const entryThatClearsOtherFilters = [...newFiltersState.entries()].find(([filterIndex]) => {
     const filter = filters[filterIndex]
     return filter?.clearOtherFilters
   })
   const filtersState = entryThatClearsOtherFilters
     ? new Map([entryThatClearsOtherFilters])
-    : _filtersState
+    : newFiltersState
 
   // maybe we needed to clear other orderBy, let's do that for the first filter we find that needs it
   const entryThatClearsOtherOrderBy = [...filtersState.entries()].find(([filterIndex]) => {
@@ -109,17 +115,15 @@ export function getRequiredOrderByBasedOnFilters(
   return [...filtersState.values()].reduce<EntryOfOrderByState[]>((orderByEntries, filterState) => {
     if (!filterState) return orderByEntries
 
-    const whereClauses = isString(filterState)
-      ? []
-      : isArray(filterState)
-      ? [filterState]
-      : [...filterState.or]
-    // : 'and' in filterState
-    // ? [...filterState.and]
-    // : [...filterState.or]
-    const firstWhereClause = whereClauses[0]
+    const firstClause: WhereClause | QueryClause | undefined = isString(filterState)
+      ? undefined
+      : 'or' in filterState && isArray(filterState.or[0])
+      ? filterState.or[0]
+      : 'and' in filterState && isArray(filterState.and[0])
+      ? filterState.and[0]
+      : undefined
 
-    const op: WhereFilterOp = firstWhereClause?.[1]
+    const op: WhereFilterOp | undefined = firstClause?.[1]
     /**
      * Optionally an `orderBy` might need to be set for a certain where filter
      *
@@ -128,8 +132,8 @@ export function getRequiredOrderByBasedOnFilters(
      */
     const alsoApplyOrderBy =
       op === '!=' || op === '<' || op === '<=' || op === '>' || op === '>=' || op === 'not-in'
-    if (firstWhereClause && alsoApplyOrderBy) {
-      const fieldPath = firstWhereClause[0]
+    if (firstClause && alsoApplyOrderBy) {
+      const fieldPath = firstClause[0]
       const direction = 'asc'
       // must be inserted at position 0
       orderByEntries.push([fieldPath, direction])
@@ -191,85 +195,74 @@ function combineWhereClausesWherePossible(whereClauses: WhereClause[]): WhereCla
 export function filterStateToClauses(
   state: FiltersState,
   filters: MUIFilter<any, any>[]
-): { filterIndex: number; result: WhereClause | { or: WhereClause[] } }[] {
+): {
+  /** `filterIndex` is needed to be able to clear the filters again */
+  filterIndex: number
+  result: WhereClause[] | QueryClause
+}[] {
   return [...state.entries()].reduce<
-    { filterIndex: number; result: WhereClause | { or: WhereClause[] } }[]
+    { filterIndex: number; result: WhereClause[] | QueryClause }[]
   >((results, entry) => {
     const [filterIndex, state] = entry
 
     if (!state) return results
 
-    if (isArray(state)) {
+    if (isString(state)) {
+      // we need to convert the string to a where clause as per the filter spec
+      const filter = filters[filterIndex]
+      if (
+        !filter ||
+        (filter.type !== 'text' && filter.type !== 'number' && filter.type !== 'date')
+      ) {
+        return results
+      }
+
+      if (filter.where) {
+        const [fieldPath, op, parseInput] = filter.where
+        results.push({ filterIndex, result: [[fieldPath, op, parseInput(state)]] })
+        return results
+      }
+
+      if (filter.query) {
+        const ors = filter.query.or.map<WhereClause>((where) => {
+          const [fieldPath, op, parseInput] = where
+          return [fieldPath, op, parseInput(state)]
+        })
+        results.push({ filterIndex, result: { or: ors } })
+        return results
+      }
+      return results
+    }
+
+    function hasWhereFiltersAND(payload?: QueryClause): payload is { and: WhereClause[] } {
+      return !!payload && 'and' in payload && payload.and.every((clause) => isArray(clause))
+    }
+    function hasWhereFiltersOR(payload?: QueryClause): payload is { or: WhereClause[] } {
+      return !!payload && 'or' in payload && payload.or.every((clause) => isArray(clause))
+    }
+
+    const combinedWheres = hasWhereFiltersAND(state)
+      ? combineWhereClausesWherePossible(state.and)
+      : hasWhereFiltersOR(state)
+      ? combineWhereClausesWherePossible(state.or)
+      : 'query-with-nested-queries'
+
+    if (combinedWheres === 'query-with-nested-queries') {
       results.push({ filterIndex, result: state })
       return results
     }
 
-    // TODO: not yet implemented
-    // if ('and' in state) {
-    //   const set = state.and
-    //   if (set.size === 0) return results
-    //   if (set.size === 1) {
-    //     const result = ([...set][0])
-    //     results.push({ filterIndex, result })
-    //     return results
-    //   }
-    //   const combinedWheres = combineWhereClausesWherePossible([...set])
-    //   if (combinedWheres.length === 1) {
-    //     const result = (combinedWheres[0])
-    //     results.push({ filterIndex, result })
-    //     return results
-    //   }
-    //   const result = ({ and: combinedWheres })
-    //   results.push({ filterIndex, result })
-    //   return results
-    // }
+    if (!combinedWheres.length) return results
 
-    if (isString(state) || 'or' in state) {
-      const set = isString(state)
-        ? (() => {
-            // we need to convert the string to a where clause as per the filter spec
-            const filter = filters[filterIndex]
-            if (
-              !filter ||
-              (filter.type !== 'text' && filter.type !== 'number' && filter.type !== 'date')
-            ) {
-              return new Set<WhereClause>()
-            }
-
-            const whereClauseSpecs = isArray(filter.where)
-              ? [filter.where]
-              : filter.query && isArray(filter.query.or)
-              ? filter.query.or
-              : []
-            const whereClauses: WhereClause[] =
-              whereClauseSpecs?.map<WhereClause>((spec) => {
-                const [fieldPath, op, parseInput] = spec
-                return [fieldPath, op, parseInput(state)]
-              }) || []
-            return new Set<WhereClause>(whereClauses)
-          })()
-        : state.or
-
-      if (set.size === 0) return results
-      if (set.size === 1) {
-        const result = [...set][0]
-        results.push({ filterIndex, result })
-        return results
-      }
-      /**
-       * Perhaps we can combine all of these into 1?
-       */
-      const combinedWheres = combineWhereClausesWherePossible([...set])
-      if (combinedWheres.length === 1) {
-        const result = combinedWheres[0]
-        results.push({ filterIndex, result })
-        return results
-      }
-      const result = { or: combinedWheres }
-      results.push({ filterIndex, result })
+    if (hasWhereFiltersAND(state) || combinedWheres.length === 1) {
+      results.push({ filterIndex, result: combinedWheres })
       return results
     }
 
+    if (hasWhereFiltersOR(state)) {
+      results.push({ filterIndex, result: { or: combinedWheres } })
+      return results
+    }
     return results
   }, [])
 }
@@ -289,7 +282,9 @@ export function calcCollection(
   const clauses = filterStateToClauses(filtersState, filters).map(({ result }) => result)
   for (const whereOrQuery of clauses) {
     if (isArray(whereOrQuery)) {
-      collection = collection.where(...whereOrQuery)
+      for (const where of whereOrQuery) {
+        collection = collection.where(...where)
+      }
     } else {
       collection = collection.query(whereOrQuery)
     }
