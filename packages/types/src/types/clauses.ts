@@ -43,7 +43,9 @@ export type OrderByClause = [string, ('asc' | 'desc')?]
  * It has no knowledge on the actual types of the data.
  * The orderBy clause is defined in a more complex manner at `CollectionInstance["query"]`
  */
-export type QueryClause = { and: WhereClause[] | QueryClause } | { or: WhereClause[] | QueryClause }
+export type QueryClause =
+  | { and: (WhereClause | QueryClause)[] }
+  | { or: (WhereClause | QueryClause)[] }
 
 /**
  * The maximum number of items to return.
@@ -79,5 +81,5 @@ export type WhereClauseTuple<
 ]
 
 export type Query<T extends Record<string, any> = Record<string, any>> =
-  | { or: WhereClauseTuple<T>[] | Query<T> }
-  | { and: WhereClauseTuple<T>[] | Query<T> }
+  | { or: (WhereClauseTuple<T> | Query<T>)[] }
+  | { and: (WhereClauseTuple<T> | Query<T>)[] }
