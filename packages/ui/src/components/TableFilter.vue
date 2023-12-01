@@ -92,7 +92,9 @@ const selectModel = computed<WhereClause | QueryClause | undefined>({
   get: () => {
     const { filter, filterState } = props
     if (!usesFilterStateOption(filter, filterState)) return undefined
-    const clause = filter.options?.find((o) => clausesEqual(o.where, filterState))
+    const clause = filter.options?.find((o) =>
+      clausesEqual(o.where ? { and: [o.where] } : o.query, filterState)
+    )
     return clause?.where || clause?.query
   },
   set: (clause) => setOptionTo(clause),
