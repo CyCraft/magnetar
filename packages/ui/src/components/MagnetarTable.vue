@@ -289,11 +289,13 @@ const labelsPagination = computed(() => ({
   'magnetar table previous-next next button': muiLabel('magnetar table previous-next next button'),
   'magnetar table previous-next end': muiLabel('magnetar table previous-next end'),
 }))
+
+const debugMode = !!localStorage.getItem('DEBUG')
 </script>
 
 <template>
   <div class="magnetar-table magnetar-column magnetar-gap-md">
-    <section v-if="filters?.length" class="magnetar-column magnetar-gap-sm">
+    <section v-if="filters?.length || debugMode" class="magnetar-column magnetar-gap-sm">
       <div class="magnetar-row magnetar-gap-sm">
         <h6>
           {{
