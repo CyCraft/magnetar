@@ -163,6 +163,33 @@ export type MUIPagination = {
   kind?: 'fetch-more' | 'previous-next'
 }
 
+/**
+ * The options to be rendered for the radio/select/checkboxes filter.
+ *
+ * - `type: 'select' | 'checkboxes' | 'radio'`
+ *   - available
+ * - `type: 'text' | 'date' | 'number'`
+ *   - not available
+ */
+export type MUIFilterOption<T extends Record<string, any>, Label = string> = {
+  /**
+   * Applied to the option
+   * @example 'flex-column'
+   */
+  class?: string
+  /**
+   * Applied to the option
+   * @example 'display: flex; flex-direction: column;'
+   */
+  style?: string
+  label: Label
+  /** Choose either `where` or `query` for an option */
+  where?: WhereClauseTuple<T>
+  /** Choose either `query` or `where` for an option */
+  query?: Query<T>
+  checked?: boolean
+}
+
 export type MUIFilter<T extends Record<string, any>, Label = string> = {
   /**
    * The filter label, will also be piped through `parseLabel` if you passed it to the table.
@@ -190,24 +217,7 @@ export type MUIFilter<T extends Record<string, any>, Label = string> = {
    * - `type: 'text' | 'date' | 'number'`
    *   - not available
    */
-  options?: {
-    /**
-     * Applied to the option
-     * @example 'flex-column'
-     */
-    class?: string
-    /**
-     * Applied to the option
-     * @example 'display: flex; flex-direction: column;'
-     */
-    style?: string
-    label: Label
-    /** Choose either `where` or `query` for an option */
-    where?: WhereClauseTuple<T>
-    /** Choose either `query` or `where` for an option */
-    query?: Query<T>
-    checked?: boolean
-  }[]
+  options?: MUIFilterOption<T, Label>[]
   /**
    * - `type: 'text' | 'date' | 'number'`
    *   - use either `where` OR `query`
@@ -372,7 +382,7 @@ export type FilterStateCheckboxes = { or: (WhereClause | QueryClause)[] }
  * - used for filters with `type: 'select' | 'radio'`.
  * - this value is used to apply which of the radio/select options are checked.
  */
-export type FilterStateOption = QueryClause
+export type FilterStateOption = WhereClause | QueryClause
 /**
  * - used for filters with `type: 'text' | 'date' | 'number'`.
  * - this value will be converted to whatever you defined as the `where` clause of the filter.

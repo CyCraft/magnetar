@@ -5,12 +5,16 @@ import { computed, watch } from 'vue'
 import {
   FilterState,
   MUIFilter,
+  MUIFilterOption,
   MUIParseLabel,
   usesFilterStateCheckboxes,
   usesFilterStateInputValue,
   usesFilterStateOption,
 } from '../types'
 import { clausesEqual } from '../utils/tableHelpers'
+import FilterCheckboxes from './FilterCheckboxes.vue'
+import FilterRadio from './FilterRadio.vue'
+import FilterSelect from './FilterSelect.vue'
 
 const props = defineProps<{
   collection: CollectionInstance<any>
@@ -49,55 +53,59 @@ watch(
   { immediate: true }
 )
 
-function setCheckbox(clause: WhereClause | QueryClause | undefined, enabled: boolean): void {
-  if (!clause) return
+const filterValueOptionDic = computed<Record<string, MUIFilterOption<Record<string, any>, any>>>(
+  () =>
+    props.filter.options?.reduce(
+      (dic, option) => ({ ...dic, [JSON.stringify(option.where || option.query)]: option }),
+      {}
+    ) || {}
+)
 
-  const { filter, filterState } = props
-  if (!usesFilterStateCheckboxes(filter, filterState)) return
+const filterOptions = computed<
+  { label: string; sublabel?: string; value: string; class?: string; style?: string }[]
+>(() =>
+  Object.entries(filterValueOptionDic.value).map(([value, option]) => ({
+    value,
+    label: props.parseLabel ? props.parseLabel(option.label) : option.label,
+    sublabel: ` (${calcCollection(option.where || option.query).count})`,
+    class: option.class,
+    style: option.style,
+  }))
+)
 
-  let or = !filterState ? [] : filterState.or
-
-  const existingIndex = or.findIndex((_clause) => clausesEqual(_clause, clause))
-  if (!enabled && existingIndex !== -1) {
-    or.splice(existingIndex, 1)
-  }
-  if (enabled && existingIndex === -1) {
-    or.push(clause)
-  }
-
-  if (or.length === 0) {
-    emit('setFilter', null)
-  } else {
-    emit('setFilter', { or })
-  }
-}
-
-function setOptionTo(clause: WhereClause | QueryClause | null | undefined): void {
-  if (clause === undefined) {
-    console.error(ERROR_NO_CLAUSE)
-    return
-  }
-  if (clause === null) {
-    emit('setFilter', null)
-    return
-  }
-  if (isArray(clause)) {
-    emit('setFilter', { and: [clause] })
-  } else {
-    emit('setFilter', clause)
-  }
-}
-
-const selectModel = computed<WhereClause | QueryClause | undefined>({
+const selectModel = computed<string | null>({
   get: () => {
     const { filter, filterState } = props
-    if (!usesFilterStateOption(filter, filterState)) return undefined
-    const clause = filter.options?.find((o) =>
-      clausesEqual(o.where ? { and: [o.where] } : o.query, filterState)
-    )
-    return clause?.where || clause?.query
+    if (!usesFilterStateOption(filter, filterState)) return null
+    const clause = filter.options?.find((o) => clausesEqual(o.where || o.query, filterState))
+    return JSON.stringify(clause?.where || clause?.query)
   },
-  set: (clause) => setOptionTo(clause),
+  set: (newValue) => {
+    if (!newValue) return emit('setFilter', null)
+    const option = filterValueOptionDic.value[newValue]
+    if (!option) console.error(ERROR_NO_CLAUSE)
+    emit('setFilter', option.where || option.query || null)
+  },
+})
+
+const checkboxModel = computed<string[]>({
+  get: () => {
+    const { filter, filterState } = props
+    if (!usesFilterStateCheckboxes(filter, filterState)) return []
+    return filterState?.or.map((clause) => JSON.stringify(clause)) || []
+  },
+  set: (newValues) => {
+    if (!newValues) return emit('setFilter', null)
+    const options = newValues.map((newValue) => filterValueOptionDic.value[newValue])
+    const or = options
+      .map<QueryClause | WhereClause | undefined>((option) => option.where || option.query)
+      .filter((clause): clause is QueryClause | WhereClause => !!clause)
+    if (or.length === 0) {
+      emit('setFilter', null)
+    } else {
+      emit('setFilter', { or })
+    }
+  },
 })
 
 let timeoutDebounce: any
@@ -148,67 +156,21 @@ const filterAttrs = computed<{
 
     <template v-if="filter.type === 'checkboxes' && usesFilterStateCheckboxes(filter, filterState)">
       <!-- CHECKBOXES -->
-      <div
-        v-for="option in filter.options"
-        class="magnetar-inline-block"
-        :class="option.class"
-        :style="option.style"
-      >
-        <input
-          :id="JSON.stringify(option.where || option.query)"
-          type="checkbox"
-          :checked="
-            !!filterState?.or?.find((_clause) =>
-              clausesEqual(_clause, option.where || option.query)
-            )
-          "
-          @change="(e) => setCheckbox(option.where || option.query, (e.target as HTMLInputElement)?.checked || false)"
-        />
-        <label :for="JSON.stringify(option.where || option.query)"
-          >{{ parseLabel ? parseLabel(option.label) : option.label }}
-          <small> ({{ calcCollection(option.where || option.query).count }})</small></label
-        >
-      </div>
+      <FilterCheckboxes v-model="checkboxModel" :options="filterOptions" />
     </template>
 
     <template v-if="filter.type === 'radio' && usesFilterStateOption(filter, filterState)">
       <!-- RADIO -->
-      <div
-        v-for="option in filter.options"
-        class="magnetar-inline-block"
-        :class="option.class"
-        :style="option.style"
-      >
-        <input
-          :id="JSON.stringify(option.where || option.query)"
-          type="radio"
-          :checked="clausesEqual(filterState, option.where || option.query)"
-          @change="(e) =>
-              setOptionTo((e.target as HTMLInputElement)?.checked ? (option.where || option.query) : null)
-            "
-        />
-        <label :for="JSON.stringify(option.where || option.query)"
-          >{{ parseLabel ? parseLabel(option.label) : option.label }}
-          <small> ({{ calcCollection(option.where || option.query).count }})</small></label
-        >
-      </div>
+      <FilterRadio v-model="selectModel" :options="filterOptions" />
     </template>
 
     <template v-if="filter.type === 'select' && usesFilterStateOption(filter, filterState)">
       <!-- SELECT -->
-      <select v-model="selectModel">
-        <option :value="null">{{ filterAttrs.placeholder || '--' }}</option>
-        <option
-          v-for="option in filter.options"
-          :key="option.label"
-          :value="option.where || option.query"
-          :class="option.class"
-          :style="option.style"
-        >
-          {{ parseLabel ? parseLabel(option.label) : option.label }}
-          <small> ({{ calcCollection(option.where || option.query).count }})</small>
-        </option>
-      </select>
+      <FilterSelect
+        v-model="selectModel"
+        :options="filterOptions"
+        :placeholder="filterAttrs.placeholder || '--'"
+      />
     </template>
 
     <template v-if="filter.type === 'text' || filter.type === 'number' || filter.type === 'date'">
@@ -226,7 +188,7 @@ const filterAttrs = computed<{
   </fieldset>
 </template>
 
-<style lang="sass" scoped>
+<style lang="sass">
 .magnetar-table-filter
   border: thin solid
   .magnetar-inline-block

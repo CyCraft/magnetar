@@ -241,6 +241,12 @@ export function filterStateToClauses(
       return !!payload && 'or' in payload && payload.or.every((clause) => isArray(clause))
     }
 
+    // the case where `FilterStateOption` is `WhereClause`
+    if (isArray(state)) {
+      results.push({ filterIndex, result: [state] })
+      return results
+    }
+
     const combinedWheres = hasWhereFiltersAND(state)
       ? combineWhereClausesWherePossible(state.and)
       : hasWhereFiltersOR(state)
