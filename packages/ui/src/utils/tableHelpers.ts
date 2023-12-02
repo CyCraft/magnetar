@@ -44,7 +44,7 @@ export function filtersAndColumnsToInitialState(params: {
       const firstChecked = f.options?.find((o) => o.checked)
       if (firstChecked) {
         if (firstChecked.where) {
-          _filtersState.set(i, { and: [firstChecked.where] })
+          _filtersState.set(i, firstChecked.where)
         }
         if (firstChecked.query) {
           _filtersState.set(i, firstChecked.query)

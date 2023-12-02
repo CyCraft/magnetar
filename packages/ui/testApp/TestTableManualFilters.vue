@@ -220,11 +220,7 @@ const optionsSelect: { label: string; where: WhereClause }[] = [
         <legend>Titles starting with...</legend>
         <select v-model="selectInput">
           <option :value="null">--</option>
-          <option
-            v-for="option in optionsSelect"
-            :key="option.label"
-            :value="{ and: [option.where] }"
-          >
+          <option v-for="option in optionsSelect" :key="option.label" :value="option.where">
             {{ option.label }}
           </option>
         </select>
