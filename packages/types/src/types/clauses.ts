@@ -36,6 +36,10 @@ export type WhereClause = [string, WhereFilterOp, any]
  */
 export type OrderByClause = [string, ('asc' | 'desc')?]
 
+export type NestedQueryClause =
+  | { and: (WhereClause | { and: (WhereClause | any)[] } | { or: (WhereClause | any)[] })[] }
+  | { or: (WhereClause | { and: (WhereClause | any)[] } | { or: (WhereClause | any)[] })[] }
+
 /**
  * Determines a complex queries of where-filter with ANDs and ORs.
  *
@@ -44,8 +48,8 @@ export type OrderByClause = [string, ('asc' | 'desc')?]
  * The orderBy clause is defined in a more complex manner at `CollectionInstance["query"]`
  */
 export type QueryClause =
-  | { and: (WhereClause | QueryClause)[] }
-  | { or: (WhereClause | QueryClause)[] }
+  | { and: (WhereClause | NestedQueryClause)[] }
+  | { or: (WhereClause | NestedQueryClause)[] }
 
 /**
  * The maximum number of items to return.
@@ -80,6 +84,22 @@ export type WhereClauseTuple<
   value: WhereFilterValue<WhereOp, DefaultTo<DeepPropType<T, Path>, any>>
 ]
 
+export type NestedQuery<T extends Record<string, any> = Record<string, any>> =
+  | {
+      and: (
+        | WhereClauseTuple<T>
+        | { and: (WhereClauseTuple<T> | any)[] }
+        | { or: (WhereClauseTuple<T> | any)[] }
+      )[]
+    }
+  | {
+      or: (
+        | WhereClauseTuple<T>
+        | { and: (WhereClauseTuple<T> | any)[] }
+        | { or: (WhereClauseTuple<T> | any)[] }
+      )[]
+    }
+
 export type Query<T extends Record<string, any> = Record<string, any>> =
-  | { or: (WhereClauseTuple<T> | Query<T>)[] }
-  | { and: (WhereClauseTuple<T> | Query<T>)[] }
+  | { or: (WhereClauseTuple<T> | NestedQuery<T>)[] }
+  | { and: (WhereClauseTuple<T> | NestedQuery<T>)[] }
