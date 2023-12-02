@@ -33,17 +33,17 @@
   "dependencies": {
     "@magnetarjs/types": "workspace:*",
     "@magnetarjs/utils": "workspace:*",
-    "copy-anything": "^3.0.2",
-    "filter-anything": "^3.0.3",
-    "getorset-anything": "^0.0.3",
-    "is-what": "^4.1.7",
-    "merge-anything": "^5.1.1",
-    "path-to-prop": "2.0.2"
+    "copy-anything": "^3.0.5",
+    "filter-anything": "^3.0.7",
+    "getorset-anything": "^0.0.5",
+    "is-what": "^4.1.16",
+    "merge-anything": "^5.1.7",
+    "path-to-prop": "2.0.4"
   },
   "devDependencies": {
     "@magnetarjs/core": "workspace:*",
     "@magnetarjs/test-utils": "workspace:*",
-    "vue": "^3.2.45"
+    "vue": "^3.3.9"
   },
   "keywords": [
     "reactive-store",

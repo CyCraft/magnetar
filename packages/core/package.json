@@ -30,9 +30,9 @@
   "dependencies": {
     "@magnetarjs/types": "workspace:*",
     "@magnetarjs/utils": "workspace:*",
-    "getorset-anything": "^0.0.3",
-    "is-what": "^4.1.7",
-    "merge-anything": "^5.1.1"
+    "getorset-anything": "^0.0.5",
+    "is-what": "^4.1.16",
+    "merge-anything": "^5.1.7"
   },
   "devDependencies": {
     "@magnetarjs/test-utils": "workspace:*"

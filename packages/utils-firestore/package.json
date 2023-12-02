@@ -31,15 +31,15 @@
   "dependencies": {
     "@magnetarjs/types": "workspace:*",
     "@magnetarjs/utils": "workspace:*",
-    "flatten-anything": "^3.0.2",
-    "getorset-anything": "^0.0.3",
-    "is-what": "^4.1.7",
-    "merge-anything": "^5.1.1",
-    "remove-anything": "^1.0.3"
+    "flatten-anything": "^3.0.5",
+    "getorset-anything": "^0.0.5",
+    "is-what": "^4.1.16",
+    "merge-anything": "^5.1.7",
+    "remove-anything": "^1.0.5"
   },
   "devDependencies": {
-    "firebase": "^10.1.0",
-    "firebase-admin": "^11.10.1"
+    "firebase": "^10.7.0",
+    "firebase-admin": "^11.11.1"
   },
   "keywords": [
     "magnetar-utils",

@@ -29,22 +29,22 @@
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "peerDependencies": {
-    "firebase-admin": "^11.10.1"
+    "firebase-admin": "^11.11.1"
   },
   "dependencies": {
     "@magnetarjs/types": "workspace:*",
     "@magnetarjs/utils-firestore": "workspace:*",
-    "flatten-anything": "^3.0.2",
-    "getorset-anything": "^0.0.3",
-    "is-what": "^4.1.7",
-    "merge-anything": "^5.1.1",
-    "remove-anything": "^1.0.3"
+    "flatten-anything": "^3.0.5",
+    "getorset-anything": "^0.0.5",
+    "is-what": "^4.1.16",
+    "merge-anything": "^5.1.7",
+    "remove-anything": "^1.0.5"
   },
   "devDependencies": {
     "@magnetarjs/core": "workspace:*",
     "@magnetarjs/test-utils": "workspace:*",
     "array-shuffle": "^3.0.0",
-    "firebase-admin": "^11.10.1"
+    "firebase-admin": "^11.11.1"
   },
   "keywords": [
     "magnetar-plugin",

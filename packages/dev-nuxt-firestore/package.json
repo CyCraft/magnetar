@@ -13,12 +13,12 @@
     "@magnetarjs/core": "workspace:*",
     "@magnetarjs/plugin-firestore": "workspace:*",
     "@magnetarjs/plugin-vue3": "workspace:*",
-    "firebase": "^10.1.0"
+    "firebase": "^10.7.0"
   },
   "devDependencies": {
-    "nuxt": "^3.2.3",
-    "@nuxt/devtools": "^0.2.4",
-    "vue": "^3.2.45"
+    "nuxt": "^3.8.2",
+    "@nuxt/devtools": "^0.8.5",
+    "vue": "^3.3.9"
   },
   "version": "0.16.5"
 }
