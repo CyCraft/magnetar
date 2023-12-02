@@ -1,12 +1,13 @@
 import type { CollectionInstance, QueryClause, WhereClause, WhereFilterOp } from '@magnetarjs/types'
 import { sort } from 'fast-sort'
 import { isArray, isPlainObject, isString } from 'is-what'
-import {
+import type {
   EntryOfOrderByState,
   FiltersState,
   FilterStateCheckboxes,
   MUIColumn,
   MUIFilter,
+  MUIFilterOption,
   OPaths,
   OrderByState,
 } from '../types'
@@ -40,8 +41,9 @@ export function filtersAndColumnsToInitialState(params: {
   const { columns, filters } = params
   // remember, see `FiltersState` for instructions how to save the state.
   const newFiltersState = filters.reduce<FiltersState>((_filtersState, f, i) => {
-    if (f.type === 'radio' || f.type === 'select') {
-      const firstChecked = f.options?.find((o) => o.checked)
+    const options: undefined | MUIFilterOption<Record<string, any>, string>[] = f.options
+    if ((f.type === 'radio' || f.type === 'select') && options) {
+      const firstChecked = options.find((o) => !!o.checked)
       if (firstChecked) {
         if (firstChecked.where) {
           _filtersState.set(i, firstChecked.where)
@@ -51,9 +53,9 @@ export function filtersAndColumnsToInitialState(params: {
         }
       }
     }
-    if (f.type === 'checkboxes') {
+    if (f.type === 'checkboxes' && options) {
       const state: FilterStateCheckboxes = { or: [] }
-      for (const option of f.options || []) {
+      for (const option of options || []) {
         if (option.checked) {
           if (option.where) state.or.push(option.where)
           if (option.query) state.or.push(option.query)
