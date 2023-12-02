@@ -81,7 +81,10 @@ const initialState = ((): {
 })()
 
 const filtersState = ref<FiltersState>(carbonCopyMap(initialState.filtersState))
-watch(filtersState, (payload) => emit('update:filtersState', payload), { deep: true })
+watch(filtersState, (payload) => emit('update:filtersState', payload), {
+  deep: true,
+  immediate: true,
+})
 watch(
   () => props.filtersState,
   async (payload) => {
@@ -170,16 +173,16 @@ async function setMinTableHeight() {
   }
 }
 
+const activeCollection = computed<CollectionInstance<any>>(() =>
+  calcCollection(props.collection, filtersState.value, orderByState.value, props.filters ?? [])
+)
+
+defineExpose({ activeCollection })
+
 /** never throws */
 async function fetchMore() {
   fetchState.value = 'fetching'
-  const collection = calcCollection(
-    props.collection,
-    filtersState.value,
-    orderByState.value,
-    props.filters ?? []
-  )
-
+  const collection = activeCollection.value
   try {
     await collection
       .limit(props.pagination.limit)
