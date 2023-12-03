@@ -157,6 +157,9 @@ function clearState(): void {
   fetchMore()
 }
 
+const hasFetchLimit = computed<boolean>(
+  () => props.pagination.limit <= 0 || props.pagination.limit === Infinity
+)
 const minH = ref(26)
 const minW = ref(26)
 const tableEl = ref(null)
@@ -167,7 +170,7 @@ const { height, width } = useElementSize(tableEl)
  */
 async function setMinTableHeight() {
   await nextTick()
-  if (collectionInstance.value.data.size >= props.pagination.limit) {
+  if (!hasFetchLimit.value || collectionInstance.value.data.size >= props.pagination.limit) {
     if (minH.value === 26 && height.value > 26) minH.value = height.value
     if (minW.value === 26 && width.value > 26) minW.value = width.value
   }
@@ -182,12 +185,10 @@ defineExpose({ activeCollection })
 /** never throws */
 async function fetchMore() {
   fetchState.value = 'fetching'
-  const collection = activeCollection.value
+  let collection = activeCollection.value
+  if (hasFetchLimit.value) collection = collection.limit(props.pagination.limit)
   try {
-    await collection
-      .limit(props.pagination.limit)
-      .startAfter(collection.fetched.cursor)
-      .fetch({ force: true })
+    await collection.startAfter(collection.fetched.cursor).fetch({ force: true })
     await collection.fetchCount()
     fetchState.value = collection.fetched.reachedEnd ? 'end' : 'ok'
     // set new state
@@ -257,11 +258,21 @@ async function setOrderBy(
 const showingFiltersCode = ref(false)
 
 const pageIndex = ref(0)
-const pageCountFetched = computed(() => Math.ceil(allData.value.length / props.pagination.limit))
-const pageCount = computed(() => Math.ceil(collectionInstance.value.count / props.pagination.limit))
+const pageCountFetched = computed(() =>
+  !hasFetchLimit.value
+    ? allData.value.length
+      ? 1
+      : 0
+    : Math.ceil(allData.value.length / props.pagination.limit)
+)
+const pageCount = computed(() =>
+  !hasFetchLimit.value ? 1 : Math.ceil(collectionInstance.value.count / props.pagination.limit)
+)
 
 const allData = computed(() => [...collectionInstance.value.data.values()])
 const rows = computed(() => {
+  if (!hasFetchLimit.value) return allData.value
+
   const { pagination } = props
   if (pagination.kind === 'previous-next') {
     return allData.value.slice(

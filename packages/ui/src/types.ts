@@ -158,6 +158,7 @@ export type MUIColumn<T extends Record<string, any>, Label = string> = {
 }
 
 export type MUIPagination = {
+  /** Infinity, 0, or any other negative number means it will fetch without limit on one page */
   limit: number
   /** @default 'fetch-more' */
   kind?: 'fetch-more' | 'previous-next'
