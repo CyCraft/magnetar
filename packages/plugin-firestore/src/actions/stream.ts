@@ -24,7 +24,7 @@ export function streamActionFactory(
     mustExecuteOnRead,
   }: PluginStreamActionPayload<FirestoreModuleConfig>): StreamResponse {
     const { added, modified, removed } = mustExecuteOnRead
-    const { db } = firestorePluginOptions
+    const { db, debug } = firestorePluginOptions
     let resolveStream: (() => void) | undefined
     let rejectStream: (() => void) | undefined
     const streaming: Promise<void> = new Promise((resolve, reject) => {
@@ -55,7 +55,7 @@ export function streamActionFactory(
     // in case of a collection module
     else if (!docId) {
       const _collectionPath = getFirestoreCollectionPath(collectionPath, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
-      const queryInstance = getQueryInstance(_collectionPath, pluginModuleConfig, db)
+      const queryInstance = getQueryInstance(_collectionPath, pluginModuleConfig, db, debug)
       closeStream = onSnapshot(
         queryInstance,
         (querySnapshot: QuerySnapshot) => {

@@ -15,11 +15,11 @@ export function fetchCountActionFactory(
     collectionPath,
     pluginModuleConfig,
   }: PluginFetchCountActionPayload<FirestoreModuleConfig>): Promise<FetchCountResponse> {
-    const { db } = firestorePluginOptions
+    const { db, debug } = firestorePluginOptions
     // in case of a doc module
     const _collectionPath = getFirestoreCollectionPath(collectionPath, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
 
-    const queryInstance = getQueryInstance(_collectionPath, pluginModuleConfig, db)
+    const queryInstance = getQueryInstance(_collectionPath, pluginModuleConfig, db, debug)
 
     // see https://firebase.google.com/docs/firestore/query-data/aggregation-queries#use_the_count_aggregation
 
