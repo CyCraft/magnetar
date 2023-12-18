@@ -132,10 +132,25 @@ const hasSomeFilterOrOrderby = computed<boolean>(
   () => !!filtersState.value.size || !!orderByState.value.size
 )
 
-/** This instance is not computed so that we can delay setting it after fetching the relevant records */
+/**
+ * Do not confuse `activeCollection` with `collectionInstance`
+ * - `collectionInstance` is a `ref`, **not** `computed` so that we can delay setting it after fetching the relevant records
+ * - `activeCollection` is `computed` so that at all times you can access it from the parent via a `ref="magnetarTableInstance"`
+ */
 const collectionInstance = ref(
   calcCollection(props.collection, filtersState.value, orderByState.value, props.filters ?? [])
 )
+
+/**
+ * Do not confuse `activeCollection` with `collectionInstance`
+ * - `collectionInstance` is a `ref`, **not** `computed` so that we can delay setting it after fetching the relevant records
+ * - `activeCollection` is `computed` so that at all times you can access it from the parent via a `ref="magnetarTableInstance"`
+ */
+const activeCollection = computed<CollectionInstance<any>>(() =>
+  calcCollection(props.collection, filtersState.value, orderByState.value, props.filters ?? [])
+)
+
+defineExpose({ activeCollection })
 
 function clearAllRecords(): void {
   props.collection.data.clear()
@@ -174,23 +189,19 @@ async function setMinTableHeight() {
   }
 }
 
-const activeCollection = computed<CollectionInstance<any>>(() =>
-  calcCollection(props.collection, filtersState.value, orderByState.value, props.filters ?? [])
-)
-
-defineExpose({ activeCollection })
-
 /** never throws */
 async function fetchMore() {
   fetchState.value = 'fetching'
-  let collection = activeCollection.value
-  if (hasFetchLimit.value) collection = collection.limit(props.pagination.limit)
+  const filteredCollection = activeCollection.value
+  const collectionToFetch = hasFetchLimit.value
+    ? filteredCollection.startAfter(filteredCollection.fetched.cursor).limit(props.pagination.limit)
+    : filteredCollection
   try {
-    await collection.startAfter(collection.fetched.cursor).fetch({ force: true })
-    await collection.fetchCount()
-    fetchState.value = collection.fetched.reachedEnd ? 'end' : 'ok'
+    await collectionToFetch.fetch({ force: true })
+    await collectionInstance.value.fetchCount()
+    fetchState.value = collectionToFetch.fetched.reachedEnd ? 'end' : 'ok'
     // set new state
-    collectionInstance.value = collection
+    collectionInstance.value = filteredCollection
 
     setMinTableHeight()
   } catch (error: unknown) {
@@ -282,6 +293,8 @@ const rows = computed(() => {
 })
 
 watch(pageIndex, async (newIndex) => {
+  console.log(`newIndex → `, newIndex)
+  console.log(`pageCountFetched.value → `, pageCountFetched.value)
   if (fetchState.value === 'ok' && newIndex === pageCountFetched.value) {
     await fetchMore()
     await nextTick()
