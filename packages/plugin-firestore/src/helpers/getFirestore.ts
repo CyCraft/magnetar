@@ -13,7 +13,10 @@ import {
   and,
   collection,
   collectionGroup,
+  getCountFromServer,
+  getDocs,
   limit,
+  onSnapshot,
   or,
   orderBy,
   query,
@@ -124,10 +127,13 @@ export function getQueryInstance(
   if (debug) {
     logWithFlair(`Magnetar's query for Firebase JS SDK:`, qDebugString)
     logWithFlair(
-      `execute \`magnetarDebugAddFirebaseToWindow()\` to add these variables to the window: db, and, collection, collectionGroup, limit, or, orderBy, query, startAfter, where`
+      `execute \`magnetarDebugAddFirebaseToWindow()\` to add these variables to the window, so you can execute the query above: db, getDocs, onSnapshot, getCountFromServer, and, collection, collectionGroup, limit, or, orderBy, query, startAfter, where`
     )
     ;(window as any).magnetarDebugAddFirebaseToWindow = () => {
       ;(window as any).db = db
+      ;(window as any).getDocs = getDocs
+      ;(window as any).onSnapshot = onSnapshot
+      ;(window as any).getCountFromServer = getCountFromServer
       ;(window as any).and = and
       ;(window as any).collection = collection
       ;(window as any).collectionGroup = collectionGroup

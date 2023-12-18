@@ -55,9 +55,9 @@ export function streamActionFactory(
     // in case of a collection module
     else if (!docId) {
       const _collectionPath = getFirestoreCollectionPath(collectionPath, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
-      const queryInstance = getQueryInstance(_collectionPath, pluginModuleConfig, db, debug)
+      const query = getQueryInstance(_collectionPath, pluginModuleConfig, db, debug)
       closeStream = onSnapshot(
-        queryInstance,
+        query,
         (querySnapshot: QuerySnapshot) => {
           // even if `docSnapshot.metadata.hasPendingWrites`
           //       we should always execute `added/modified`

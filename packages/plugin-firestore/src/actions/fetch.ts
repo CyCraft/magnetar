@@ -45,23 +45,6 @@ export function fetchActionFactory(
       const warnNoResponse = debug
         ? setTimeout(() => logWithFlair(`no response after 5 seconds on \`await getDocs(query)\``, 'query:', query), 5_000) // prettier-ignore
         : undefined
-      if (debug) {
-        ;(window as any).magnetarDebug = {
-          collectionPath: _collectionPath,
-          db,
-          pluginModuleConfig,
-          firestorePluginOptions,
-          query,
-          getDocs,
-        }
-        logWithFlair(
-          `use \`window.magnetarDebug\` to debug fetch call:`,
-          (window as any).magnetarDebug
-        )
-        logWithFlair(
-          `You can execute \`magnetarDebug.getDocs(magnetarDebug.query)\` to test the actual firebase call`
-        )
-      }
       const querySnapshot = await getDocs(query)
       clearTimeout(warnNoResponse)
       snapshots = querySnapshot.docs
