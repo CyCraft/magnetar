@@ -84,8 +84,8 @@ export function getQueryInstance(
     ? collectionGroup(db, collectionPath.split('*/')[1])
     : collection(db, collectionPath)
   qDebugString = collectionPath.includes('*/')
-    ? `collectionGroup(db, ${collectionPath.split('*/')[1]})`
-    : `collection(db, ${collectionPath})`
+    ? `collectionGroup(db, "${collectionPath.split('*/')[1]}")`
+    : `collection(db, "${collectionPath}")`
 
   for (const queryClause of config.query || []) {
     q = query(q, applyQueryClause(queryClause))
