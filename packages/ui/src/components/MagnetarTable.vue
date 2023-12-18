@@ -4,22 +4,22 @@ import { useElementSize } from '@vueuse/core'
 import { isAnyObject, isArray, isError, isPlainObject } from 'is-what'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import {
-  FiltersState,
   FilterState,
+  FiltersState,
   MUIColumn,
   MUIFilter,
   MUILabel,
-  muiLabelDic,
   MUIPagination,
   MUIParseLabel,
   OPaths,
   OrderByState,
+  muiLabelDic,
 } from '../types'
 import {
   calcCollection,
   carbonCopyMap,
-  filtersAndColumnsToInitialState,
   filterStateToClauses,
+  filtersAndColumnsToInitialState,
   getRequiredOrderByBasedOnFilters,
   mapUnshift,
   orderByStateToClauses,
@@ -157,9 +157,7 @@ function clearState(): void {
   fetchMore()
 }
 
-const hasFetchLimit = computed<boolean>(
-  () => props.pagination.limit <= 0 || props.pagination.limit === Infinity
-)
+const hasFetchLimit = computed<boolean>(() => props.pagination.limit > 0)
 const minH = ref(26)
 const minW = ref(26)
 const tableEl = ref(null)
