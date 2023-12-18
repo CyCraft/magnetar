@@ -53,10 +53,10 @@ watch(
   { immediate: true }
 )
 
-const filterValueOptionDic = computed<Record<string, MUIFilterOption<Record<string, any>, any>>>(
+const filterValueOptionDic = computed<Record<string, MUIFilterOption<Record<string, any>>>>(
   () =>
     props.filter.options?.reduce(
-      (dic, option) => ({ ...dic, [JSON.stringify(option.where || option.query)]: option }),
+      (dic, option) => ({ ...dic, [JSON.stringify(option.where || option.query || '')]: option }),
       {}
     ) || {}
 )
@@ -78,7 +78,7 @@ const selectModel = computed<string | null>({
     const { filter, filterState } = props
     if (!usesFilterStateOption(filter, filterState)) return null
     const clause = filter.options?.find((o) => clausesEqual(o.where || o.query, filterState))
-    return JSON.stringify(clause?.where || clause?.query)
+    return JSON.stringify(clause?.where || clause?.query || '')
   },
   set: (newValue) => {
     if (!newValue) return emit('setFilter', null)
@@ -92,7 +92,7 @@ const checkboxModel = computed<string[]>({
   get: () => {
     const { filter, filterState } = props
     if (!usesFilterStateCheckboxes(filter, filterState)) return []
-    return filterState?.or.map((clause) => JSON.stringify(clause)) || []
+    return filterState?.or.map((clause) => JSON.stringify(clause || '')) || []
   },
   set: (newValues) => {
     if (!newValues) return emit('setFilter', null)
