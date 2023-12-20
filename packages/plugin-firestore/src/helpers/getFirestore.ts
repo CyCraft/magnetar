@@ -1,5 +1,5 @@
 import type { DocMetadata, QueryClause } from '@magnetarjs/types'
-import { logWithFlair } from '@magnetarjs/utils'
+import { arrStr, logWithFlair } from '@magnetarjs/utils'
 import type { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'
 import type {
   CollectionReference,
@@ -41,10 +41,6 @@ function applyQueryClause(queryClause: QueryClause): QueryCompositeFilterConstra
     )
   }
   throw new Error('invalid query')
-}
-
-function arrStr(clause: any[]): string {
-  return clause.map((part) => JSON.stringify(part)).join(', ')
 }
 
 function applyQueryClauseDebug(queryClause: QueryClause): string {

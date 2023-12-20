@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CollectionInstance } from '@magnetarjs/types'
+import { arrStr } from '@magnetarjs/utils'
 import { useElementSize } from '@vueuse/core'
 import { isAnyObject, isArray, isError, isPlainObject } from 'is-what'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
@@ -364,7 +365,7 @@ const debugMode = !!localStorage.getItem('DEBUG')
         >
           {{
             isArray(info.result)
-              ? `.where(${info.result.map((chunk) => JSON.stringify(chunk)).join(', ')})`
+              ? info.result.map((where) => `.where(${arrStr(where)})`).join('')
               : `.query(${JSON.stringify(info.result)})`
           }}
           <button @click="() => setFilter(info.filterIndex, null)">✕</button>
@@ -374,7 +375,7 @@ const debugMode = !!localStorage.getItem('DEBUG')
           :key="JSON.stringify(_orderBy)"
           class="magnetar-filter-code"
         >
-          .orderBy({{ _orderBy.map((o) => JSON.stringify(o)).join(', ') }})
+          .orderBy({{ arrStr(_orderBy) }})
           <button @click="() => setOrderBy(_orderBy[0], null)">✕</button>
         </div>
       </div>
