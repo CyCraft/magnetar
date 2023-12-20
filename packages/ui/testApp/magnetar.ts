@@ -13,7 +13,7 @@ export const generateRandomId = (): string => doc(collection(db, 'random')).id
 // create the local store plugin instance:
 const local = PluginVue3({ generateRandomId })
 
-const remote = PluginFirestore({ db })
+const remote = PluginFirestore({ db, debug: true })
 
 // -----------------------------------------------------
 // instantiate the Magnetar instance with the store plugins

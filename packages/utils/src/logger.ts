@@ -2,14 +2,49 @@ import type { EventFnSuccess, QueryClause, WhereClause } from '@magnetarjs/types
 import { isArray, isFullArray, isNumber } from 'is-what'
 
 /**
+ * `Line-height: 2` is to prevent line overlapping on Safari
+ */
+const LOGGER_STYLE =
+  'background: #0e0f15; color: #af98e6; border-radius: 4px; padding: 6px 10px; line-height: 2;'
+
+/**
  * Logs to the console with `console.info` and colors.
  */
 export function logWithFlair(message: string, ...args: any[]): void {
-  console.info(
-    `%c💫 [magnetar] ${message}`,
-    'background: #0e0f15; color: #af98e6; border-radius: 4px; padding: 6px 10px;',
-    ...args
-  )
+  console.info(`%c💫 [magnetar] ${message}`, LOGGER_STYLE, ...args)
+}
+
+let lastGroupLogTime = 0
+let lastGroupParams = null
+
+function shouldLog(params: any, preventLogFor: number) {
+  const now = Date.now()
+  // Check if the last log was less than 60000 milliseconds (1 minute) ago
+  // and if the parameters are the same as the last call
+  if (
+    now - lastGroupLogTime < preventLogFor &&
+    JSON.stringify(params) === JSON.stringify(lastGroupParams)
+  ) {
+    return false
+  }
+  lastGroupLogTime = now
+  lastGroupParams = params
+  return true
+}
+
+/**
+ * Logs to the console with `console.groupCollapsed` and colors.
+ */
+export function logWithFlairGroup(
+  title: string,
+  nestedMessage: string,
+  options?: { preventLogFor: number }
+): void {
+  if (options && !shouldLog([title, nestedMessage], options.preventLogFor)) return
+
+  console.groupCollapsed(`%c💫 [magnetar] ${title}`, LOGGER_STYLE)
+  console.log(nestedMessage)
+  console.groupEnd()
 }
 
 function stringifyQueryClause(q: QueryClause): string {

@@ -1,5 +1,5 @@
 import type { DocMetadata, QueryClause } from '@magnetarjs/types'
-import { arrStr, logWithFlair } from '@magnetarjs/utils'
+import { arrStr, logWithFlair, logWithFlairGroup } from '@magnetarjs/utils'
 import type { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'
 import type {
   CollectionReference,
@@ -82,9 +82,10 @@ export function getQueryInstance(
   q = collectionPath.includes('*/')
     ? collectionGroup(db, collectionPath.split('*/')[1])
     : collection(db, collectionPath)
-  qDebugString = collectionPath.includes('*/')
+  const qDebugCollection = collectionPath.includes('*/')
     ? `collectionGroup(db, "${collectionPath.split('*/')[1]}")`
     : `collection(db, "${collectionPath}")`
+  qDebugString = qDebugCollection
 
   for (const queryClause of config.query || []) {
     q = query(q, applyQueryClause(queryClause))
@@ -121,24 +122,38 @@ export function getQueryInstance(
   }
 
   if (debug) {
-    logWithFlair(`Magnetar's query for Firebase JS SDK:`, qDebugString)
-    logWithFlair(
-      `execute \`magnetarDebugAddFirebaseToWindow()\` to add these variables to the window, so you can execute the query above: db, getDocs, onSnapshot, getCountFromServer, and, collection, collectionGroup, limit, or, orderBy, query, startAfter, where`
+    logWithFlairGroup(
+      `Firebase JS SDK Query (click to expand): ${qDebugCollection}...`,
+      `// add \`db, getDocs, where, ...\` to window:
+magnetarDebugAddFirebaseToWindow()
+
+// debug by executing & tweaking:
+${qDebugString}
+    .getDocs()
+    .then(console.info)
+    .error(console.error)`,
+      { preventLogFor: 10_000 }
     )
-    ;(window as any).magnetarDebugAddFirebaseToWindow = () => {
-      ;(window as any).db = db
-      ;(window as any).getDocs = getDocs
-      ;(window as any).onSnapshot = onSnapshot
-      ;(window as any).getCountFromServer = getCountFromServer
-      ;(window as any).and = and
-      ;(window as any).collection = collection
-      ;(window as any).collectionGroup = collectionGroup
-      ;(window as any).limit = limit
-      ;(window as any).or = or
-      ;(window as any).orderBy = orderBy
-      ;(window as any).query = query
-      ;(window as any).startAfter = startAfter
-      ;(window as any).where = where
+    if (!(window as any).magnetarDebugAddFirebaseToWindowExplained) {
+      logWithFlair(
+        `execute \`magnetarDebugAddFirebaseToWindow()\` to add these Firebase JS SDK variables to the window for debugging: db, getDocs, onSnapshot, getCountFromServer, and, collection, collectionGroup, limit, or, orderBy, query, startAfter, where`
+      )
+      ;(window as any).magnetarDebugAddFirebaseToWindow = () => {
+        ;(window as any).db = db
+        ;(window as any).getDocs = getDocs
+        ;(window as any).onSnapshot = onSnapshot
+        ;(window as any).getCountFromServer = getCountFromServer
+        ;(window as any).and = and
+        ;(window as any).collection = collection
+        ;(window as any).collectionGroup = collectionGroup
+        ;(window as any).limit = limit
+        ;(window as any).or = or
+        ;(window as any).orderBy = orderBy
+        ;(window as any).query = query
+        ;(window as any).startAfter = startAfter
+        ;(window as any).where = where
+      }
+      ;(window as any).magnetarDebugAddFirebaseToWindowExplained = true
     }
   }
 
