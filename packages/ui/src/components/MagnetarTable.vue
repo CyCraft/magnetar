@@ -358,11 +358,7 @@ const debugMode = !!localStorage.getItem('DEBUG')
 
       <div v-if="showingFiltersCode" class="magnetar-row magnetar-gap-sm magnetar-active-filters">
         <div v-if="!hasSomeFilterOrOrderby">{{ muiLabel('magnetar table no active filters') }}</div>
-        <div
-          v-for="info in currentFilters"
-          :key="JSON.stringify(filters)"
-          class="magnetar-filter-code"
-        >
+        <div v-for="info in currentFilters" :key="info.filterIndex" class="magnetar-filter-code">
           {{
             isArray(info.result)
               ? info.result.map((where) => `.where(${arrStr(where)})`).join('')
