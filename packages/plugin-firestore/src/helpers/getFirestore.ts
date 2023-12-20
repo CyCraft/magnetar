@@ -128,8 +128,9 @@ export function getQueryInstance(
 magnetarDebugAddFirebaseToWindow()
 
 // debug by executing & tweaking:
-${qDebugString}
-    .getDocs()
+const myQuery = ${qDebugString}
+
+getDocs(myQuery)
     .then(console.info)
     .error(console.error)`,
       { preventLogFor: 10_000 }
