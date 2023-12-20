@@ -3,8 +3,8 @@ import { sort } from 'fast-sort'
 import { isArray, isPlainObject, isString } from 'is-what'
 import type {
   EntryOfOrderByState,
-  FiltersState,
   FilterStateCheckboxes,
+  FiltersState,
   MUIColumn,
   MUIFilter,
   MUIFilterOption,
@@ -119,6 +119,8 @@ export function getRequiredOrderByBasedOnFilters(
 
     const firstClause: WhereClause | QueryClause | undefined = isString(filterState)
       ? undefined
+      : isArray(filterState)
+      ? filterState
       : 'or' in filterState && isArray(filterState.or[0])
       ? filterState.or[0]
       : 'and' in filterState && isArray(filterState.and[0])

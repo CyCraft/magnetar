@@ -73,7 +73,7 @@ const columns: MUIColumn<Item, Label>[] = [
   {
     label: ['th_label'],
     fieldPath: 'title',
-    sortable: { clearOtherOrderBy: true, orderBy: 'asc', position: 0 },
+    sortable: { clearOtherOrderBy: true },
   },
   {
     label: 'Custom Slot',
@@ -91,7 +91,7 @@ const columns: MUIColumn<Item, Label>[] = [
     label: 'Is it done?',
     fieldPath: 'isDone',
     parseValue: ({ value }) => (value ? '✅' : '❌'),
-    sortable: { clearOtherOrderBy: true },
+    sortable: { clearOtherOrderBy: true, orderBy: 'asc', position: 0 },
   },
   {
     label: 'Is it done? (clickable)',
@@ -137,7 +137,7 @@ const filters: MUIFilter<Item>[] = [
     label: 'Titles starting with...',
     type: 'radio',
     options: [
-      { label: 'a', where: ['title', '>', 'a'] },
+      { label: 'a', where: ['title', '>', 'a'], checked: true },
       { label: 'f', where: ['title', '>', 'f'] },
       { label: 'k', where: ['title', '>', 'k'] },
       { label: 'p', where: ['title', '>', 'p'] },
