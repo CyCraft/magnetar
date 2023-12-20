@@ -294,8 +294,6 @@ const rows = computed(() => {
 })
 
 watch(pageIndex, async (newIndex) => {
-  console.log(`newIndex → `, newIndex)
-  console.log(`pageCountFetched.value → `, pageCountFetched.value)
   if (fetchState.value === 'ok' && newIndex === pageCountFetched.value) {
     await fetchMore()
     await nextTick()
