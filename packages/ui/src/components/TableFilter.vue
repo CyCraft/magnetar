@@ -53,10 +53,14 @@ watch(
   { immediate: true }
 )
 
+function optionToValue(option?: MUIFilterOption<any, string>): string {
+  return JSON.stringify(option?.where || option?.query || '')
+}
+
 const filterValueOptionDic = computed<Record<string, MUIFilterOption<Record<string, any>>>>(
   () =>
     props.filter.options?.reduce(
-      (dic, option) => ({ ...dic, [JSON.stringify(option.where || option.query || '')]: option }),
+      (dic, option) => ({ ...dic, [optionToValue(option)]: option }),
       {}
     ) || {}
 )
@@ -77,8 +81,8 @@ const selectModel = computed<string | null>({
   get: () => {
     const { filter, filterState } = props
     if (!usesFilterStateOption(filter, filterState)) return null
-    const clause = filter.options?.find((o) => clausesEqual(o.where || o.query, filterState))
-    return JSON.stringify(clause?.where || clause?.query || '')
+    const option = filter.options?.find((o) => clausesEqual(o.where || o.query, filterState))
+    return optionToValue(option)
   },
   set: (newValue) => {
     if (!newValue) return emit('setFilter', null)
