@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/types",
-  "version": "0.16.17",
+  "version": "0.16.18",
   "sideEffects": false,
   "description": "Magnetar shared types",
   "main": "dist/index.js",
