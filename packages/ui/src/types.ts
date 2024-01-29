@@ -47,20 +47,34 @@ export type MUIColumn<T extends Record<string, any>, Label = string> = {
   label?: Label
   /**
    * Represents the path to the prop that should be shown in this column for each data item.
-   * No need to pass if the value doesn't matter for a column, because you want to show a combination of 2 columns with the `parseValue` function.
    *
-   * The data to be shown in a cell is calculated by any of the following props. They cannot be combined, choose only 1 of:
-   * - `slot`
-   * - `fetchValue`
-   * - `fieldPath`
+   * If a column does not represent a value from your data, you do not need to use this.
+   * Eg. When showing parsed data using the `parseValue` function, this column does not represent a single value, so you don't need `fieldPath`.
    *
-   * @example 'name' // would show `data.name`
-   * @example 'name.family' // would show `data.name.family`
-   * @example undefined // an empty column, you can use `parseValue` to show something else
+   * @example 'name' // would show the value at the prop `data.name` of your data
+   * @example 'name.family' // would show the value at the prop `data.name.family` of your data
+   * @example undefined // an empty column, you can use `parseValue` / `fetchValue` to show something else
    */
   fieldPath?: OPaths<T>
   /**
+   * Fetches a value to be shown. When provided, the `fieldPath` prop will be ignored.
+   *
+   * @example
+   * ```js
+   * async ({ data }) => {
+   *   const user = await magnetar.collection('users').doc(data.userIdCreated).fetch()
+   *   return user.name
+   * }
+   * ```
+   *
+   * Under the hood this uses `computedAsync` from [vueuse](https://vueuse.org/core/computedAsync/).
+   * However, there's a small reactivity bug when using `computedAsync` with Magnetar, so we use a wrapper that fixes this reactivity issue.
+   * `computedAsync` can be imported via `import { computedAsync } from '@magnetarjs/ui'`
+   */
+  fetchValue?: (info: { data: T }) => Promise<any>
+  /**
    * A function that parses the value to be shown.
+   *
    * The function will receive an object with these props:
    * - `data` — the row data
    * - `value` —
@@ -74,24 +88,27 @@ export type MUIColumn<T extends Record<string, any>, Label = string> = {
    */
   parseValue?: (info: { value: any; data: T }) => string
   /**
-   * Fetches a value to be shown. When passing this, the `fieldPath` prop will be ignored.
+   * When set this will be the name of the slot you can use to edit the column cells via Vue slots.
    *
-   * Under the hood this uses `computedAsync` from [vueuse](https://vueuse.org/core/computedAsync/).
-   *
-   * The data to be shown in a cell is calculated by any of the following props. They cannot be combined, choose only 1 of:
-   * - `slot`
-   * - `fetchValue`
-   * - `fieldPath`
+   * The slot will receive an object with these props:
+   * - `data` — the row data
+   * - `value` —
+   *   - if `fieldPath` it provided, the value found at that `fieldPath`
+   *   - if `fetchValue` it provided, the value that was fetched
+   *   - else `undefined`
    *
    * @example
-   * ```js
-   * async ({ data }) => {
-   *   const user = await magnetar.collection('users').doc(data.userIdCreated).fetch()
-   *   return user.name
-   * }
+   * ```html
+   * <MagnetarTable
+   *   :columns="[{ slot: "myslot" }]"
+   * >
+   *   <template #myslot="{ data, value }">
+   *     <pre>{{ data }}</pre>
+   *   </template>
+   * </MagnetarTable>
    * ```
    */
-  fetchValue?: (info: { data: T }) => Promise<any>
+  slot?: string
   /** Applied to `td > div` */
   class?: string | Codable<T, string>
   /** Applied to `td > div` */
@@ -121,15 +138,6 @@ export type MUIColumn<T extends Record<string, any>, Label = string> = {
    * ```
    */
   html?: boolean
-  /**
-   * When set this will be the name of the slot you can use to edit the column cells via Vue slots.
-   *
-   * The data to be shown in a cell is calculated by any of the following props. They cannot be combined, choose only 1 of:
-   * - `slot`
-   * - `fetchValue`
-   * - `fieldPath`
-   */
-  slot?: string
   /**
    * The column can be made sortable which will use the Magnetar orderBy feature under the hood
    *
