@@ -96,9 +96,8 @@ export async function handleAction(args: {
       throw error
     }
     if (onError === 'revert') {
-      stopExecutionAfterAction('revert')
       // we need to revert first, then throw the error later
-      return error
+      stopExecutionAfterAction('revert')
     }
     return error
   }
