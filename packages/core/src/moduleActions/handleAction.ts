@@ -100,6 +100,7 @@ export async function handleAction(args: {
       // we need to revert first, then throw the error later
       return error
     }
+    return
   }
   // handle and await each eventFn in sequence
   for (const fn of on.success) {
