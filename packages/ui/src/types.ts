@@ -10,7 +10,7 @@ import { Ref } from 'vue'
 
 export type OPaths<T> = OPathsWithOptional<T>
 
-export type MUITableSlot<T = any> = { data: T; isExpanded: Ref<boolean> }
+export type MUITableSlot<T = any> = { data: T; isExpanded: Ref<boolean>; value: any }
 
 /** You can pass a text parser which will be used for any `label` used throughout the table */
 export type MUIParseLabel<LabelType = any> = (label: LabelType) => string

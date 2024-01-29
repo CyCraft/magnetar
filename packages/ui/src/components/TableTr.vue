@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, Ref, ref } from 'vue'
-import { MUIColumn, MUIParseLabel } from '../types'
+import { computed, ref } from 'vue'
+import { MUIColumn, MUIParseLabel, MUITableSlot } from '../types'
 import TableTd from './TableTd.vue'
 
 const props = defineProps<{
@@ -11,9 +11,10 @@ const props = defineProps<{
 
 const isExpanded = ref(false)
 
-const rowSlotContext = computed<{ data: any; isExpanded: Ref<boolean> }>(() => ({
+const rowSlotContext = computed<MUITableSlot<any>>(() => ({
   data: props.row,
   isExpanded,
+  value: undefined,
 }))
 </script>
 
@@ -23,14 +24,17 @@ const rowSlotContext = computed<{ data: any; isExpanded: Ref<boolean> }>(() => (
       v-for="(column, columnIndex) in columns"
       :key="(column.fieldPath || column.slot) + 'td' + row.id"
     >
-      <slot :name="column.slot || columnIndex" v-bind="rowSlotContext">
-        <TableTd
-          v-model:isExpanded="isExpanded"
-          :row="row"
-          :column="column"
-          :parseLabel="parseLabel"
-        />
-      </slot>
+      <TableTd
+        ref="tableTdInstance"
+        v-model:isExpanded="isExpanded"
+        :row="row"
+        :column="column"
+        :parseLabel="parseLabel"
+      >
+        <template #default="ctx">
+          <slot :name="column.slot || columnIndex" v-bind="ctx" />
+        </template>
+      </TableTd>
     </td>
   </tr>
   <tr v-if="isExpanded" class="magnetar-expansion">

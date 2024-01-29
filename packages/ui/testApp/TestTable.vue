@@ -78,6 +78,7 @@ const columns: MUIColumn<Item, Label>[] = [
   {
     label: 'Custom Slot',
     slot: 'nakashima',
+    fieldPath: 'title',
   },
   {
     label: 'random pokemon name',
@@ -170,10 +171,10 @@ const filters: MUIFilter<Item>[] = [
       :pagination="{ limit: 10, kind: 'previous-next' }"
       :parseLabel="parseLabel"
     >
-      <template #nakashima="{ data, isExpanded }: MUITableSlot<Item>">
-        {{ Object.keys(data).join('、') }}
+      <template #nakashima="{ data, isExpanded, value }: MUITableSlot<Item>">
+        {{ value.slice(0, 1) + '...' }}
         <button @click="() => (isExpanded.value = !isExpanded.value)">
-          {{ isExpanded.value ? 'Hide' : 'Show' }}
+          {{ isExpanded.value ? 'Hide Details' : 'Show Details' }}
         </button>
       </template>
 

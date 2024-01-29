@@ -2,7 +2,7 @@
 import { isFunction } from 'is-what'
 import { getProp } from 'path-to-prop'
 import { computed, ref } from 'vue'
-import { Codable, MUIColumn, MUIParseLabel } from '../types'
+import { Codable, MUIColumn, MUIParseLabel, MUITableSlot } from '../types'
 import { computedAsync } from '../utils/computedAsync'
 
 const props = defineProps<{
@@ -107,32 +107,40 @@ async function handleClick(index: number): Promise<void> {
   }
   buttonLoadingArr.value[index] = false
 }
+
+const rowSlotContext = computed<MUITableSlot<any>>(() => ({
+  data: props.row,
+  isExpanded,
+  value: cellValueRaw.value,
+}))
 </script>
 
 <template>
-  <div :class="cellAttrs.class" :style="cellAttrs.style">
-    <div v-if="column.html" v-html="cellValueParsed" />
-    <div v-if="!column.html">{{ cellValueParsed }}</div>
-    <template v-for="(button, i) in buttonAttrArr" :key="button?.label">
-      <button
-        v-if="button.html"
-        :disabled="button.disabled || undefined"
-        :class="button.class"
-        :style="button.style"
-        @click.stop="() => handleClick(i)"
-        v-html="button.label"
-      />
-      <button
-        v-if="!button.html"
-        :disabled="button.disabled || undefined"
-        :class="button.class"
-        :style="button.style"
-        @click.stop="() => handleClick(i)"
-      >
-        {{ button.label }}
-      </button>
-    </template>
-  </div>
+  <slot v-bind="rowSlotContext">
+    <div :class="cellAttrs.class" :style="cellAttrs.style">
+      <div v-if="column.html" v-html="cellValueParsed" />
+      <div v-if="!column.html">{{ cellValueParsed }}</div>
+      <template v-for="(button, i) in buttonAttrArr" :key="button?.label">
+        <button
+          v-if="button.html"
+          :disabled="button.disabled || undefined"
+          :class="button.class"
+          :style="button.style"
+          @click.stop="() => handleClick(i)"
+          v-html="button.label"
+        />
+        <button
+          v-if="!button.html"
+          :disabled="button.disabled || undefined"
+          :class="button.class"
+          :style="button.style"
+          @click.stop="() => handleClick(i)"
+        >
+          {{ button.label }}
+        </button>
+      </template>
+    </div>
+  </slot>
 </template>
 
 <style scoped></style>
