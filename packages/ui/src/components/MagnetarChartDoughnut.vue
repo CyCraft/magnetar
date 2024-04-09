@@ -1,7 +1,11 @@
 <script lang="ts" setup>
 import type { CollectionInstance, QueryClause, WhereClause } from '@magnetarjs/types'
 import { ArcElement, ChartData, Chart as ChartJS, ChartOptions, Title } from 'chart.js'
-import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels'
+// import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels'
+// fix: https://github.com/chartjs/chartjs-plugin-datalabels/issues/411
+import ChartDataLabels, {
+  Context,
+} from 'chartjs-plugin-datalabels/dist/chartjs-plugin-datalabels.esm.js'
 import DoughnutLabel from 'chartjs-plugin-doughnutlabel-rebourne'
 import { isAnyObject, isArray } from 'is-what'
 import { computed, watch } from 'vue'
@@ -13,7 +17,7 @@ ChartJS.register(ArcElement, Title)
 
 const props = defineProps<{
   collection: CollectionInstance<any>
-  chart: MUIChartDoughnut<any>
+  chart: MUIChartDoughnut<any, any>
   parseLabel: MUIParseLabel | undefined
 }>()
 
