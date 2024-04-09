@@ -1,6 +1,6 @@
 {
   "name": "dev-vue3-firestore",
-  "version": "0.16.18",
+  "version": "0.17.0",
   "private": true,
   "scripts": {
     "typecheck": "echo na",
