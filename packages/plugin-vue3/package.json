@@ -43,7 +43,7 @@
   "devDependencies": {
     "@magnetarjs/core": "workspace:*",
     "@magnetarjs/test-utils": "workspace:*",
-    "vue": "^3.4.15"
+    "vue": "^3.4.21"
   },
   "keywords": [
     "reactive-store",
