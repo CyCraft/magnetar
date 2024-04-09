@@ -380,6 +380,47 @@ export type MUIFilter<T extends Record<string, any>, Label = string> = {
   initialValue?: string | undefined
 }
 
+export type MUIChartDoughnut<T extends Record<string, any>, Label = string> = {
+  /**
+   * The chart label, will also be piped through `parseLabel` if you passed it to the table.
+   *
+   * The chart label will be rendered as the `<legend />` element of the chart <fieldset />.
+   */
+  label: Label
+  /**
+   * The type of chart.
+   */
+  type: 'doughnut'
+  /**
+   * The  to be rendered for the radio/select/checkboxes chart.
+   *
+   * - `type: 'select' | 'checkboxes' | 'radio'`
+   *   - available
+   * - `type: 'text' | 'date' | 'number'`
+   *   - not available
+   */
+  datasets: {
+    label: Label
+    /** Choose either `where` or `query` for an option */
+    where?: WhereClauseTuple<T>
+    /** Choose either `query` or `where` for an option */
+    query?: Query<T>
+  }[]
+  /**
+   * some text shown leading in front of the label.
+   * @example '€'
+   */
+  prefix?: string | Label
+  /**
+   * some text shown trailing behind the label.
+   * @example 'kg'
+   * @example 'JPY'
+   */
+  suffix?: string | Label
+}
+
+export type MUIChart<T extends Record<string, any>, Label = string> = MUIChartDoughnut<T, Label>
+
 export type MUIRows<T extends Record<string, any>> = T[]
 
 /**

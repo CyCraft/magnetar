@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { PokedexEntry } from '@magnetarjs/test-utils'
 import { roll } from 'roll-anything'
-import { MagnetarTable, MUIColumn, MUIFilter, MUIParseLabel, MUITableSlot } from '../src/index'
+import {
+  MUIChart,
+  MUIColumn,
+  MUIFilter,
+  MUIParseLabel,
+  MUITableSlot,
+  MagnetarChartDoughnut,
+  MagnetarTable,
+} from '../src/index'
 import { magnetar } from './magnetar'
 
 type Item = { title: string; id: string; isDone: boolean; name: { family: string } }
@@ -157,10 +165,30 @@ const filters: MUIFilter<Item>[] = [
     ],
   },
 ]
+
+const charts: MUIChart<Item, Label>[] = [
+  {
+    label: 'Done or not',
+    type: 'doughnut',
+    datasets: [
+      { label: 'done', where: ['isDone', '==', true] },
+      { label: 'not done', where: ['isDone', '==', false] },
+    ],
+  },
+]
 </script>
 
 <template>
   <div class="test">
+    <div>
+      <h6>Charts</h6>
+      <MagnetarChartDoughnut
+        v-for="chart of charts"
+        :chart="chart"
+        :collection="itemsModuleT"
+        :parseLabel="parseLabel"
+      />
+    </div>
     <!-- <h6>plugin-vue3 + plugin-firestore Magnetar Table</h6> -->
 
     <MagnetarTable
