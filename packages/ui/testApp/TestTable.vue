@@ -11,6 +11,7 @@ import {
   MagnetarTable,
 } from '../src/index'
 import { magnetar } from './magnetar'
+import { ref, computed } from 'vue'
 
 type Item = { title: string; id: string; isDone: boolean; name: { family: string } }
 
@@ -176,11 +177,27 @@ const charts: MUIChart<Item, Label>[] = [
     ],
   },
 ]
+
+const showingCharts = ref(false)
+const searchQuery = ref('')
+const filterDataFn = computed<undefined | ((data: Record<string, any>, index: number) => boolean)>(
+  () => {
+    if (!searchQuery.value) return undefined
+    return (data: Record<string, any>, index: number): boolean => {
+      const regex = new RegExp(searchQuery.value, 'i')
+      return regex.test(JSON.stringify(data))
+    }
+  }
+)
 </script>
 
 <template>
   <div class="test">
-    <div>
+    <label>
+      <span>Show charts </span>
+      <input v-model="showingCharts" type="checkbox" />
+    </label>
+    <div v-if="showingCharts">
       <h6>Charts</h6>
       <MagnetarChartDoughnut
         v-for="chart of charts"
@@ -191,6 +208,15 @@ const charts: MUIChart<Item, Label>[] = [
     </div>
     <!-- <h6>plugin-vue3 + plugin-firestore Magnetar Table</h6> -->
 
+    <hr />
+
+    <label>
+      <span>Search fetched table rows... </span>
+      <input v-model="searchQuery" placeholder="Search..." />
+    </label>
+
+    <hr />
+
     <MagnetarTable
       class="magnetar-table"
       :collection="itemsModuleT"
@@ -198,6 +224,7 @@ const charts: MUIChart<Item, Label>[] = [
       :filters="filters"
       :pagination="{ limit: 10, kind: 'previous-next' }"
       :parseLabel="parseLabel"
+      :filterDataFn="filterDataFn"
     >
       <template #nakashima="{ data, isExpanded, value }: MUITableSlot<Item>">
         {{ value.slice(0, 1) + '...' }}
