@@ -48,6 +48,10 @@ const props = defineProps<{
    * - Passing this will replace any orderBy state that is derived based on the `columns` prop
    */
   orderByState?: OrderByState
+  /**
+   * A browser-side data filter that is applied on the fetched data locally.
+   */
+  filterDataFn?: (record: Record<string, unknown>, index: number) => boolean
 }>()
 
 const emit = defineEmits<{
@@ -279,7 +283,11 @@ const pageCount = computed(() =>
   !hasFetchLimit.value ? 1 : Math.ceil(collectionInstance.value.count / props.pagination.limit)
 )
 
-const allData = computed(() => [...collectionInstance.value.data.values()])
+const allData = computed(() => {
+  const { filterDataFn } = props
+  const data = [...collectionInstance.value.data.values()]
+  return filterDataFn ? data.filter(filterDataFn) : data
+})
 const rows = computed(() => {
   if (!hasFetchLimit.value) return allData.value
 
