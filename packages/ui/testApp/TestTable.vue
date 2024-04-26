@@ -214,24 +214,28 @@ const magnetarTableInstance = ref<null | InstanceType<typeof MagnetarTable>>(nul
 
     <hr />
 
-    <label>
-      <span>Search fetched table rows... </span>
-      <input v-model="searchQuery" placeholder="Search..." />
-    </label>
+    <template v-if="magnetarTableInstance">
+      <button
+        v-if="magnetarTableInstance.fetchState !== 'end'"
+        :disabled="magnetarTableInstance.fetchState !== 'ok'"
+        kind="sub"
+        @click="() => magnetarTableInstance?.fetchAll()"
+      >
+        {{
+          magnetarTableInstance.fetchState === 'loading'
+            ? 'fetching...'
+            : `fetch all ${magnetarTableInstance.activeCollection.count} records`
+        }}
+      </button>
+      <input
+        v-if="magnetarTableInstance.fetchState === 'end'"
+        v-model="searchQuery"
+        type="search"
+        placeholder="Search..."
+      />
+    </template>
 
     <hr />
-
-    <button
-      v-if="magnetarTableInstance"
-      :disabled="magnetarTableInstance.fetchState !== 'ok'"
-      @click="() => magnetarTableInstance?.fetchAll()"
-    >
-      {{
-        magnetarTableInstance.fetchState === 'loading'
-          ? 'fetching...'
-          : `fetch all ${magnetarTableInstance.activeCollection.count} records`
-      }}
-    </button>
 
     <MagnetarTable
       ref="magnetarTableInstance"

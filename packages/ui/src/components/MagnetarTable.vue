@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { logWithFlair } from '@magnetarjs/utils'
 import type { CollectionInstance } from '@magnetarjs/types'
 import { useElementSize } from '@vueuse/core'
 import { isAnyObject, isError, isPlainObject, isNumber } from 'is-what'
@@ -296,14 +297,26 @@ const rowsShown = computed(() => {
 })
 
 const pageIndex = ref(0)
-const pageCountFetched = computed(() =>
+const pageCountFetched = computed<number>(() =>
   pageSize.value ? Math.ceil(rowsAll.value.length / pageSize.value) : rowsAll.value.length ? 1 : 0
 )
-const pageCountHypothetical = computed(() =>
-  !pageSize.value ? 1 : Math.ceil(collectionInstance.value.count / pageSize.value)
-)
+const pageCountHypothetical = computed<number>(() => {
+  if (!pageSize.value) return 1
+  if (props.filterDataFn) return Math.ceil(rowsFiltered.value.length / pageSize.value)
+  return Math.ceil(collectionInstance.value.count / pageSize.value)
+})
 
+// reset the page index when the total page count changes
+watch(pageCountHypothetical, (newPageCount, oldPageCount) => {
+  if (newPageCount !== oldPageCount) { pageIndex.value = 0 } // prettier-ignore
+})
+
+// fetch more when pageIndex changes
 watch(pageIndex, async (newIndex) => {
+  if (props.filterDataFn) {
+    logWithFlair('[ui] fetching disabled when a `filterDataFn` in the props is present')
+    return
+  }
   if (fetchState.value === 'ok' && newIndex === pageCountFetched.value) {
     await fetchMore()
     await nextTick()
