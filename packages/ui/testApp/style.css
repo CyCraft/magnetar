@@ -59,8 +59,13 @@ button:focus-visible {
   padding: 2em;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 #app {
   max-width: 1280px;
+  width: 100vw;
   margin: 0 auto;
   padding: 2rem;
 }
