@@ -28,6 +28,7 @@ const magnetarLabelDic = {
   'magnetar table fetch-state error default': 'エラーが出ました',
   'magnetar table info counts total': '件 全レコード数',
   'magnetar table info counts filtered': '件 有効フィルター',
+  'magnetar table info counts fetched': '件 取得済み',
   'magnetar table info counts showing': '件 表示中',
   'magnetar table fetch-state reset': 'フィルターを初期値に戻す',
   'magnetar table filters': 'フィルター',

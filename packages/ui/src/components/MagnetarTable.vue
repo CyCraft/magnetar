@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { CollectionInstance } from '@magnetarjs/types'
-import { arrStr } from '@magnetarjs/utils'
 import { useElementSize } from '@vueuse/core'
-import { isAnyObject, isArray, isError, isPlainObject } from 'is-what'
+import { isAnyObject, isError, isPlainObject } from 'is-what'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import {
   FilterState,
@@ -19,18 +18,17 @@ import {
 import {
   calcCollection,
   carbonCopyMap,
-  filterStateToClauses,
   filtersAndColumnsToInitialState,
   getRequiredOrderByBasedOnFilters,
   mapUnshift,
-  orderByStateToClauses,
 } from '../utils/tableHelpers'
-import LoadingSpinner from './LoadingSpinner.vue'
+import TableDataInfo from './TableDataInfo.vue'
 import TableFilter from './TableFilter.vue'
 import TablePagination from './TablePagination.vue'
 import TableTh from './TableTh.vue'
 import TableTr from './TableTr.vue'
 import TextWithAnchorTags from './TextWithAnchorTags.vue'
+import MagnetarFiltersCodeRepresentation from './MagnetarFiltersCodeRepresentation.vue'
 
 const props = defineProps<{
   collection: CollectionInstance<any>
@@ -112,9 +110,6 @@ watch(
   },
   { deep: true }
 )
-
-const currentFilters = computed(() => filterStateToClauses(filtersState.value, props.filters ?? []))
-const currentOrderBy = computed(() => orderByStateToClauses(orderByState.value))
 
 /**
  * This will always be true in case there was no initialState
@@ -313,6 +308,20 @@ watch(pageIndex, async (newIndex) => {
 })
 
 // prettier-ignore
+const labelsFiltersCodeRepresentation = computed(() => ({
+    'magnetar table no active filters': muiLabel('magnetar table no active filters'),
+  }))
+
+// prettier-ignore
+const labelsDataInfo = computed(() => ({
+    'magnetar table record counts': muiLabel('magnetar table record counts'),
+    'magnetar table info counts total': muiLabel('magnetar table info counts total'),
+    'magnetar table info counts filtered': muiLabel('magnetar table info counts filtered'),
+    'magnetar table info counts fetched': muiLabel('magnetar table info counts fetched'),
+    'magnetar table info counts showing': muiLabel('magnetar table info counts showing'),
+  }))
+
+// prettier-ignore
 const labelsPagination = computed(() => ({
   'magnetar table fetch-more button end': muiLabel('magnetar table fetch-more button end'),
   'magnetar table fetch-more button': muiLabel('magnetar table fetch-more button'),
@@ -362,25 +371,19 @@ const debugMode = !!localStorage.getItem('DEBUG')
         />
       </div>
 
-      <div v-if="showingFiltersCode" class="magnetar-row magnetar-gap-sm magnetar-active-filters">
-        <div v-if="!hasSomeFilterOrOrderby">{{ muiLabel('magnetar table no active filters') }}</div>
-        <div v-for="info in currentFilters" :key="info.filterIndex" class="magnetar-filter-code">
-          {{
-            isArray(info.result)
-              ? info.result.map((where) => `.where(${arrStr(where)})`).join('')
-              : `.query(${JSON.stringify(info.result)})`
-          }}
-          <button @click="() => setFilter(info.filterIndex, null)">✕</button>
-        </div>
-        <div
-          v-for="_orderBy in currentOrderBy"
-          :key="JSON.stringify(_orderBy)"
-          class="magnetar-filter-code"
-        >
-          .orderBy({{ arrStr(_orderBy) }})
-          <button @click="() => setOrderBy(_orderBy[0], null)">✕</button>
-        </div>
-      </div>
+      <MagnetarFiltersCodeRepresentation
+        v-if="showingFiltersCode"
+        :labels="labelsFiltersCodeRepresentation"
+        :hasSomeFilterOrOrderby="hasSomeFilterOrOrderby"
+        :filters="filters"
+        :filtersState="filtersState"
+        :orderByState="orderByState"
+        @setFilter="({ filterIndex, payload }) => setFilter(filterIndex, payload)"
+        @setOrderBy="
+          ({ fieldPath, direction, clearOtherOrderBy }) =>
+            setOrderBy(fieldPath, direction, clearOtherOrderBy)
+        "
+      />
     </section>
 
     <TextWithAnchorTags
@@ -389,15 +392,13 @@ const debugMode = !!localStorage.getItem('DEBUG')
       :text="fetchState.error"
     />
 
-    <section class="magnetar-column magnetar-gap-sm magnetar-items-end">
-      <h6>{{ muiLabel('magnetar table record counts') }}</h6>
-      <div class="magnetar-row magnetar-gap-md">
-        <LoadingSpinner v-if="fetchState === 'fetching'" />
-        {{ collection.count }} {{ muiLabel('magnetar table info counts total') }} /
-        {{ collectionInstance.count }} {{ muiLabel('magnetar table info counts filtered') }} /
-        {{ rows.length }} {{ muiLabel('magnetar table info counts showing') }}
-      </div>
-    </section>
+    <TableDataInfo
+      :labels="labelsDataInfo"
+      :fetchState="fetchState"
+      :collection="collection"
+      :collectionInstance="collectionInstance"
+      :rows="rows"
+    />
 
     <table ref="tableEl" :style="`min-height: ${minH}px; min-width: ${minW}px`">
       <thead>
@@ -466,17 +467,8 @@ const debugMode = !!localStorage.getItem('DEBUG')
 .magnetar-table
   h6
     margin: 0
-.magnetar-table-info
-  min-height: 26px
 .magnetar-fetch-state-error
   color: var(--c-error, indianred)
-.magnetar-filter-code
-  background: var(--c-primary-extra-light, whitesmoke)
-  border-radius: 0.25rem
-  padding: 0.25rem 0.5rem
-  display: flex
-  align-items: center
-  gap: 0.25rem
 .magnetar-table-controls
   display: flex
   align-items: center

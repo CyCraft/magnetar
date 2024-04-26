@@ -493,6 +493,7 @@ export type MUILabel =
   | 'magnetar table fetch-state error default'
   | 'magnetar table info counts total'
   | 'magnetar table info counts filtered'
+  | 'magnetar table info counts fetched'
   | 'magnetar table info counts showing'
   | 'magnetar table fetch-state reset'
   | 'magnetar table filters'
@@ -513,6 +514,7 @@ export const muiLabelDic: Record<MUILabel, string> = {
   'magnetar table fetch-state error default': 'An error occured, check the console',
   'magnetar table info counts total': 'total',
   'magnetar table info counts filtered': 'filtered',
+  'magnetar table info counts fetched': 'fetched',
   'magnetar table info counts showing': 'showing',
   'magnetar table fetch-state reset': 'Reset to Defaults',
   'magnetar table filters': 'Filters',
