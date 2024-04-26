@@ -41,6 +41,7 @@ const magnetarLabelDic = {
   'magnetar table fetch-more button': '追加取得する',
   'magnetar table fetch-more button end': 'すべて取得しました',
   'magnetar table previous-next first-page button': '最初のページへ',
+  'magnetar table previous-next last-page button': '最後のページへ',
   'magnetar table previous-next previous button': '前へ',
   'magnetar table previous-next next button': '次へ',
   'magnetar table previous-next end': 'すべて取得しました',
@@ -236,7 +237,7 @@ const optionsSelect: { label: string; where: WhereClause }[] = [
       :collection="itemsModuleT"
       :columns="columns"
       :filters="[]"
-      :pagination="{ limit: 10, kind: 'previous-next' }"
+      :pagination="{ fetchSize: 10, pageSize: 10 }"
       :parseLabel="parseLabel"
     >
       <template #nakashima="{ data, isExpanded }: MUITableSlot<Item>">

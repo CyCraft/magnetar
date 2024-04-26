@@ -166,10 +166,10 @@ export type MUIColumn<T extends Record<string, any>, Label = string> = {
 }
 
 export type MUIPagination = {
-  /** Infinity, 0, or any other negative number means it will fetch without limit on one page */
-  limit: number
-  /** @default 'fetch-more' */
-  kind?: 'fetch-more' | 'previous-next'
+  /** Infinity, 0, or any other negative number means it will fetch without limit */
+  fetchSize: number
+  /** not having a page size means it will show all fetched data in one big table, hitting "fetch more" adds rows at the bottom */
+  pageSize?: number
 }
 
 /**
@@ -505,6 +505,7 @@ export type MUILabel =
   | 'magnetar table fetch-more button'
   | 'magnetar table fetch-more button end'
   | 'magnetar table previous-next first-page button'
+  | 'magnetar table previous-next last-page button'
   | 'magnetar table previous-next previous button'
   | 'magnetar table previous-next next button'
   | 'magnetar table previous-next end'
@@ -526,6 +527,7 @@ export const muiLabelDic: Record<MUILabel, string> = {
   'magnetar table fetch-more button': 'Fetch More',
   'magnetar table fetch-more button end': 'Fetched Everything!',
   'magnetar table previous-next first-page button': 'To first page',
+  'magnetar table previous-next last-page button': 'To last page',
   'magnetar table previous-next previous button': 'Previous',
   'magnetar table previous-next next button': 'Next',
   'magnetar table previous-next end': 'Fetched Everything!',

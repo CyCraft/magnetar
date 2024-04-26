@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CollectionInstance } from '@magnetarjs/types'
 import { useElementSize } from '@vueuse/core'
-import { isAnyObject, isError, isPlainObject } from 'is-what'
+import { isAnyObject, isError, isPlainObject, isNumber } from 'is-what'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import {
   FilterState,
@@ -150,8 +150,6 @@ const activeCollection = computed<CollectionInstance<any>>(() =>
   calcCollection(props.collection, filtersState.value, orderByState.value, props.filters ?? [])
 )
 
-defineExpose({ activeCollection })
-
 function clearAllRecords(): void {
   props.collection.data.clear()
   collectionInstance.value.fetched.cursor = undefined
@@ -172,7 +170,12 @@ function clearState(): void {
   fetchMore()
 }
 
-const hasFetchLimit = computed<boolean>(() => props.pagination.limit > 0)
+/** If we have a page size that is not 0 or Infinity, we return it, otherwise `false` */
+const pageSize = computed<false | number>(() => {
+  const { pageSize } = props.pagination
+  return isNumber(pageSize) && pageSize > 0 && pageSize !== Infinity ? pageSize : false
+})
+
 const minH = ref(26)
 const minW = ref(26)
 const tableEl = ref(null)
@@ -183,18 +186,23 @@ const { height, width } = useElementSize(tableEl)
  */
 async function setMinTableHeight() {
   await nextTick()
-  if (!hasFetchLimit.value || collectionInstance.value.data.size >= props.pagination.limit) {
+  if (pageSize.value === false || collectionInstance.value.data.size >= pageSize.value) {
     if (minH.value === 26 && height.value > 26) minH.value = height.value
     if (minW.value === 26 && width.value > 26) minW.value = width.value
   }
 }
 
 /** never throws */
-async function fetchMore() {
+async function fetchMore(params: { limit: number } = { limit: props.pagination.fetchSize }) {
   fetchState.value = 'fetching'
+
+  const fetchSize = params.limit
+  const limit: number | undefined =
+    isNumber(fetchSize) && fetchSize > 0 && fetchSize !== Infinity ? fetchSize : undefined
+
   const filteredCollection = activeCollection.value
-  const collectionToFetch = hasFetchLimit.value
-    ? filteredCollection.startAfter(filteredCollection.fetched.cursor).limit(props.pagination.limit)
+  const collectionToFetch = limit
+    ? filteredCollection.startAfter(filteredCollection.fetched.cursor).limit(limit)
     : filteredCollection
   try {
     await collectionToFetch.fetch({ force: true })
@@ -213,6 +221,12 @@ async function fetchMore() {
     }
   }
 }
+
+function fetchAll() {
+  fetchMore({ limit: 0 })
+}
+
+defineExpose({ activeCollection, fetchMore, fetchAll, fetchState })
 
 onMounted(() => {
   clearAllRecords()
@@ -266,41 +280,34 @@ async function setOrderBy(
 
 const showingFiltersCode = ref(false)
 
+/** All data as per collection instance with potential `.where` clauses applied */
+const rowsAll = computed(() => [...collectionInstance.value.data.values()])
+/** `rowsAll` but with extra local `filterDataFn` applied  */
+const rowsFiltered = computed(() =>
+  props.filterDataFn ? rowsAll.value.filter(props.filterDataFn) : rowsAll.value
+)
+/** `rowsFiltered` but with pagination applied  */
+const rowsShown = computed(() => {
+  if (pageSize.value === false) return rowsFiltered.value
+  return rowsFiltered.value.slice(
+    pageSize.value * pageIndex.value,
+    pageSize.value * (pageIndex.value + 1)
+  )
+})
+
 const pageIndex = ref(0)
 const pageCountFetched = computed(() =>
-  !hasFetchLimit.value
-    ? allData.value.length
-      ? 1
-      : 0
-    : Math.ceil(allData.value.length / props.pagination.limit)
+  pageSize.value ? Math.ceil(rowsAll.value.length / pageSize.value) : rowsAll.value.length ? 1 : 0
 )
-const pageCount = computed(() =>
-  !hasFetchLimit.value ? 1 : Math.ceil(collectionInstance.value.count / props.pagination.limit)
+const pageCountHypothetical = computed(() =>
+  !pageSize.value ? 1 : Math.ceil(collectionInstance.value.count / pageSize.value)
 )
-
-const allData = computed(() => {
-  const { filterDataFn } = props
-  const data = [...collectionInstance.value.data.values()]
-  return filterDataFn ? data.filter(filterDataFn) : data
-})
-const rows = computed(() => {
-  if (!hasFetchLimit.value) return allData.value
-
-  const { pagination } = props
-  if (pagination.kind === 'previous-next') {
-    return allData.value.slice(
-      pagination.limit * pageIndex.value,
-      pagination.limit * (pageIndex.value + 1)
-    )
-  }
-  return allData.value
-})
 
 watch(pageIndex, async (newIndex) => {
   if (fetchState.value === 'ok' && newIndex === pageCountFetched.value) {
     await fetchMore()
     await nextTick()
-    if (!rows.value.length) {
+    if (!rowsShown.value.length) {
       // the final page fetched was empty, let's go back one page
       pageIndex.value = newIndex - 1
     }
@@ -326,6 +333,7 @@ const labelsPagination = computed(() => ({
   'magnetar table fetch-more button end': muiLabel('magnetar table fetch-more button end'),
   'magnetar table fetch-more button': muiLabel('magnetar table fetch-more button'),
   'magnetar table previous-next first-page button': muiLabel('magnetar table previous-next first-page button'),
+  'magnetar table previous-next last-page button': muiLabel('magnetar table previous-next last-page button'),
   'magnetar table previous-next previous button': muiLabel('magnetar table previous-next previous button'),
   'magnetar table previous-next next button': muiLabel('magnetar table previous-next next button'),
   'magnetar table previous-next end': muiLabel('magnetar table previous-next end'),
@@ -397,7 +405,7 @@ const debugMode = !!localStorage.getItem('DEBUG')
       :fetchState="fetchState"
       :collection="collection"
       :collectionInstance="collectionInstance"
-      :rows="rows"
+      :rows="rowsShown"
     />
 
     <table ref="tableEl" :style="`min-height: ${minH}px; min-width: ${minW}px`">
@@ -421,7 +429,7 @@ const debugMode = !!localStorage.getItem('DEBUG')
         </tr>
       </thead>
       <tbody>
-        <slot v-if="!rows.length && fetchState !== 'fetching'" name="empty">
+        <slot v-if="!rowsShown.length && fetchState !== 'fetching'" name="empty">
           <tr>
             <td :colspan="columns.length">
               <div class="magnetar-row magnetar-justify-center" style="min-height: 100px">
@@ -431,7 +439,7 @@ const debugMode = !!localStorage.getItem('DEBUG')
           </tr>
         </slot>
         <TableTr
-          v-for="row in rows"
+          v-for="row in rowsShown"
           :key="row.id"
           :row="row"
           :columns="columns"
@@ -451,8 +459,9 @@ const debugMode = !!localStorage.getItem('DEBUG')
 
     <TablePagination
       v-model:pageIndex="pageIndex"
-      :pageCount="pageCount"
-      :kind="pagination.kind ?? 'fetch-more'"
+      :pageSize="pageSize"
+      :pageCountFetched="pageCountFetched"
+      :pageCountHypothetical="pageCountHypothetical"
       :fetchMore="fetchMore"
       :fetchState="fetchState"
       :labels="labelsPagination"

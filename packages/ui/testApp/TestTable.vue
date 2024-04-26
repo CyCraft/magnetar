@@ -40,6 +40,7 @@ const magnetarLabelDic = {
   'magnetar table fetch-more button': '追加取得する',
   'magnetar table fetch-more button end': 'すべて取得しました',
   'magnetar table previous-next first-page button': '最初のページへ',
+  'magnetar table previous-next last-page button': '最後のページへ',
   'magnetar table previous-next previous button': '前へ',
   'magnetar table previous-next next button': '次へ',
   'magnetar table previous-next end': 'すべて取得しました',
@@ -190,6 +191,8 @@ const filterDataFn = computed<undefined | ((data: Record<string, any>, index: nu
     }
   }
 )
+
+const magnetarTableInstance = ref<null | InstanceType<typeof MagnetarTable>>(null)
 </script>
 
 <template>
@@ -218,12 +221,25 @@ const filterDataFn = computed<undefined | ((data: Record<string, any>, index: nu
 
     <hr />
 
+    <button
+      v-if="magnetarTableInstance"
+      :disabled="magnetarTableInstance.fetchState !== 'ok'"
+      @click="() => magnetarTableInstance?.fetchAll()"
+    >
+      {{
+        magnetarTableInstance.fetchState === 'loading'
+          ? 'fetching...'
+          : `fetch all ${magnetarTableInstance.activeCollection.count} records`
+      }}
+    </button>
+
     <MagnetarTable
+      ref="magnetarTableInstance"
       class="magnetar-table"
       :collection="itemsModuleT"
       :columns="columns"
       :filters="filters"
-      :pagination="{ limit: 10, kind: 'previous-next' }"
+      :pagination="{ fetchSize: 20, pageSize: 10 }"
       :parseLabel="parseLabel"
       :filterDataFn="filterDataFn"
     >
