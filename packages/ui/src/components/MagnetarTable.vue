@@ -297,9 +297,11 @@ const rowsShown = computed(() => {
 })
 
 const pageIndex = ref(0)
-const pageCountFetched = computed<number>(() =>
-  pageSize.value ? Math.ceil(rowsAll.value.length / pageSize.value) : rowsAll.value.length ? 1 : 0
-)
+const pageCountFetched = computed<number>(() => {
+  if (!pageSize.value) return rowsAll.value.length ? 1 : 0
+  if (props.filterDataFn) return Math.ceil(rowsFiltered.value.length / pageSize.value)
+  return Math.ceil(rowsAll.value.length / pageSize.value)
+})
 const pageCountHypothetical = computed<number>(() => {
   if (!pageSize.value) return 1
   if (props.filterDataFn) return Math.ceil(rowsFiltered.value.length / pageSize.value)
