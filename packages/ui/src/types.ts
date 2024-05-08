@@ -10,32 +10,65 @@ import { Ref } from 'vue'
 
 export type OPaths<T> = OPathsWithOptional<T>
 
-export type MUITableSlot<T = any> = { data: T; isExpanded: Ref<boolean>; value: any }
+export type MUITableSlot<T = any> = {
+  data: Readonly<T>
+  value: Readonly<any>
+  isExpanded: Ref<boolean>
+  class: Readonly<string | undefined>
+  style: Readonly<string | undefined>
+}
 
 /** You can pass a text parser which will be used for any `label` used throughout the table */
 export type MUIParseLabel<LabelType = any> = (label: LabelType) => string
 
-export type Codable<DataType, ReturnType> = (info: {
-  value: any
-  data: DataType
-  isExpanded: boolean
-}) => ReturnType
+/**
+ * A codable prop means you can set up a function and return a value you want to apply.
+ *
+ * As params for this function you will get information on the current row, the `data`, `value`, and wether or not the row is expanded.
+ */
+export type Codable<DataType, ReturnType> = (
+  info: Readonly<{
+    value: any
+    data: DataType
+    isExpanded: boolean
+  }>
+) => ReturnType
 
 export type MUIButton<T extends Record<string, any>, Label = string> = {
   /** Executed on button click */
-  handler: (info: { value: any; data: T; isExpanded: Ref<boolean> }) => void | Promise<void>
-  /** Applied to the innerText of the `<button>` */
+  handler: (info: {
+    value: Readonly<any>
+    data: Readonly<T>
+    isExpanded: Ref<boolean>
+  }) => void | Promise<void>
+  /**
+   * Applied to the innerText of the `<button>`
+   *
+   * @see {@link Codable}
+   */
   label: string | Label | Codable<T, string> | Codable<T, Label>
   /**
    * When `true` it will bind the `label` to the `innerHTML` of the `<button>` instead of the `innerText`.
    * Useful to pass SVGs as buttons or a bit more complex HTML to confine to some button CSS you use throughout your project.
    */
   html?: boolean
-  /** Applied to the `<button>` */
+  /**
+   * Applied to the `<button>`
+   *
+   * @see {@link Codable}
+   */
   class?: string | Codable<T, string>
-  /** Applied to the `<button>` */
+  /**
+   * Applied to the `<button>`
+   *
+   * @see {@link Codable}
+   */
   style?: string | Codable<T, string>
-  /** Applied to the `<button>` */
+  /**
+   * Applied to the `<button>`
+   *
+   * @see {@link Codable}
+   */
   disabled?: boolean | undefined | Codable<T, boolean | undefined>
 }
 
@@ -107,13 +140,25 @@ export type MUIColumn<T extends Record<string, any>, Label = string> = {
    *   </template>
    * </MagnetarTable>
    * ```
+   *
+   * @see {@link MUITableSlot} for the props you will have access to in the slot context
    */
   slot?: string
-  /** Applied to `td > div` */
+  /**
+   * Applied to `td > div`
+   *
+   * @see {@link Codable}
+   */
   class?: string | Codable<T, string>
-  /** Applied to `td > div` */
+  /**
+   * Applied to `td > div`
+   *
+   * @see {@link Codable}
+   */
   style?: string | Codable<T, string>
-  /** Shows action buttons next to the cell value */
+  /**
+   * Shows action buttons next to the cell value
+   */
   buttons?: MUIButton<T, Label>[]
   /**
    * When `true` it will bind the `value` to the `innerHTML` of the `td > div > div` instead of the `innerText`.

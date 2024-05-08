@@ -123,6 +123,8 @@ const rowSlotContext = computed<MUITableSlot<any>>(() => ({
   data: props.row,
   isExpanded,
   value: cellValueRaw.value,
+  class: cellAttrs.value.class,
+  style: cellAttrs.value.style,
 }))
 </script>
 
