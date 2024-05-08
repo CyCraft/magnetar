@@ -5,6 +5,7 @@ import { useElementSize } from '@vueuse/core'
 import { isAnyObject, isError, isPlainObject, isNumber } from 'is-what'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import {
+  MUIRowMeta,
   FilterState,
   FiltersState,
   MUIColumn,
@@ -34,6 +35,7 @@ import MagnetarFiltersCodeRepresentation from './MagnetarFiltersCodeRepresentati
 const props = defineProps<{
   collection: CollectionInstance<any>
   columns: MUIColumn<any, any>[]
+  rowMeta?: MUIRowMeta
   pagination: MUIPagination
   filters?: MUIFilter<any, any>[]
   parseLabel?: MUIParseLabel
@@ -459,6 +461,7 @@ const debugMode = !!localStorage.getItem('DEBUG')
           :row="row"
           :columns="columns"
           :parseLabel="parseLabel"
+          :rowMeta="rowMeta"
         >
           <template
             v-for="(column, columnIndex) in columns"

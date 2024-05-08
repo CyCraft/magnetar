@@ -12,7 +12,7 @@ export type OPaths<T> = OPathsWithOptional<T>
 
 export type MUITableSlot<T = any> = {
   data: Readonly<T>
-  value: Readonly<any>
+  value: Readonly<any> | undefined
   isExpanded: Ref<boolean>
   class: Readonly<string | undefined>
   style: Readonly<string | undefined>
@@ -33,6 +33,16 @@ export type Codable<DataType, ReturnType> = (
     isExpanded: boolean
   }>
 ) => ReturnType
+
+/**
+ * Gives you the ability to apply classes / styles to rows.
+ *
+ * Use {@link Codable} to write a function so you can apply it conditionally based on the row data.
+ */
+export type MUIRowMeta = {
+  class?: string | Codable<any, string | undefined>
+  style?: string | Codable<any, string | undefined>
+}
 
 export type MUIButton<T extends Record<string, any>, Label = string> = {
   /** Executed on button click */

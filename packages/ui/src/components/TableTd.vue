@@ -47,13 +47,11 @@ const cellValueRaw = computedAsync<any>(
 )
 
 /** Any `Codable<...>` prop or handler will use this payload, so we prep it here. */
-const codablePayload = computed<{ data: Record<string, any>; value: any; isExpanded: boolean }>(
-  () => ({
-    data: props.row,
-    value: cellValueRaw.value,
-    isExpanded: isExpanded.value,
-  })
-)
+const codablePayload = computed<Parameters<Codable<any, any>>[0]>(() => ({
+  data: props.row,
+  value: cellValueRaw.value,
+  isExpanded: isExpanded.value,
+}))
 
 /** Any type that has `Codable<...>` should be piped through this. */
 function evaluateCodableProp<T>(prop: T | Codable<Record<string, any>, T>): T {

@@ -246,9 +246,13 @@ const magnetarTableInstance = ref<null | InstanceType<typeof MagnetarTable>>(nul
       :pagination="{ fetchSize: 20, pageSize: 10 }"
       :parseLabel="parseLabel"
       :filterDataFn="filterDataFn"
+      :rowMeta="{
+        style: ({ data }) =>
+          data.isDone ? 'background-color: lightgreen; opacity: 0.5' : undefined,
+      }"
     >
       <template #nakashima="{ data, isExpanded, value }: MUITableSlot<Item>">
-        {{ value.slice(0, 1) + '...' }}
+        {{ value?.slice(0, 1) + '...' }}
         <button @click="() => (isExpanded.value = !isExpanded.value)">
           {{ isExpanded.value ? 'Hide Details' : 'Show Details' }}
         </button>
