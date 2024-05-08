@@ -12,7 +12,7 @@ export type OPaths<T> = OPathsWithOptional<T>
 
 export type MUITableSlot<T = any> = {
   data: Readonly<T>
-  value: Readonly<any> | undefined
+  value: any
   isExpanded: Ref<boolean>
   class: Readonly<string | undefined>
   style: Readonly<string | undefined>
@@ -47,7 +47,7 @@ export type MUIRowMeta = {
 export type MUIButton<T extends Record<string, any>, Label = string> = {
   /** Executed on button click */
   handler: (info: {
-    value: Readonly<any>
+    value: any
     data: Readonly<T>
     isExpanded: Ref<boolean>
   }) => void | Promise<void>
