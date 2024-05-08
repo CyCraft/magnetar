@@ -22,6 +22,12 @@ const isExpanded = computed<boolean>({
 })
 
 const isFetchingCell = ref(false)
+
+/**
+ * Represents the cell value BEFORE `parseValue` is applied.
+ *
+ * Fetches the value when `fetchValue` is defined.
+ */
 const cellValueRaw = computedAsync<any>(
   async () => {
     const { column, row } = props
@@ -54,6 +60,11 @@ function evaluateCodableProp<T>(prop: T | Codable<Record<string, any>, T>): T {
   return isFunction(prop) ? prop(codablePayload.value) : prop
 }
 
+/**
+ * Represents the cell value AFTER `parseValue` is applied.
+ *
+ * Uses {@link cellValueRaw} under the hood.
+ */
 const cellValueParsed = computed<string>(() => {
   const { parseValue, fetchValue } = props.column
   const rawValue = cellValueRaw.value
