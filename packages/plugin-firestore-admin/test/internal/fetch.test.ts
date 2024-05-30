@@ -51,6 +51,20 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
   })
 }
 {
+  const testName = 'fetch (doc) edit right before opening, but already having fetched once'
+  test(testName, async (t) => {
+    const { trainerModule } = await createMagnetarInstance(testName, {
+      insertDocs: { '': { age: 10, name: 'Luca' } },
+    })
+
+    await trainerModule.fetch().catch((e: any) => t.fail(e.message))
+    trainerModule.merge({ name: 'L' })
+    await trainerModule.fetch().catch((e: any) => t.fail(e.message))
+
+    t.deepEqual(trainerModule.data, { name: 'L', age: 10 })
+  })
+}
+{
   const testName = 'fetch (collection) edit right before opening'
   test(testName, async (t) => {
     const { pokedexModule } = await createMagnetarInstance(testName, {

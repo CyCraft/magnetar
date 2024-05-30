@@ -108,12 +108,16 @@ export function handleActionPerStore(
 
     // eslint-disable-next-line no-async-promise-executor
     const actionPromise = new Promise<any>(async (resolve, reject) => {
+      let docId = _docId
+      let modulePath = [collectionPath, docId].filter(Boolean).join('/')
       /**
        * Are we forcing to check in with the DB or can we be satisfied with only optimistic fetch?
        */
       const force = payload?.force === true
+      const willForceFetch =
+        force || (docId ? docFn(modulePath, moduleConfig).exists !== true : false)
       // we need to await any writeLock _before_ fetching, to prevent grabbing outdated data
-      if (actionName === 'fetch' && force) {
+      if (actionName === 'fetch' && willForceFetch) {
         await writeLock.promise
         if (!_docId) {
           // we need to await all promises of all docs in this collection...
@@ -123,8 +127,6 @@ export function handleActionPerStore(
       }
 
       try {
-        let docId = _docId
-        let modulePath = [collectionPath, docId].filter(Boolean).join('/')
         // get all the config needed to perform this action
         const onError = actionConfig.onError || moduleConfig.onError || globalConfig.onError
         const modifyPayloadFnsMap = getModifyPayloadFnsMap(
