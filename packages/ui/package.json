@@ -35,9 +35,9 @@
     "@magnetarjs/core": "workspace:*",
     "@magnetarjs/types": "workspace:*",
     "@magnetarjs/utils": "workspace:*",
-    "@vueuse/core": "^10.9.0",
+    "@vueuse/core": "^10.10.0",
     "array-shuffle": "^3.0.0",
-    "chart.js": "^4.4.2",
+    "chart.js": "^4.4.3",
     "chartjs-plugin-datalabels": "^2.2.0",
     "chartjs-plugin-doughnutlabel-rebourne": "3.0.0-beta.4",
     "color2k": "^2.0.3",
@@ -45,8 +45,8 @@
     "getorset-anything": "^0.0.5",
     "is-what": "^4.1.16",
     "path-to-prop": "^2.0.4",
-    "vue": "^3.4.21",
-    "vue-chartjs": "^5.3.0"
+    "vue": "^3.4.27",
+    "vue-chartjs": "^5.3.1"
   },
   "devDependencies": {
     "@magnetarjs/plugin-firestore": "workspace:*",
@@ -54,9 +54,9 @@
     "@magnetarjs/test-utils": "workspace:^",
     "@vitejs/plugin-vue": "^4.6.2",
     "roll-anything": "^3.0.4",
-    "sass": "^1.74.1",
-    "typescript": "^5.4.4",
-    "vite": "^5.2.8",
+    "sass": "^1.77.3",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.12",
     "vue-tsc": "^1.8.27"
   },
   "homepage": "https://github.com/cycraft/magnetar#readme",

@@ -9,15 +9,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "firebase": "^10.10.0",
+    "firebase": "^10.12.2",
     "magnetar": "workspace:*",
-    "vue": "^3.4.21"
+    "vue": "^3.4.27"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.6.2",
-    "typescript": "^5.4.4",
+    "typescript": "^5.4.5",
     "vite": "^4.5.3",
-    "sass": "^1.74.1",
+    "sass": "^1.77.3",
     "vue-tsc": "^1.8.27"
   }
 }
