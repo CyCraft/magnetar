@@ -150,7 +150,7 @@ export type MagnetarDeleteAction = (
 /**
  * All fetch promises with the payload passed to `fetch(payload)` as key (JSON.stringify) and the "fetch promise" as value. In case `fetch()` had no payload, use `undefined`
  */
-export type FetchPromises = Map<string, Promise<any>>
+export type FetchPromises = { [key in 'fetch' | 'fetchCount']: Map<string, Promise<any>> }
 
 /**
  * Meta data on the last fetch call for a collection().

@@ -14,15 +14,8 @@ export function revertActionFactory(
     actionName,
     error,
   }: PluginRevertActionPayload<Vue3StoreModuleConfig>): void {
-    if (actionName === 'stream' || actionName === 'fetch') {
-      // no need to "revert" anything on stream or fetch
-      return
-    }
     // revert all write actions when called on a doc
-    if (
-      docId &&
-      ['insert', 'merge', 'assign', 'replace', 'delete', 'deleteProp'].includes(actionName)
-    ) {
+    if (docId) {
       restoreBackup(collectionPath, docId)
       return
     }

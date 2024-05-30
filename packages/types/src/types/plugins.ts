@@ -1,7 +1,7 @@
 import { ActionConfig, ActionName } from './actions'
+import { Clauses } from './clauses'
 import { DocMetadata } from './core'
 import { OnAddedFn, OnModifiedFn, OnRemovedFn } from './modifyReadResponse'
-import { Clauses } from './clauses'
 import { MergeDeep } from './utils/MergeDeep'
 
 // stores / plugins
@@ -260,7 +260,10 @@ export type PluginRevertActionPayload<SpecificPluginModuleConfig = PluginModuleC
     /**
      * Whatever action was originally triggered when an error was thrown. This is the action that will need to be reverted by this function.
      */
-    actionName: ActionName
+    actionName: Extract<
+      ActionName,
+      'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp' | 'delete'
+    >
     /**
      * Whatever error was thrown that caused the need for reverting.
      */

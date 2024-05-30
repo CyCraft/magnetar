@@ -14,9 +14,9 @@ import type {
   WriteLock,
 } from '@magnetarjs/types'
 import {
+  MODULE_IDENTIFIER_SPLIT,
   getPathFilterIdentifier,
   getPathWhereOrderByIdentifier,
-  MODULE_IDENTIFIER_SPLIT,
 } from '@magnetarjs/types'
 import { mapGetOrSet } from 'getorset-anything'
 import { isString } from 'is-what'
@@ -95,7 +95,7 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     const fetchPromises = mapGetOrSet(
       fetchPromiseMap,
       pathFilterIdentifier,
-      (): FetchPromises => new Map()
+      (): FetchPromises => ({ fetch: new Map(), fetchCount: new Map() })
     )
     // Create the FetchMeta helpers for this module
     const pathWhereOrderByIdentifier = getPathWhereOrderByIdentifier(modulePath, moduleConfig)

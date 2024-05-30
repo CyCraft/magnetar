@@ -3,7 +3,6 @@ import type {
   ActionConfig,
   ActionName,
   ActionTernary,
-  ActionType,
   CollectionFn,
   DocFn,
   DoOnFetch,
@@ -12,19 +11,14 @@ import type {
   FetchPromises,
   FetchResponse,
   GlobalConfig,
-  MagnetarDeleteAction,
-  MagnetarDeletePropAction,
   MagnetarFetchAction,
   MagnetarFetchCountAction,
-  MagnetarInsertAction,
-  MagnetarWriteAction,
   ModuleConfig,
   OnAddedFn,
   SyncBatch,
   WriteLock,
 } from '@magnetarjs/types'
-import { mapGetOrSet } from 'getorset-anything'
-import { isBoolean, isFullArray, isFullString, isPromise } from 'is-what'
+import { isBoolean, isPromise } from 'is-what'
 import { getEventNameFnsMap } from '../helpers/eventHelpers'
 import { executeOnFns } from '../helpers/executeOnFns'
 import { getModifyPayloadFnsMap } from '../helpers/modifyPayload'
@@ -40,7 +34,7 @@ import {
 import { throwIfNoFnsToExecute } from '../helpers/throwFns'
 import { handleAction } from './handleAction'
 
-export type HandleActionSharedParams = {
+export type HandleFetchPerStoreParams = {
   collectionPath: string
   _docId: string | undefined
   moduleConfig: ModuleConfig
@@ -52,64 +46,31 @@ export type HandleActionSharedParams = {
   setLastFetched?: (payload: FetchMetaDataCollection) => void
 }
 
-export function handleActionPerStore<TActionName extends Exclude<ActionName, 'stream'>>(
-  sharedParams: HandleActionSharedParams,
-  actionName: TActionName,
-  actionType: ActionType
-): ActionTernary<TActionName>
-export function handleActionPerStore(
-  sharedParams: HandleActionSharedParams,
-  actionName: Exclude<ActionName, 'stream'>,
-  actionType: ActionType
-):
-  | MagnetarFetchCountAction
-  | MagnetarFetchAction<any>
-  | MagnetarWriteAction<any>
-  | MagnetarInsertAction<any>
-  | MagnetarDeleteAction
-  | MagnetarDeletePropAction<any> {
+export function handleFetchPerStore<
+  TActionName extends Extract<ActionName, 'fetch' | 'fetchCount'>
+>(sharedParams: HandleFetchPerStoreParams, actionName: TActionName): ActionTernary<TActionName>
+export function handleFetchPerStore(
+  sharedParams: HandleFetchPerStoreParams,
+  actionName: Extract<ActionName, 'fetch' | 'fetchCount'>
+): MagnetarFetchCountAction | MagnetarFetchAction<any> {
   const { collectionPath, _docId, moduleConfig, globalConfig, fetchPromises, writeLockMap, docFn, collectionFn, setLastFetched } = sharedParams // prettier-ignore
 
   // returns the action the dev can call with myModule.insert() etc.
   return function (payload?: any, actionConfig: ActionConfig = {}): Promise<any> {
     // first of all, check if the same fetch call was just made or not, if so return the same fetch promise early
     const fetchPromiseKey = JSON.stringify(payload)
-    const foundFetchPromise = fetchPromises.get(fetchPromiseKey)
+    const foundFetchPromise = fetchPromises[actionName].get(fetchPromiseKey)
     // return the same fetch promise early if it's not yet resolved
     if (actionName === 'fetch' && isPromise(foundFetchPromise)) return foundFetchPromise
 
     // set up and/or reset te writeLock for write actions
     const writeLockId = _docId ? `${collectionPath}/${_docId}` : collectionPath
-    const writeLock = mapGetOrSet(writeLockMap, writeLockId, (): WriteLock => {
-      return { promise: null, resolve: () => {}, countdown: null }
-    })
-
-    if (actionName !== 'fetch' && actionName !== 'fetchCount') {
-      // we need to create a promise we'll resolve later to prevent any incoming docs from being written to the local state during this time
-      if (writeLock.promise === null) {
-        writeLock.promise = new Promise<void>((resolve) => {
-          writeLock.resolve = () => {
-            resolve()
-            writeLock.resolve = () => {}
-            writeLock.promise = null
-            if (writeLock.countdown !== null) {
-              clearTimeout(writeLock.countdown)
-              writeLock.countdown = null
-            }
-          }
-        })
-      }
-      if (writeLock.promise !== null && writeLock.countdown !== null) {
-        // there already is a promise, let's just stop the countdown, we'll start it again at the end of all the store actions
-        clearTimeout(writeLock.countdown)
-        writeLock.countdown = null
-      }
-    }
+    const writeLock = writeLockMap.get(writeLockId)
 
     // eslint-disable-next-line no-async-promise-executor
     const actionPromise = new Promise<any>(async (resolve, reject) => {
-      let docId = _docId
-      let modulePath = [collectionPath, docId].filter(Boolean).join('/')
+      const docId = _docId
+      const modulePath = [collectionPath, docId].filter(Boolean).join('/')
       /**
        * Are we forcing to check in with the DB or can we be satisfied with only optimistic fetch?
        */
@@ -118,7 +79,7 @@ export function handleActionPerStore(
         force || (docId ? docFn(modulePath, moduleConfig).exists !== true : false)
       // we need to await any writeLock _before_ fetching, to prevent grabbing outdated data
       if (actionName === 'fetch' && willForceFetch) {
-        await writeLock.promise
+        await writeLock?.promise
         if (!_docId) {
           // we need to await all promises of all docs in this collection...
           const collectionWriteMaps = getCollectionWriteLocks(collectionPath, writeLockMap)
@@ -147,9 +108,9 @@ export function handleActionPerStore(
         const storesToExecute: string[] =
           actionConfig.executionOrder ||
           (moduleConfig.executionOrder || {})[actionName] ||
-          (moduleConfig.executionOrder || {})[actionType] ||
+          (moduleConfig.executionOrder || {})['read'] ||
           (globalConfig.executionOrder || {})[actionName] ||
-          (globalConfig.executionOrder || {})[actionType] ||
+          (globalConfig.executionOrder || {})['read'] ||
           []
         throwIfNoFnsToExecute(storesToExecute)
         // update the payload
@@ -228,49 +189,12 @@ export function handleActionPerStore(
 
           // handle reverting. stopExecution might have been modified by `handleAction`
           if (stopExecution === 'revert') {
-            const storesToRevert = storesToExecute.slice(0, i)
-            storesToRevert.reverse()
-            for (const storeToRevert of storesToRevert) {
-              const pluginRevertAction = globalConfig.stores[storeToRevert].revert
-              const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeToRevert)
-              await pluginRevertAction({
-                payload,
-                actionConfig,
-                collectionPath,
-                docId,
-                pluginModuleConfig,
-                actionName,
-                error: resultFromPlugin, // in this case the result is the error
-              })
-              // revert eventFns, handle and await each eventFn in sequence
-              for (const fn of eventNameFnsMap.revert) {
-                await fn({ payload, result: resultFromPlugin, actionName, storeName, collectionPath, docId, path: modulePath, pluginModuleConfig }) // prettier-ignore
-              }
-            }
             // we must update the `exists` prop for fetch calls
             if (actionName === 'fetch' && docId) {
               doOnFetchFns.forEach((fn) => fn(undefined, 'error'))
             }
-            if (actionName !== 'fetch' && actionName !== 'fetchCount') {
-              writeLock.resolve()
-            }
             // now we must throw the error
             throw resultFromPlugin
-          }
-
-          // special handling for 'insert' (resultFromPlugin will always be `string | [string, SyncBatch]`)
-          if (actionName === 'insert') {
-            // update the modulePath if a doc with random ID was inserted in a collection
-            // if this is the case the result will be a string - the randomly genererated ID
-            if (!docId) {
-              if (isFullString(resultFromPlugin)) {
-                docId = resultFromPlugin
-              }
-              if (isFullArray(resultFromPlugin) && isFullString(resultFromPlugin[0])) {
-                docId = resultFromPlugin[0]
-              }
-              modulePath = [collectionPath, docId].filter(Boolean).join('/')
-            }
           }
 
           // special handling for 'fetch' (resultFromPlugin will always be `FetchResponse | OnAddedFn`)
@@ -319,42 +243,30 @@ export function handleActionPerStore(
         }
         // all the stores resolved their actions
 
-        // return fetchCount
+        fetchPromises[actionName].delete(fetchPromiseKey)
+
         if (actionName === 'fetchCount') {
+          // return the fetchCount
           resolve(fetchCount)
-          return
-        }
-
-        // start the writeLock countdown
-        if (actionName !== 'fetch' && !writeLock.countdown) {
-          writeLock.countdown = setTimeout(writeLock.resolve, 5000)
-        }
-
-        // 'insert' always returns a DocInstance, unless the "abort" action was called, then the modulePath might still be a collection:
-        if (actionName === 'insert' && docId) {
-          resolve(docFn(modulePath, moduleConfig))
           return
         }
 
         // anything that's executed from a "doc" module:
         if (docId || !collectionFn) {
+          // return the module's up-to-date data
           resolve(docFn(modulePath, moduleConfig).data)
-          if (actionName === 'fetch') fetchPromises.delete(fetchPromiseKey)
           return
         }
 
-        // all other actions triggered on collections ('fetch' is the only possibility left)
+        // return the collectionFetchResult
         resolve(collectionFetchResult)
-        if (actionName === 'fetch') fetchPromises.delete(fetchPromiseKey)
       } catch (error) {
         reject(error)
-        if (actionName === 'fetch') fetchPromises.delete(fetchPromiseKey)
+        fetchPromises[actionName].delete(fetchPromiseKey)
       }
     })
 
-    if (actionName === 'fetch') {
-      fetchPromises.set(fetchPromiseKey, actionPromise)
-    }
+    fetchPromises[actionName].set(fetchPromiseKey, actionPromise)
 
     return actionPromise
   }

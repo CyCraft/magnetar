@@ -16,7 +16,6 @@ import type {
   WhereFilterOp,
   WriteLock,
 } from '@magnetarjs/types'
-import { actionNameTypeMap } from '@magnetarjs/types'
 import { merge, mergeAndConcat } from 'merge-anything'
 import {
   executeSetupModulePerStore,
@@ -24,11 +23,9 @@ import {
   getDataFromDataStore,
   proxify,
 } from './helpers/moduleHelpers'
-import {
-  handleActionPerStore,
-  HandleActionSharedParams,
-} from './moduleActions/handleActionPerStore'
+import { HandleFetchPerStoreParams, handleFetchPerStore } from './moduleActions/handleFetchPerStore'
 import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
+import { HandleWritePerStoreParams, handleWritePerStore } from './moduleActions/handleWritePerStore'
 
 export function createCollectionWithContext(
   collectionPath: string,
@@ -55,7 +52,16 @@ export function createCollectionWithContext(
     return docFn(`${path}/${docId}`, merge(moduleConfig, _moduleConfig))
   }) as any
 
-  const sharedParams: HandleActionSharedParams = {
+  const writeParams: HandleWritePerStoreParams = {
+    collectionPath,
+    _docId: undefined,
+    moduleConfig,
+    globalConfig,
+    writeLockMap,
+    docFn,
+    collectionFn,
+  }
+  const fetchParams: HandleFetchPerStoreParams = {
     collectionPath,
     _docId: undefined,
     moduleConfig,
@@ -66,11 +72,11 @@ export function createCollectionWithContext(
     collectionFn,
     setLastFetched: fetchMeta.set,
   }
-  const insert = handleActionPerStore(sharedParams, 'insert', actionNameTypeMap.insert) as MagnetarInsertAction //prettier-ignore
-  const _delete = handleActionPerStore(sharedParams, 'delete', actionNameTypeMap.delete) as MagnetarDeleteAction //prettier-ignore
-  const fetch = handleActionPerStore(sharedParams, 'fetch', actionNameTypeMap.fetch) as MagnetarFetchAction<Record<string, unknown>, 'collection'> //prettier-ignore
-  const fetchCount = handleActionPerStore(sharedParams, 'fetchCount', actionNameTypeMap.fetchCount) as MagnetarFetchCountAction // prettier-ignore
-  const stream = handleStreamPerStore([collectionPath, undefined], moduleConfig, globalConfig, actionNameTypeMap.stream, streaming, cacheStream, writeLockMap) // prettier-ignore
+  const insert = handleWritePerStore(writeParams, 'insert') as MagnetarInsertAction //prettier-ignore
+  const _delete = handleWritePerStore(writeParams, 'delete') as MagnetarDeleteAction //prettier-ignore
+  const fetch = handleFetchPerStore(fetchParams, 'fetch') as MagnetarFetchAction<Record<string, unknown>, 'collection'> //prettier-ignore
+  const fetchCount = handleFetchPerStore(fetchParams, 'fetchCount') as MagnetarFetchCountAction // prettier-ignore
+  const stream = handleStreamPerStore([collectionPath, undefined], moduleConfig, globalConfig, 'write', streaming, cacheStream, writeLockMap) // prettier-ignore
 
   const actions = { stream, fetch, fetchCount, insert, delete: _delete }
 

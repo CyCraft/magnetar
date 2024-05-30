@@ -1,13 +1,13 @@
 import { ActionName } from './actions'
 import {
-  FetchResponse,
-  StreamResponse,
-  DoOnStream,
   DoOnFetch,
-  PluginModuleConfig,
-  SyncBatch,
-  FetchCountResponse,
   DoOnFetchCount,
+  DoOnStream,
+  FetchCountResponse,
+  FetchResponse,
+  PluginModuleConfig,
+  StreamResponse,
+  SyncBatch,
 } from './plugins'
 import { MergeDeep } from './utils/MergeDeep'
 
