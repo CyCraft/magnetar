@@ -1,6 +1,6 @@
+import { pokedex } from '@magnetarjs/test-utils'
 import test from 'ava'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { pokedex } from '@magnetarjs/test-utils'
 
 test('fetch (collection)', async (t) => {
   /// 'fetch' resolves once all stores have given a response with data
@@ -59,7 +59,9 @@ test('fetch (document) if unfetched', async (t) => {
   } catch (error) {
     t.fail(JSON.stringify(error))
   }
-  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
+  // even though we haven't _force_ fetched, the data is still fetched
+  // because even though the the local state was already there, we had never executed `fetch` or `stream` once in this session
+  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })
 
 test('fetch (collection) where-filter: ==', async (t) => {
