@@ -4,8 +4,8 @@ import type {
   PluginFetchCountActionPayload,
 } from '@magnetarjs/types'
 import { FirestoreModuleConfig, getFirestoreCollectionPath } from '@magnetarjs/utils-firestore'
-import { FirestoreAdminPluginOptions } from '../CreatePlugin'
-import { getQueryInstance } from '../helpers/getFirestore'
+import { FirestoreAdminPluginOptions } from '../CreatePlugin.js'
+import { getQueryInstance } from '../helpers/getFirestore.js'
 
 export function fetchCountActionFactory(
   firestorePluginOptions: Required<FirestoreAdminPluginOptions>

@@ -6,7 +6,7 @@ import type {
   PluginFetchCountActionPayload,
 } from '@magnetarjs/types'
 import { getPathWhereIdentifier } from '@magnetarjs/types'
-import { StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin'
+import { StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin.js'
 
 export function fetchCountActionFactory(
   pathCountDic: { [collectionPath in PathWhereIdentifier]?: number },

@@ -25,5 +25,8 @@
   "editor.insertSpaces": true,
   // gitlens
   "gitlens.defaultTimeFormat": "HH:mm",
-  "gitlens.codeLens.enabled": false
+  "gitlens.codeLens.enabled": false,
+  // auto import with .js extension
+  "javascript.preferences.importModuleSpecifierEnding": "js",
+  "typescript.preferences.importModuleSpecifierEnding": "js"
 }

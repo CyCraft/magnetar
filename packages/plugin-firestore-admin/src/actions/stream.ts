@@ -9,8 +9,8 @@ import {
   getFirestoreDocPath,
 } from '@magnetarjs/utils-firestore'
 import type { DocumentChange, DocumentSnapshot, QuerySnapshot } from 'firebase-admin/firestore'
-import { FirestoreAdminPluginOptions } from '../CreatePlugin'
-import { docSnapshotToDocMetadata, getQueryInstance } from '../helpers/getFirestore'
+import { FirestoreAdminPluginOptions } from '../CreatePlugin.js'
+import { docSnapshotToDocMetadata, getQueryInstance } from '../helpers/getFirestore.js'
 
 export function streamActionFactory(
   firestorePluginOptions: Required<FirestoreAdminPluginOptions>
@@ -26,7 +26,7 @@ export function streamActionFactory(
     const { db } = firestorePluginOptions
     let resolveStream: (() => void) | undefined
     let rejectStream: (() => void) | undefined
-    const streaming: Promise<void> = new Promise((resolve, reject) => {
+    const streaming = new Promise<void>((resolve, reject) => {
       resolveStream = resolve
       rejectStream = reject
     })
@@ -36,7 +36,7 @@ export function streamActionFactory(
       const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
       closeStream = db
         .doc(documentPath)
-        .onSnapshot((docSnapshot: DocumentSnapshot<Record<string, unknown>>) => {
+        .onSnapshot((docSnapshot: DocumentSnapshot<{ [key: string]: unknown }>) => {
           // even if `docSnapshot.metadata.hasPendingWrites`
           //       we should always execute `added/modified`
           //       because `core` handles overlapping calls for us
@@ -54,7 +54,7 @@ export function streamActionFactory(
       const _collectionPath = getFirestoreCollectionPath(collectionPath, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
       const queryInstance = getQueryInstance(_collectionPath, pluginModuleConfig, db)
       closeStream = queryInstance.onSnapshot(
-        (querySnapshot: QuerySnapshot<Record<string, unknown>>) => {
+        (querySnapshot: QuerySnapshot<{ [key: string]: unknown }>) => {
           // even if `docSnapshot.metadata.hasPendingWrites`
           //       we should always execute `added/modified`
           //       because `core` handles overlapping calls for us
@@ -62,7 +62,7 @@ export function streamActionFactory(
           // serverChanges only
           querySnapshot
             .docChanges()
-            .forEach((docChange: DocumentChange<Record<string, unknown>>) => {
+            .forEach((docChange: DocumentChange<{ [key: string]: unknown }>) => {
               const docSnapshot = docChange.doc
               const docData = docSnapshot.data()
               const docMetadata = docSnapshotToDocMetadata(docSnapshot)

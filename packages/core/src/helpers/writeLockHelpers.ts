@@ -19,11 +19,11 @@ export async function writeLockPromise(
  */
 export async function getDocAfterWritelock(params: {
   writeLockMap: Map<string, WriteLock>
-  lastIncomingDocs: Map<string, { payload: Record<string, unknown> | undefined; meta: DocMetadata }>
+  lastIncomingDocs: Map<string, { payload: { [key: string]: unknown } | undefined; meta: DocMetadata }>
   docIdentifier: string
-  payload: Record<string, unknown> | undefined
+  payload: { [key: string]: unknown } | undefined
   meta: DocMetadata
-}): Promise<undefined | { payload: Record<string, unknown> | undefined; meta: DocMetadata }> {
+}): Promise<undefined | { payload: { [key: string]: unknown } | undefined; meta: DocMetadata }> {
   const { writeLockMap, lastIncomingDocs, docIdentifier, payload, meta } = params
   // add to lastIncoming map
   lastIncomingDocs.set(docIdentifier, { payload, meta })

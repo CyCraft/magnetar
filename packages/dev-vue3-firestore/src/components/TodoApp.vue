@@ -25,13 +25,13 @@ const editingIndex = ref(-1)
 const editingTitle = ref('')
 function editItem(i: number) {
   const original = props.items[i]
-  editingTitle.value = original.title
+  editingTitle.value = original?.title ?? ''
   editingIndex.value = i
 }
 function saveEdits() {
   const title = editingTitle.value
   const item = props.items[editingIndex.value]
-  const payload = { ...item, title }
+  const payload: Item = { id: '', isDone: false, ...item, title }
   editingIndex.value = -1
   editingTitle.value = ''
   emit('edit', payload)

@@ -1,11 +1,11 @@
+import { isCollectionModule, isDocModule } from '@magnetarjs/utils'
 import { isFullString } from 'is-what'
-import { isDocModule, isCollectionModule } from '@magnetarjs/utils'
 
-export function logError(errorMessage: string): void {
+export function logError(errorMessage: string): undefined {
   console.error('[@magnetarjs/plugin-firestore error]\n', errorMessage)
 }
 
-export function logErrorAndThrow(errorMessage: string): void {
+export function logErrorAndThrow(errorMessage: string): undefined {
   logError(errorMessage)
   throw new Error(errorMessage)
 }
@@ -13,7 +13,7 @@ export function logErrorAndThrow(errorMessage: string): void {
 export function throwIfInvalidFirestorePath(
   firestorePath: string,
   moduleType?: 'collection' | 'doc'
-): void {
+): undefined {
   let errorMessage = ''
   // no firestorePath found
   if (!isFullString(firestorePath)) {

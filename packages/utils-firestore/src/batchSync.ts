@@ -1,11 +1,11 @@
 import type { SyncBatch } from '@magnetarjs/types'
 import { logWithFlair } from '@magnetarjs/utils'
-import { mapGetOrSet } from 'getorset-anything'
+import { arrGetOrSet, mapGetOrSet } from 'getorset-anything'
 import { isEmptyObject, isNumber } from 'is-what'
 import { merge as mergeObjects } from 'merge-anything'
 import { removeProp } from 'remove-anything'
-import { Countdown, CountdownInstance } from './Countdown'
-import { ApplySyncBatch, CreateWriteBatch, Firestore, FirestorePluginOptions } from './types'
+import { Countdown, CountdownInstance } from './Countdown.js'
+import { ApplySyncBatch, CreateWriteBatch, Firestore, FirestorePluginOptions } from './types.js'
 
 // https://firebase.google.com/docs/firestore/manage-data/transactions#batched-writes
 // A batched write can contain up to 500 operations.
@@ -23,10 +23,10 @@ type Stack = {
 }
 
 export type BatchSync = {
-  assign: (documentPath: string, payload: Record<string, unknown>, debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
-  merge: (documentPath: string, payload: Record<string, unknown>, debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
-  replace: (documentPath: string, payload: Record<string, unknown>, debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
-  insert: (documentPath: string, payload: Record<string, unknown>, debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
+  assign: (documentPath: string, payload: { [key: string]: unknown }, debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
+  merge: (documentPath: string, payload: { [key: string]: unknown }, debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
+  replace: (documentPath: string, payload: { [key: string]: unknown }, debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
+  insert: (documentPath: string, payload: { [key: string]: unknown }, debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
   deleteProp: (documentPath: string, payload: string[], debounceMsOverwrite?: number) => Promise<SyncBatch> // prettier-ignore
   delete: (documentPath: string, debounceMsOverwrite?: number) => Promise<SyncBatch>
   forceSyncEarly: () => Promise<void>
@@ -47,14 +47,14 @@ const newStack = (): Stack => ({
  * @param {Record<string, unknown>} payload
  * @returns {number}
  */
-function countOperations(payload: Record<string, unknown>): number {
+function countOperations(payload: { [key: string]: unknown }): number {
   const count = 1
   // todo: when actions like serverTimestamp, arrayUnion and increment are supported, count them here
   return count
 }
 
-function preparePayload(_payload: Record<string, unknown>): {
-  payload: Record<string, unknown>
+function preparePayload(_payload: { [key: string]: unknown }): {
+  payload: { [key: string]: unknown }
   operationCount: number
 } {
   // todo: properly handle any serverTimestamp, arrayUnion and increment in here
@@ -79,7 +79,7 @@ function prepareReturnPromise(stack: Stack): Promise<SyncBatch> {
 export function batchSyncFactory(
   firestorePluginOptions: Required<FirestorePluginOptions<Firestore>>,
   createWriteBatch: CreateWriteBatch,
-  applySyncBatch: ApplySyncBatch
+  applySyncBatch: ApplySyncBatch,
 ): BatchSync {
   const { db, syncDebounceMs, debug } = firestorePluginOptions
   // const applySyncBatch = applySyncBatchFactory(db, )
@@ -90,8 +90,7 @@ export function batchSyncFactory(
   }
 
   async function prepareStack(operationCount: number, queueIndex = 0): Promise<Stack> {
-    if (!state.queue[queueIndex]) state.queue[queueIndex] = newStack()
-    const stack = state.queue[queueIndex]
+    const stack = arrGetOrSet(state.queue, queueIndex, () => newStack())
     if (stack.operationCount + operationCount >= MAX_OPERATION_COUNT) {
       return prepareStack(operationCount, queueIndex + 1)
     }
@@ -102,7 +101,7 @@ export function batchSyncFactory(
   /**
    * Removes one `stack` entry from the `queue` & executes batch.commit() and makes sure to reject or resolve all actions when this promise is resolved
    */
-  function executeSync(): void {
+  function executeSync(): undefined {
     state.countdown = null
     const stack = state.queue.shift()
     if (!stack) {
@@ -160,15 +159,15 @@ export function batchSyncFactory(
     return state.countdown
   }
 
-  function triggerSync(debounceMsOverwrite?: number): void {
+  function triggerSync(debounceMsOverwrite?: number): undefined {
     const countdown = prepareCountdown(debounceMsOverwrite)
     countdown.restart(debounceMsOverwrite)
   }
 
   async function insert(
     documentPath: string,
-    _payload: Record<string, unknown>,
-    debounceMsOverwrite?: number
+    _payload: { [key: string]: unknown },
+    debounceMsOverwrite?: number,
   ): Promise<SyncBatch> {
     const { payload, operationCount } = preparePayload(_payload)
     const stack = await prepareStack(operationCount)
@@ -182,8 +181,8 @@ export function batchSyncFactory(
 
   async function assign(
     documentPath: string,
-    _payload: Record<string, unknown>,
-    debounceMsOverwrite?: number
+    _payload: { [key: string]: unknown },
+    debounceMsOverwrite?: number,
   ): Promise<SyncBatch> {
     const { payload, operationCount } = preparePayload(_payload)
     let stack = await prepareStack(operationCount)
@@ -213,8 +212,8 @@ export function batchSyncFactory(
 
   async function merge(
     documentPath: string,
-    _payload: Record<string, unknown>,
-    debounceMsOverwrite?: number
+    _payload: { [key: string]: unknown },
+    debounceMsOverwrite?: number,
   ): Promise<SyncBatch> {
     const { payload, operationCount } = preparePayload(_payload)
     let stack = await prepareStack(operationCount)
@@ -253,8 +252,8 @@ export function batchSyncFactory(
 
   async function replace(
     documentPath: string,
-    _payload: Record<string, unknown>,
-    debounceMsOverwrite?: number
+    _payload: { [key: string]: unknown },
+    debounceMsOverwrite?: number,
   ): Promise<SyncBatch> {
     const { payload, operationCount } = preparePayload(_payload)
     let stack = await prepareStack(operationCount)
@@ -275,7 +274,7 @@ export function batchSyncFactory(
   async function deleteProp(
     documentPath: string,
     propPaths: string[],
-    debounceMsOverwrite?: number
+    debounceMsOverwrite?: number,
   ): Promise<SyncBatch> {
     const operationCount = 1
     const stack = await prepareStack(operationCount)
@@ -293,16 +292,11 @@ export function batchSyncFactory(
 
   async function _delete(documentPath: string, debounceMsOverwrite?: number): Promise<SyncBatch> {
     const operationCount = 1
-    let stack = await prepareStack(operationCount)
+    const stack = await prepareStack(operationCount)
     const promise = prepareReturnPromise(stack)
 
-    if (stack.batch.insert.has(documentPath)) {
-      // flush! Because these writes cannot be combined
-      await forceSyncEarly()
-      stack = await prepareStack(operationCount)
-    }
-
     // all these changes don't matter anymore, so let's remove them from the stack.batch
+    stack.batch.insert.delete(documentPath)
     stack.batch.merge.delete(documentPath)
     stack.batch.assign.delete(documentPath)
     stack.batch.replace.delete(documentPath)

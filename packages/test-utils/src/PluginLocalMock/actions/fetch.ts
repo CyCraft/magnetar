@@ -6,13 +6,14 @@ import type {
   PluginFetchActionPayload,
 } from '@magnetarjs/types'
 import { filterDataPerClauses } from '@magnetarjs/utils'
+import { objGetOrSet } from 'getorset-anything'
 import { isBoolean, isFullString, isNumber } from 'is-what'
-import { throwIfEmulatedError } from '../../helpers'
-import { StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin'
-import { insertActionFactory } from './insert'
+import { throwIfEmulatedError } from '../../helpers/index.js'
+import { StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin.js'
+import { insertActionFactory } from './insert.js'
 
 export function fetchActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
+  data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
   exists: { [docPath: string]: undefined | 'error' | boolean },
   storePluginOptions: StorePluginOptions
 ): PluginFetchAction {
@@ -31,7 +32,8 @@ export function fetchActionFactory(
     if (optimisticFetch) {
       if (!docId) {
         const { query, where, orderBy, limit, startAfter } = pluginModuleConfig
-        const collectionData = filterDataPerClauses(data[collectionPath], {
+        const foundData = objGetOrSet(data, collectionPath, () => new Map())
+        const collectionData = filterDataPerClauses(foundData, {
           query,
           where,
           orderBy,
@@ -54,7 +56,7 @@ export function fetchActionFactory(
        */
       const itSureExists = exists[`${collectionPath}/${docId}`] === true
       if (docId && itSureExists) {
-        const localDoc = data[collectionPath].get(docId)
+        const localDoc = data[collectionPath]?.get(docId)
         // if already fetched
         if (localDoc) {
           const fetchResponse: FetchResponse = {
@@ -79,12 +81,12 @@ export function fetchActionFactory(
       const _docId = docId
         ? docId
         : meta === 'error'
-        ? undefined
-        : isFullString(meta?.id)
-        ? meta.id
-        : isNumber(meta?.id)
-        ? `${meta.id}`
-        : undefined
+          ? undefined
+          : isFullString(meta?.id)
+            ? meta.id
+            : isNumber(meta?.id)
+              ? `${meta.id}`
+              : undefined
       // set `exists`
       const docPath = `${collectionPath}/${_docId}`
       if (meta === 'error') {

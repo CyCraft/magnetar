@@ -9,7 +9,7 @@ export function createWriteBatch(db: Firestore): WriteBatch {
  * A function that applies everything in the `SyncBatch` to a Firestore's `WriteBatch`.
  * It mutates the passed `batch`.
  */
-export function applySyncBatch(writeBatch: WriteBatch, batch: SyncBatch, db: Firestore): void {
+export function applySyncBatch(writeBatch: WriteBatch, batch: SyncBatch, db: Firestore): undefined {
   batch.insert.forEach((payload, documentPath) => {
     const ref = doc(db, documentPath)
     writeBatch.set(ref, payload)

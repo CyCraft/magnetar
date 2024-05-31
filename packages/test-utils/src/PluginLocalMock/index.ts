@@ -1,2 +1,2 @@
-export { CreatePlugin } from './CreatePlugin'
-export type { StorePluginOptions, StorePluginModuleConfig } from './CreatePlugin'
+export { CreatePlugin } from './CreatePlugin.js'
+export type { StorePluginModuleConfig, StorePluginOptions } from './CreatePlugin.js'

@@ -1,57 +1,57 @@
 import { pokedex } from '@magnetarjs/test-utils'
-import test from 'ava'
-import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
+import { assert, test } from 'vitest'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
 
-test('delete (document)', async (t) => {
+test('delete (document)', async () => {
   const { trainerModule } = createMagnetarInstance()
-  t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
+  assert.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
   try {
     await trainerModule.delete()
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
 
-  t.deepEqual(trainerModule.data, undefined)
+  assert.deepEqual(trainerModule.data, undefined)
 })
 
-test('delete (collection)', async (t) => {
+test('delete (collection)', async () => {
   const { pokedexModule } = createMagnetarInstance()
-  t.deepEqual(pokedexModule.data.size, 1)
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  assert.deepEqual(pokedexModule.data.size, 1)
+  assert.deepEqual(pokedexModule.data.get('1'), pokedex(1))
 
   try {
     await pokedexModule.delete('1')
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
-  t.deepEqual(pokedexModule.data.size, 0)
-  t.deepEqual(pokedexModule.data.get('1'), undefined)
+  assert.deepEqual(pokedexModule.data.size, 0)
+  assert.deepEqual(pokedexModule.data.get('1'), undefined)
 })
 
-test('revert: delete (local → remote)', async (t) => {
+test('revert: delete (local → remote)', async () => {
   const { trainerModule } = createMagnetarInstance()
-  t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
+  assert.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
   try {
     await trainerModule.delete('remote', { onError: 'revert', executionOrder: ['local', 'remote'] }) // mocks error on delete for remote store mock
   } catch (error) {
-    t.truthy(error)
+    assert.isTrue(!!error)
   }
 
-  t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
+  assert.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 })
 
 // todo: for this test to work we need to mock a data pool for the remote plugin mock
 // test('revert: delete (remote → local)', async t => {
 //   const { trainerModule } = createMagnetarInstance()
-//   t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
+//   assert.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
 //   try {
 //     await trainerModule.delete('local', { onError: 'revert', executionOrder: ['remote', 'local'] }) // mocks error on delete for remote store mock
 //   } catch (error) {
-//     t.truthy(error)
+//     assert.isTrue(!!error)
 //   }
 
-//   t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
+//   assert.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 // })

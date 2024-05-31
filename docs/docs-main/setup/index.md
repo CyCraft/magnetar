@@ -21,7 +21,10 @@ This is a complete setup example which uses:
 ```javascript
 import { initializeApp } from 'firebase/app'
 import { getFirestore, collection, doc } from 'firebase/firestore'
-import { PluginFirestore, PluginVue3, Magnetar, logger } from 'magnetar'
+import { Magnetar } from '@magnetarjs/core'
+import { CreatePlugin as PluginFirestore } from '@magnetarjs/plugin-firestore'
+import { CreatePlugin as PluginVue3 } from '@magnetarjs/plugin-vue3'
+import { logger } from '@magnetarjs/utils'
 // ---------------------------------------------
 // 0. Initialise firebase
 // ---------------------------------------------

@@ -2,9 +2,9 @@ import type { Clauses, QueryClause, WhereClause } from '@magnetarjs/types'
 import { ISortByObjectSorter, sort } from 'fast-sort'
 import { isArray, isNumber } from 'is-what'
 import { getProp } from 'path-to-prop'
-import { parseValueForFilters } from './parseValueForFilters'
+import { parseValueForFilters } from './parseValueForFilters.js'
 
-function passesWhere(docData: Record<string, unknown>, whereQuery: WhereClause): boolean {
+function passesWhere(docData: { [key: string]: unknown }, whereQuery: WhereClause): boolean {
   const [fieldPath, operator, expectedValue] = whereQuery
   const valueAtFieldPath = parseValueForFilters(getProp(docData, fieldPath) as any)
   let passes = false
@@ -47,7 +47,7 @@ function passesWhere(docData: Record<string, unknown>, whereQuery: WhereClause):
   return passes
 }
 
-function passesQuery(docData: Record<string, unknown>, queryClause: QueryClause): boolean {
+function passesQuery(docData: { [key: string]: unknown }, queryClause: QueryClause): boolean {
   if ('and' in queryClause) {
     return queryClause.and.every((clause) =>
       isArray(clause) ? passesWhere(docData, clause) : passesQuery(docData, clause)
@@ -63,14 +63,14 @@ function passesQuery(docData: Record<string, unknown>, queryClause: QueryClause)
  * Filters a Collection module's data map `Map<string, DocData>` based on provided clauses.
  */
 export function filterDataPerClauses(
-  collectionDB: Map<string, Record<string, unknown>>,
+  dataCollectionMap: Map<string, { [key: string]: unknown }>,
   clauses: Clauses
-): Map<string, Record<string, unknown>> {
+): Map<string, { [key: string]: unknown }> {
   const queryClauses = clauses.query || []
   const whereClauses = clauses.where || []
   const orderByClauses = clauses.orderBy || []
   const { limit, startAfter } = clauses
-  // return the same collectionDB to be sure to keep reactivity
+  // return the same dataCollectionMap to be sure to keep reactivity
   if (
     !queryClauses.length &&
     !whereClauses.length &&
@@ -78,11 +78,11 @@ export function filterDataPerClauses(
     !isNumber(limit) &&
     !startAfter
   ) {
-    return collectionDB
+    return dataCollectionMap
   }
   // all other cases we need to create a new Map() with the results
-  let entries: [string, Record<string, unknown>][] = []
-  collectionDB.forEach((docData, docId) => {
+  let entries: [string, { [key: string]: unknown }][] = []
+  dataCollectionMap.forEach((docData, docId) => {
     const passedQuery = queryClauses.every((queryClause) => passesQuery(docData, queryClause))
     if (!passedQuery) return
     const passedWhereFilters = whereClauses.every((whereClause) =>
@@ -92,13 +92,17 @@ export function filterDataPerClauses(
     entries.push([docId, docData])
   })
   // orderBy
-  const by = orderByClauses.reduce((carry, [path, direction = 'asc']) => {
-    const sorter: ISortByObjectSorter<[string, Record<string, unknown>]> = {
-      [direction as 'asc']: (entry: [string, Record<string, unknown>]) => getProp(entry[1], path),
-    }
-    carry.push(sorter)
-    return carry
-  }, [] as ISortByObjectSorter<[string, Record<string, unknown>]>[])
+  const by = orderByClauses.reduce(
+    (carry, [path, direction = 'asc']) => {
+      const sorter: ISortByObjectSorter<[string, { [key: string]: unknown }]> = {
+        [direction as 'asc']: (entry: [string, { [key: string]: unknown }]) =>
+          getProp(entry[1], path),
+      }
+      carry.push(sorter)
+      return carry
+    },
+    [] as ISortByObjectSorter<[string, { [key: string]: unknown }]>[]
+  )
   entries = orderByClauses.length ? sort(entries).by(by) : entries
   // startAfter
   if (startAfter && orderByClauses.length) {

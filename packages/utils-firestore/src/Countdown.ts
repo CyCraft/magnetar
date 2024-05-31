@@ -26,7 +26,7 @@ export function Countdown(ms: number): CountdownInstance {
   let interval: any = null
   let resolveTrigger: any = null
   let duration: number = ms
-  const done: Promise<void> = new Promise((resolve) => (resolveTrigger = resolve))
+  const done = new Promise<void>((resolve) => (resolveTrigger = resolve))
 
   function finish() {
     clearInterval(interval)
@@ -37,7 +37,7 @@ export function Countdown(ms: number): CountdownInstance {
     }
   }
 
-  function restart (newDurationMs?: number): void {
+  function restart(newDurationMs?: number): undefined {
     if (typeof newDurationMs !== 'undefined') {
       duration = newDurationMs
     }

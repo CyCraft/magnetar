@@ -22,10 +22,16 @@ import {
   getCountFromDataStore,
   getDataFromDataStore,
   proxify,
-} from './helpers/moduleHelpers'
-import { HandleFetchPerStoreParams, handleFetchPerStore } from './moduleActions/handleFetchPerStore'
-import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
-import { HandleWritePerStoreParams, handleWritePerStore } from './moduleActions/handleWritePerStore'
+} from './helpers/moduleHelpers.js'
+import {
+  HandleFetchPerStoreParams,
+  handleFetchPerStore,
+} from './moduleActions/handleFetchPerStore.js'
+import { handleStreamPerStore } from './moduleActions/handleStreamPerStore.js'
+import {
+  HandleWritePerStoreParams,
+  handleWritePerStore,
+} from './moduleActions/handleWritePerStore.js'
 
 export function createCollectionWithContext(
   collectionPath: string,
@@ -45,7 +51,7 @@ export function createCollectionWithContext(
 ): CollectionInstance {
   const { writeLockMap, fetchPromises, cacheStream, streaming, closeStream, closeAllStreams } = streamAndFetchPromises // prettier-ignore
 
-  const id = collectionPath.split('/').slice(-1)[0]
+  const id = collectionPath.split('/').slice(-1)[0] ?? ''
   const path = collectionPath
 
   const doc: DocFn = ((docId: string, _moduleConfig: ModuleConfig = {}) => {
@@ -74,7 +80,7 @@ export function createCollectionWithContext(
   }
   const insert = handleWritePerStore(writeParams, 'insert') as MagnetarInsertAction //prettier-ignore
   const _delete = handleWritePerStore(writeParams, 'delete') as MagnetarDeleteAction //prettier-ignore
-  const fetch = handleFetchPerStore(fetchParams, 'fetch') as MagnetarFetchAction<Record<string, unknown>, 'collection'> //prettier-ignore
+  const fetch = handleFetchPerStore(fetchParams, 'fetch') as MagnetarFetchAction<{ [key: string]: unknown }, 'collection'> //prettier-ignore
   const fetchCount = handleFetchPerStore(fetchParams, 'fetchCount') as MagnetarFetchCountAction // prettier-ignore
   const stream = handleStreamPerStore([collectionPath, undefined], moduleConfig, globalConfig, 'write', streaming, cacheStream, writeLockMap) // prettier-ignore
 

@@ -20,7 +20,7 @@ firebase.initializeApp({
 })
 
 // initialise PluginFirestore
-import { PluginFirestore } from 'magnetar'
+import { CreatePlugin as PluginFirestore } from '@magnetarjs/plugin-firestore'
 
 const remote = PluginFirestore.CreatePlugin({ firebaseInstance: firebase })
 ```
@@ -38,7 +38,7 @@ const firebaseApp = initializeApp({
 const db = getFirestore(firebaseApp)
 
 // initialise PluginFirestore
-import { PluginFirestore } from 'magnetar'
+import { CreatePlugin as PluginFirestore } from '@magnetarjs/plugin-firestore'
 
 const remote = PluginFirestore.CreatePlugin({ db })
 ```

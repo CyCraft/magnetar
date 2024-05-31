@@ -2,7 +2,7 @@
 import LoadingSpinner from './LoadingSpinner.vue'
 import type { CollectionInstance } from '@magnetarjs/types'
 
-const props = defineProps<{
+defineProps<{
   labels: {
     'magnetar table record counts': string
     'magnetar table info counts total': string

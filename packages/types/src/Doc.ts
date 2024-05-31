@@ -1,16 +1,16 @@
+import { CollectionFn } from './Magnetar.js'
 import {
-  MagnetarWriteAction,
-  MagnetarFetchAction,
-  MagnetarStreamAction,
   MagnetarDeleteAction,
   MagnetarDeletePropAction,
+  MagnetarFetchAction,
   MagnetarInsertAction,
-} from './types/actions'
-import { CollectionFn } from './Magnetar'
+  MagnetarStreamAction,
+  MagnetarWriteAction,
+} from './types/actions.js'
 
 export type DocInstance<
-  DocDataType extends Record<string, any> = Record<string, any>,
-  GranularTypes extends { insert: Record<string, any> } = { insert: DocDataType }
+  DocDataType extends { [key: string]: any } = { [key: string]: any },
+  GranularTypes extends { insert: { [key: string]: any } } = { insert: DocDataType },
 > = {
   /**
    * The cached data that was written or read so far

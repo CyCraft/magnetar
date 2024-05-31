@@ -1,17 +1,17 @@
 <script lang="ts" setup>
 import type { CollectionInstance, QueryClause, WhereClause } from '@magnetarjs/types'
 import { ArcElement, ChartData, Chart as ChartJS, ChartOptions, Title } from 'chart.js'
-// import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels'
-// fix: https://github.com/chartjs/chartjs-plugin-datalabels/issues/411
 import ChartDataLabels, {
   Context,
+  // @ts-expect-error fix for `import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels'` see https://github.com/chartjs/chartjs-plugin-datalabels/issues/411
 } from 'chartjs-plugin-datalabels/dist/chartjs-plugin-datalabels.esm.js'
+// @ts-expect-error no types...
 import DoughnutLabel from 'chartjs-plugin-doughnutlabel-rebourne'
-import { isAnyObject, isArray } from 'is-what'
+import { isAnyObject, isArray, isString } from 'is-what'
 import { computed, watch } from 'vue'
 import { Doughnut } from 'vue-chartjs'
-import { MUIChartDoughnut, MUIParseLabel } from '../types'
-import { cssColorAlpha, getRandomCssColorNames } from '../utils/chartHelpers'
+import { MUIChartDoughnut, MUIParseLabel } from '../types.js'
+import { cssColorAlpha, getRandomCssColorNames } from '../utils/chartHelpers.js'
 
 ChartJS.register(ArcElement, Title)
 
@@ -107,8 +107,8 @@ const chartOptions = computed<ChartOptions<'doughnut'>>(() => {
     labels: [
       {
         text: (context: { data: ChartData<'doughnut', number[], string> }) => {
-          const total = context.data.datasets[0].data.reduce((a, b) => a + b, 0)
-          return `${prefix}${total.toLocaleString()}${suffix}`
+          const total = context.data.datasets[0]?.data.reduce((a, b) => a + b, 0)
+          return `${prefix}${total?.toLocaleString()}${suffix}`
         },
         font: { size: '24', weight: 'bold' },
         color: '#5c5f69',
@@ -117,9 +117,19 @@ const chartOptions = computed<ChartOptions<'doughnut'>>(() => {
   }
 
   const defaults = {
-    backgroundColor: ({ dataset, dataIndex }) =>
-      cssColorAlpha(dataset?.borderColor?.[dataIndex], 0.8),
+    backgroundColor: ({ dataset, dataIndex }) => {
+      const borderColor = dataset?.borderColor
+      if (!borderColor) return ''
+      const color = isString(borderColor)
+        ? borderColor
+        : isArray(borderColor)
+          ? borderColor[dataIndex]
+          : ''
+      if (!isString(color)) return ''
+      return cssColorAlpha(color, 0.8)
+    },
     plugins: {
+      // @ts-expect-error This is from the 'chartjs-plugin-doughnutlabel-rebourne' plugin
       datalabels: datalabels as any,
       doughnutlabel: doughnutLabel as any,
       legend: { display: false },
@@ -127,7 +137,7 @@ const chartOptions = computed<ChartOptions<'doughnut'>>(() => {
     },
     layout: { padding: { left: 100, right: 100, bottom: 48 } },
     responsive: true,
-  }
+  } satisfies ChartOptions<'doughnut'>
 
   return defaults
 })
@@ -137,7 +147,7 @@ const chartOptions = computed<ChartOptions<'doughnut'>>(() => {
   <Doughnut
     :data="chartData"
     :options="chartOptions"
-    :plugins="[(ChartDataLabels as any), (DoughnutLabel as any)]"
+    :plugins="[ChartDataLabels as any, DoughnutLabel as any]"
   />
 </template>
 

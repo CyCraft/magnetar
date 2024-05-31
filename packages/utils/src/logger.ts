@@ -10,12 +10,12 @@ const LOGGER_STYLE =
 /**
  * Logs to the console with `console.info` and colors.
  */
-export function logWithFlair(message: string, ...args: any[]): void {
+export function logWithFlair(message: string, ...args: any[]): undefined {
   console.info(`%c💫 [magnetar] ${message}`, LOGGER_STYLE, ...args)
 }
 
 let lastGroupLogTime = 0
-let lastGroupParams = null
+let lastGroupParams: unknown = null
 
 function shouldLog(params: any, preventLogFor: number) {
   const now = Date.now()
@@ -39,7 +39,7 @@ export function logWithFlairGroup(
   title: string,
   nestedMessage: string,
   options?: { preventLogFor: number }
-): void {
+): undefined {
   if (options && !shouldLog([title, nestedMessage], options.preventLogFor)) return
 
   console.groupCollapsed(`%c💫 [magnetar] ${title}`, LOGGER_STYLE)

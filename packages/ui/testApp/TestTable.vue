@@ -9,8 +9,8 @@ import {
   MUITableSlot,
   MagnetarChartDoughnut,
   MagnetarTable,
-} from '../src/index'
-import { magnetar } from './magnetar'
+} from '../src/index.js'
+import { magnetar } from './magnetar.js'
 import { ref, computed } from 'vue'
 
 type Item = { title: string; id: string; isDone: boolean; name: { family: string } }
@@ -189,14 +189,14 @@ const filterDataFn = computed<undefined | ((data: Record<string, any>, index: nu
       const regex = new RegExp(searchQuery.value, 'i')
       return regex.test(JSON.stringify(data))
     }
-  }
+  },
 )
 
 const magnetarTableInstance = ref<null | InstanceType<typeof MagnetarTable>>(null)
 </script>
 
 <template>
-  <div class="test">
+  <div class="_test">
     <label>
       <span>Show charts </span>
       <input v-model="showingCharts" type="checkbox" />

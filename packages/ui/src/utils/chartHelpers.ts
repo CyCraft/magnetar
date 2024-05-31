@@ -163,7 +163,9 @@ export function cssColorToHex(color: CssColorName): string | null {
 
     document.body.removeChild(div)
     return colors.length >= 3
-      ? '#' + ((1 << 24) + (colors[0] << 16) + (colors[1] << 8) + colors[2]).toString(16).slice(1)
+      ? '#' +
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          ((1 << 24) + (colors[0]! << 16) + (colors[1]! << 8) + colors[2]!).toString(16).slice(1)
       : null
   }
 

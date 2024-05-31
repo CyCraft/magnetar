@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { MUIColumn, MUIParseLabel, OPaths, OrderByState } from '../types'
+import { MUIColumn, MUIParseLabel, OPaths, OrderByState } from '../types.js'
 
 const props = defineProps<{
   column: MUIColumn<any>

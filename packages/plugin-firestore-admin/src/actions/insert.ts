@@ -1,14 +1,14 @@
 import type { PluginInsertAction, PluginInsertActionPayload, SyncBatch } from '@magnetarjs/types'
 import {
   BatchSync,
-  batchSyncFactory,
   FirestoreModuleConfig,
+  batchSyncFactory,
   getFirestoreDocPath,
 } from '@magnetarjs/utils-firestore'
 import { mapGetOrSet } from 'getorset-anything'
 import { isFullString, isNumber } from 'is-what'
-import { BatchSyncMap, FirestoreAdminPluginOptions } from '../CreatePlugin'
-import { applySyncBatch, createWriteBatch } from '../helpers/batchHelpers'
+import { BatchSyncMap, FirestoreAdminPluginOptions } from '../CreatePlugin.js'
+import { applySyncBatch, createWriteBatch } from '../helpers/batchHelpers.js'
 
 export function insertActionFactory(
   batchSyncMap: BatchSyncMap,
@@ -25,11 +25,11 @@ export function insertActionFactory(
     let _docId = docId
     if (!_docId) {
       // we don't have a _docId, so we need to retrieve it from the payload or generate one
-      _docId = isFullString(payload.id)
-        ? payload.id
-        : isNumber(payload.id)
-        ? `${payload.id}`
-        : db.collection('random').doc().id
+      _docId = isFullString(payload['id'])
+        ? payload['id']
+        : isNumber(payload['id'])
+          ? `${payload['id']}`
+          : db.collection('random').doc().id
     }
     const documentPath = getFirestoreDocPath(collectionPath, _docId as string, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
     const syncDebounceMs = isNumber(actionConfig.syncDebounceMs)

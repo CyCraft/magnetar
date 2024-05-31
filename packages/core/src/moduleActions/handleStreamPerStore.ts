@@ -11,15 +11,15 @@ import type {
   WriteLock,
 } from '@magnetarjs/types'
 import { isPromise } from 'is-what'
-import { getEventNameFnsMap } from '../helpers/eventHelpers'
-import { executeOnFns } from '../helpers/executeOnFns'
-import { getModifyPayloadFnsMap } from '../helpers/modifyPayload'
-import { getModifyReadResponseFnsMap } from '../helpers/modifyReadResponse'
-import { getPluginModuleConfig } from '../helpers/moduleHelpers'
-import { isDoOnStream } from '../helpers/pluginHelpers'
-import { throwIfNoFnsToExecute, throwOnIncompleteStreamResponses } from '../helpers/throwFns'
-import { getDocAfterWritelock, writeLockPromise } from '../helpers/writeLockHelpers'
-import { handleStream } from './handleStream'
+import { getEventNameFnsMap } from '../helpers/eventHelpers.js'
+import { executeOnFns } from '../helpers/executeOnFns.js'
+import { getModifyPayloadFnsMap } from '../helpers/modifyPayload.js'
+import { getModifyReadResponseFnsMap } from '../helpers/modifyReadResponse.js'
+import { getPluginModuleConfig } from '../helpers/moduleHelpers.js'
+import { isDoOnStream } from '../helpers/pluginHelpers.js'
+import { throwIfNoFnsToExecute, throwOnIncompleteStreamResponses } from '../helpers/throwFns.js'
+import { getDocAfterWritelock, writeLockPromise } from '../helpers/writeLockHelpers.js'
+import { handleStream } from './handleStream.js'
 
 export function handleStreamPerStore(
   [collectionPath, docId]: [string, string | undefined],
@@ -79,7 +79,7 @@ export function handleStreamPerStore(
      */
     const lastIncomingDocs = new Map<
       string,
-      { payload: Record<string, unknown> | undefined; meta: DocMetadata }
+      { payload: { [key: string]: unknown } | undefined; meta: DocMetadata }
     >()
 
     /**
@@ -147,7 +147,7 @@ export function handleStreamPerStore(
     // handle and await each action in sequence
     for (const storeName of storesToExecute) {
       // find the action on the plugin
-      const pluginAction = globalConfig.stores[storeName].actions['stream']
+      const pluginAction = globalConfig.stores[storeName]?.actions['stream']
       const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeName)
 
       // the plugin action
@@ -182,12 +182,12 @@ export function handleStreamPerStore(
     // create a function to closeStream from the stream of each store
     const closeStream = (): void => {
       Object.values(streamInfoPerStore).forEach(({ stop }) => stop())
-      cacheStream(() => {}, null)
+      cacheStream(() => undefined, null)
     }
     // handle caching the returned promises
     const streamPromises = Object.values(streamInfoPerStore).map((res) => res.streaming)
     // create a single stream promise from multiple stream promises the store plugins return
-    const streamPromise: Promise<void> = new Promise((resolve, reject) => {
+    const streamPromise = new Promise<void>((resolve, reject) => {
       Promise.all(streamPromises)
         .then(() => {
           resolve()

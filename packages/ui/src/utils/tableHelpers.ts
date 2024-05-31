@@ -10,7 +10,7 @@ import type {
   MUIFilterOption,
   OPaths,
   OrderByState,
-} from '../types'
+} from '../types.js'
 
 export function mapUnshift<K, V>(map: Map<K, V>, ...newEntries: [K, V][]): Map<K, V> {
   const oldEntries = [...map.entries()].filter(([key]) => !newEntries.find((e) => e[0] === key))
@@ -33,7 +33,7 @@ export function clausesEqual(
 
 export function filtersAndColumnsToInitialState(params: {
   columns: MUIColumn<any>[]
-  filters: MUIFilter<Record<string, any>>[]
+  filters: MUIFilter<{ [key: string]: any }>[]
 }): {
   filtersState: FiltersState
   orderByState: OrderByState
@@ -41,7 +41,7 @@ export function filtersAndColumnsToInitialState(params: {
   const { columns, filters } = params
   // remember, see `FiltersState` for instructions how to save the state.
   const newFiltersState = filters.reduce<FiltersState>((_filtersState, f, i) => {
-    const options: undefined | MUIFilterOption<Record<string, any>, string>[] = f.options
+    const options: undefined | MUIFilterOption<{ [key: string]: any }, string>[] = f.options
     if ((f.type === 'radio' || f.type === 'select') && options) {
       const firstChecked = options.find((o) => !!o.checked)
       if (firstChecked) {
@@ -120,12 +120,12 @@ export function getRequiredOrderByBasedOnFilters(
     const firstClause: WhereClause | QueryClause | undefined = isString(filterState)
       ? undefined
       : isArray(filterState)
-      ? filterState
-      : 'or' in filterState && isArray(filterState.or[0])
-      ? filterState.or[0]
-      : 'and' in filterState && isArray(filterState.and[0])
-      ? filterState.and[0]
-      : undefined
+        ? filterState
+        : 'or' in filterState && isArray(filterState.or[0])
+          ? filterState.or[0]
+          : 'and' in filterState && isArray(filterState.and[0])
+            ? filterState.and[0]
+            : undefined
 
     const op: WhereFilterOp | undefined = firstClause?.[1]
     /**
@@ -148,8 +148,8 @@ export function getRequiredOrderByBasedOnFilters(
 
 /** Clears JavaScript reference pointers */
 export function carbonCopyMap<T extends Map<any, any>>(map: T): T {
-  let newMap = new Map() as T
-  for (let [key, value] of map) {
+  const newMap = new Map() as T
+  for (const [key, value] of map) {
     const _key = isArray(key) ? [...key] : key
     const _value = isArray(value) ? [...value] : value
     newMap.set(_key, _value)
@@ -159,8 +159,8 @@ export function carbonCopyMap<T extends Map<any, any>>(map: T): T {
 
 /** Clears JavaScript reference pointers */
 export function carbonCopyState<T extends Set<any>>(set: T): T {
-  let newSet = new Set() as T
-  for (let value of set) {
+  const newSet = new Set() as T
+  for (const value of set) {
     const _value = isArray(value) ? [...value] : value
     newSet.add(_value)
   }
@@ -254,8 +254,8 @@ export function filterStateToClauses(
     const combinedWheres = hasWhereFiltersAND(state)
       ? combineWhereClausesWherePossible(state.and)
       : hasWhereFiltersOR(state)
-      ? combineWhereClausesWherePossible(state.or)
-      : 'query-with-nested-queries'
+        ? combineWhereClausesWherePossible(state.or)
+        : 'query-with-nested-queries'
 
     if (combinedWheres === 'query-with-nested-queries') {
       results.push({ filterIndex, result: state })
@@ -311,7 +311,7 @@ export function calcCollection(
 export function splitOnLink(text: string): { kind: 'text' | 'link'; content: string }[] {
   /** this regex checks for links */
   const regex = new RegExp(
-    /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/gi
+    /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\\/%=~_|$])/gi
   )
 
   const matches = text.matchAll(regex)

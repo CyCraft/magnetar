@@ -1,15 +1,15 @@
 import { pokedex, PokedexEntry, pokedexGetAll, waitMs } from '@magnetarjs/test-utils'
 import type { DocInstance } from '@magnetarjs/types'
-import test from 'ava'
-import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
+import { assert, test } from 'vitest'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
+import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
 
 {
   const testName = 'insert (document)'
-  test(testName, async (t) => {
+  test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName)
     const payload = pokedex(7)
-    t.deepEqual(pokedexModule.doc('7').data, undefined)
+    assert.deepEqual(pokedexModule.doc('7').data, undefined)
 
     const { pokedexModule: p } = await createMagnetarInstance('read')
     pokedexGetAll().forEach((_p) => p.insert(_p))
@@ -20,17 +20,17 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     try {
       await squirtle.insert(payload)
     } catch (error) {
-      t.fail(JSON.stringify(error))
+      assert.fail(JSON.stringify(error))
     }
 
     const expected = payload
-    t.deepEqual(pokedexModule.doc('7').data, expected as any)
-    await firestoreDeepEqual(t, testName, 'pokedex/7', expected as any)
+    assert.deepEqual(pokedexModule.doc('7').data, expected as any)
+    await firestoreDeepEqual(testName, 'pokedex/7', expected as any)
   })
 }
 {
   const testName = 'insert (collection) → id from payload'
-  test(testName, async (t) => {
+  test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName)
     const payload = pokedex(7)
 
@@ -38,19 +38,19 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     try {
       moduleFromResult = await pokedexModule.insert(payload)
     } catch (error) {
-      t.fail(JSON.stringify(error))
+      assert.fail(JSON.stringify(error))
       return
     }
 
     const newId = moduleFromResult.id
     const expected = payload
-    t.deepEqual(pokedexModule.doc(newId).data, expected as any)
-    await firestoreDeepEqual(t, testName, `pokedex/${newId}`, expected as any)
+    assert.deepEqual(pokedexModule.doc(newId).data, expected as any)
+    await firestoreDeepEqual(testName, `pokedex/${newId}`, expected as any)
   })
 }
 {
   const testName = 'insert (collection) → random id'
-  test(testName, async (t) => {
+  test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName)
     const payload = pokedex(7)
     delete payload.id
@@ -59,51 +59,51 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
     try {
       moduleFromResult = await pokedexModule.insert(payload)
     } catch (error) {
-      t.fail(JSON.stringify(error))
+      assert.fail(JSON.stringify(error))
       return
     }
 
     const newId = moduleFromResult.id
     const expected = payload
-    t.deepEqual(pokedexModule.doc(newId).data, expected as any)
-    await firestoreDeepEqual(t, testName, `pokedex/${newId}`, expected as any)
+    assert.deepEqual(pokedexModule.doc(newId).data, expected as any)
+    await firestoreDeepEqual(testName, `pokedex/${newId}`, expected as any)
   })
 }
 {
   const testName = 'revert: insert (document)'
-  test(testName, async (t) => {
+  test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName)
     const payload = { ...pokedex(7), shouldFail: undefined }
-    t.deepEqual(pokedexModule.doc('7').data, undefined)
+    assert.deepEqual(pokedexModule.doc('7').data, undefined)
 
     const squirtle = pokedexModule.doc('7')
 
     try {
       await squirtle.insert(payload, { onError: 'revert' })
     } catch (error) {
-      t.truthy(error)
+      assert.isTrue(!!error)
     }
 
     const expected = undefined
-    t.deepEqual(pokedexModule.doc('7').data, expected as any)
-    await firestoreDeepEqual(t, testName, 'pokedex/7', expected as any)
+    assert.deepEqual(pokedexModule.doc('7').data, expected as any)
+    await firestoreDeepEqual(testName, 'pokedex/7', expected as any)
   })
 }
 {
   const testName = 'revert: insert (collection) → random ID'
-  test(testName, async (t) => {
+  test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName)
     const payload = { ...pokedex(7), shouldFail: undefined }
 
     try {
       await pokedexModule.insert(payload, { onError: 'revert' })
-      t.fail()
+      assert.fail()
     } catch (error) {
-      t.truthy(error)
+      assert.isTrue(!!error)
     }
 
     const expected = undefined
-    t.deepEqual(pokedexModule.doc('7').data, expected as any)
-    await firestoreDeepEqual(t, testName, 'pokedex/7', expected as any)
+    assert.deepEqual(pokedexModule.doc('7').data, expected as any)
+    await firestoreDeepEqual(testName, 'pokedex/7', expected as any)
   })
 }

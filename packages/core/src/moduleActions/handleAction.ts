@@ -28,7 +28,7 @@ export async function handleAction(args: {
   modulePath: string
   pluginModuleConfig: PluginModuleConfig
   pluginAction: PluginFetchCountAction | PluginFetchAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction // prettier-ignore
-  payload: void | Record<string, unknown> | Record<string, unknown>[] | string | string[]
+  payload: undefined | { [key: string]: unknown } | { [key: string]: unknown }[] | string | string[]
   actionConfig: ActionConfig
   eventNameFnsMap: EventNameFnsMap
   onError: 'revert' | 'continue' | 'stop'
@@ -36,7 +36,7 @@ export async function handleAction(args: {
   stopExecutionAfterAction: (arg?: boolean | 'revert') => void
   storeName: string
 }): Promise<
-  | void
+  | undefined
   | string
   | FetchCountResponse
   | DoOnFetchCount
@@ -75,7 +75,7 @@ export async function handleAction(args: {
     stopExecutionAfterAction()
     return
   }
-  let result: void | string | FetchCountResponse | DoOnFetchCount | FetchResponse | DoOnFetch | SyncBatch | [string, SyncBatch] // prettier-ignore
+  let result: undefined | string | FetchCountResponse | DoOnFetchCount | FetchResponse | DoOnFetch | SyncBatch | [string, SyncBatch] // prettier-ignore
   try {
     // triggering the action provided by the plugin
     result = await pluginAction({

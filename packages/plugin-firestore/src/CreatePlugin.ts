@@ -4,14 +4,14 @@ import type {
   FirestorePluginOptions as PluginOptions,
 } from '@magnetarjs/utils-firestore'
 import type { Firestore } from 'firebase/firestore'
-import { deleteActionFactory } from './actions/delete'
-import { deletePropActionFactory } from './actions/deleteProp'
-import { fetchActionFactory } from './actions/fetch'
-import { fetchCountActionFactory } from './actions/fetchCount'
-import { insertActionFactory } from './actions/insert'
-import { writeActionFactory } from './actions/mergeAssignReplace'
-import { revertActionFactory } from './actions/revert'
-import { streamActionFactory } from './actions/stream'
+import { deleteActionFactory } from './actions/delete.js'
+import { deletePropActionFactory } from './actions/deleteProp.js'
+import { fetchActionFactory } from './actions/fetch.js'
+import { fetchCountActionFactory } from './actions/fetchCount.js'
+import { insertActionFactory } from './actions/insert.js'
+import { writeActionFactory } from './actions/mergeAssignReplace.js'
+import { revertActionFactory } from './actions/revert.js'
+import { streamActionFactory } from './actions/stream.js'
 
 export type FirestorePluginOptions = PluginOptions<Firestore>
 export type { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'

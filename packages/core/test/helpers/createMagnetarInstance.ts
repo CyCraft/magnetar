@@ -11,7 +11,7 @@ import type {
   GlobalConfig,
   MagnetarInstance,
 } from '@magnetarjs/types'
-import { Magnetar } from '../../src'
+import { Magnetar } from '../../src/index.js'
 
 const CreatePluginLocal = PluginMockLocal.CreatePlugin
 const CreatePluginRemote = PluginMockRemote.CreatePlugin

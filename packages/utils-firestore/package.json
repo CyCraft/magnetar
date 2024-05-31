@@ -1,28 +1,23 @@
 {
   "name": "@magnetarjs/utils-firestore",
   "version": "0.20.1",
+  "type": "module",
   "sideEffects": false,
   "description": "Magnetar utils firestore",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
   "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "default": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+    ".": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "files": [
     "dist"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build": "tsup src/index.ts --clean --format esm,cjs --dts",
+    "build": "del-cli dist && tsc",
     "dev": "pnpm build --watch",
-    "test-and-build": "npm run test && npm run build",
-    "test": "firebase emulators:exec \"node -r esbuild-register ./test/helpers/scripts/execAllTests.ts\"",
-    "test--only": "firebase emulators:exec \"node -r esbuild-register ./test/helpers/scripts/execAllTestsOnly.ts\""
+    "test": "echo none"
   },
   "author": "Luca Ban - Mesqueeb",
   "funding": "https://github.com/sponsors/mesqueeb",
@@ -32,14 +27,10 @@
     "@magnetarjs/types": "workspace:*",
     "@magnetarjs/utils": "workspace:*",
     "flatten-anything": "^3.0.5",
-    "getorset-anything": "^0.0.5",
-    "is-what": "^4.1.16",
+    "getorset-anything": "^0.1.0",
+    "is-what": "^5.0.0",
     "merge-anything": "^5.1.7",
     "remove-anything": "^1.0.5"
-  },
-  "devDependencies": {
-    "firebase": "^10.12.2",
-    "firebase-admin": "^11.11.1"
   },
   "keywords": [
     "magnetar-utils",
@@ -77,15 +68,6 @@
   },
   "bugs": {
     "url": "https://github.com/cycraft/magnetar/issues"
-  },
-  "ava": {
-    "extensions": [
-      "ts"
-    ],
-    "require": [
-      "esbuild-register"
-    ],
-    "timeout": "60s"
   },
   "gitHead": "7358494dc3072b8f1f8bb7ec64ca1ecba610b3e7"
 }

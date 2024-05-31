@@ -2,7 +2,7 @@
 import { isNumber } from 'is-what'
 import LoadingSpinner from './LoadingSpinner.vue'
 
-const props = defineProps<{
+defineProps<{
   pageIndex: number
   pageCountFetched: number
   pageCountHypothetical: number

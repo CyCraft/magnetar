@@ -1,4 +1,4 @@
-import { EqualsAnyOfUnion, IsFullStringLiteral } from './Equals'
+import { EqualsAnyOfUnion, IsFullStringLiteral } from './Equals.js'
 
 /**
  * Joins two keys into a dot notation path
@@ -27,7 +27,7 @@ export type OPathsWithoutOptional<T, D extends number = 10> = [D] extends [never
   ? never
   : EqualsAnyOfUnion<T, null | undefined> extends 1
   ? ''
-  : T extends Record<string, any>
+  : T extends { [key: string]: any }
   ? {
       [K in keyof T]-?: K extends string
         ? `${K}` | Join<K, OPathsWithoutOptional<T[K], Prev[D]>>
@@ -42,7 +42,7 @@ export type OPathsWithoutOptional<T, D extends number = 10> = [D] extends [never
  */
 export type OPathsWithOptional<T, D extends number = 10> = [D] extends [never]
   ? never
-  : T extends Record<string, any>
+  : T extends { [key: string]: any }
   ? Exclude<
       {
         [K in keyof T]: K extends string
@@ -62,7 +62,7 @@ export type OLeaves<T, D extends number = 10> = [D] extends [never]
   ? ''
   : EqualsAnyOfUnion<T, null | undefined> extends 1
   ? ''
-  : T extends Record<string, any>
+  : T extends { [key: string]: any }
   ? {
       [K in keyof T]-?: IsFullStringLiteral<K> extends true ? Join<K, OLeaves<T[K], Prev[D]>> : ''
     }[keyof T]

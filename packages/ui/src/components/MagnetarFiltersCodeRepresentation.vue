@@ -2,8 +2,8 @@
 import { arrStr } from '@magnetarjs/utils'
 import { isArray } from 'is-what'
 import { computed } from 'vue'
-import { FilterState, FiltersState, MUIFilter, OPaths, OrderByState } from '../types'
-import { filterStateToClauses, orderByStateToClauses } from '../utils/tableHelpers'
+import { FilterState, FiltersState, MUIFilter, OPaths, OrderByState } from '../types.js'
+import { filterStateToClauses, orderByStateToClauses } from '../utils/tableHelpers.js'
 
 const props = defineProps<{
   labels: {

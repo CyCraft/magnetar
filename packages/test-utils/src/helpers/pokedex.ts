@@ -1,8 +1,8 @@
 import type { PartialDeep } from '@magnetarjs/types'
 import { copy } from 'copy-anything'
 import { merge } from 'merge-anything'
-import { allPokemonArray } from './pokemon'
-import type { PokedexEntry } from './types'
+import { allPokemonArray } from './pokemon.js'
+import type { PokedexEntry } from './types.js'
 
 export function pokedexEntryDefaults(partial: PartialDeep<PokedexEntry>): PokedexEntry {
   const defaults: PokedexEntry = {
@@ -16,7 +16,9 @@ export function pokedexEntryDefaults(partial: PartialDeep<PokedexEntry>): Pokede
 
 export function pokedex(pokedexNr: number): PokedexEntry {
   const entryIndex = pokedexNr - 1
-  return copy(allPokemonArray[entryIndex])
+  const foundPokemon = allPokemonArray[entryIndex]
+  if (!foundPokemon) throw new Error(`Pokemon with pokedexNr ${pokedexNr} not found!`)
+  return copy(foundPokemon)
 }
 
 export function pokedexGetAll(): PokedexEntry[] {

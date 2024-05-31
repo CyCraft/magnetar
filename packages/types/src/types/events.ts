@@ -1,4 +1,4 @@
-import { ActionName } from './actions'
+import { ActionName } from './actions.js'
 import {
   DoOnFetch,
   DoOnFetchCount,
@@ -8,8 +8,8 @@ import {
   PluginModuleConfig,
   StreamResponse,
   SyncBatch,
-} from './plugins'
-import { MergeDeep } from './utils/MergeDeep'
+} from './plugins.js'
+import { MergeDeep } from './utils/MergeDeep.js'
 
 // events
 export type EventName = 'before' | 'success' | 'error' | 'revert'
@@ -36,9 +36,9 @@ type EventSharedPayload = {
    * The payload that was passed to the action
    * write actions: Record<string, any> | Record<string, any>[]
    * delete actions: Record<string, any> | Record<string, any>[] | string | string[]
-   * read actions: Record<string, any> | void
+   * read actions: Record<string, any> | undefined
    */
-  payload: Record<string, any> | Record<string, any>[] | void | string | string[]
+  payload: { [key: string]: any } | { [key: string]: any }[] | undefined | string | string[]
   /**
    * The action name for which the current event is being run
    */
@@ -60,7 +60,7 @@ type EventSharedPayload = {
 
 type EventPayloadPropResult = {
   result:
-    | void
+    | undefined
     | string
     | FetchCountResponse
     | DoOnFetchCount

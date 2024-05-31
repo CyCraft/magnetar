@@ -1,11 +1,12 @@
 import type { PluginWriteAction, PluginWriteActionPayload } from '@magnetarjs/types'
+import { objGetOrSet } from 'getorset-anything'
 import { isPlainObject } from 'is-what'
 import { merge } from 'merge-anything'
-import { throwIfEmulatedError } from '../../helpers'
-import { MakeRestoreBackup, StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin'
+import { throwIfEmulatedError } from '../../helpers/index.js'
+import { MakeRestoreBackup, StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin.js'
 
 export function writeActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
+  data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
   storePluginOptions: StorePluginOptions,
   actionName: 'merge' | 'assign' | 'replace',
   makeBackup?: MakeRestoreBackup
@@ -15,7 +16,7 @@ export function writeActionFactory(
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginWriteActionPayload<StorePluginModuleConfig>): void {
+  }: PluginWriteActionPayload<StorePluginModuleConfig>): undefined {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
@@ -23,7 +24,7 @@ export function writeActionFactory(
     // write actions cannot be executed on collections
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 
-    const collectionMap = data[collectionPath]
+    const collectionMap = objGetOrSet(data, collectionPath, () => new Map())
 
     if (makeBackup) makeBackup(collectionPath, docId)
 

@@ -1,14 +1,13 @@
+import { MoveEntry, allMovesArray, pokedex, pokedexGetAll } from '@magnetarjs/test-utils'
 import arrayShuffle from 'array-shuffle'
-import { pokedex, pokedexGetAll, allMovesArray, MoveEntry } from '@magnetarjs/test-utils'
-import { createMagnetarInstance, DateDoc } from '../createMagnetarInstance'
+import { DateDoc, createMagnetarInstance } from '../createMagnetarInstance.js'
 
 const immediate = { syncDebounceMs: 1 }
 
 export async function setupTestDatabase() {
   // setup read DB
-  const { pokedexModule, trainerModule, datesModule, movesModuleOf } = await createMagnetarInstance(
-    'read'
-  )
+  const { pokedexModule, trainerModule, datesModule, movesModuleOf } =
+    await createMagnetarInstance('read')
   const allPokemon = pokedexGetAll()
 
   await Promise.all(

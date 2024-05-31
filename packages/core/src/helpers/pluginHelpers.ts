@@ -13,9 +13,9 @@ import { isArray, isFunction, isNumber, isPlainObject } from 'is-what'
 export function isDoOnStream(payload: any): payload is DoOnStream {
   const isNotDoOnStream =
     !isPlainObject(payload) ||
-    payload.streaming ||
-    payload.stop ||
-    !(payload.added || payload.modified || payload.removed)
+    payload['streaming'] ||
+    payload['stop'] ||
+    !(payload['added'] || payload['modified'] || payload['removed'])
   return !isNotDoOnStream
 }
 
@@ -32,7 +32,7 @@ export function isDoOnFetchCount(payload: any): payload is DoOnFetchCount {
  * FetchResponse type guard
  */
 export function isFetchCountResponse(payload: any): payload is FetchCountResponse {
-  return isPlainObject(payload) && isNumber(payload.count)
+  return isPlainObject(payload) && isNumber(payload['count'])
 }
 
 /**
@@ -46,5 +46,5 @@ export function isDoOnFetch(payload: any): payload is DoOnFetch {
  * FetchResponse type guard
  */
 export function isFetchResponse(payload: any): payload is FetchResponse {
-  return isPlainObject(payload) && isArray(payload.docs)
+  return isPlainObject(payload) && isArray(payload['docs'])
 }

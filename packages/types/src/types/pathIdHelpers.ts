@@ -1,4 +1,4 @@
-import { ModuleConfig } from './config'
+import { ModuleConfig } from './config.js'
 
 export const MODULE_IDENTIFIER_SPLIT = ' /// '
 

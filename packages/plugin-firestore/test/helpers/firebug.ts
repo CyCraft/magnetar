@@ -1,9 +1,9 @@
-import test from 'ava'
-import { doc, collection, onSnapshot } from 'firebase/firestore'
-import { db } from './initFirebase'
 import { waitMs } from '@magnetarjs/test-utils'
+import { collection, doc, onSnapshot } from 'firebase/firestore'
+import { test } from 'vitest'
+import { db } from './initFirebase.js'
 
-test('firebase sdk', async (t) => {
+test('firebase sdk', async () => {
   const pokemonPath = `magnetarTests/read/pokedex/136`
   console.log(`1)`)
   await onSnapshot(

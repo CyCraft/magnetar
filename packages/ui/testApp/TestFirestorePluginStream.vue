@@ -66,7 +66,7 @@ function deleteItem(item: Item) {
 </script>
 
 <template>
-  <div class="test">
+  <div class="_test">
     <h6>plugin-vue3 + plugin-firestore Todo list ({{ size }})</h6>
     <div style="margin: 1rem">
       <label for="all">show done items</label>

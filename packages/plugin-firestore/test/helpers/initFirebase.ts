@@ -11,6 +11,6 @@ const config = {
 }
 const firebaseApp = initializeApp(config)
 const db = initializeFirestore(firebaseApp, { experimentalAutoDetectLongPolling: true })
-connectFirestoreEmulator(db, 'localhost', 8198)
+connectFirestoreEmulator(db, 'localhost', 8124)
 
 export { db }

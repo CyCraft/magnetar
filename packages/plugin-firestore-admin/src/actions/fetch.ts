@@ -10,8 +10,8 @@ import {
   getFirestoreDocPath,
 } from '@magnetarjs/utils-firestore'
 import type { DocumentSnapshot, QueryDocumentSnapshot } from 'firebase-admin/firestore'
-import { FirestoreAdminPluginOptions } from '../CreatePlugin'
-import { docSnapshotToDocMetadata, getQueryInstance } from '../helpers/getFirestore'
+import { FirestoreAdminPluginOptions } from '../CreatePlugin.js'
+import { docSnapshotToDocMetadata, getQueryInstance } from '../helpers/getFirestore.js'
 
 export function fetchActionFactory(
   firestorePluginOptions: Required<FirestoreAdminPluginOptions>

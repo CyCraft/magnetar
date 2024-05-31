@@ -1,15 +1,13 @@
 {
   "name": "magnetar",
   "version": "0.20.1",
+  "type": "module",
   "description": "State-management done right with automatic sync to remote databases and services. Framework-agnostic & optimistic-UI built-in 🌟",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
   "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "default": "./dist/index.js"
-    }
+    ".": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "files": [
     "dist"
@@ -19,8 +17,9 @@
   "license": "MIT",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build": "tsup src/index.ts --clean --format esm,cjs --dts",
-    "dev": "pnpm build --watch"
+    "build": "del-cli dist && tsc",
+    "dev": "pnpm build --watch",
+    "test": "echo none"
   },
   "dependencies": {
     "@magnetarjs/core": "workspace:*",

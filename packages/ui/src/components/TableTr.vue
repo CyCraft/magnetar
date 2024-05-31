@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { MUIColumn, MUIParseLabel, MUITableSlot, MUIRowMeta, Codable } from '../types'
+import { MUIColumn, MUIParseLabel, MUITableSlot, MUIRowMeta, Codable, isCodable } from '../types.js'
 import TableTd from './TableTd.vue'
-import { isFunction } from 'is-what'
 
 const props = defineProps<{
   row: any
@@ -22,7 +21,7 @@ const codablePayload = computed<Parameters<Codable<any, any>>[0]>(() => ({
 
 /** Any type that has `Codable<...>` should be piped through this. */
 function evaluateCodableProp<T>(prop: T | Codable<Record<string, any>, T>): T {
-  return isFunction(prop) ? prop(codablePayload.value) : prop
+  return isCodable(prop) ? prop(codablePayload.value) : prop
 }
 
 const rowAttrs = computed<{ class: string | undefined; style: string | undefined }>(() => ({

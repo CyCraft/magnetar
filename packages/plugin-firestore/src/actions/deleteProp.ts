@@ -11,8 +11,8 @@ import {
 } from '@magnetarjs/utils-firestore'
 import { mapGetOrSet } from 'getorset-anything'
 import { isArray, isNumber } from 'is-what'
-import { BatchSyncMap, FirestorePluginOptions } from '../CreatePlugin'
-import { applySyncBatch, createWriteBatch } from '../helpers/batchHelpers'
+import { BatchSyncMap, FirestorePluginOptions } from '../CreatePlugin.js'
+import { applySyncBatch, createWriteBatch } from '../helpers/batchHelpers.js'
 
 export function deletePropActionFactory(
   batchSyncMap: BatchSyncMap,

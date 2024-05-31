@@ -1,23 +1,19 @@
 {
+  "extends": "@cycraft/tsconfig",
   "compilerOptions": {
-    "baseUrl": "./packages",
-    "downlevelIteration": true,
-    "esModuleInterop": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "lib": ["ESNext", "DOM", "scripthost", "DOM.Iterable"],
-    "module": "esnext",
-    "moduleResolution": "node",
-    "noErrorTruncation": false,
-    "noImplicitAny": false,
-    "noImplicitReturns": true,
-    "noUnusedLocals": false,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "sourceMap": true,
-    "strict": true,
-    "target": "esnext",
-    "useDefineForClassFields": true
+    "baseUrl": ".",
+    "paths": {
+      "@magnetarjs/core": ["./packages/core/src/index.ts"],
+      "@magnetarjs/plugin-firestore": ["./packages/plugin-firestore/src/index.ts"],
+      "@magnetarjs/plugin-firestore-admin": ["./packages/plugin-firestore-admin/src/index.ts"],
+      "@magnetarjs/plugin-simple-store": ["./packages/plugin-simple-store/src/index.ts"],
+      "@magnetarjs/plugin-vue3": ["./packages/plugin-vue3/src/index.ts"],
+      "@magnetarjs/test-utils": ["./packages/test-utils/src/index.ts"],
+      "@magnetarjs/types": ["./packages/types/src/index.ts"],
+      "@magnetarjs/ui": ["./packages/ui/src/index.ts"],
+      "@magnetarjs/utils": ["./packages/utils/src/index.ts"],
+      "@magnetarjs/utils-firestore": ["./packages/utils-firestore/src/index.ts"]
+    }
   },
   "exclude": ["/dist", "node_modules"]
 }

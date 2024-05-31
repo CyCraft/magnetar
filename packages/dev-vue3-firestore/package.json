@@ -1,23 +1,18 @@
 {
   "name": "dev-vue3-firestore",
   "version": "0.20.1",
+  "type": "module",
   "private": true,
   "scripts": {
-    "typecheck": "echo na",
+    "typecheck": "vue-tsc --noEmit",
     "dev": "vite",
     "build": "vue-tsc && vite build",
+    "test": "echo none",
     "preview": "vite preview"
   },
   "dependencies": {
-    "firebase": "^10.12.2",
-    "magnetar": "workspace:*",
-    "vue": "^3.4.27"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^4.6.2",
-    "typescript": "^5.4.5",
-    "vite": "^4.5.3",
-    "sass": "^1.77.3",
-    "vue-tsc": "^1.8.27"
+    "@magnetarjs/core": "workspace:*",
+    "@magnetarjs/plugin-firestore": "workspace:*",
+    "@magnetarjs/plugin-vue3": "workspace:*"
   }
 }

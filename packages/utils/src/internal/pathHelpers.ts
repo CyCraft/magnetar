@@ -1,4 +1,4 @@
-import { isOdd, isEven, countCharacter } from './countHelpers'
+import { isOdd, isEven, countCharacter } from './countHelpers.js'
 
 export function isDocModule(path: string): boolean {
   return isOdd(countCharacter(path, /\//g))

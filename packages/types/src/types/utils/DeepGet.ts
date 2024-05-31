@@ -1,4 +1,4 @@
-import { TupleExcludingFirst, TupleFirst } from './Tuple'
+import { TupleExcludingFirst, TupleFirst } from './Tuple.js'
 
 export type DeepGet<T, K extends readonly unknown[]> = K extends []
   ? T

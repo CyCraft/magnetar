@@ -1,9 +1,9 @@
-import { DocInstance } from '../Doc'
-import { StoreName } from './core'
-import { EventNameFnMap } from './events'
-import { ModifyPayloadFnMap } from './modifyPayload'
-import { ModifyReadResponseFnMap } from './modifyReadResponse'
-import { PartialDeep } from './utils/PartialDeep'
+import { DocInstance } from '../Doc.js'
+import { StoreName } from './core.js'
+import { EventNameFnMap } from './events.js'
+import { ModifyPayloadFnMap } from './modifyPayload.js'
+import { ModifyReadResponseFnMap } from './modifyReadResponse.js'
+import { PartialDeep } from './utils/PartialDeep.js'
 
 /**
  * these are all the actions that Magnetar streamlines, whichever plugin is used
@@ -21,7 +21,7 @@ export type ActionName = 'fetch' | 'fetchCount' | 'stream' | 'insert' | 'merge' 
  * // don't throw errors for this action, wherever it might fail
  * { onError: 'continue' }
  */
-export type ActionConfig<DocDataType extends Record<string, any> = Record<string, any>> = {
+export type ActionConfig<DocDataType extends { [key: string]: any } = { [key: string]: any }> = {
   executionOrder?: StoreName[]
   onError?: 'revert' | 'continue' | 'stop'
   modifyPayloadOn?: ModifyPayloadFnMap<DocDataType>
@@ -39,8 +39,10 @@ export type ActionConfig<DocDataType extends Record<string, any> = Record<string
  * Opens a continuous stream to a document or collection.
  * @returns the open stream promise. This will never resolve as long as the stream is open.
  */
-export type MagnetarStreamAction<DocDataType extends Record<string, any> = Record<string, any>> = (
-  payload?: any | void,
+export type MagnetarStreamAction<
+  DocDataType extends { [key: string]: any } = { [key: string]: any },
+> = (
+  payload?: any | undefined,
   /**
    * TODO
    * @deprecated — should deprecated this "general" action config and replace with one specific for this action
@@ -67,10 +69,10 @@ export type MagnetarStreamAction<DocDataType extends Record<string, any> = Recor
  * pokedex.fetch({ force: true }) // makes API call to remote store
  */
 export type MagnetarFetchAction<
-  DocDataType extends Record<string, any> = Record<string, any>,
-  calledFrom extends 'collection' | 'doc' = 'collection' | 'doc'
+  DocDataType extends { [key: string]: any } = { [key: string]: any },
+  calledFrom extends 'collection' | 'doc' = 'collection' | 'doc',
 > = (
-  payload?: { force?: boolean } | Record<string, any> | void,
+  payload?: { force?: boolean } | { [key: string]: any } | undefined,
   /**
    * TODO
    * @deprecated — should deprecated this "general" action config and replace with one specific for this action
@@ -97,7 +99,9 @@ export type MagnetarFetchCountAction = () => Promise<number>
  * newDoc.id // the generated id
  * newDoc.data // { some: 'payload' }
  */
-export type MagnetarInsertAction<DocDataType extends Record<string, any> = Record<string, any>> = (
+export type MagnetarInsertAction<
+  DocDataType extends { [key: string]: any } = { [key: string]: any },
+> = (
   payload: DocDataType,
   /**
    * TODO
@@ -109,7 +113,9 @@ export type MagnetarInsertAction<DocDataType extends Record<string, any> = Recor
 /**
  * @returns the new document data after applying the changes to the local document (including any modifications from modifyPayloadOn)
  */
-export type MagnetarWriteAction<DocDataType extends Record<string, any> = Record<string, any>> = (
+export type MagnetarWriteAction<
+  DocDataType extends { [key: string]: any } = { [key: string]: any },
+> = (
   payload: PartialDeep<DocDataType>,
   /**
    * TODO
@@ -122,7 +128,7 @@ export type MagnetarWriteAction<DocDataType extends Record<string, any> = Record
  * @returns the new document data after applying the changes to the local document (including any modifications from modifyPayloadOn)
  */
 export type MagnetarDeletePropAction<
-  DocDataType extends Record<string, any> = Record<string, any>
+  DocDataType extends { [key: string]: any } = { [key: string]: any },
 > = (
   payload: keyof DocDataType | string | (keyof DocDataType | string)[],
   /**

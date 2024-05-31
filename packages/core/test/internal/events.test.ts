@@ -1,8 +1,8 @@
-import test from 'ava'
-import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex } from '@magnetarjs/test-utils'
+import { assert, test } from 'vitest'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
 
-test('delete: emits before & success events', async (t) => {
+test('delete: emits before & success events', async () => {
   const { pokedexModule } = createMagnetarInstance()
   const insertPayload = pokedex(7)
   await pokedexModule.insert(insertPayload)
@@ -17,10 +17,10 @@ test('delete: emits before & success events', async (t) => {
       },
     },
   })
-  t.deepEqual(ranAllEvents.length, 4)
+  assert.deepEqual(ranAllEvents.length, 4)
 })
 
-test('insert: emits before & success events', async (t) => {
+test('insert: emits before & success events', async () => {
   const { pokedexModule } = createMagnetarInstance()
   const insertPayload = pokedex(7)
   const ranAllEvents: any[] = []
@@ -28,30 +28,30 @@ test('insert: emits before & success events', async (t) => {
     on: {
       before: ({ payload, storeName }) => {
         if (storeName === 'local') {
-          t.deepEqual(payload, insertPayload)
+          assert.deepEqual(payload, insertPayload)
           ranAllEvents.push(1)
         }
         if (storeName === 'remote') {
-          t.deepEqual(payload, insertPayload)
+          assert.deepEqual(payload, insertPayload)
           ranAllEvents.push(1)
         }
       },
       success: ({ payload, storeName }) => {
         if (storeName === 'local') {
-          t.deepEqual(payload, insertPayload)
+          assert.deepEqual(payload, insertPayload)
           ranAllEvents.push(1)
         }
         if (storeName === 'remote') {
-          t.deepEqual(payload, insertPayload)
+          assert.deepEqual(payload, insertPayload)
           ranAllEvents.push(1)
         }
       },
     },
   })
-  t.deepEqual(ranAllEvents.length, 4)
+  assert.deepEqual(ranAllEvents.length, 4)
 })
 
-test('insert: can abort in before events', async (t) => {
+test('insert: can abort in before events', async () => {
   const { pokedexModule } = createMagnetarInstance()
   const insertPayload = pokedex(7)
   try {
@@ -61,23 +61,23 @@ test('insert: can abort in before events', async (t) => {
           if (storeName === 'local') {
             abort()
           }
-          if (storeName === 'remote') t.fail()
+          if (storeName === 'remote') assert.fail()
         },
         success: ({ storeName, result }) => {
-          t.fail()
+          assert.fail()
         },
         error: ({ storeName }) => {
-          if (storeName === 'local') t.fail()
+          if (storeName === 'local') assert.fail()
         },
       },
     })
-    t.deepEqual(result.data, pokedexModule.data.get('7'))
+    assert.deepEqual(result.data, pokedexModule.data.get('7'))
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
 })
 
-test('insert: can abort in success events', async (t) => {
+test('insert: can abort in success events', async () => {
   const { pokedexModule } = createMagnetarInstance()
   const insertPayload = pokedex(7)
   const ranAllEvents: any[] = []
@@ -88,7 +88,7 @@ test('insert: can abort in success events', async (t) => {
           if (storeName === 'local') {
             ranAllEvents.push(1)
           }
-          if (storeName === 'remote') t.fail()
+          if (storeName === 'remote') assert.fail()
         },
         success: ({ payload, abort, storeName }) => {
           if (storeName === 'local') {
@@ -98,9 +98,9 @@ test('insert: can abort in success events', async (t) => {
         },
       },
     })
-    t.deepEqual(result.data, insertPayload)
+    assert.deepEqual(result.data, insertPayload)
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
-  t.deepEqual(ranAllEvents.length, 2)
+  assert.deepEqual(ranAllEvents.length, 2)
 })

@@ -2,8 +2,8 @@ import { Magnetar } from '@magnetarjs/core'
 import { generateRandomId, MoveEntry, PluginMockLocal, PokedexEntry } from '@magnetarjs/test-utils'
 import type { CollectionInstance, DocInstance, MagnetarInstance } from '@magnetarjs/types'
 import type { Timestamp } from 'firebase-admin/firestore'
-import { CreatePlugin as CreatePluginRemote } from '../../src/index'
-import { db } from './initFirebase'
+import { CreatePlugin as CreatePluginRemote } from '../../src/index.js'
+import { db } from './initFirebase.js'
 
 const CreatePluginLocal = PluginMockLocal.CreatePlugin
 
@@ -34,8 +34,8 @@ export async function createMagnetarInstance(
     insertDocs = {},
     remoteConfig = {},
   }: {
-    insertDocs?: { [path: string]: Record<string, any> }
-    remoteConfig?: Record<string, any>
+    insertDocs?: { [path: string]: { [key: string]: any } }
+    remoteConfig?: { [key: string]: any }
   } = {}
 ): Promise<{
   pokedexModule: CollectionInstance<PokedexModuleData>
@@ -53,7 +53,7 @@ export async function createMagnetarInstance(
   }
 
   // prepare the firestore side
-  const initialEntriesPokedex: [string, Record<string, any>][] = []
+  const initialEntriesPokedex: [string, { [key: string]: any }][] = []
   const insertPromises = Object.entries(insertDocs).map(([path, data]) => {
     const docPath = `magnetarTests/${testName}${path ? '/' + path : ''}`
     if (path.startsWith('pokedex/') && !path.endsWith('/moves')) {

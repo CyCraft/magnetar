@@ -1,3 +1,3 @@
-export * from './helpers'
-export * as PluginMockRemote from './PluginRemoteMock/index'
-export * as PluginMockLocal from './PluginLocalMock/index'
+export * as PluginMockLocal from './PluginLocalMock/index.js'
+export * as PluginMockRemote from './PluginRemoteMock/index.js'
+export * from './helpers/index.js'

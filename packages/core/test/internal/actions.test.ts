@@ -1,23 +1,23 @@
 import { pokedex, PokedexEntry } from '@magnetarjs/test-utils'
 import type { DocInstance } from '@magnetarjs/types'
-import test from 'ava'
 import { merge } from 'merge-anything'
-import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
+import { assert, test } from 'vitest'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
 
-test('write: insert (document)', async (t) => {
+test('write: insert (document)', async () => {
   const { pokedexModule, magnetar } = createMagnetarInstance()
   const payload = pokedex(7)
-  t.deepEqual(pokedexModule.data.get('7'), undefined)
-  await pokedexModule.doc('7').insert(payload).catch((e: any) => t.fail(e.message)) // prettier-ignore
+  assert.deepEqual(pokedexModule.data.get('7'), undefined)
+  await pokedexModule.doc('7').insert(payload).catch((e: any) => assert.fail(e.message)) // prettier-ignore
   // check data of references executed on
-  t.deepEqual(pokedexModule.data.get('7'), payload)
+  assert.deepEqual(pokedexModule.data.get('7'), payload)
   // check data of new references
-  t.deepEqual(pokedexModule.doc('7').data, payload)
-  t.deepEqual(magnetar.doc('pokedex/7').data, payload)
-  t.deepEqual(magnetar.collection('pokedex').doc('7').data, payload)
+  assert.deepEqual(pokedexModule.doc('7').data, payload)
+  assert.deepEqual(magnetar.doc('pokedex/7').data, payload)
+  assert.deepEqual(magnetar.collection('pokedex').doc('7').data, payload)
 })
 
-test('write: insert (collection) → random ID', async (t) => {
+test('write: insert (collection) → random ID', async () => {
   const { pokedexModule, magnetar } = createMagnetarInstance()
   const payload = pokedex(7)
 
@@ -25,24 +25,24 @@ test('write: insert (collection) → random ID', async (t) => {
   try {
     moduleFromResult = await pokedexModule.insert(payload)
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
     return
   }
   const newId = moduleFromResult.id
   // check data of reference returned
-  t.deepEqual(moduleFromResult.data, payload)
+  assert.deepEqual(moduleFromResult.data, payload)
   // check data of references executed on
-  t.deepEqual(pokedexModule.data.get(newId), payload)
+  assert.deepEqual(pokedexModule.data.get(newId), payload)
   // check data of new references
-  t.deepEqual(magnetar.doc(`pokedex/${newId}`).data, payload)
-  t.deepEqual(magnetar.collection('pokedex').doc(newId).data, payload)
-  t.deepEqual(pokedexModule.doc(newId).data, payload)
+  assert.deepEqual(magnetar.doc(`pokedex/${newId}`).data, payload)
+  assert.deepEqual(magnetar.collection('pokedex').doc(newId).data, payload)
+  assert.deepEqual(pokedexModule.doc(newId).data, payload)
 })
 
-test('deleteProp: (document)', async (t) => {
+test('deleteProp: (document)', async () => {
   const { trainerModule, magnetar } = createMagnetarInstance()
   const prop = 'age'
-  t.deepEqual(trainerModule.data?.age, 10)
+  assert.deepEqual(trainerModule.data?.age, 10)
 
   // create references on beforehand
   const magnetarDoc = magnetar.doc('app-data/trainer') // prettier-ignore
@@ -52,21 +52,21 @@ test('deleteProp: (document)', async (t) => {
   try {
     const result = await trainerModule.deleteProp(prop)
     // check data of reference returned
-    t.deepEqual(result, trainerModule.data as any)
+    assert.deepEqual(result, trainerModule.data as any)
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
   // check data of references created on beforehand
-  t.deepEqual(magnetarDoc.data?.[prop], undefined)
-  t.deepEqual(magnetarCollectionDoc.data?.[prop], undefined)
-  t.deepEqual(magnetarCollectionData.get('trainer')?.[prop], undefined)
+  assert.deepEqual(magnetarDoc.data?.[prop], undefined)
+  assert.deepEqual(magnetarCollectionDoc.data?.[prop], undefined)
+  assert.deepEqual(magnetarCollectionData.get('trainer')?.[prop], undefined)
   // check data of references executed on
-  t.deepEqual(trainerModule.data?.[prop], undefined)
+  assert.deepEqual(trainerModule.data?.[prop], undefined)
 })
 
-test('delete: (document)', async (t) => {
+test('delete: (document)', async () => {
   const { trainerModule, magnetar } = createMagnetarInstance()
-  t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
+  assert.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
   // create references on beforehand
   const magnetarCollection = magnetar.collection('app-data')
@@ -76,85 +76,85 @@ test('delete: (document)', async (t) => {
   try {
     const result = await trainerModule.delete()
     // check data of reference returned
-    t.deepEqual(result, undefined)
+    assert.deepEqual(result, undefined)
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
   // check data of references created on beforehand
-  t.deepEqual(magnetarCollection.data.get('trainer'), undefined)
-  t.deepEqual(magnetarCollectionDoc.data, undefined)
-  t.deepEqual(magnetarDoc.data, undefined)
+  assert.deepEqual(magnetarCollection.data.get('trainer'), undefined)
+  assert.deepEqual(magnetarCollectionDoc.data, undefined)
+  assert.deepEqual(magnetarDoc.data, undefined)
   // check data of references executed on
-  t.deepEqual(trainerModule.data, undefined)
+  assert.deepEqual(trainerModule.data, undefined)
   // check data of new references
-  t.deepEqual(magnetar.collection('app-data').doc('trainer').data, undefined)
-  t.deepEqual(magnetar.doc('app-data/trainer').data, undefined)
-  t.deepEqual(magnetar.collection('app-data').data.get('trainer'), undefined)
+  assert.deepEqual(magnetar.collection('app-data').doc('trainer').data, undefined)
+  assert.deepEqual(magnetar.doc('app-data/trainer').data, undefined)
+  assert.deepEqual(magnetar.collection('app-data').data.get('trainer'), undefined)
 })
 
-test('write: merge (document)', async (t) => {
+test('write: merge (document)', async () => {
   const { pokedexModule } = createMagnetarInstance()
   const payload = { base: { HP: 9000 } }
   const doc = pokedexModule.doc('1')
-  t.deepEqual(doc.data, pokedex(1))
-  await doc.merge(payload).catch((e: any) => t.fail(e.message)) // prettier-ignore
+  assert.deepEqual(doc.data, pokedex(1))
+  await doc.merge(payload).catch((e: any) => assert.fail(e.message)) // prettier-ignore
   const mergedResult = merge(pokedex(1), { base: { HP: 9000 } })
-  t.deepEqual(pokedexModule.data.get('1'), mergedResult)
-  t.deepEqual(doc.data, mergedResult)
+  assert.deepEqual(pokedexModule.data.get('1'), mergedResult)
+  assert.deepEqual(doc.data, mergedResult)
 })
 
-test('read: fetch (collection)', async (t) => {
+test('read: fetch (collection)', async () => {
   // 'fetch' resolves once all stores have given a response with data
   const { pokedexModule } = createMagnetarInstance()
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-  t.deepEqual(pokedexModule.data.size, 1)
+  assert.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  assert.deepEqual(pokedexModule.data.size, 1)
   try {
     const result = await pokedexModule.fetch({ force: true })
-    t.deepEqual(result.get('1'), pokedex(1))
-    t.deepEqual(result.get('136'), pokedex(136))
+    assert.deepEqual(result.get('1'), pokedex(1))
+    assert.deepEqual(result.get('136'), pokedex(136))
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-  t.deepEqual(pokedexModule.data.get('136'), pokedex(136))
-  t.deepEqual(pokedexModule.data.size, 151)
+  assert.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  assert.deepEqual(pokedexModule.data.get('136'), pokedex(136))
+  assert.deepEqual(pokedexModule.data.size, 151)
 })
 
-test('read: fetch (document)', async (t) => {
+test('read: fetch (document)', async () => {
   // get resolves once all stores have given a response with data
   const { trainerModule } = createMagnetarInstance()
-  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
+  assert.deepEqual(trainerModule.data, { name: 'Luca', age: 10 })
   try {
     const result = await trainerModule.fetch({ force: true })
-    t.deepEqual(result, { name: 'Luca', age: 10, dream: 'job' })
+    assert.deepEqual(result, { name: 'Luca', age: 10, dream: 'job' })
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
-  t.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
+  assert.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })
 
-test('fetch (collection) where-filter: ==', async (t) => {
+test('fetch (collection) where-filter: ==', async () => {
   const { pokedexModule, magnetar } = createMagnetarInstance()
 
   const pokedexModuleWithQuery = pokedexModule.where('name', '==', 'Flareon')
   try {
     const queryModuleRef = pokedexModuleWithQuery
     await queryModuleRef.fetch({ force: true })
-    t.deepEqual([...queryModuleRef.data.values()], [pokedex(136)])
+    assert.deepEqual([...queryModuleRef.data.values()], [pokedex(136)])
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
   // try take the query again and see if it's the same result
   const queryModuleRef = pokedexModule.where('name', '==', 'Flareon')
-  t.deepEqual([...queryModuleRef.data.values()], [pokedex(136)])
+  assert.deepEqual([...queryModuleRef.data.values()], [pokedex(136)])
   // try take the pokedexModuleWithQuery and see if it's the same result
-  t.deepEqual([...pokedexModuleWithQuery.data.values()], [pokedex(136)])
+  assert.deepEqual([...pokedexModuleWithQuery.data.values()], [pokedex(136)])
   // check the invididual doc refs from the pokedexModuleWithQuery
-  t.deepEqual(pokedexModuleWithQuery.doc('136').data, pokedex(136))
+  assert.deepEqual(pokedexModuleWithQuery.doc('136').data, pokedex(136))
   // check the invididual doc refs from pokedexModule
-  t.deepEqual(pokedexModule.doc('136').data, pokedex(136))
+  assert.deepEqual(pokedexModule.doc('136').data, pokedex(136))
   // check the invididual doc refs from base
-  t.deepEqual(magnetar.doc('pokedex/136').data, pokedex(136))
+  assert.deepEqual(magnetar.doc('pokedex/136').data, pokedex(136))
   // see if the main module has also received this data
-  t.deepEqual([...pokedexModule.data.values()], [pokedex(1), pokedex(136)])
+  assert.deepEqual([...pokedexModule.data.values()], [pokedex(1), pokedex(136)])
 })

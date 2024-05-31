@@ -9,12 +9,12 @@ import type {
 /**
  * Executes given function array with given args-array deconstructed, it will always use replace the first param with whatever the response of each function was.
  */
-export function executeOnFns<Payload extends Record<string, any> | string | undefined>(params: {
+export function executeOnFns<Payload extends { [key: string]: any } | string | undefined>(params: {
   modifyReadResultFns: (OnAddedFn | OnModifiedFn | OnRemovedFn)[]
   localStoreFns: (DoOnFetch | OnAddedFn | OnModifiedFn | OnRemovedFn)[]
   payload: Payload
   docMetaData: DocMetadata
-}): Payload | void {
+}): Payload | undefined {
   const { modifyReadResultFns, localStoreFns, payload, docMetaData } = params
 
   let newPayload = payload

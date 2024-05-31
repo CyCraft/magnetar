@@ -1,10 +1,10 @@
 import type { PluginDeleteAction, PluginDeleteActionPayload } from '@magnetarjs/types'
 import { isFullString } from 'is-what'
-import { throwIfEmulatedError } from '../../helpers'
-import { MakeRestoreBackup, StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin'
+import { throwIfEmulatedError } from '../../helpers/index.js'
+import { MakeRestoreBackup, StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin.js'
 
 export function deleteActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
+  data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
   storePluginOptions: StorePluginOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeleteAction {
@@ -13,7 +13,7 @@ export function deleteActionFactory(
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginDeleteActionPayload<StorePluginModuleConfig>): void {
+  }: PluginDeleteActionPayload<StorePluginModuleConfig>): undefined {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
@@ -23,6 +23,6 @@ export function deleteActionFactory(
 
     if (makeBackup) makeBackup(collectionPath, _docId)
 
-    data[collectionPath].delete(_docId)
+    data[collectionPath]?.delete(_docId)
   }
 }
