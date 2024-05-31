@@ -1,6 +1,6 @@
 import type { EventNameFnMap, EventNameFnsMap } from '@magnetarjs/types'
 
-export function getEventNameFnsMap(...onMaps: (EventNameFnMap | void)[]): EventNameFnsMap {
+export function getEventNameFnsMap(...onMaps: (EventNameFnMap | undefined)[]): EventNameFnsMap {
   const _onMaps = onMaps.filter(Boolean) as EventNameFnMap[]
   const result: EventNameFnsMap = {
     before: _onMaps.flatMap((on) => on.before ?? []),

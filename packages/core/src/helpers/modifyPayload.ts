@@ -1,7 +1,7 @@
 import type { ModifyPayloadFnMap, ModifyPayloadFnsMap } from '@magnetarjs/types'
 
 export function getModifyPayloadFnsMap(
-  ...onMaps: (ModifyPayloadFnMap | void)[]
+  ...onMaps: (ModifyPayloadFnMap | undefined)[]
 ): Omit<ModifyPayloadFnsMap, 'write' | 'read'> {
   const _onMaps = onMaps.filter(Boolean) as ModifyPayloadFnMap[]
   const writeFns = _onMaps.flatMap((on) => on.write ?? [])

@@ -1,4 +1,3 @@
-/* eslint-disable no-inner-declarations */
 import type {
   ActionConfig,
   ActionName,
@@ -19,20 +18,20 @@ import type {
   WriteLock,
 } from '@magnetarjs/types'
 import { isBoolean, isPromise } from 'is-what'
-import { getEventNameFnsMap } from '../helpers/eventHelpers'
-import { executeOnFns } from '../helpers/executeOnFns'
-import { getModifyPayloadFnsMap } from '../helpers/modifyPayload'
-import { getModifyReadResponseFnsMap } from '../helpers/modifyReadResponse'
-import { getPluginModuleConfig } from '../helpers/moduleHelpers'
-import { getCollectionWriteLocks } from '../helpers/pathHelpers'
+import { getEventNameFnsMap } from '../helpers/eventHelpers.js'
+import { executeOnFns } from '../helpers/executeOnFns.js'
+import { getModifyPayloadFnsMap } from '../helpers/modifyPayload.js'
+import { getModifyReadResponseFnsMap } from '../helpers/modifyReadResponse.js'
+import { getPluginModuleConfig } from '../helpers/moduleHelpers.js'
+import { getCollectionWriteLocks } from '../helpers/pathHelpers.js'
 import {
   isDoOnFetch,
   isDoOnFetchCount,
   isFetchCountResponse,
   isFetchResponse,
-} from '../helpers/pluginHelpers'
-import { throwIfNoFnsToExecute } from '../helpers/throwFns'
-import { handleAction } from './handleAction'
+} from '../helpers/pluginHelpers.js'
+import { throwIfNoFnsToExecute } from '../helpers/throwFns.js'
+import { handleAction } from './handleAction.js'
 
 export type HandleFetchPerStoreParams = {
   collectionPath: string
@@ -47,7 +46,7 @@ export type HandleFetchPerStoreParams = {
 }
 
 export function handleFetchPerStore<
-  TActionName extends Extract<ActionName, 'fetch' | 'fetchCount'>
+  TActionName extends Extract<ActionName, 'fetch' | 'fetchCount'>,
 >(sharedParams: HandleFetchPerStoreParams, actionName: TActionName): ActionTernary<TActionName>
 export function handleFetchPerStore(
   sharedParams: HandleFetchPerStoreParams,
@@ -59,7 +58,7 @@ export function handleFetchPerStore(
   return function (payload?: any, actionConfig: ActionConfig = {}): Promise<any> {
     // first of all, check if the same fetch call was just made or not, if so return the same fetch promise early
     const fetchPromiseKey = JSON.stringify(payload)
-    const foundFetchPromise = fetchPromises[actionName].get(fetchPromiseKey)
+    const foundFetchPromise = fetchPromises[actionName]?.get(fetchPromiseKey)
     // return the same fetch promise early if it's not yet resolved
     if (actionName === 'fetch' && isPromise(foundFetchPromise)) return foundFetchPromise
 
@@ -107,9 +106,9 @@ export function handleFetchPerStore(
         )
         const storesToExecute: string[] =
           actionConfig.executionOrder ||
-          (moduleConfig.executionOrder || {})[actionName] ||
+          (actionName === 'fetch' ? (moduleConfig.executionOrder || {})[actionName] : false) ||
           (moduleConfig.executionOrder || {})['read'] ||
-          (globalConfig.executionOrder || {})[actionName] ||
+          (actionName === 'fetch' ? (globalConfig.executionOrder || {})[actionName] : false) ||
           (globalConfig.executionOrder || {})['read'] ||
           []
         throwIfNoFnsToExecute(storesToExecute)
@@ -126,7 +125,7 @@ export function handleFetchPerStore(
         /**
          * The abort mechanism for the entire store chain. When executed in handleAction() it won't go to the next store in executionOrder.
          */
-        function stopExecutionAfterAction(trueOrRevert: StopExecution = true): void {
+        function stopExecutionAfterAction(trueOrRevert: StopExecution = true): undefined {
           stopExecution = trueOrRevert
         }
 
@@ -145,7 +144,7 @@ export function handleFetchPerStore(
         /**
          * Fetching on a collection should return a map with just the fetched records for that API call
          */
-        const collectionFetchResult = new Map<string, Record<string, any>>()
+        const collectionFetchResult = new Map<string, { [key: string]: any }>()
         /**
          * the result of fetchCount
          */
@@ -156,18 +155,18 @@ export function handleFetchPerStore(
          * `unknown` in case an error was thrown
          */
         let resultFromPlugin:
-          | void
+          | undefined
           | string
           | unknown
           | FetchResponse
           | SyncBatch
           | [string, SyncBatch]
         // handle and await each action in sequence
-        for (const [i, storeName] of storesToExecute.entries()) {
+        for (const storeName of storesToExecute.values()) {
           // a previous iteration stopped the execution:
           if (stopExecution === true) break
           // find the action on the plugin
-          const pluginAction = globalConfig.stores[storeName].actions[actionName]
+          const pluginAction = globalConfig.stores[storeName]?.actions[actionName]
           const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeName)
           // the plugin action
           resultFromPlugin = !pluginAction
@@ -266,7 +265,7 @@ export function handleFetchPerStore(
       }
     })
 
-    fetchPromises[actionName].set(fetchPromiseKey, actionPromise)
+    fetchPromises[actionName]?.set(fetchPromiseKey, actionPromise)
 
     return actionPromise
   }

@@ -1,4 +1,4 @@
-import { PokedexEntry } from './types'
+import { PokedexEntry } from './types.js'
 
 export const allPokemonArray: PokedexEntry[] = [
   {

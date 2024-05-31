@@ -1,3 +1,3 @@
 export * from '@magnetarjs/types'
-export * from './Magnetar'
-export * from './helpers/pathHelpers'
+export * from './Magnetar.js'
+export * from './helpers/pathHelpers.js'

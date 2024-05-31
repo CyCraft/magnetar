@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v1.0.0
+
+##### ESM Only & Node v18+
+
+- Magnetar is now ESM only. This means you need to use `import` instead of `require`.
+- Magnetar now requires Node v18+.
+- `@magnetarjs/plugin-vue2` was removed.
+
 ## v0.4.0
 
 ##### breaking changes
@@ -20,7 +28,7 @@ firebase.initializeApp({
 })
 
 // initialise PluginFirestore
-import { PluginFirestore } from 'magnetar'
+import { CreatePlugin as PluginFirestore } from '@magnetarjs/plugin-firestore'
 
 const remote = PluginFirestore.CreatePlugin({ firebaseInstance: firebase })
 ```
@@ -38,7 +46,7 @@ const firebaseApp = initializeApp({
 const db = getFirestore(firebaseApp)
 
 // initialise PluginFirestore
-import { PluginFirestore } from 'magnetar'
+import { CreatePlugin as PluginFirestore } from '@magnetarjs/plugin-firestore'
 
 const remote = PluginFirestore.CreatePlugin({ db })
 ```

@@ -15,7 +15,7 @@ import {
   revertActionFactory,
   streamActionFactory,
   writeActionFactory,
-} from './actions'
+} from './actions.js'
 
 // there are two interfaces to be defined & exported by each plugin: `StoreOptions` and `StoreModuleConfig`
 // for this plugin we use:
@@ -23,9 +23,9 @@ import {
 // - StorePluginModuleConfig
 
 export type RemoteStoreOptions = { storeName: string }
-export interface StorePluginModuleConfig {
+export type StorePluginModuleConfig = {
   path?: string
-  initialData?: Record<string, unknown> | [string, Record<string, unknown>][]
+  initialData?: { [key: string]: unknown } | [string, { [key: string]: unknown }][]
   query?: QueryClause[]
   where?: WhereClause[]
   orderBy?: OrderByClause[]

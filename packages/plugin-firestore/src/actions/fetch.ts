@@ -12,8 +12,8 @@ import {
 } from '@magnetarjs/utils-firestore'
 import type { DocumentSnapshot, QueryDocumentSnapshot } from 'firebase/firestore'
 import { doc, getDoc, getDocs } from 'firebase/firestore'
-import { FirestorePluginOptions } from '../CreatePlugin'
-import { docSnapshotToDocMetadata, getQueryInstance } from '../helpers/getFirestore'
+import { FirestorePluginOptions } from '../CreatePlugin.js'
+import { docSnapshotToDocMetadata, getQueryInstance } from '../helpers/getFirestore.js'
 
 export function fetchActionFactory(
   firestorePluginOptions: Required<FirestorePluginOptions>

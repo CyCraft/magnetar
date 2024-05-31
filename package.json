@@ -1,6 +1,8 @@
 {
   "name": "magnetar-monorepo",
   "private": true,
+  "version": "1.0.1",
+  "type": "module",
   "workspaces": [
     "packages/*"
   ],
@@ -8,55 +10,60 @@
     "dev:nuxt-firestore": "pnpm --filter dev-nuxt-firestore dev",
     "dev:vue3-firestore": "pnpm --filter dev-vue3-firestore dev",
     "dev:ui": "pnpm --filter @magnetarjs/ui dev",
-    "dep:del-all": "npm exec --workspaces -- npx rimraf node_modules && npx rimraf node_modules",
+    "dep:del-all": "npm exec --workspaces -- del-cli node_modules && del-cli node_modules",
     "dep:update-minor": "ncu --target minor -u && pnpm --parallel exec ncu --target minor -u && echo \"review git changes and install with ni\"",
-    "dep:update-major": "ncu -u && pnpm --parallel exec ncu -u && echo \"review git changes and install with ni\"",
+    "dep:update-major": "ncu -ws -u && echo \"review git changes and install with ni\"",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:deploy": "pnpm docs:build && firebase deploy --only hosting && git add -A && git commit -m \"chore: deploy\"",
     "docs:serve": "vitepress serve docs",
-    "build": "pnpm -r build",
+    "build": "turbo run build",
     "typecheck": "turbo run typecheck",
     "build-and-commit": "npm run build && git add -A && git commit -m \"chore: build\"",
     "build:nuxt-firestore": "pnpm --filter dev-nuxt-firestore build",
     "generate:nuxt-firestore": "pnpm --filter dev-nuxt-firestore generate",
     "preview:nuxt-firestore": "pnpm --filter dev-nuxt-firestore preview",
-    "test": "pnpm test:core && pnpm test:plugin-simple-store && pnpm test:plugin-vue2 && pnpm test:plugin-vue3 && pnpm test:plugin-firestore",
-    "_test:admin-broken": "pnpm test:core && pnpm test:plugin-simple-store && pnpm test:plugin-vue2 && pnpm test:plugin-vue3 && pnpm test:plugin-firestore-admin",
+    "test": "turbo run test",
+    "_test:admin-broken": "pnpm test:core && pnpm test:plugin-simple-store && pnpm test:plugin-vue3 && pnpm test:plugin-firestore-admin",
     "test:core": "pnpm --filter=@magnetarjs/core test",
     "test:plugin-firestore": "pnpm --filter=@magnetarjs/plugin-firestore test",
     "test:plugin-firestore-admin": "pnpm --filter=@magnetarjs/plugin-firestore-admin test",
-    "test:plugin-firestore:only": "pnpm --filter=@magnetarjs/plugin-firestore run test:only",
     "test:plugin-simple-store": "pnpm --filter=@magnetarjs/plugin-simple-store test",
-    "test:plugin-vue2": "pnpm --filter=@magnetarjs/plugin-vue2 test",
     "test:plugin-vue3": "pnpm --filter=@magnetarjs/plugin-vue3 test",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "prettier:run": "prettier --write \"packages/*/src/**/*.{vue,ts}\" && prettier --write \"docs/**/*.{vue,ts,md}\"",
+    "lint": "eslint",
     "release": "pnpm build && bumpp package.json packages/*/package.json --commit --push --tag && pnpm -r publish --access public"
   },
   "devDependencies": {
-    "@types/node": "^18.19.33",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
+    "@cycraft/eslint": "^0.3.0",
+    "@cycraft/run-ts": "^0.0.0",
+    "@cycraft/tsconfig": "^0.1.2",
+    "@magnetarjs/core": "workspace:*",
+    "@magnetarjs/plugin-firestore": "workspace:*",
+    "@magnetarjs/plugin-vue3": "workspace:*",
+    "@magnetarjs/test-utils": "workspace:*",
+    "@vitejs/plugin-vue": "^5.0.5",
     "@vue/typescript": "^1.8.20",
-    "ava": "^4.3.3",
-    "bumpp": "^8.2.1",
+    "array-shuffle": "^3.0.0",
+    "browser-env": "^3.3.0",
+    "bumpp": "^9.4.1",
     "copyfiles": "^2.4.1",
     "del-cli": "^5.1.0",
     "esbuild": "^0.21.4",
-    "esbuild-register": "^3.5.0",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^8.10.0",
-    "eslint-plugin-tree-shaking": "^1.12.1",
-    "exec-sh": "^0.4.0",
+    "execa": "^9.1.0",
+    "firebase": "^10.12.2",
+    "firebase-admin": "^12.1.1",
     "npm-check-updates": "^16.14.20",
-    "prettier": "^2.8.8",
-    "prettier-plugin-organize-imports": "^3.2.4",
-    "rimraf": "^3.0.2",
-    "tslib": "^2.6.2",
-    "tsup": "^6.7.0",
+    "roll-anything": "^3.0.4",
+    "sass": "^1.77.4",
+    "tsup": "^8.0.2",
     "turbo": "^1.13.3",
     "typescript": "^5.4.5",
-    "vitepress": "1.2.2"
+    "vite": "^5.2.12",
+    "vitepress": "1.2.2",
+    "vitest": "^1.6.0",
+    "vue": "^3.4.27",
+    "vue-tsc": "^2.0.19"
   },
   "author": "Luca Ban - Mesqueeb",
   "funding": "https://github.com/sponsors/mesqueeb",
@@ -70,50 +77,8 @@
     "url": "git+https://github.com/cycraft/magnetar.git"
   },
   "engines": {
-    "node": ">= 14.0.0",
-    "npm": ">= 7.8.0"
+    "node": ">=18"
   },
-  "eslintConfig": {
-    "root": true,
-    "parser": "@typescript-eslint/parser",
-    "plugins": [
-      "@typescript-eslint",
-      "tree-shaking"
-    ],
-    "ignorePatterns": [
-      "node_modules",
-      "dist",
-      "/packages/dev-nuxt-firestore",
-      "/packages/dev-firestore",
-      "/packages/dev-vue2",
-      "/packages/dev-vue2-firestore",
-      "/packages/dev-vue3",
-      "/packages/dev-vue3-firestore",
-      "/packages/docs",
-      "/packages/ui",
-      "test"
-    ],
-    "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/eslint-recommended",
-      "plugin:@typescript-eslint/recommended",
-      "prettier"
-    ],
-    "rules": {
-      "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/no-empty-function": "off",
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/ban-ts-ignore": "off",
-      "tree-shaking/no-side-effects-in-initialization": "error",
-      "@typescript-eslint/no-non-null-assertion": "off",
-      "comma-dangle": [
-        "warn",
-        "always-multiline"
-      ],
-      "@typescript-eslint/ban-ts-comment": "warn"
-    }
-  },
-  "version": "0.20.1",
   "pnpm": {
     "peerDependencyRules": {
       "ignoreMissing": [

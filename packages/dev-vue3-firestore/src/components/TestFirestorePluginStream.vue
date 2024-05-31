@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, onBeforeMount, onBeforeUnmount } from 'vue'
-import { magnetar, generateRandomId } from '../magnetar'
+import { magnetar, generateRandomId } from '../magnetar.js'
 import TodoApp from './TodoApp.vue'
 
 type Item = { title: string; id: string; isDone: boolean }
@@ -66,7 +66,7 @@ function deleteItem(item: Item) {
 </script>
 
 <template>
-  <div class="test">
+  <div class="_test">
     <h6>plugin-vue3 + plugin-firestore Todo list ({{ size }})</h6>
     <div style="margin: 1rem">
       <label for="all">show done items</label>

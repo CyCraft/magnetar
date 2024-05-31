@@ -1,18 +1,18 @@
-import { ActionConfig, ActionName } from './actions'
-import { Clauses } from './clauses'
-import { DocMetadata } from './core'
-import { OnAddedFn, OnModifiedFn, OnRemovedFn } from './modifyReadResponse'
-import { MergeDeep } from './utils/MergeDeep'
+import { ActionConfig, ActionName } from './actions.js'
+import { Clauses } from './clauses.js'
+import { DocMetadata } from './core.js'
+import { OnAddedFn, OnModifiedFn, OnRemovedFn } from './modifyReadResponse.js'
+import { MergeDeep } from './utils/MergeDeep.js'
 
 // stores / plugins
 
 // these are the interfaces that plugins need to use and implement
 type DocumentPath = string
 export type SyncBatch = {
-  insert: Map<DocumentPath, Record<string, any>>
-  assign: Map<DocumentPath, Record<string, any>>
-  merge: Map<DocumentPath, Record<string, any>>
-  replace: Map<DocumentPath, Record<string, any>>
+  insert: Map<DocumentPath, { [key: string]: any }>
+  assign: Map<DocumentPath, { [key: string]: any }>
+  merge: Map<DocumentPath, { [key: string]: any }>
+  replace: Map<DocumentPath, { [key: string]: any }>
   deleteProp: Map<DocumentPath, Set<string>>
   delete: Set<string>
 }
@@ -25,7 +25,7 @@ export type MagnetarPlugin<PluginOptions> = (pluginOptions: PluginOptions) => Pl
 /**
  * The PluginInstance is what a Store Plugin must return. The plugin must implement end-points for each possible action the dev might trigger.
  */
-export interface PluginInstance {
+export type PluginInstance = {
   actions: {
     fetchCount?: PluginFetchCountAction
     fetch?: PluginFetchAction
@@ -50,7 +50,7 @@ export interface PluginInstance {
    */
   getModuleData?: (
     pluginModuleSetupPayload: PluginModuleSetupPayload
-  ) => Record<string, any> | Map<string, Record<string, any>>
+  ) => { [key: string]: any } | Map<string, { [key: string]: any }>
   /**
    * This must be provided by Store Plugins that have "local" data. It should signify wether or not the document exists. Must return `undefined` when not sure (if the document was never fetched). It is triggered EVERY TIME the module's `.data` is accessed.
    */
@@ -70,7 +70,7 @@ export interface PluginInstance {
 /**
  * Where, orderBy, limit clauses or extra config a dev might pass when instanciates a module as second param (under `configPerStore`). Eg. `collection('pokedex', { configPerStore: { local: pluginModuleConfig } })`
  */
-export type PluginModuleConfig = MergeDeep<Clauses, { [key in string]: any }>
+export type PluginModuleConfig = Clauses & { [key in string]: any }
 
 /**
  * The payload the core lib will pass when executing plugin's `setupModule`, `getModuleData`,`getModuleExists` functions.
@@ -120,7 +120,7 @@ export type PluginStreamActionPayload<SpecificPluginModuleConfig = PluginModuleC
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: Record<string, any> | void
+    payload: { [key: string]: any } | undefined
     /**
      * MustExecuteOnRead:
      * The functions for 'added', 'modified' and 'removed' **must** be executed by the plugin whenever the stream sees any of these changes. These are the functions that will pass the data to the other "local" Store Plugins.
@@ -142,7 +142,7 @@ export type PluginFetchActionPayload<SpecificPluginModuleConfig = PluginModuleCo
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: { force?: boolean } | Record<string, any> | void
+    payload: { force?: boolean } | { [key: string]: any } | undefined
   }
 >
 
@@ -171,19 +171,19 @@ export type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleCo
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: Record<string, any>
+    payload: { [key: string]: any }
   }
 >
 
 /**
  * Should handle 'merge' 'assign' 'replace' for docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
  * @returns
- *   - `void` if the plugin writes one by one
+ *   - `undefined` if the plugin writes one by one
  *   - `SyncBatch` If the plugin batches multiple write actions together, it will return the sync batch information
  */
 export type PluginWriteAction = (
   payload: PluginWriteActionPayload
-) => void | Promise<void | SyncBatch>
+) => undefined | Promise<undefined | SyncBatch>
 
 export type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = MergeDeep<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
@@ -191,7 +191,7 @@ export type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleC
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: Record<string, any>
+    payload: { [key: string]: any }
   }
 >
 
@@ -223,12 +223,12 @@ export type PluginDeletePropActionPayload<SpecificPluginModuleConfig = PluginMod
 /**
  * Should handle 'deleteProp' for docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
  * @returns
- *   - `void` if the plugin writes one by one
+ *   - `undefined` if the plugin writes one by one
  *   - `SyncBatch` If the plugin batches multiple write actions together, it will return the sync batch information
  */
 export type PluginDeletePropAction = (
   payload: PluginDeletePropActionPayload
-) => void | Promise<void | SyncBatch>
+) => undefined | Promise<undefined | SyncBatch>
 
 export type PluginDeleteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = MergeDeep<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
@@ -236,19 +236,19 @@ export type PluginDeleteActionPayload<SpecificPluginModuleConfig = PluginModuleC
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: void | any
+    payload: undefined | any
   }
 >
 
 /**
  * Should handle 'delete' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper)
  * @returns
- *   - `void` if the plugin writes one by one
+ *   - `undefined` if the plugin writes one by one
  *   - `SyncBatch` If the plugin batches multiple write actions together, it will return the sync batch information
  */
 export type PluginDeleteAction = (
   payload: PluginDeleteActionPayload
-) => void | Promise<void | SyncBatch>
+) => undefined | Promise<undefined | SyncBatch>
 
 export type PluginRevertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = MergeDeep<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
@@ -256,7 +256,7 @@ export type PluginRevertActionPayload<SpecificPluginModuleConfig = PluginModuleC
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: Record<string, any> | Record<string, any>[] | void | string | string[]
+    payload: { [key: string]: any } | { [key: string]: any }[] | undefined | string | string[]
     /**
      * Whatever action was originally triggered when an error was thrown. This is the action that will need to be reverted by this function.
      */
@@ -279,14 +279,14 @@ export type PluginRevertAction = (payload: PluginRevertActionPayload) => void | 
 export type PluginActionTernary<TActionName extends ActionName> = TActionName extends 'stream'
   ? PluginStreamAction
   : TActionName extends 'fetch'
-  ? PluginFetchAction
-  : TActionName extends 'delete'
-  ? PluginDeleteAction
-  : TActionName extends 'deleteProp'
-  ? PluginDeletePropAction
-  : TActionName extends 'insert'
-  ? PluginInsertAction
-  : PluginWriteAction
+    ? PluginFetchAction
+    : TActionName extends 'delete'
+      ? PluginDeleteAction
+      : TActionName extends 'deleteProp'
+        ? PluginDeletePropAction
+        : TActionName extends 'insert'
+          ? PluginInsertAction
+          : PluginWriteAction
 
 // 'stream' related
 
@@ -356,9 +356,9 @@ export type FetchResponse = {
  * Plugin's response to a 'fetch' action, when acting as a "local" Store Plugin.
  */
 export type DoOnFetch = (
-  docData: Record<string, unknown> | undefined,
+  docData: { [key: string]: unknown } | undefined,
   docMetadata: DocMetadata | 'error'
-) => Record<string, unknown> | void
+) => { [key: string]: unknown } | undefined
 
 /**
  * The remote store should document count after retrieving it from the server
@@ -367,4 +367,4 @@ export type FetchCountResponse = { count: number }
 /**
  * The local store should provide a function that will store the fetchCount when it comes in from the remote store.
  */
-export type DoOnFetchCount = (payload: FetchCountResponse) => void
+export type DoOnFetchCount = (payload: FetchCountResponse) => undefined

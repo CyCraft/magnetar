@@ -1,10 +1,11 @@
 import type { PluginWriteAction, PluginWriteActionPayload } from '@magnetarjs/types'
+import { objGetOrSet } from 'getorset-anything'
 import { isPlainObject } from 'is-what'
 import { merge } from 'merge-anything'
-import { MakeRestoreBackup, SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin'
+import { MakeRestoreBackup, SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin.js'
 
 export function writeActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
+  data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
   simpleStoreOptions: SimpleStoreOptions,
   actionName: 'merge' | 'assign' | 'replace',
   makeBackup?: MakeRestoreBackup
@@ -14,11 +15,11 @@ export function writeActionFactory(
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginWriteActionPayload<SimpleStoreModuleConfig>): void {
+  }: PluginWriteActionPayload<SimpleStoreModuleConfig>): undefined {
     // write actions cannot be executed on collections
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 
-    const collectionMap = data[collectionPath]
+    const collectionMap = objGetOrSet(data, collectionPath, () => new Map())
 
     if (makeBackup) makeBackup(collectionPath, docId)
 

@@ -11,8 +11,8 @@ import {
   MUIColumn,
   MUIParseLabel,
   MUITableSlot,
-} from '../src/index'
-import { magnetar } from './magnetar'
+} from '../src/index.js'
+import { magnetar } from './magnetar.js'
 
 type Item = { title: string; id: string; isDone: boolean; name: { family: string } }
 
@@ -151,7 +151,7 @@ watch(
       filtersState.value.set(INDEX_SEARCH, filterState)
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 // prettier-ignore
 watch(
@@ -189,7 +189,7 @@ const optionsSelect: { label: string; where: WhereClause }[] = [
 </script>
 
 <template>
-  <div class="test">
+  <div class="_test">
     <h4>Table Manual Filters</h4>
     <div style="margin: 2rem; display: flex; gap: 1rem">
       <fieldset>
@@ -206,12 +206,16 @@ const optionsSelect: { label: string; where: WhereClause }[] = [
               :checked="
                 !!checkboxesInput.or.find((o) => JSON.stringify(o) === JSON.stringify(option.where))
               "
-              @change="(e) => {
-                const checked = (e.target as HTMLInputElement)?.checked || false
-                const existingIndex = checkboxesInput.or.findIndex(o => JSON.stringify(o) === JSON.stringify(option.where))
-                if (checked && existingIndex === -1) checkboxesInput.or.push(option.where)
-                if (!checked && existingIndex !== -1) checkboxesInput.or.splice(existingIndex, 1)
-              }"
+              @change="
+                (e) => {
+                  const checked = (e.target as HTMLInputElement)?.checked || false
+                  const existingIndex = checkboxesInput.or.findIndex(
+                    (o) => JSON.stringify(o) === JSON.stringify(option.where),
+                  )
+                  if (checked && existingIndex === -1) checkboxesInput.or.push(option.where)
+                  if (!checked && existingIndex !== -1) checkboxesInput.or.splice(existingIndex, 1)
+                }
+              "
             />
             {{ option.label }}
           </label>

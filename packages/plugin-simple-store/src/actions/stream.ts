@@ -5,12 +5,12 @@ import type {
   StreamResponse,
 } from '@magnetarjs/types'
 import { isFullString, isString } from 'is-what'
-import { SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin'
-import { deleteActionFactory } from './delete'
-import { insertActionFactory } from './insert'
+import { SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin.js'
+import { deleteActionFactory } from './delete.js'
+import { insertActionFactory } from './insert.js'
 
 export function streamActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
+  data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
   simpleStoreOptions: SimpleStoreOptions
 ): PluginStreamAction {
   return function ({
@@ -28,7 +28,7 @@ export function streamActionFactory(
     const doOnStream: DoOnStream = {
       added: (payload, meta) => {
         // abort updating local state if the payload was set to undefined
-        if (payload === undefined) return
+        if (payload === undefined) return undefined
 
         const _docId = docId || `${meta.id}`
         insertActionFactory(
@@ -41,10 +41,11 @@ export function streamActionFactory(
           actionConfig,
           pluginModuleConfig,
         })
+        return undefined
       },
       modified: (payload, meta) => {
         // abort updating local state if the payload was set to undefined
-        if (payload === undefined) return
+        if (payload === undefined) return undefined
 
         const _docId = docId || `${meta.id}`
         insertActionFactory(
@@ -57,16 +58,17 @@ export function streamActionFactory(
           actionConfig,
           pluginModuleConfig,
         })
+        return undefined
       },
       removed: (payload, meta) => {
         // abort updating local state if the payload was set to undefined
-        if (payload === undefined) return
+        if (payload === undefined) return undefined
 
         const collectionPathDocIdToDelete: [string, string] = isFullString(docId)
           ? [collectionPath, docId]
           : isString(payload)
-          ? [collectionPath, payload]
-          : [collectionPath, meta.id]
+            ? [collectionPath, payload]
+            : [collectionPath, meta.id]
         const [_cPath, _dId] = collectionPathDocIdToDelete
         deleteActionFactory(
           data,
@@ -78,6 +80,7 @@ export function streamActionFactory(
           actionConfig,
           pluginModuleConfig,
         })
+        return undefined
       },
     }
     return doOnStream

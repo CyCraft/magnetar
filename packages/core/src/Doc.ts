@@ -17,10 +17,16 @@ import {
   getDataFromDataStore,
   getExistsFromDataStore,
   proxify,
-} from './helpers/moduleHelpers'
-import { HandleFetchPerStoreParams, handleFetchPerStore } from './moduleActions/handleFetchPerStore'
-import { handleStreamPerStore } from './moduleActions/handleStreamPerStore'
-import { HandleWritePerStoreParams, handleWritePerStore } from './moduleActions/handleWritePerStore'
+} from './helpers/moduleHelpers.js'
+import {
+  HandleFetchPerStoreParams,
+  handleFetchPerStore,
+} from './moduleActions/handleFetchPerStore.js'
+import { handleStreamPerStore } from './moduleActions/handleStreamPerStore.js'
+import {
+  HandleWritePerStoreParams,
+  handleWritePerStore,
+} from './moduleActions/handleWritePerStore.js'
 
 export function createDocWithContext(
   [collectionPath, docId]: [string, string],
@@ -68,7 +74,7 @@ export function createDocWithContext(
     replace: (handleWritePerStore(writeParams, 'replace') as MagnetarWriteAction), // prettier-ignore
     deleteProp: (handleWritePerStore(writeParams, 'deleteProp') as MagnetarDeletePropAction), // prettier-ignore
     delete: (handleWritePerStore(writeParams, 'delete') as MagnetarDeleteAction), // prettier-ignore
-    fetch: (handleFetchPerStore(fetchParams, 'fetch') as MagnetarFetchAction<Record<string, unknown>, 'doc'>), // prettier-ignore
+    fetch: (handleFetchPerStore(fetchParams, 'fetch') as MagnetarFetchAction<{ [key: string]: unknown }, 'doc'>), // prettier-ignore
     stream: handleStreamPerStore([collectionPath, docId], moduleConfig, globalConfig, 'write', streaming, cacheStream, writeLockMap), // prettier-ignore
   }
 

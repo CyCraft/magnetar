@@ -15,7 +15,7 @@ export async function handleStream(args: {
   docId: string | undefined
   pluginModuleConfig: PluginModuleConfig
   pluginAction: PluginStreamAction
-  payload: Record<string, unknown> | void
+  payload: { [key: string]: unknown } | undefined
   actionConfig: ActionConfig
   eventNameFnsMap: EventNameFnsMap
   actionName: 'stream'

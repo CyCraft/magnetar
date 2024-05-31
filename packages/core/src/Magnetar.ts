@@ -20,11 +20,11 @@ import {
 } from '@magnetarjs/types'
 import { mapGetOrSet } from 'getorset-anything'
 import { isString } from 'is-what'
-import { createCollectionWithContext } from './Collection'
-import { createDocWithContext } from './Doc'
-import { defaultsGlobalConfig } from './helpers/configHelpers'
-import { getCollectionPathDocIdEntry } from './helpers/pathHelpers'
-import { throwIfInvalidModulePath } from './helpers/throwFns'
+import { createCollectionWithContext } from './Collection.js'
+import { createDocWithContext } from './Doc.js'
+import { defaultsGlobalConfig } from './helpers/configHelpers.js'
+import { getCollectionPathDocIdEntry } from './helpers/pathHelpers.js'
+import { throwIfInvalidModulePath } from './helpers/throwFns.js'
 
 /**
  * Creates a magnetar instance.
@@ -44,23 +44,23 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
    * the global storage for WriteLock objects
    * @see {@link WriteLock}
    */
-  const writeLockMap: Map<string, WriteLock> = new Map() // apply type upon get/set
+  const writeLockMap = new Map<string, WriteLock>() // apply type upon get/set
   /**
    * the global storage for closeStream functions
    */
-  const closeStreamFnMap: Map<PathFilterIdentifier, () => void> = new Map() // apply type upon get/set
+  const closeStreamFnMap = new Map<PathFilterIdentifier, () => void>() // apply type upon get/set
   /**
    * the global storage for open stream promises
    */
-  const streamingPromiseMap: Map<PathFilterIdentifier, Promise<void> | null> = new Map() // apply type upon get/set
+  const streamingPromiseMap = new Map<PathFilterIdentifier, Promise<void> | null>() // apply type upon get/set
   /**
    * the global storage for fetch promises
    */
-  const fetchPromiseMap: Map<PathFilterIdentifier, FetchPromises> = new Map() // apply type upon get/set
+  const fetchPromiseMap = new Map<PathFilterIdentifier, FetchPromises>() // apply type upon get/set
   /**
    * the global storage for FetchMetaDataCollection
    */
-  const fetchMetaMap: Map<PathWhereOrderByIdentifier, FetchMetaDataCollection> = new Map()
+  const fetchMetaMap = new Map<PathWhereOrderByIdentifier, FetchMetaDataCollection>() // apply type upon get/set
 
   async function clearAllData(options?: { exclude?: CollectionName[] }): Promise<void> {
     for (const collectionName of collectionNames) {
@@ -110,14 +110,17 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     }
 
     // grab the stream related functions
-    function cacheStream(closeStreamFn: () => void, streamingPromise: Promise<void> | null): void {
+    function cacheStream(
+      closeStreamFn: () => void,
+      streamingPromise: Promise<void> | null
+    ): undefined {
       closeStreamFnMap.set(pathFilterIdentifier, closeStreamFn)
       streamingPromiseMap.set(pathFilterIdentifier, streamingPromise)
     }
     function streaming(): Promise<void> | null {
       return streamingPromiseMap.get(pathFilterIdentifier) || null
     }
-    function closeStream(): void {
+    function closeStream(): undefined {
       const closeStreamFn = closeStreamFnMap.get(pathFilterIdentifier)
       if (closeStreamFn) {
         closeStreamFn()
@@ -127,10 +130,10 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
         })
       }
     }
-    function closeAllStreams(): void {
+    function closeAllStreams(): undefined {
       for (const [identifier, closeStreamFn] of closeStreamFnMap) {
         const openStreamPath = identifier.split(MODULE_IDENTIFIER_SPLIT)[0]
-        if (openStreamPath === modulePath || openStreamPath.startsWith(modulePath + '/')) {
+        if (openStreamPath === modulePath || openStreamPath?.startsWith(modulePath + '/')) {
           closeStreamFn()
         }
       }
@@ -169,7 +172,6 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
   }
 
   function collection(modulePath: string, moduleConfig: ModuleConfig = {}): CollectionInstance {
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return getModuleInstance(modulePath, moduleConfig, 'collection', doc as DocFn, collection as CollectionFn) as CollectionInstance // prettier-ignore
   }
 

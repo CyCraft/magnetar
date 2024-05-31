@@ -1,2 +1,2 @@
-export { CreatePlugin } from './CreatePlugin'
-export type { SimpleStoreOptions, SimpleStoreModuleConfig } from './CreatePlugin'
+export { CreatePlugin } from './CreatePlugin.js'
+export type { SimpleStoreOptions, SimpleStoreModuleConfig } from './CreatePlugin.js'

@@ -11,7 +11,7 @@ import {
   usesFilterStateInputValue,
   usesFilterStateOption,
 } from '../types'
-import { clausesEqual } from '../utils/tableHelpers'
+import { clausesEqual } from '../utils/tableHelpers.js'
 import FilterCheckboxes from './FilterCheckboxes.vue'
 import FilterRadio from './FilterRadio.vue'
 import FilterSelect from './FilterSelect.vue'
@@ -87,7 +87,7 @@ const selectModel = computed<string | null>({
   set: (newValue) => {
     if (!newValue) return emit('setFilter', null)
     const option = filterValueOptionDic.value[newValue]
-    if (!option) console.error(ERROR_NO_CLAUSE)
+    if (!option) return console.error(ERROR_NO_CLAUSE)
     emit('setFilter', option.where || option.query || null)
   },
 })
@@ -102,7 +102,7 @@ const checkboxModel = computed<string[]>({
     if (!newValues) return emit('setFilter', null)
     const options = newValues.map((newValue) => filterValueOptionDic.value[newValue])
     const or = options
-      .map<QueryClause | WhereClause | undefined>((option) => option.where || option.query)
+      .map<QueryClause | WhereClause | undefined>((option) => option?.where || option?.query)
       .filter((clause): clause is QueryClause | WhereClause => !!clause)
     if (or.length === 0) {
       emit('setFilter', null)

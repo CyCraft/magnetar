@@ -1,11 +1,11 @@
-import test from 'ava'
-import { Magnetar } from '../../src/index'
 import { PluginMockLocal, generateRandomId, pokedex } from '@magnetarjs/test-utils'
-import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
+import { assert, test } from 'vitest'
+import { Magnetar } from '../../src/index.js'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
 
 const CreatePluginLocal = PluginMockLocal.CreatePlugin
 
-test('emits global, module and action events', async (t) => {
+test('emits global, module and action events', async () => {
   const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
   const ranAllEvents: any[] = []
   const magnetar = Magnetar({
@@ -37,11 +37,11 @@ test('emits global, module and action events', async (t) => {
       },
     },
   })
-  t.deepEqual(result.data, insertPayload)
-  t.deepEqual(ranAllEvents, [insertPayload, insertPayload, insertPayload])
+  assert.deepEqual(result.data, insertPayload)
+  assert.deepEqual(ranAllEvents, [insertPayload, insertPayload, insertPayload])
 })
 
-test('can modify payload in global, module and action settings', async (t) => {
+test('can modify payload in global, module and action settings', async () => {
   const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
   const magnetar = Magnetar({
     localStoreName: 'local',
@@ -72,7 +72,7 @@ test('can modify payload in global, module and action settings', async (t) => {
       },
     },
   })
-  t.deepEqual(result.data, {
+  assert.deepEqual(result.data, {
     ...insertPayload,
     addedInModule: true,
     addedInGlobal: true,
@@ -80,7 +80,7 @@ test('can modify payload in global, module and action settings', async (t) => {
   })
 })
 
-test('can overwrite execution order', async (t) => {
+test('can overwrite execution order', async () => {
   const { pokedexModule } = createMagnetarInstance()
   const insertPayload = pokedex(7)
   await pokedexModule.insert(insertPayload)
@@ -96,7 +96,7 @@ test('can overwrite execution order', async (t) => {
       },
     },
   })
-  t.deepEqual(ranAllEvents, ['local', 'local', 'remote', 'remote'])
+  assert.deepEqual(ranAllEvents, ['local', 'local', 'remote', 'remote'])
   await pokedexModule.insert(insertPayload)
   ranAllEvents = []
   await pokedexModule.doc('7').delete(undefined, {
@@ -110,5 +110,5 @@ test('can overwrite execution order', async (t) => {
       },
     },
   })
-  t.deepEqual(ranAllEvents, ['remote', 'remote', 'local', 'local'])
+  assert.deepEqual(ranAllEvents, ['remote', 'remote', 'local', 'local'])
 })

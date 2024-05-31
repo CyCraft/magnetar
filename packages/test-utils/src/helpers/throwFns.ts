@@ -1,15 +1,20 @@
 import { isArray, isPlainObject } from 'is-what'
 
 export function throwIfEmulatedError(
-  payload: Record<string, unknown> | Record<string, unknown>[] | string | string[] | void,
+  payload:
+    | { [key: string]: unknown }
+    | { [key: string]: unknown }[]
+    | string
+    | string[]
+    | undefined,
   storePluginOptions: { storeName: string } & { [key in string]: any }
-): void {
+): undefined {
   const { storeName } = storePluginOptions
   if (!payload) return
   if (isArray(payload) && !payload.length) return
   const payloadArray = !isArray(payload) ? [payload] : payload
   const shouldFail = payloadArray.some(
-    (p) => p === storeName || (isPlainObject(p) && p.shouldFail === storeName)
+    (p) => p === storeName || (isPlainObject(p) && p['shouldFail'] === storeName)
   )
   if (!shouldFail) return
   const errorToThrow = {

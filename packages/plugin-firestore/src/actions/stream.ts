@@ -10,8 +10,8 @@ import {
 } from '@magnetarjs/utils-firestore'
 import type { DocumentChange, DocumentSnapshot, QuerySnapshot } from 'firebase/firestore'
 import { doc, onSnapshot } from 'firebase/firestore'
-import { FirestorePluginOptions } from '../CreatePlugin'
-import { docSnapshotToDocMetadata, getQueryInstance } from '../helpers/getFirestore'
+import { FirestorePluginOptions } from '../CreatePlugin.js'
+import { docSnapshotToDocMetadata, getQueryInstance } from '../helpers/getFirestore.js'
 
 export function streamActionFactory(
   firestorePluginOptions: Required<FirestorePluginOptions>
@@ -27,7 +27,7 @@ export function streamActionFactory(
     const { db, debug } = firestorePluginOptions
     let resolveStream: (() => void) | undefined
     let rejectStream: (() => void) | undefined
-    const streaming: Promise<void> = new Promise((resolve, reject) => {
+    const streaming = new Promise<void>((resolve, reject) => {
       resolveStream = resolve
       rejectStream = reject
     })
@@ -37,7 +37,7 @@ export function streamActionFactory(
       const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
       closeStream = onSnapshot(
         doc(db, documentPath),
-        (docSnapshot: DocumentSnapshot<Record<string, unknown>>) => {
+        (docSnapshot: DocumentSnapshot<{ [key: string]: unknown }>) => {
           // even if `docSnapshot.metadata.hasPendingWrites`
           //       we should always execute `added/modified`
           //       because `core` handles overlapping calls for us
@@ -66,7 +66,7 @@ export function streamActionFactory(
           // serverChanges only
           querySnapshot
             .docChanges()
-            .forEach((docChange: DocumentChange<Record<string, unknown>>) => {
+            .forEach((docChange: DocumentChange<{ [key: string]: unknown }>) => {
               const docSnapshot = docChange.doc
               const docData = docSnapshot.data()
               const docMetadata = docSnapshotToDocMetadata(docSnapshot)

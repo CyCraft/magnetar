@@ -1,50 +1,40 @@
 {
   "name": "@magnetarjs/plugin-firestore",
-  "version": "0.20.1",
+  "version": "1.0.1",
+  "type": "module",
   "sideEffects": false,
   "description": "Magnetar plugin firestore",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
   "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "default": "./dist/index.js"
-    }
+    ".": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "files": [
     "dist"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build": "tsup src/index.ts --clean --format esm,cjs --dts",
+    "build": "del-cli dist && tsc",
     "dev": "pnpm build --watch",
-    "test-and-build": "npm run test && npm run build",
-    "test": "firebase emulators:exec \"node -r esbuild-register ./test/helpers/scripts/execAllTests.ts\"",
-    "test:only": "firebase emulators:exec \"node -r esbuild-register ./test/helpers/scripts/execAllTestsOnly.ts\""
+    "test": "firebase emulators:exec --only firestore \"node --import @cycraft/run-ts ./test/helpers/scripts/execAllTests.ts\""
   },
   "author": "Luca Ban - Mesqueeb",
   "funding": "https://github.com/sponsors/mesqueeb",
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "peerDependencies": {
-    "firebase": "^10.7.0"
+    "firebase": "^10.12.2"
   },
   "dependencies": {
     "@magnetarjs/types": "workspace:*",
     "@magnetarjs/utils": "workspace:*",
     "@magnetarjs/utils-firestore": "workspace:*",
     "flatten-anything": "^3.0.5",
-    "getorset-anything": "^0.0.5",
-    "is-what": "^4.1.16",
+    "getorset-anything": "^0.1.0",
+    "is-what": "^5.0.0",
     "merge-anything": "^5.1.7",
     "remove-anything": "^1.0.5"
-  },
-  "devDependencies": {
-    "@magnetarjs/core": "workspace:*",
-    "@magnetarjs/test-utils": "workspace:*",
-    "array-shuffle": "^3.0.0",
-    "firebase": "^10.12.2"
   },
   "keywords": [
     "magnetar-plugin",
@@ -82,15 +72,6 @@
   },
   "bugs": {
     "url": "https://github.com/cycraft/magnetar/issues"
-  },
-  "ava": {
-    "extensions": [
-      "ts"
-    ],
-    "require": [
-      "esbuild-register"
-    ],
-    "timeout": "60s"
   },
   "gitHead": "7358494dc3072b8f1f8bb7ec64ca1ecba610b3e7"
 }

@@ -1,8 +1,8 @@
-import test from 'ava'
-import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex, waitMs } from '@magnetarjs/test-utils'
+import { assert, test } from 'vitest'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
 
-test('fetch: can mutate payload & read response (config in global magnetar instance)', async (t) => {
+test('fetch: can mutate payload & read response (config in global magnetar instance)', async () => {
   function addSeen(payload: any) {
     return { ...payload, seen: true }
   }
@@ -27,16 +27,16 @@ test('fetch: can mutate payload & read response (config in global magnetar insta
       }
     )
     // the remote result SHOULD HAVE the applied defaults
-    t.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123', force: true })
-    t.deepEqual(result.get('136'), { ...pokedex(136), seen: true })
+    assert.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123', force: true })
+    assert.deepEqual(result.get('136'), { ...pokedex(136), seen: true })
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
   // the local store SHOULD HAVE the applied defaults
-  t.deepEqual(magnetar.collection('pokedex').data.get('136'), { ...pokedex(136), seen: true })
+  assert.deepEqual(magnetar.collection('pokedex').data.get('136'), { ...pokedex(136), seen: true })
 })
 
-test('stream: can mutate payload & read response (config in global magnetar instance)', async (t) => {
+test('stream: can mutate payload & read response (config in global magnetar instance)', async () => {
   function addSeen(payload: any) {
     return { ...payload, seen: true }
   }
@@ -60,11 +60,11 @@ test('stream: can mutate payload & read response (config in global magnetar inst
   )
   await waitMs(600)
   // the local store SHOULD HAVE the applied defaults
-  t.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123' })
-  t.deepEqual(magnetar.collection('pokedex').data.get('2'), { ...pokedex(2), seen: true })
+  assert.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123' })
+  assert.deepEqual(magnetar.collection('pokedex').data.get('2'), { ...pokedex(2), seen: true })
 })
 
-test('insert: can mutate payload (config in global magnetar instance)', async (t) => {
+test('insert: can mutate payload (config in global magnetar instance)', async () => {
   function addSeen(payload: any) {
     if (!('seen' in payload)) return { ...payload, seen: true }
   }
@@ -77,19 +77,19 @@ test('insert: can mutate payload (config in global magnetar instance)', async (t
     const resultB = await magnetar.collection('pokedex').doc('10').insert(pokedex(10))
     const resultC = await magnetar.doc('pokedex/25').insert(pokedex(25))
     // the remote result SHOULD HAVE the applied defaults
-    t.deepEqual(resultA.data, { ...pokedex(7), seen: true })
-    t.deepEqual(resultB.data, { ...pokedex(10), seen: true })
-    t.deepEqual(resultC.data, { ...pokedex(25), seen: true })
+    assert.deepEqual(resultA.data, { ...pokedex(7), seen: true })
+    assert.deepEqual(resultB.data, { ...pokedex(10), seen: true })
+    assert.deepEqual(resultC.data, { ...pokedex(25), seen: true })
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
   // the local store SHOULD HAVE the applied defaults
-  t.deepEqual(magnetar.collection('pokedex').data.get('7'), { ...pokedex(7), seen: true })
-  t.deepEqual(magnetar.collection('pokedex').data.get('10'), { ...pokedex(10), seen: true })
-  t.deepEqual(magnetar.collection('pokedex').data.get('25'), { ...pokedex(25), seen: true })
+  assert.deepEqual(magnetar.collection('pokedex').data.get('7'), { ...pokedex(7), seen: true })
+  assert.deepEqual(magnetar.collection('pokedex').data.get('10'), { ...pokedex(10), seen: true })
+  assert.deepEqual(magnetar.collection('pokedex').data.get('25'), { ...pokedex(25), seen: true })
 })
 
-test('fetch: can mutate payload & read response (config in module)', async (t) => {
+test('fetch: can mutate payload & read response (config in module)', async () => {
   function addSeen(payload: any) {
     return { ...payload, seen: true }
   }
@@ -115,16 +115,16 @@ test('fetch: can mutate payload & read response (config in module)', async (t) =
       }
     )
     // the remote result SHOULD HAVE the applied defaults
-    t.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123', force: true })
-    t.deepEqual(result.get('136'), { ...pokedex(136), seen: true })
+    assert.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123', force: true })
+    assert.deepEqual(result.get('136'), { ...pokedex(136), seen: true })
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
   // the local store SHOULD HAVE the applied defaults
-  t.deepEqual(pokedexModule.data.get('136'), { ...pokedex(136), seen: true })
+  assert.deepEqual(pokedexModule.data.get('136'), { ...pokedex(136), seen: true })
 })
 
-test('stream: can mutate payload & read response (config in module)', async (t) => {
+test('stream: can mutate payload & read response (config in module)', async () => {
   function addSeen(payload: any) {
     return { ...payload, seen: true }
   }
@@ -149,11 +149,11 @@ test('stream: can mutate payload & read response (config in module)', async (t) 
   )
   await waitMs(600)
   // the local store SHOULD HAVE the applied defaults
-  t.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123' })
-  t.deepEqual(pokedexModule.data.get('2'), { ...pokedex(2), seen: true })
+  assert.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123' })
+  assert.deepEqual(pokedexModule.data.get('2'), { ...pokedex(2), seen: true })
 })
 
-test('insert: can mutate payload (config in module)', async (t) => {
+test('insert: can mutate payload (config in module)', async () => {
   function addSeen(payload: any) {
     if (!('seen' in payload)) return { ...payload, seen: true }
   }
@@ -166,15 +166,15 @@ test('insert: can mutate payload (config in module)', async (t) => {
     const payload = pokedex(7)
     const result = await pokedexModule.insert(payload)
     // the remote result SHOULD HAVE the applied defaults
-    t.deepEqual(result.data, { ...pokedex(7), seen: true })
+    assert.deepEqual(result.data, { ...pokedex(7), seen: true })
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
   // the local store SHOULD HAVE the applied defaults
-  t.deepEqual(pokedexModule.data.get('7'), { ...pokedex(7), seen: true })
+  assert.deepEqual(pokedexModule.data.get('7'), { ...pokedex(7), seen: true })
 })
 
-test('fetch: can mutate payload & read response (config in action)', async (t) => {
+test('fetch: can mutate payload & read response (config in action)', async () => {
   function addSeen(payload: any) {
     return { ...payload, seen: true }
   }
@@ -183,7 +183,7 @@ test('fetch: can mutate payload & read response (config in action)', async (t) =
   }
   // get resolves once all stores have given a response with data
   const { pokedexModule } = createMagnetarInstance()
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  assert.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   try {
     let payloadInSuccessEvent: any
     const result = await pokedexModule.fetch(
@@ -199,18 +199,18 @@ test('fetch: can mutate payload & read response (config in action)', async (t) =
       }
     )
     // the remote result SHOULD HAVE the applied defaults
-    t.deepEqual(result.get('1'), { ...pokedex(1), seen: true })
-    t.deepEqual(result.get('136'), { ...pokedex(136), seen: true })
-    t.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123', force: true })
+    assert.deepEqual(result.get('1'), { ...pokedex(1), seen: true })
+    assert.deepEqual(result.get('136'), { ...pokedex(136), seen: true })
+    assert.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123', force: true })
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
   // the local store SHOULD HAVE the applied defaults
-  t.deepEqual(pokedexModule.data.get('1'), { ...pokedex(1), seen: true })
-  t.deepEqual(pokedexModule.data.get('136'), { ...pokedex(136), seen: true })
+  assert.deepEqual(pokedexModule.data.get('1'), { ...pokedex(1), seen: true })
+  assert.deepEqual(pokedexModule.data.get('136'), { ...pokedex(136), seen: true })
 })
 
-test('stream: can mutate payload & read response (config in action)', async (t) => {
+test('stream: can mutate payload & read response (config in action)', async () => {
   function addSeen(payload: any) {
     return { ...payload, seen: true }
   }
@@ -218,7 +218,7 @@ test('stream: can mutate payload & read response (config in action)', async (t) 
     return { ...payload, auth: 'Bearer 123123' }
   }
   const { pokedexModule } = createMagnetarInstance()
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  assert.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   let payloadInSuccessEvent: any
   pokedexModule.stream(
     {},
@@ -233,35 +233,35 @@ test('stream: can mutate payload & read response (config in action)', async (t) 
     }
   )
   await waitMs(600)
-  t.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123' })
+  assert.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123' })
   // the local store SHOULD HAVE the applied defaults
-  t.deepEqual(pokedexModule.data.get('1'), { ...pokedex(1), seen: true })
-  t.deepEqual(pokedexModule.data.get('2'), { ...pokedex(2), seen: true })
+  assert.deepEqual(pokedexModule.data.get('1'), { ...pokedex(1), seen: true })
+  assert.deepEqual(pokedexModule.data.get('2'), { ...pokedex(2), seen: true })
 })
 
-test('insert: can mutate payload (config in action)', async (t) => {
+test('insert: can mutate payload (config in action)', async () => {
   function addSeen(payload: any) {
     if (!('seen' in payload)) return { ...payload, seen: true }
   }
   // get resolves once all stores have given a response with data
   const { pokedexModule } = createMagnetarInstance()
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  assert.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   try {
     const payload = pokedex(7)
     const result = await pokedexModule.insert(payload, {
       modifyPayloadOn: { write: addSeen },
     })
     // the remote result SHOULD HAVE the applied defaults
-    t.deepEqual(result.data, { ...pokedex(7), seen: true })
+    assert.deepEqual(result.data, { ...pokedex(7), seen: true })
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
   // the local store SHOULD HAVE the applied defaults
-  t.deepEqual(pokedexModule.data.get('1'), { ...pokedex(1) })
-  t.deepEqual(pokedexModule.data.get('7'), { ...pokedex(7), seen: true })
+  assert.deepEqual(pokedexModule.data.get('1'), { ...pokedex(1) })
+  assert.deepEqual(pokedexModule.data.get('7'), { ...pokedex(7), seen: true })
 })
 
-test('insert: can mutate payload (config in module - action from doc)', async (t) => {
+test('insert: can mutate payload (config in module - action from doc)', async () => {
   function addSeen(payload: any) {
     if (!('seen' in payload)) return { ...payload, seen: true }
   }
@@ -274,15 +274,15 @@ test('insert: can mutate payload (config in module - action from doc)', async (t
     const resultWithoutSeen = await magnetar.collection('pokedex').doc('10').insert(pokedex(10))
     const resultWithSeen = await pokedexModule.doc('7').insert(pokedex(7))
     // the remote result not from pokedexModule SHOULD NOT HAVE the applied defaults
-    t.deepEqual(resultWithoutSeen.data, { ...pokedex(10) })
-    t.falsy('seen' in resultWithoutSeen)
+    assert.deepEqual(resultWithoutSeen.data, { ...pokedex(10) })
+    assert.isFalse(!!('seen' in resultWithoutSeen))
     // the remote result SHOULD HAVE the applied defaults
-    t.deepEqual(resultWithSeen.data, { ...pokedex(7), seen: true })
+    assert.deepEqual(resultWithSeen.data, { ...pokedex(7), seen: true })
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
   // the local store result not from pokedexModule SHOULD NOT HAVE the applied defaults
-  t.deepEqual(pokedexModule.data.get('7'), { ...pokedex(7), seen: true })
+  assert.deepEqual(pokedexModule.data.get('7'), { ...pokedex(7), seen: true })
   // the local store SHOULD HAVE the applied defaults
-  t.deepEqual(pokedexModule.data.get('10'), { ...pokedex(10) })
+  assert.deepEqual(pokedexModule.data.get('10'), { ...pokedex(10) })
 })

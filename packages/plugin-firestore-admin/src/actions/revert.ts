@@ -4,7 +4,7 @@ import type {
   PluginRevertActionPayload,
 } from '@magnetarjs/types'
 import { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'
-import { FirestoreAdminPluginOptions } from '../CreatePlugin'
+import { FirestoreAdminPluginOptions } from '../CreatePlugin.js'
 
 export function revertActionFactory(
   actions: PluginInstance['actions'],

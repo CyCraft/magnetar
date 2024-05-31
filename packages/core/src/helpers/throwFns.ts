@@ -2,11 +2,11 @@ import type { DoOnStreamFns, StreamResponse } from '@magnetarjs/types'
 import { isCollectionModule, isDocModule } from '@magnetarjs/utils'
 import { isFullString } from 'is-what'
 
-export function logError(errorMessage: string): void {
+export function logError(errorMessage: string): undefined {
   console.error('[@magnetarjs error]\n', errorMessage)
 }
 
-export function logErrorAndThrow(errorMessage: string): void {
+export function logErrorAndThrow(errorMessage: string): undefined {
   logError(errorMessage)
   throw new Error(errorMessage)
 }
@@ -14,7 +14,7 @@ export function logErrorAndThrow(errorMessage: string): void {
 export function throwOnIncompleteStreamResponses(
   streamInfoPerStore: { [storeName: string]: StreamResponse },
   doOnStreamFns: DoOnStreamFns
-): void {
+): undefined {
   const noStreamLogic = !Object.keys(streamInfoPerStore).length
   if (noStreamLogic) {
     const errorMessage = 'None of your store plugins have implemented logic to open a stream.'
@@ -28,7 +28,7 @@ export function throwOnIncompleteStreamResponses(
   }
 }
 
-export function throwIfNoFnsToExecute(storesToExecute: string[]): void {
+export function throwIfNoFnsToExecute(storesToExecute: string[]): undefined {
   if (storesToExecute.length === 0) {
     const errorMessage =
       'None of your store plugins have implemented this function or you have not defined an executionOrder anywhere.'
@@ -36,7 +36,7 @@ export function throwIfNoFnsToExecute(storesToExecute: string[]): void {
   }
 }
 
-export function throwIfNolocalStoreName(localStoreName: string): void {
+export function throwIfNolocalStoreName(localStoreName: string): undefined {
   if (isFullString(localStoreName)) return
   const errorMessage = `No 'localStoreName' provided.`
   logErrorAndThrow(errorMessage)
@@ -45,7 +45,7 @@ export function throwIfNolocalStoreName(localStoreName: string): void {
 export function throwIfInvalidModulePath(
   modulePath: string,
   moduleType: 'collection' | 'doc'
-): void {
+): undefined {
   let errorMessage = ''
   if (moduleType === 'collection') {
     if (!modulePath)

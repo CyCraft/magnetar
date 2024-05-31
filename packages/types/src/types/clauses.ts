@@ -1,7 +1,7 @@
-import { ArrayValues } from './utils/ArrayValues'
-import { DeepPropType } from './utils/DeepPropType'
-import { DefaultTo } from './utils/DefaultTo'
-import { OPathsWithOptional } from './utils/Paths'
+import { ArrayValues } from './utils/ArrayValues.js'
+import { DeepPropType } from './utils/DeepPropType.js'
+import { DefaultTo } from './utils/DefaultTo.js'
+import { OPathsWithOptional } from './utils/Paths.js'
 
 /**
  * The operator of a where filter.
@@ -71,20 +71,20 @@ export type Clauses = {
 export type WhereFilterValue<WFO extends WhereFilterOp, V> = WFO extends 'in' | 'not-in'
   ? V[]
   : WFO extends `array-contains`
-  ? ArrayValues<V>
-  : V
+    ? ArrayValues<V>
+    : V
 
 export type WhereClauseTuple<
-  T extends Record<string, any>,
+  T extends { [key: string]: any },
   Path extends OPathsWithOptional<T> = OPathsWithOptional<T>,
-  WhereOp extends WhereFilterOp = WhereFilterOp
+  WhereOp extends WhereFilterOp = WhereFilterOp,
 > = [
   fieldPath: Path,
   operator: WhereOp,
-  value: WhereFilterValue<WhereOp, DefaultTo<DeepPropType<T, Path>, any>>
+  value: WhereFilterValue<WhereOp, DefaultTo<DeepPropType<T, Path>, any>>,
 ]
 
-export type NestedQuery<T extends Record<string, any> = Record<string, any>> =
+export type NestedQuery<T extends { [key: string]: any } = { [key: string]: any }> =
   | {
       and: (
         | WhereClauseTuple<T>
@@ -100,6 +100,6 @@ export type NestedQuery<T extends Record<string, any> = Record<string, any>> =
       )[]
     }
 
-export type Query<T extends Record<string, any> = Record<string, any>> =
+export type Query<T extends { [key: string]: any } = { [key: string]: any }> =
   | { or: (WhereClauseTuple<T> | NestedQuery<T>)[] }
   | { and: (WhereClauseTuple<T> | NestedQuery<T>)[] }

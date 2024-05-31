@@ -90,7 +90,7 @@ export function addUpdatedAt(payload) {
 And then in the file(s) you define your modules:
 
 ```js
-import { addCreatedAt, addUpdatedAt } from './helpers'
+import { addCreatedAt, addUpdatedAt } from './helpers/index.js'
 
 const pokedexModule = magnetar.collection('pokedex', {
   modifyPayloadOn: {

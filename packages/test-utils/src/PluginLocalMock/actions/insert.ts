@@ -1,10 +1,11 @@
 import type { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/types'
+import { objGetOrSet } from 'getorset-anything'
 import { isFullString, isNumber } from 'is-what'
-import { throwIfEmulatedError } from '../../helpers'
-import { MakeRestoreBackup, StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin'
+import { throwIfEmulatedError } from '../../helpers/index.js'
+import { MakeRestoreBackup, StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin.js'
 
 export function insertActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
+  data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
   storePluginOptions: StorePluginOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginInsertAction {
@@ -17,15 +18,15 @@ export function insertActionFactory(
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
-    const collectionMap = data[collectionPath]
+    const collectionMap = objGetOrSet(data, collectionPath, () => new Map())
 
     const _docId =
       docId ||
-      (isFullString(payload.id)
-        ? payload.id
-        : isNumber(payload.id)
-        ? `${payload.id}`
-        : storePluginOptions.generateRandomId())
+      (isFullString(payload['id'])
+        ? payload['id']
+        : isNumber(payload['id'])
+          ? `${payload['id']}`
+          : storePluginOptions.generateRandomId())
 
     if (makeBackup) makeBackup(collectionPath, _docId)
 

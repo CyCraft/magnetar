@@ -1,10 +1,7 @@
 import { Magnetar } from '@magnetarjs/core'
 import { generateRandomId, PluginMockRemote, pokedex, PokedexEntry } from '@magnetarjs/test-utils'
 import type { CollectionInstance, DocInstance, MagnetarInstance } from '@magnetarjs/types'
-import { CreatePlugin as CreatePluginLocal } from '../../src'
-
-// @ts-ignore
-// import Vue from 'vue/dist/vue.cjs.js'
+import { CreatePlugin as CreatePluginLocal } from '../../src/index.js'
 
 const CreatePluginRemote = PluginMockRemote.CreatePlugin
 

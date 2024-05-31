@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { isFunction } from 'is-what'
 import { getProp } from 'path-to-prop'
 import { computed, ref } from 'vue'
-import { Codable, MUIColumn, MUIParseLabel, MUITableSlot } from '../types'
-import { computedAsync } from '../utils/computedAsync'
+import { Codable, MUIColumn, MUIParseLabel, MUITableSlot, isCodable } from '../types.js'
+import { computedAsync } from '../utils/computedAsync.js'
 
 const props = defineProps<{
   column: MUIColumn<any>
@@ -55,7 +54,7 @@ const codablePayload = computed<Parameters<Codable<any, any>>[0]>(() => ({
 
 /** Any type that has `Codable<...>` should be piped through this. */
 function evaluateCodableProp<T>(prop: T | Codable<Record<string, any>, T>): T {
-  return isFunction(prop) ? prop(codablePayload.value) : prop
+  return isCodable(prop) ? prop(codablePayload.value) : prop
 }
 
 /**
@@ -69,8 +68,8 @@ const cellValueParsed = computed<string>(() => {
   return !!fetchValue && isFetchingCell.value
     ? '...'
     : parseValue
-    ? parseValue(codablePayload.value)
-    : rawValue
+      ? parseValue(codablePayload.value)
+      : rawValue
 })
 
 const cellAttrs = computed<{ class: string | undefined; style: string | undefined }>(() => ({
@@ -88,11 +87,11 @@ const buttonAttrArr = computed<
   return (column.buttons || []).map((button, index) => {
     return {
       html: button.html,
-      label: isFunction(button.label)
+      label: isCodable(button.label)
         ? evaluateCodableProp(button.label)
         : parseLabel
-        ? parseLabel(button.label)
-        : button.label,
+          ? parseLabel(button.label)
+          : button.label,
       class: evaluateCodableProp(button.class),
       style: evaluateCodableProp(button.style),
       disabled: buttonLoadingArr.value[index] ? true : evaluateCodableProp(button.disabled),

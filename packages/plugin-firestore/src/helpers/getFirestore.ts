@@ -80,7 +80,7 @@ export function getQueryInstance(
   }
 
   q = collectionPath.includes('*/')
-    ? collectionGroup(db, collectionPath.split('*/')[1])
+    ? collectionGroup(db, collectionPath.split('*/')[1] ?? '')
     : collection(db, collectionPath)
   const qDebugCollection = collectionPath.includes('*/')
     ? `collectionGroup(db, "${collectionPath.split('*/')[1]}")`
@@ -163,8 +163,8 @@ getDocs(myQuery)
 
 export function docSnapshotToDocMetadata(
   docSnapshot:
-    | DocumentSnapshot<Record<string, unknown>>
-    | QueryDocumentSnapshot<Record<string, unknown>>
+    | DocumentSnapshot<{ [key: string]: unknown }>
+    | QueryDocumentSnapshot<{ [key: string]: unknown }>
 ): DocMetadata {
   const docMetaData: DocMetadata = {
     data: docSnapshot.data(),

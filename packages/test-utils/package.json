@@ -1,17 +1,14 @@
 {
   "name": "@magnetarjs/test-utils",
   "private": true,
-  "version": "0.20.1",
+  "version": "1.0.1",
+  "type": "module",
   "description": "magnetar test utils",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
   "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "default": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+    ".": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "files": [
     "dist"
@@ -21,20 +18,17 @@
   "license": "MIT",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build": "tsup src/index.ts --clean --format esm,cjs --dts",
-    "dev": "pnpm build --watch"
-  },
-  "devDependencies": {
-    "copyfiles": "^2.4.1",
-    "rimraf": "^3.0.2"
+    "build": "del-cli dist && tsc",
+    "dev": "pnpm build --watch",
+    "test": "echo none"
   },
   "dependencies": {
     "@magnetarjs/types": "workspace:*",
     "@magnetarjs/utils": "workspace:*",
     "copy-anything": "^3.0.5",
     "filter-anything": "^3.0.7",
-    "getorset-anything": "^0.0.5",
-    "is-what": "^4.1.16",
+    "getorset-anything": "^0.1.0",
+    "is-what": "^5.0.0",
     "merge-anything": "^5.1.7",
     "path-to-prop": "^2.0.4"
   },

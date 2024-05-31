@@ -14,7 +14,7 @@ Example setup:
 
 <!-- prettier-ignore-start -->
 ```js
-import { PluginFirestore } from 'magnetar'
+import { PluginFirestore } from '@magnetarjs/plugin-firestore'
 import { initializeApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
 
@@ -67,7 +67,7 @@ Use the Vue 3 plugin for Vue 3 projects.
 Example setup:
 
 ```js
-import { PluginVue3 } from 'magnetar'
+import { CreatePlugin as PluginVue3 } from '@magnetarjs/plugin-vue3'
 
 function generateRandomId() {
   return [Math.random(), Math.random(), Math.random()].join('-')
@@ -76,27 +76,6 @@ function generateRandomId() {
 }
 
 const local = PluginVue3.CreatePlugin({ generateRandomId })
-```
-
-## Vue 2
-
-> documentation WIP
-
-Use the Vue 2 plugin for Vue 2 projects.
-
-Example setup:
-
-```js
-import { CreatePlugin as CreatePluginVue2 } from '@magnetarjs/plugin-vue2'
-import vue from 'vue'
-
-function generateRandomId() {
-  return [Math.random(), Math.random(), Math.random()].join('-')
-  // you need to provide your own logic
-  // this function is used when you execute `insert` without specifying an ID
-}
-
-const local = CreatePluginVue2({ vueInstance: vue, generateRandomId })
 ```
 
 ## Simple Store
@@ -108,7 +87,7 @@ The Simple Store has no built-in reactivity. Good for a lightweight solution in 
 Example setup:
 
 ```js
-import { PluginSimpleStore } from 'magnetar'
+import { CreatePlugin as PluginSimpleStore } from '@magnetarjs/plugin-simple-store'
 
 function generateRandomId() {
   return [Math.random(), Math.random(), Math.random()].join('-')

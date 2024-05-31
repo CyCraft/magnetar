@@ -1,5 +1,11 @@
-import { initializeApp, cert } from 'firebase-admin/app'
+import { cert, initializeApp } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
+import * as path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const serviceAccountJson = path.join(__dirname, '../../service-account.json')
 
 const config = {
   apiKey: 'AIzaSyDivMlXIuHqDFsTCCqBDTVL0h29xbltcL8',
@@ -10,7 +16,8 @@ const config = {
   // messagingSenderId: '743555674736'
 }
 const firebaseApp = initializeApp({
-  credential: cert(require('../../service-account.json')),
+  ...config,
+  credential: cert(serviceAccountJson),
 })
 const db = getFirestore(firebaseApp)
 

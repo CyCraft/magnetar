@@ -1,14 +1,14 @@
-import test from 'ava'
-import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
 import { pokedex } from '@magnetarjs/test-utils'
-import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
+import { assert, test } from 'vitest'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
+import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
 
 {
   const testName = 'revert: (remote → local) insert (document)'
-  test(testName, async (t) => {
+  test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName)
     const payload = { ...pokedex(7), shouldFail: 'local' }
-    t.deepEqual(pokedexModule.doc('7').data, undefined)
+    assert.deepEqual(pokedexModule.doc('7').data, undefined)
 
     const squirtle = pokedexModule.doc('7')
 
@@ -19,22 +19,22 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
         on: {
           success: async ({ storeName }) => {
             if (storeName !== 'remote') return
-            await firestoreDeepEqual(t, testName, 'pokedex/7', payload, 'should exist')
+            await firestoreDeepEqual(testName, 'pokedex/7', payload, 'should exist')
           },
         },
       })
     } catch (error) {
-      t.truthy(error)
+      assert.isTrue(!!error)
     }
 
     const expected = undefined
-    t.deepEqual(pokedexModule.doc('7').data, expected as any)
-    await firestoreDeepEqual(t, testName, 'pokedex/7', expected, 'should be deleted')
+    assert.deepEqual(pokedexModule.doc('7').data, expected as any)
+    await firestoreDeepEqual(testName, 'pokedex/7', expected, 'should be deleted')
   })
 }
 {
   const testName = 'revert: (remote → local) insert (collection) → random ID'
-  test(testName, async (t) => {
+  test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName)
     const payload = { ...pokedex(7), shouldFail: 'local' }
 
@@ -45,18 +45,18 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
         on: {
           success: async ({ storeName }) => {
             if (storeName !== 'remote') return
-            await firestoreDeepEqual(t, testName, 'pokedex/7', payload, 'should exist')
+            await firestoreDeepEqual(testName, 'pokedex/7', payload, 'should exist')
           },
         },
       })
-      t.fail()
+      assert.fail()
     } catch (error) {
-      t.truthy(error)
+      assert.isTrue(!!error)
     }
 
     const expected = undefined
-    t.deepEqual(pokedexModule.doc('7').data, expected as any)
-    await firestoreDeepEqual(t, testName, 'pokedex/7', expected, 'should be deleted')
+    assert.deepEqual(pokedexModule.doc('7').data, expected as any)
+    await firestoreDeepEqual(testName, 'pokedex/7', expected, 'should be deleted')
   })
 }
 // Todo: currently not possible
@@ -66,9 +66,9 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 //   test(testName, async t => {
 //     const payload = { ...pokedex(7), shouldFailDelete: 'local' }
 //     const { pokedexModule } = await createMagnetarInstance(testName)
-//     t.deepEqual(pokedexModule.doc('7').data, undefined)
+//     assert.deepEqual(pokedexModule.doc('7').data, undefined)
 //     await pokedexModule.insert(payload)
-//     t.deepEqual(pokedexModule.doc('7').data, payload)
+//     assert.deepEqual(pokedexModule.doc('7').data, payload)
 
 //     try {
 //       await pokedexModule
@@ -79,15 +79,15 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 //           on: {
 //             success: async ({ storeName }) => {
 //               if (storeName !== 'remote') return
-//               await firestoreDeepEqual(t, testName, 'pokedex/7', undefined, 'should not exist')
+//               await firestoreDeepEqual(testName, 'pokedex/7', undefined, 'should not exist')
 //             },
 //           },
 //         })
 //     } catch (error) {
-//       t.truthy(error)
+//       assert.isTrue(!!error)
 //     }
 //     const expected = payload
-//     t.deepEqual(pokedexModule.doc('7').data, expected as any)
+//     assert.deepEqual(pokedexModule.doc('7').data, expected as any)
 //     await firestoreDeepEqual(
 //       t,
 //       testName,
@@ -101,13 +101,13 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
 {
   // this tests is _not really_ testing reverting the remote store, they test if the local store is reverted and if the remote store stays untouched on an error
   const testName = 'revert: merge (with extra checks)'
-  test(testName, async (t) => {
+  test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
     })
-    await firestoreDeepEqual(t, testName, 'pokedex/1', pokedex(1))
+    await firestoreDeepEqual(testName, 'pokedex/1', pokedex(1))
     const payload = { base: { HP: undefined } }
-    t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
+    assert.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
     try {
       await pokedexModule.doc('1').merge(payload, {
@@ -120,37 +120,37 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
               name: 'Bulbasaur',
               type: ['Grass', 'Poison'],
               base: {
-                'HP': undefined,
-                'Attack': 49,
-                'Defense': 49,
-                'SpAttack': 65,
-                'SpDefense': 65,
-                'Speed': 45,
+                HP: undefined,
+                Attack: 49,
+                Defense: 49,
+                SpAttack: 65,
+                SpDefense: 65,
+                Speed: 45,
               },
             }
-            t.deepEqual(pokedexModule.doc('1').data, expectedMidway as any)
+            assert.deepEqual(pokedexModule.doc('1').data, expectedMidway as any)
           },
         },
       })
     } catch (error) {
-      t.truthy(error)
+      assert.isTrue(!!error)
     }
 
     const expected = pokedex(1)
-    t.deepEqual(pokedexModule.doc('1').data, expected as any)
-    await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
+    assert.deepEqual(pokedexModule.doc('1').data, expected as any)
+    await firestoreDeepEqual(testName, 'pokedex/1', expected as any)
   })
 }
 {
   // this tests is _not really_ testing reverting the remote store, they test if the local store is reverted and if the remote store stays untouched on an error
   const testName = 'revert: assign (with extra checks)'
-  test(testName, async (t) => {
+  test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
     })
-    await firestoreDeepEqual(t, testName, 'pokedex/1', pokedex(1))
+    await firestoreDeepEqual(testName, 'pokedex/1', pokedex(1))
     const payload = { base: { HP: undefined } }
-    t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
+    assert.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
     try {
       await pokedexModule.doc('1').assign(payload, {
@@ -166,29 +166,29 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
                 HP: undefined,
               },
             }
-            t.deepEqual(pokedexModule.doc('1').data, expectedMidway as any)
+            assert.deepEqual(pokedexModule.doc('1').data, expectedMidway as any)
           },
         },
       })
     } catch (error) {
-      t.truthy(error)
+      assert.isTrue(!!error)
     }
 
     const expected = pokedex(1)
-    t.deepEqual(pokedexModule.doc('1').data, expected as any)
-    await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
+    assert.deepEqual(pokedexModule.doc('1').data, expected as any)
+    await firestoreDeepEqual(testName, 'pokedex/1', expected as any)
   })
 }
 {
   // this tests is _not really_ testing reverting the remote store, they test if the local store is reverted and if the remote store stays untouched on an error
   const testName = 'revert: replace (with extra checks)'
-  test(testName, async (t) => {
+  test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName, {
       insertDocs: { 'pokedex/1': pokedex(1) },
     })
-    await firestoreDeepEqual(t, testName, 'pokedex/1', pokedex(1))
+    await firestoreDeepEqual(testName, 'pokedex/1', pokedex(1))
     const payload = { base: { HP: undefined } }
-    t.deepEqual(pokedexModule.doc('1').data, pokedex(1))
+    assert.deepEqual(pokedexModule.doc('1').data, pokedex(1))
 
     try {
       await pokedexModule.doc('1').replace(payload, {
@@ -197,16 +197,16 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
           success: ({ storeName }) => {
             if (storeName !== 'local') return
             const expectedMidway = { base: { HP: undefined } }
-            t.deepEqual(pokedexModule.doc('1').data, expectedMidway as any)
+            assert.deepEqual(pokedexModule.doc('1').data, expectedMidway as any)
           },
         },
       })
     } catch (error) {
-      t.truthy(error)
+      assert.isTrue(!!error)
     }
 
     const expected = pokedex(1)
-    t.deepEqual(pokedexModule.doc('1').data, expected as any)
-    await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
+    assert.deepEqual(pokedexModule.doc('1').data, expected as any)
+    await firestoreDeepEqual(testName, 'pokedex/1', expected as any)
   })
 }

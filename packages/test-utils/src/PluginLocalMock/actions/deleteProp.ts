@@ -1,11 +1,12 @@
 import type { PluginDeletePropAction, PluginDeletePropActionPayload } from '@magnetarjs/types'
+import { objGetOrSet } from 'getorset-anything'
 import { isArray } from 'is-what'
 import { getProp } from 'path-to-prop'
-import { throwIfEmulatedError } from '../../helpers'
-import { MakeRestoreBackup, StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin'
+import { throwIfEmulatedError } from '../../helpers/index.js'
+import { MakeRestoreBackup, StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin.js'
 
 export function deletePropActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
+  data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
   storePluginOptions: StorePluginOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginDeletePropAction {
@@ -14,7 +15,7 @@ export function deletePropActionFactory(
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginDeletePropActionPayload<StorePluginModuleConfig>): void {
+  }: PluginDeletePropActionPayload<StorePluginModuleConfig>): undefined {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
@@ -22,7 +23,7 @@ export function deletePropActionFactory(
     // `deleteProp` action cannot be executed on collections
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 
-    const collectionMap = data[collectionPath]
+    const collectionMap = objGetOrSet(data, collectionPath, () => new Map())
     const docData = collectionMap.get(docId)
 
     if (!docData) throw new Error(`Document data not found for id: ${collectionPath} ${docId}`)
@@ -35,9 +36,11 @@ export function deletePropActionFactory(
       if (isNestedPropPath) {
         const parts = propToDelete.split(/[./]/)
         const lastPart = parts.pop()
-        const parentRef = getProp(docData, parts.join('.')) as Record<string, unknown>
+        const parentRef = getProp(docData, parts.join('.')) as { [key: string]: unknown }
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete parentRef[lastPart || '']
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete docData[propToDelete]
       }
     }

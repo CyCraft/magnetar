@@ -1,4 +1,3 @@
-/* eslint-disable no-inner-declarations */
 import type {
   ActionConfig,
   ActionName,
@@ -17,11 +16,11 @@ import type {
 } from '@magnetarjs/types'
 import { mapGetOrSet } from 'getorset-anything'
 import { isFullArray, isFullString } from 'is-what'
-import { getEventNameFnsMap } from '../helpers/eventHelpers'
-import { getModifyPayloadFnsMap } from '../helpers/modifyPayload'
-import { getPluginModuleConfig } from '../helpers/moduleHelpers'
-import { throwIfNoFnsToExecute } from '../helpers/throwFns'
-import { handleAction } from './handleAction'
+import { getEventNameFnsMap } from '../helpers/eventHelpers.js'
+import { getModifyPayloadFnsMap } from '../helpers/modifyPayload.js'
+import { getPluginModuleConfig } from '../helpers/moduleHelpers.js'
+import { throwIfNoFnsToExecute } from '../helpers/throwFns.js'
+import { handleAction } from './handleAction.js'
 
 export type HandleWritePerStoreParams = {
   collectionPath: string
@@ -37,7 +36,7 @@ export function handleWritePerStore<
   TActionName extends Extract<
     ActionName,
     'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp' | 'delete'
-  >
+  >,
 >(sharedParams: HandleWritePerStoreParams, actionName: TActionName): ActionTernary<TActionName>
 export function handleWritePerStore(
   sharedParams: HandleWritePerStoreParams,
@@ -57,7 +56,7 @@ export function handleWritePerStore(
     // set up and/or reset te writeLock for write actions
     const writeLockId = _docId ? `${collectionPath}/${_docId}` : collectionPath
     const writeLock = mapGetOrSet(writeLockMap, writeLockId, (): WriteLock => {
-      return { promise: null, resolve: () => {}, countdown: null }
+      return { promise: null, resolve: () => undefined, countdown: null }
     })
 
     // we need to create a promise we'll resolve later to prevent any incoming docs from being written to the local state during this time
@@ -65,7 +64,7 @@ export function handleWritePerStore(
       writeLock.promise = new Promise<void>((resolve) => {
         writeLock.resolve = () => {
           resolve()
-          writeLock.resolve = () => {}
+          writeLock.resolve = () => undefined
           writeLock.promise = null
           if (writeLock.countdown !== null) {
             clearTimeout(writeLock.countdown)
@@ -117,21 +116,21 @@ export function handleWritePerStore(
         /**
          * The abort mechanism for the entire store chain. When executed in handleAction() it won't go to the next store in executionOrder.
          */
-        function stopExecutionAfterAction(trueOrRevert: StopExecution = true): void {
+        function stopExecutionAfterAction(trueOrRevert: StopExecution = true): undefined {
           stopExecution = trueOrRevert
         }
 
         /**
          * Fetching on a collection should return a map with just the fetched records for that API call
          */
-        const collectionFetchResult = new Map<string, Record<string, any>>()
+        const collectionFetchResult = new Map<string, { [key: string]: any }>()
 
         /**
          * All possible results from the plugins.
          * `unknown` in case an error was thrown
          */
         let resultFromPlugin:
-          | void
+          | undefined
           | string
           | unknown
           | FetchResponse
@@ -142,7 +141,7 @@ export function handleWritePerStore(
           // a previous iteration stopped the execution:
           if (stopExecution === true) break
           // find the action on the plugin
-          const pluginAction = globalConfig.stores[storeName].actions[actionName]
+          const pluginAction = globalConfig.stores[storeName]?.actions[actionName]
           const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeName)
           // the plugin action
           resultFromPlugin = !pluginAction
@@ -167,17 +166,19 @@ export function handleWritePerStore(
             const storesToRevert = storesToExecute.slice(0, i)
             storesToRevert.reverse()
             for (const storeToRevert of storesToRevert) {
-              const pluginRevertAction = globalConfig.stores[storeToRevert].revert
+              const pluginRevertAction = globalConfig.stores[storeToRevert]?.revert
               const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeToRevert)
-              await pluginRevertAction({
-                payload,
-                actionConfig,
-                collectionPath,
-                docId,
-                pluginModuleConfig,
-                actionName,
-                error: resultFromPlugin, // in this case the result is the error
-              })
+              if (pluginRevertAction) {
+                await pluginRevertAction({
+                  payload,
+                  actionConfig,
+                  collectionPath,
+                  docId,
+                  pluginModuleConfig,
+                  actionName,
+                  error: resultFromPlugin, // in this case the result is the error
+                })
+              }
               // revert eventFns, handle and await each eventFn in sequence
               for (const fn of eventNameFnsMap.revert) {
                 await fn({ payload, result: resultFromPlugin, actionName, storeName, collectionPath, docId, path: modulePath, pluginModuleConfig }) // prettier-ignore

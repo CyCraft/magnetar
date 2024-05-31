@@ -6,7 +6,7 @@ import type {
   PluginFetchCountActionPayload,
 } from '@magnetarjs/types'
 import { getPathWhereIdentifier } from '@magnetarjs/types'
-import { Vue3StoreModuleConfig, Vue3StoreOptions } from '../CreatePlugin'
+import { Vue3StoreModuleConfig, Vue3StoreOptions } from '../CreatePlugin.js'
 
 export function fetchCountActionFactory(
   pathCountDic: { [collectionPath in PathWhereIdentifier]?: number },

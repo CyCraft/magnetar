@@ -10,7 +10,7 @@
  * // { nested?: { props?: string } }
  * ```
  */
-export type PartialDeep<O> = O extends Record<string | number | symbol, unknown>
+export type PartialDeep<O> = O extends { [key: string | number | symbol]: unknown }
   ? { [K in keyof O]?: PartialDeep<O[K]> }
   : O
 

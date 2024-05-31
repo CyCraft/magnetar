@@ -26,8 +26,8 @@ import type {
 import { filterDataPerClauses } from '@magnetarjs/utils'
 import { pick } from 'filter-anything'
 import { isFullArray, isFullString, isNumber, isPromise } from 'is-what'
-import { generateRandomId, pokedexMap, throwIfEmulatedError, waitMs } from '../helpers'
-import { RemoteStoreOptions, StorePluginModuleConfig } from './index'
+import { generateRandomId, pokedexMap, throwIfEmulatedError, waitMs } from '../helpers/index.js'
+import { RemoteStoreOptions, StorePluginModuleConfig } from './index.js'
 
 export function writeActionFactory(
   storePluginOptions: RemoteStoreOptions,
@@ -38,7 +38,7 @@ export function writeActionFactory(
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginWriteActionPayload<StorePluginModuleConfig>): Promise<void> {
+  }: PluginWriteActionPayload<StorePluginModuleConfig>): Promise<undefined> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
@@ -77,7 +77,7 @@ export function deletePropActionFactory(
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginDeletePropActionPayload<StorePluginModuleConfig>): Promise<void> {
+  }: PluginDeletePropActionPayload<StorePluginModuleConfig>): Promise<undefined> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
@@ -94,7 +94,7 @@ export function deleteActionFactory(storePluginOptions: RemoteStoreOptions): Plu
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginDeleteActionPayload<StorePluginModuleConfig>): Promise<void> {
+  }: PluginDeleteActionPayload<StorePluginModuleConfig>): Promise<undefined> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
@@ -107,7 +107,7 @@ function mockDataRetrieval(
   collectionPath: string | undefined,
   docId: string | undefined,
   pluginModuleConfig: StorePluginModuleConfig
-): Record<string, unknown>[] {
+): { [key: string]: unknown }[] {
   if (docId === 'trainer') return [{ name: 'Luca', age: 10, dream: 'job' }]
 
   if (collectionPath === 'pokedex') {
@@ -148,15 +148,15 @@ export function fetchActionFactory(storePluginOptions: RemoteStoreOptions): Plug
         // this mocks an error during execution
         const dataRetrieved = mockDataRetrieval(collectionPath, docId, pluginModuleConfig)
         // we must trigger `mustExecuteOnGet.added` for each document that was retrieved and return whatever that returns
-        const results = dataRetrieved.map((_data: Record<string, any>) => {
+        const results = dataRetrieved.map((_data: { [key: string]: any }) => {
           const _metaData = {
             data: _data,
             exists: true,
-            id: isFullString(_data.id)
-              ? _data.id
-              : isNumber(_data.id)
-              ? `${_data.id}`
-              : docId || '',
+            id: isFullString(_data['id'])
+              ? _data['id']
+              : isNumber(_data['id'])
+                ? `${_data['id']}`
+                : docId || '',
           }
           return _metaData
         })
@@ -215,8 +215,8 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
       stop: () => {},
     }
     // this mocks actual data coming in at different intervals
-    dataRetrieved.forEach((data: Record<string, any>, i) => {
-      const metaData = { data, id: data.id || docId, exists: true }
+    dataRetrieved.forEach((data: { [key: string]: any }, i) => {
+      const metaData = { data, id: data['id'] || docId, exists: true }
 
       // we can simulate new docs coming in by manually triggerering promises
       if (isFullArray(payload) && payload.every(isPromise)) {
@@ -241,7 +241,7 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
     })
 
     // this mocks the opening of the stream
-    const streaming: Promise<void> = new Promise((resolve, reject): void => {
+    const streaming = new Promise<void>((resolve, reject) => {
       stopStreaming.stop = resolve
       setTimeout(() => {
         // this mocks an error during execution

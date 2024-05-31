@@ -1,9 +1,9 @@
-import { Limit, OrderByClause, QueryClause, WhereClause } from './clauses'
-import { StoreName } from './core'
-import { EventNameFnMap } from './events'
-import { ModifyPayloadFnMap } from './modifyPayload'
-import { ModifyReadResponseFnMap } from './modifyReadResponse'
-import { PluginInstance } from './plugins'
+import { Limit, OrderByClause, QueryClause, WhereClause } from './clauses.js'
+import { StoreName } from './core.js'
+import { EventNameFnMap } from './events.js'
+import { ModifyPayloadFnMap } from './modifyPayload.js'
+import { ModifyReadResponseFnMap } from './modifyReadResponse.js'
+import { PluginInstance } from './plugins.js'
 
 /**
  * Execution order per action or action type.
@@ -40,12 +40,12 @@ export type GlobalConfig = {
 /**
  * Extra options the dev can pass when creating a module with collection() or doc(). These will take precedence over the global config.
  */
-export type ModuleConfig<DocDataType extends Record<string, any> = Record<string, any>> = {
+export type ModuleConfig<DocDataType extends { [key: string]: any } = { [key: string]: any }> = {
   query?: QueryClause[]
   where?: WhereClause[]
   orderBy?: OrderByClause[]
   limit?: Limit
-  startAfter?: unknown[] | Record<string, any>
+  startAfter?: unknown[] | { [key: string]: any }
   executionOrder?: ExecutionOrderConfig
   onError?: 'revert' | 'continue' | 'stop'
   modifyPayloadOn?: ModifyPayloadFnMap<DocDataType>
@@ -55,6 +55,6 @@ export type ModuleConfig<DocDataType extends Record<string, any> = Record<string
    * Custom config the dev can set per Store Plugin. This will be passed to the plugin's action handler.
    */
   configPerStore?: {
-    [storeName: string]: Record<string, any>
+    [storeName: string]: { [key: string]: any }
   }
 }

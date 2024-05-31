@@ -20,7 +20,7 @@ export type {
   WriteBatch,
 } from 'firebase-admin/firestore'
 
-export function doc(db: Firestore, path: string): DocumentReference<Record<string, unknown>> {
+export function doc(db: Firestore, path: string): DocumentReference<{ [key: string]: unknown }> {
   return db.doc(path)
 }
 
@@ -62,7 +62,7 @@ export function getQueryInstance(
 ): Query {
   let q: CollectionReference | Query
   q = collectionPath.includes('*/')
-    ? db.collectionGroup(collectionPath.split('*/')[1])
+    ? db.collectionGroup(collectionPath.split('*/')[1] ?? '')
     : db.collection(collectionPath)
   for (const queryClause of config.query || []) {
     q = q.where(queryToFilter(queryClause))
@@ -86,8 +86,8 @@ export function getQueryInstance(
 
 export function docSnapshotToDocMetadata(
   docSnapshot:
-    | DocumentSnapshot<Record<string, unknown>>
-    | QueryDocumentSnapshot<Record<string, unknown>>
+    | DocumentSnapshot<{ [key: string]: unknown }>
+    | QueryDocumentSnapshot<{ [key: string]: unknown }>
 ): DocMetadata {
   const docMetaData: DocMetadata = {
     data: docSnapshot.data(),

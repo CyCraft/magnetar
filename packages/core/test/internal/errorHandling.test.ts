@@ -1,9 +1,9 @@
 import { pokedex, pokedexEntryDefaults } from '@magnetarjs/test-utils'
 import type { FetchResponse } from '@magnetarjs/types'
-import test from 'ava'
-import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
+import { assert, test } from 'vitest'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
 
-test('write + onError: stop -- emits fail events & aborts execution by default', async (t) => {
+test('write + onError: stop -- emits fail events & aborts execution by default', async () => {
   const { pokedexModule } = createMagnetarInstance()
   const insertPayload = {
     ...pokedexEntryDefaults({ name: 'this should fail' }),
@@ -15,21 +15,21 @@ test('write + onError: stop -- emits fail events & aborts execution by default',
       on: {
         error: ({ payload, storeName }) => {
           if (storeName === 'local') {
-            t.deepEqual(payload, insertPayload)
+            assert.deepEqual(payload, insertPayload)
           }
         },
         before: ({ storeName }) => {
-          if (storeName === 'remote') t.fail()
+          if (storeName === 'remote') assert.fail()
         },
       },
     })
   } catch (error) {
-    t.deepEqual(error, { message: 'failed', payload: insertPayload })
+    assert.deepEqual(error, { message: 'failed', payload: insertPayload })
   }
-  t.deepEqual(pokedexModule.data.get('testid'), undefined)
+  assert.deepEqual(pokedexModule.data.get('testid'), undefined)
 })
 
-test('write + onError: stop -- fail in second store plugin does not prevent execution first store plugin', async (t) => {
+test('write + onError: stop -- fail in second store plugin does not prevent execution first store plugin', async () => {
   const { pokedexModule } = createMagnetarInstance()
   const insertPayload = {
     ...pokedexEntryDefaults({ name: 'this should fail' }),
@@ -40,20 +40,20 @@ test('write + onError: stop -- fail in second store plugin does not prevent exec
       onError: 'stop',
       on: {
         error: ({ payload, storeName }) => {
-          if (storeName === 'local') t.fail()
+          if (storeName === 'local') assert.fail()
           if (storeName === 'remote') {
-            t.deepEqual(payload, insertPayload)
+            assert.deepEqual(payload, insertPayload)
           }
         },
       },
     })
   } catch (error) {
-    t.deepEqual(error, { message: 'failed', payload: insertPayload })
+    assert.deepEqual(error, { message: 'failed', payload: insertPayload })
   }
-  t.deepEqual(pokedexModule.data.get('testid'), insertPayload)
+  assert.deepEqual(pokedexModule.data.get('testid'), insertPayload)
 })
 
-test('write + onError: continue', async (t) => {
+test('write + onError: continue', async () => {
   const { pokedexModule } = createMagnetarInstance()
   const insertPayload = {
     ...pokedexEntryDefaults({ name: 'this should fail' }),
@@ -65,24 +65,24 @@ test('write + onError: continue', async (t) => {
       on: {
         error: ({ payload, storeName }) => {
           if (storeName === 'local') {
-            t.deepEqual(payload, insertPayload)
+            assert.deepEqual(payload, insertPayload)
           }
-          if (storeName === 'remote') t.fail()
+          if (storeName === 'remote') assert.fail()
         },
         success: ({ payload, storeName }) => {
           if (storeName === 'remote') {
-            t.deepEqual(payload, insertPayload)
+            assert.deepEqual(payload, insertPayload)
           }
         },
       },
     })
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
-  t.deepEqual(pokedexModule.data.get('testid'), undefined)
+  assert.deepEqual(pokedexModule.data.get('testid'), undefined)
 })
 
-test('write + onError: revert', async (t) => {
+test('write + onError: revert', async () => {
   const { pokedexModule } = createMagnetarInstance()
   const insertPayload = {
     ...pokedexEntryDefaults({ name: 'this should fail' }),
@@ -94,27 +94,28 @@ test('write + onError: revert', async (t) => {
       on: {
         revert: ({ payload, result, actionName, storeName }) => {
           if (storeName === 'local') {
-            t.deepEqual(actionName, 'insert')
+            assert.deepEqual(actionName, 'insert')
           }
         },
         before: ({ storeName }) => {
-          if (storeName === 'remote') t.deepEqual(pokedexModule.data.get('testid'), insertPayload)
+          if (storeName === 'remote')
+            assert.deepEqual(pokedexModule.data.get('testid'), insertPayload)
         },
         error: ({ payload, storeName }) => {
-          if (storeName === 'local') t.fail()
+          if (storeName === 'local') assert.fail()
           if (storeName === 'remote') {
-            t.deepEqual(payload, insertPayload)
+            assert.deepEqual(payload, insertPayload)
           }
         },
       },
     })
   } catch (error) {
-    t.truthy(error)
+    assert.isTrue(!!error)
   }
-  t.deepEqual(pokedexModule.data.get('testid'), undefined)
+  assert.deepEqual(pokedexModule.data.get('testid'), undefined)
 })
 
-test('write + onError: revert - will not go to next store', async (t) => {
+test('write + onError: revert - will not go to next store', async () => {
   const { pokedexModule } = createMagnetarInstance()
   const insertPayload = {
     ...pokedexEntryDefaults({ name: 'this should fail' }),
@@ -126,102 +127,102 @@ test('write + onError: revert - will not go to next store', async (t) => {
       on: {
         error: ({ payload, storeName }) => {
           if (storeName === 'local') {
-            t.deepEqual(payload, insertPayload)
+            assert.deepEqual(payload, insertPayload)
           }
         },
         revert: ({ storeName }) => {
-          if (storeName === 'local') t.fail()
+          if (storeName === 'local') assert.fail()
         },
         before: ({ payload, storeName }) => {
           if (storeName === 'remote') {
-            t.fail()
+            assert.fail()
           }
         },
       },
     })
   } catch (error) {
-    t.truthy(error)
+    assert.isTrue(!!error)
   }
-  t.deepEqual(pokedexModule.data.get('testid'), undefined)
+  assert.deepEqual(pokedexModule.data.get('testid'), undefined)
 })
 
-test('fetch + onError: stop -- emits fail events & aborts execution by default', async (t) => {
+test('fetch + onError: stop -- emits fail events & aborts execution by default', async () => {
   const { pokedexModule } = createMagnetarInstance()
   const fetchPayload = { shouldFail: 'local', force: true }
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  assert.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   try {
     await pokedexModule.fetch(fetchPayload, {
       onError: 'stop',
       on: {
         error: ({ payload, storeName }) => {
           if (storeName === 'local') {
-            t.deepEqual(payload, fetchPayload)
+            assert.deepEqual(payload, fetchPayload)
           }
         },
         before: ({ storeName }) => {
-          if (storeName === 'remote') t.fail()
+          if (storeName === 'remote') assert.fail()
         },
       },
     })
   } catch (error) {
-    t.deepEqual(error, { message: 'failed', payload: fetchPayload })
+    assert.deepEqual(error, { message: 'failed', payload: fetchPayload })
   }
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  assert.deepEqual(pokedexModule.data.get('1'), pokedex(1))
 })
 
-test('fetch + onError: stop -- fail in second store plugin does not prevent execution first store plugin', async (t) => {
+test('fetch + onError: stop -- fail in second store plugin does not prevent execution first store plugin', async () => {
   const { pokedexModule } = createMagnetarInstance()
   const fetchPayload = { shouldFail: 'remote', force: true }
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  assert.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   let result: any
   try {
     result = await pokedexModule.fetch(fetchPayload, {
       onError: 'stop',
       on: {
         error: ({ payload, storeName }) => {
-          if (storeName === 'local') t.fail()
+          if (storeName === 'local') assert.fail()
           if (storeName === 'remote') {
-            t.deepEqual(payload, fetchPayload)
+            assert.deepEqual(payload, fetchPayload)
           }
         },
       },
     })
   } catch (error) {
-    t.deepEqual(error, { message: 'failed', payload: fetchPayload })
+    assert.deepEqual(error, { message: 'failed', payload: fetchPayload })
   }
-  t.deepEqual(result, undefined)
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  assert.deepEqual(result, undefined)
+  assert.deepEqual(pokedexModule.data.get('1'), pokedex(1))
 })
 
-test('fetch + onError: continue', async (t) => {
+test('fetch + onError: continue', async () => {
   const { pokedexModule } = createMagnetarInstance()
   const fetchPayload = { shouldFail: 'local', force: true }
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  assert.deepEqual(pokedexModule.data.get('1'), pokedex(1))
   try {
     const result = await pokedexModule.fetch(fetchPayload, {
       onError: 'continue',
       on: {
         error: ({ payload, storeName }) => {
           if (storeName === 'local') {
-            t.deepEqual(payload, fetchPayload)
+            assert.deepEqual(payload, fetchPayload)
           }
-          if (storeName === 'remote') t.fail()
+          if (storeName === 'remote') assert.fail()
         },
         success: ({ payload, result, storeName }) => {
           if (storeName === 'remote') {
-            t.deepEqual(payload, fetchPayload)
+            assert.deepEqual(payload, fetchPayload)
             // even though the local store failed, we got the result of the remote store
-            t.deepEqual((result as FetchResponse).docs.length, 151)
+            assert.deepEqual((result as FetchResponse).docs.length, 151)
           }
         },
       },
     })
-    t.deepEqual(result.get('1'), pokedex(1))
-    t.deepEqual(result.get('136'), pokedex(136)) // the remote store result is returned no matter what
+    assert.deepEqual(result.get('1'), pokedex(1))
+    assert.deepEqual(result.get('136'), pokedex(136)) // the remote store result is returned no matter what
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
   // the local store didn't succeed in applying its 'inserted' event, so its local data will be empty:
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
-  t.deepEqual(pokedexModule.data.get('136'), undefined)
+  assert.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  assert.deepEqual(pokedexModule.data.get('136'), undefined)
 })

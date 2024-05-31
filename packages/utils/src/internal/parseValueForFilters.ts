@@ -7,10 +7,10 @@ import { isAnyObject, isFunction } from 'is-what'
  */
 export function parseValueForFilters(val: any): any {
   try {
-    if (isAnyObject(val) && isFunction(val.toDate)) {
-      return val.toDate()
+    if (isAnyObject(val) && 'toDate' in val && isFunction(val['toDate'])) {
+      return val['toDate']()
     }
-  } catch (error) {
+  } catch (error: unknown) {
     return val
   }
   return val

@@ -1,4 +1,4 @@
-import type { MoveEntry } from './types'
+import type { MoveEntry } from './types.js'
 
 export const allMovesArray: MoveEntry[] = [
   {

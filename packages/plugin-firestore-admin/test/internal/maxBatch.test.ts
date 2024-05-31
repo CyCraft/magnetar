@@ -1,14 +1,14 @@
-import test from 'ava'
-import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
-import { pokedex, waitMs } from '@magnetarjs/test-utils'
-import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
+import { pokedex } from '@magnetarjs/test-utils'
+import { assert, test } from 'vitest'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
+import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
 
 {
   const testName = 'Max Batch — 550'
-  test(testName, async (t) => {
+  test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName)
-    await firestoreDeepEqual(t, testName, 'pokedex/1', undefined)
-    t.deepEqual(pokedexModule.doc('1').data, undefined)
+    await firestoreDeepEqual(testName, 'pokedex/1', undefined)
+    assert.deepEqual(pokedexModule.doc('1').data, undefined)
 
     try {
       pokedexModule.doc('1').insert(pokedex(1))
@@ -17,21 +17,21 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
       }
       await pokedexModule.doc('3').insert(pokedex(3))
     } catch (error) {
-      t.fail(JSON.stringify(error))
+      assert.fail(JSON.stringify(error))
     }
 
     const expected = pokedex(1)
-    t.deepEqual(pokedexModule.doc('1').data, expected as any)
-    await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
+    assert.deepEqual(pokedexModule.doc('1').data, expected as any)
+    await firestoreDeepEqual(testName, 'pokedex/1', expected as any)
   })
 }
 
 {
   const testName = 'Max Batch — 1550'
-  test(testName, async (t) => {
+  test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName)
-    await firestoreDeepEqual(t, testName, 'pokedex/1', undefined)
-    t.deepEqual(pokedexModule.doc('1').data, undefined)
+    await firestoreDeepEqual(testName, 'pokedex/1', undefined)
+    assert.deepEqual(pokedexModule.doc('1').data, undefined)
 
     try {
       pokedexModule.doc('1').insert(pokedex(1))
@@ -40,11 +40,11 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual'
       }
       await pokedexModule.doc('3').insert(pokedex(3))
     } catch (error) {
-      t.fail(JSON.stringify(error))
+      assert.fail(JSON.stringify(error))
     }
 
     const expected = pokedex(1)
-    t.deepEqual(pokedexModule.doc('1').data, expected as any)
-    await firestoreDeepEqual(t, testName, 'pokedex/1', expected as any)
+    assert.deepEqual(pokedexModule.doc('1').data, expected as any)
+    await firestoreDeepEqual(testName, 'pokedex/1', expected as any)
   })
 }

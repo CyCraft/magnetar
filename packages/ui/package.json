@@ -1,23 +1,14 @@
 {
   "name": "@magnetarjs/ui",
-  "version": "0.20.1",
+  "version": "1.0.1",
   "type": "module",
   "sideEffects": false,
   "description": "A fully functional table that automatically connects to your database powered by Magnetar 🌟",
-  "types": "./dist/cjs/index.d.cts",
-  "main": "./dist/cjs/index.js",
   "exports": {
-    ".": {
-      "require": {
-        "types": "./dist/cjs/index.d.cts",
-        "default": "./dist/cjs/index.js"
-      },
-      "import": {
-        "types": "./dist/es/index.d.ts",
-        "default": "./dist/es/index.js"
-      }
-    },
-    "./dist/*": "./dist/*"
+    ".": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "files": [
     "dist"
@@ -27,9 +18,13 @@
   "license": "MIT",
   "scripts": {
     "typecheck": "vue-tsc --noEmit",
-    "build": "del-cli dist && npm run typecheck && vite build",
+    "build": "del-cli dist && vite build",
     "dev": "vite",
+    "test": "echo none",
     "preview": "vite preview"
+  },
+  "peerDependencies": {
+    "vue": "^3.4.27"
   },
   "dependencies": {
     "@magnetarjs/core": "workspace:*",
@@ -42,22 +37,10 @@
     "chartjs-plugin-doughnutlabel-rebourne": "3.0.0-beta.4",
     "color2k": "^2.0.3",
     "fast-sort": "^3.4.0",
-    "getorset-anything": "^0.0.5",
-    "is-what": "^4.1.16",
+    "getorset-anything": "^0.1.0",
+    "is-what": "^5.0.0",
     "path-to-prop": "^2.0.4",
-    "vue": "^3.4.27",
     "vue-chartjs": "^5.3.1"
-  },
-  "devDependencies": {
-    "@magnetarjs/plugin-firestore": "workspace:*",
-    "@magnetarjs/plugin-vue3": "workspace:*",
-    "@magnetarjs/test-utils": "workspace:^",
-    "@vitejs/plugin-vue": "^4.6.2",
-    "roll-anything": "^3.0.4",
-    "sass": "^1.77.3",
-    "typescript": "^5.4.5",
-    "vite": "^5.2.12",
-    "vue-tsc": "^1.8.27"
   },
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "keywords": [

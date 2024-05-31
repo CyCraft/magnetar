@@ -1,7 +1,7 @@
-import { isFullString } from 'is-what'
-import type { Firestore, FirestoreModuleConfig, FirestorePluginOptions } from './types'
 import { isCollectionModule } from '@magnetarjs/utils'
-import { throwIfInvalidFirestorePath } from './throwFns'
+import { isFullString } from 'is-what'
+import { throwIfInvalidFirestorePath } from './throwFns.js'
+import type { Firestore, FirestoreModuleConfig, FirestorePluginOptions } from './types.js'
 
 export function getFirestoreDocPath(
   collectionPath: string,

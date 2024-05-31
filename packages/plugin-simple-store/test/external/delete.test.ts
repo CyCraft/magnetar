@@ -1,44 +1,43 @@
 import { pokedex } from '@magnetarjs/test-utils'
-import test from 'ava'
-import { createMagnetarInstance } from '../helpers/createMagnetarInstance'
+import { assert, test } from 'vitest'
+import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
 
-test('delete (document)', async (t) => {
+test('delete (document)', async () => {
   const { trainerModule } = createMagnetarInstance()
-  t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
+  assert.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
   try {
     await trainerModule.delete()
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
 
-  t.deepEqual(trainerModule.data, undefined)
+  assert.deepEqual(trainerModule.data, undefined)
 })
 
-test('delete (collection)', async (t) => {
+test('delete (collection)', async () => {
   const { pokedexModule } = createMagnetarInstance()
-  t.deepEqual(pokedexModule.data.size, 1)
-  t.deepEqual(pokedexModule.data.get('1'), pokedex(1))
+  assert.deepEqual(pokedexModule.data.size, 1)
+  assert.deepEqual(pokedexModule.data.get('1'), pokedex(1))
 
   try {
     await pokedexModule.delete('1')
   } catch (error) {
-    t.fail(JSON.stringify(error))
+    assert.fail(JSON.stringify(error))
   }
-  t.deepEqual(pokedexModule.data.size, 0)
-  t.deepEqual(pokedexModule.data.get('1'), undefined)
+  assert.deepEqual(pokedexModule.data.size, 0)
+  assert.deepEqual(pokedexModule.data.get('1'), undefined)
 })
 
-test('revert: delete', async (t) => {
+test('revert: delete', async () => {
   const { trainerModule } = createMagnetarInstance()
-  t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
+  assert.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
   try {
-    // @ts-ignore
     await trainerModule.delete('remote', { onError: 'revert' }) // mocks error on delete for remote store mock
   } catch (error) {
-    t.truthy(error)
+    assert.isTrue(!!error)
   }
 
-  t.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
+  assert.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 })

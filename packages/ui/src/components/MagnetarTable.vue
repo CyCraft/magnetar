@@ -153,20 +153,20 @@ const activeCollection = computed<CollectionInstance<any>>(() =>
   calcCollection(props.collection, filtersState.value, orderByState.value, props.filters ?? [])
 )
 
-function clearAllRecords(): void {
+function clearAllRecords(): undefined {
   props.collection.data.clear()
   collectionInstance.value.fetched.cursor = undefined
   pageIndex.value = 0
 }
 
-function resetState(): void {
+function resetState(): undefined {
   filtersState.value = carbonCopyMap(initialState.filtersState)
   orderByState.value = carbonCopyMap(initialState.orderByState)
   clearAllRecords()
   fetchMore()
 }
 
-function clearState(): void {
+function clearState(): undefined {
   filtersState.value = new Map()
   orderByState.value = new Map()
   clearAllRecords()
@@ -218,7 +218,7 @@ async function fetchMore(params: { limit: number } = { limit: props.pagination.f
   } catch (error: unknown) {
     console.error(`fetchMore error:`, error)
     if ((isError(error) || isAnyObject(error)) && 'message' in error) {
-      fetchState.value = { error: error.message }
+      fetchState.value = { error: `${error.message}` }
     } else {
       fetchState.value = { error: muiLabel('magnetar table fetch-state error default') }
     }

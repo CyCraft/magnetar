@@ -1,4 +1,4 @@
-import { DocFn } from './Magnetar'
+import { DocFn } from './Magnetar.js'
 import {
   FetchMetaDataCollection,
   MagnetarDeleteAction,
@@ -6,15 +6,15 @@ import {
   MagnetarFetchCountAction,
   MagnetarInsertAction,
   MagnetarStreamAction,
-} from './types/actions'
-import { Query, WhereFilterOp, WhereFilterValue } from './types/clauses'
-import { DeepPropType } from './types/utils/DeepPropType'
-import { DefaultTo } from './types/utils/DefaultTo'
-import { OPathsWithOptional } from './types/utils/Paths'
+} from './types/actions.js'
+import { Query, WhereFilterOp, WhereFilterValue } from './types/clauses.js'
+import { DeepPropType } from './types/utils/DeepPropType.js'
+import { DefaultTo } from './types/utils/DefaultTo.js'
+import { OPathsWithOptional } from './types/utils/Paths.js'
 
 export type CollectionInstance<
-  DocDataType extends Record<string, any> = Record<string, any>,
-  GranularTypes extends { insert: Record<string, any> } = { insert: DocDataType }
+  DocDataType extends { [key: string]: any } = { [key: string]: any },
+  GranularTypes extends { insert: { [key: string]: any } } = { insert: DocDataType },
 > = {
   /**
    * The cached data that was written or read so far
@@ -111,7 +111,7 @@ export type CollectionInstance<
   /**
    * Chainable filter. Returns {@link CollectionInstance} with filter applied.
    */
-  startAfter(docSnapshot: Record<string, any>): CollectionInstance<DocDataType, GranularTypes>
+  startAfter(docSnapshot: { [key: string]: any }): CollectionInstance<DocDataType, GranularTypes>
   startAfter(...fieldValues: unknown[]): CollectionInstance<DocDataType, GranularTypes>
   /**
    * Meta data from the last fetch call

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { splitOnLink } from '../utils/tableHelpers'
+import { splitOnLink } from '../utils/tableHelpers.js'
 
 const props = defineProps<{
   text: string

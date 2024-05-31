@@ -1,6 +1,6 @@
-import { CollectionInstance } from './Collection'
-import { GlobalConfig, ModuleConfig } from './types/config'
-import { DocInstance } from './Doc'
+import { CollectionInstance } from './Collection.js'
+import { DocInstance } from './Doc.js'
+import { GlobalConfig, ModuleConfig } from './types/config.js'
 
 /** Any of the possible collection paths used so far */
 export type CollectionName = string
@@ -8,7 +8,7 @@ export type CollectionName = string
 /**
  * This is the global Magnetar instance that is returned when instantiating with Magnetar()
  */
-export interface MagnetarInstance {
+export type MagnetarInstance = {
   globalConfig: Required<GlobalConfig>
   /**
    * @see {@link CollectionFn}
@@ -75,8 +75,8 @@ export type WriteLock = {
  * @see {@link CollectionInstance}
  */
 export type CollectionFn = <
-  DocDataType extends Record<string, any> = Record<string, any>,
-  GranularTypes extends { insert: Record<string, any> } = { insert: DocDataType }
+  DocDataType extends { [key: string]: any } = { [key: string]: any },
+  GranularTypes extends { insert: { [key: string]: any } } = { insert: DocDataType },
 >(
   idOrPath: string,
   moduleConfig?: ModuleConfig<DocDataType>
@@ -86,9 +86,9 @@ export type CollectionFn = <
  * This is the `doc()` method type.
  * @see {@link DocInstance}
  */
-export type DocFn<DocDataTypeInherited extends Record<string, any> = Record<string, any>> = <
-  DocDataType extends Record<string, any> = DocDataTypeInherited,
-  GranularTypes extends { insert: Record<string, any> } = { insert: DocDataType }
+export type DocFn<DocDataTypeInherited extends { [key: string]: any } = { [key: string]: any }> = <
+  DocDataType extends { [key: string]: any } = DocDataTypeInherited,
+  GranularTypes extends { insert: { [key: string]: any } } = { insert: DocDataType },
 >(
   idOrPath: string,
   moduleConfig?: ModuleConfig<DocDataType>

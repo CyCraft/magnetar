@@ -1,9 +1,10 @@
 import type { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/types'
+import { objGetOrSet } from 'getorset-anything'
 import { isFullString, isNumber } from 'is-what'
-import { MakeRestoreBackup, SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin'
+import { MakeRestoreBackup, SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin.js'
 
 export function insertActionFactory(
-  data: { [collectionPath: string]: Map<string, Record<string, unknown>> },
+  data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
   simpleStoreOptions: SimpleStoreOptions,
   makeBackup?: MakeRestoreBackup
 ): PluginInsertAction {
@@ -13,15 +14,15 @@ export function insertActionFactory(
     docId,
     pluginModuleConfig,
   }: PluginInsertActionPayload<SimpleStoreModuleConfig>): string {
-    const collectionMap = data[collectionPath]
+    const collectionMap = objGetOrSet(data, collectionPath, () => new Map())
 
     const _docId =
       docId ||
-      (isFullString(payload.id)
-        ? payload.id
-        : isNumber(payload.id)
-        ? `${payload.id}`
-        : simpleStoreOptions.generateRandomId())
+      (isFullString(payload['id'])
+        ? payload['id']
+        : isNumber(payload['id'])
+          ? `${payload['id']}`
+          : simpleStoreOptions.generateRandomId())
 
     if (makeBackup) makeBackup(collectionPath, _docId)
 

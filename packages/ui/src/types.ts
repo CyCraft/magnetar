@@ -6,6 +6,7 @@ import type {
   WhereClauseTuple,
   WhereFilterOp,
 } from '@magnetarjs/types'
+import { isFunction } from 'is-what'
 import { Ref } from 'vue'
 
 export type OPaths<T> = OPathsWithOptional<T>
@@ -34,6 +35,11 @@ export type Codable<DataType, ReturnType> = (
   }>
 ) => ReturnType
 
+/** Type Guard for `Codable`, only checks wether or not it's a function at runtime. */
+export function isCodable<T extends Codable<any, any>>(payload: any): payload is T {
+  return isFunction(payload)
+}
+
 /**
  * Gives you the ability to apply classes / styles to rows.
  *
@@ -44,7 +50,7 @@ export type MUIRowMeta = {
   style?: string | Codable<any, string | undefined>
 }
 
-export type MUIButton<T extends Record<string, any>, Label = string> = {
+export type MUIButton<T extends { [key: string]: any }, Label = string> = {
   /** Executed on button click */
   handler: (info: {
     value: any
@@ -82,7 +88,7 @@ export type MUIButton<T extends Record<string, any>, Label = string> = {
   disabled?: boolean | undefined | Codable<T, boolean | undefined>
 }
 
-export type MUIColumn<T extends Record<string, any>, Label = string> = {
+export type MUIColumn<T extends { [key: string]: any }, Label = string> = {
   /**
    * - Defaults to whatever you passed in `fieldPath`.
    * - Pass an empty string if you want to show nothing.
@@ -235,7 +241,7 @@ export type MUIPagination = {
  * - `type: 'text' | 'date' | 'number'`
  *   - not available
  */
-export type MUIFilterOption<T extends Record<string, any>, Label = string> = {
+export type MUIFilterOption<T extends { [key: string]: any }, Label = string> = {
   /**
    * Applied to the option
    * @example 'flex-column'
@@ -254,7 +260,7 @@ export type MUIFilterOption<T extends Record<string, any>, Label = string> = {
   checked?: boolean
 }
 
-export type MUIFilter<T extends Record<string, any>, Label = string> = {
+export type MUIFilter<T extends { [key: string]: any }, Label = string> = {
   /**
    * The filter label, will also be piped through `parseLabel` if you passed it to the table.
    *
@@ -435,7 +441,7 @@ export type MUIFilter<T extends Record<string, any>, Label = string> = {
   initialValue?: string | undefined
 }
 
-export type MUIChartDoughnut<T extends Record<string, any>, Label = string> = {
+export type MUIChartDoughnut<T extends { [key: string]: any }, Label = string> = {
   /**
    * The chart label, will also be piped through `parseLabel` if you passed it to the table.
    *
@@ -474,9 +480,9 @@ export type MUIChartDoughnut<T extends Record<string, any>, Label = string> = {
   suffix?: string | Label
 }
 
-export type MUIChart<T extends Record<string, any>, Label = string> = MUIChartDoughnut<T, Label>
+export type MUIChart<T extends { [key: string]: any }, Label = string> = MUIChartDoughnut<T, Label>
 
-export type MUIRows<T extends Record<string, any>> = T[]
+export type MUIRows<T extends { [key: string]: any }> = T[]
 
 /**
  * - used for filters with `type: 'checkboxes'`.
@@ -565,7 +571,7 @@ export type MUILabel =
   | 'magnetar table previous-next next button'
   | 'magnetar table previous-next end'
 
-export const muiLabelDic: Record<MUILabel, string> = {
+export const muiLabelDic: { [key in MUILabel]: string } = {
   'magnetar table record counts': 'Found Record Counts',
   'magnetar table fetch-state error default': 'An error occured, check the console',
   'magnetar table info counts total': 'total',

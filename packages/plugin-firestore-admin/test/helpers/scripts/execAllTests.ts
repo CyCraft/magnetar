@@ -1,19 +1,13 @@
-import ExecSh from 'exec-sh'
-import { setupTestDatabase } from './setupTestDatabase'
+import { execa } from 'execa'
+import { setupTestDatabase } from './setupTestDatabase.js'
 
-const { promise: ExecShPromise } = ExecSh
-
-function execSh(command: string) {
-  return ExecShPromise(command, { cwd: '../..' })
+try {
+  await setupTestDatabase()
+  await execa({
+    stdout: 'inherit',
+    stdin: 'inherit',
+  })`vitest run --testTimeout 31000`
+  process.exit(0)
+} catch (error) {
+  process.exit(1)
 }
-
-;(async () => {
-  try {
-    await setupTestDatabase()
-    await execSh(`yarn workspace @magnetarjs/plugin-firestore ava`)
-    process.exit(0)
-  } catch (error) {
-    console.error(error)
-    process.exit(1)
-  }
-})()
