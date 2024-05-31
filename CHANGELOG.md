@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v1.0.0
+
+##### ESM Only & Node v18+
+
+- Magnetar is now ESM only. This means you need to use `import` instead of `require`.
+- Magnetar now requires Node v18+.
+
 ## v0.4.0
 
 ##### breaking changes
