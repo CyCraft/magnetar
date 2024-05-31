@@ -6,6 +6,7 @@
 
 - Magnetar is now ESM only. This means you need to use `import` instead of `require`.
 - Magnetar now requires Node v18+.
+- `@magnetarjs/plugin-vue2` was removed.
 
 ## v0.4.0
 
