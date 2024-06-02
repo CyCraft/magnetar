@@ -161,7 +161,7 @@ The Firestore JS SDK has a [built-in feature for realtime updates](https://fireb
 - You need to write a lot of code to capture the documents that comes in and save them in local cache
 - You need to organize where and how to temporarily save the function you get back to stop the stream
 
-Magnetar's Firestore Plugin uses `onSnapshot` [under the hood](https://github.com/CyCraft/magnetar/blob/production/packages/plugin-firestore/src/actions/stream.ts) but does these things for you:
+Magnetar's Firestore Plugin uses `onSnapshot` [under the hood](https://github.com/CyCraft/magnetar/blob/main/packages/plugin-firestore/src/actions/stream.ts) but does these things for you:
 
 - The syntax is super clean. It's just `.stream()`
 - A stream cannot be opened twice on accident, the already open stream will be returned in case you open it again
