@@ -3,7 +3,9 @@ import {
   MagnetarDeleteAction,
   MagnetarDeletePropAction,
   MagnetarFetchAction,
+  MagnetarFetchAverageAction,
   MagnetarFetchCountAction,
+  MagnetarFetchSumAction,
   MagnetarInsertAction,
   MagnetarStreamAction,
   MagnetarWriteAction,
@@ -18,12 +20,16 @@ export type ActionTernary<TActionName extends ActionName> = TActionName extends 
   ? MagnetarStreamAction
   : TActionName extends 'fetchCount'
     ? MagnetarFetchCountAction
-    : TActionName extends 'fetch'
-      ? MagnetarFetchAction
-      : TActionName extends 'delete'
-        ? MagnetarDeleteAction
-        : TActionName extends 'deleteProp'
-          ? MagnetarDeletePropAction
-          : TActionName extends 'insert'
-            ? MagnetarInsertAction
-            : MagnetarWriteAction
+    : TActionName extends 'fetchSum'
+      ? MagnetarFetchSumAction
+      : TActionName extends 'fetchAverage'
+        ? MagnetarFetchAverageAction
+        : TActionName extends 'fetch'
+          ? MagnetarFetchAction
+          : TActionName extends 'delete'
+            ? MagnetarDeleteAction
+            : TActionName extends 'deleteProp'
+              ? MagnetarDeletePropAction
+              : TActionName extends 'insert'
+                ? MagnetarInsertAction
+                : MagnetarWriteAction

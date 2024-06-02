@@ -27,8 +27,10 @@ export type MagnetarPlugin<PluginOptions> = (pluginOptions: PluginOptions) => Pl
  */
 export type PluginInstance = {
   actions: {
-    fetchCount?: PluginFetchCountAction
     fetch?: PluginFetchAction
+    fetchCount?: PluginFetchCountAction
+    fetchSum?: PluginFetchAggregateAction
+    fetchAverage?: PluginFetchAggregateAction
     stream?: PluginStreamAction
     insert?: PluginInsertAction
     merge?: PluginWriteAction
@@ -49,18 +51,25 @@ export type PluginInstance = {
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's `.data` is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
    */
   getModuleData?: (
-    pluginModuleSetupPayload: PluginModuleSetupPayload
+    pluginModuleSetupPayload: PluginModuleSetupPayload,
   ) => { [key: string]: any } | Map<string, { [key: string]: any }>
   /**
    * This must be provided by Store Plugins that have "local" data. It should signify wether or not the document exists. Must return `undefined` when not sure (if the document was never fetched). It is triggered EVERY TIME the module's `.data` is accessed.
    */
   getModuleExists?: (
-    pluginModuleSetupPayload: Pick<PluginModuleSetupPayload, 'collectionPath' | 'docId'>
+    pluginModuleSetupPayload: Pick<PluginModuleSetupPayload, 'collectionPath' | 'docId'>,
   ) => undefined | 'error' | boolean
   /**
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's `.count` is accessed. The `modulePath` will always be that of a "collection". It must return the fetched doc count, or fall back to `.data.size` in case it hasn't fetched the doc count yet.
    */
   getModuleCount?: (pluginModuleSetupPayload: Omit<PluginModuleSetupPayload, 'docId'>) => number
+  /**
+   * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's `.count` is accessed. The `modulePath` will always be that of a "collection". It must return the fetched doc sum/average for the fields requested so far
+   */
+  getModuleAggregate?: (
+    kind: 'sum' | 'average',
+    pluginModuleSetupPayload: Omit<PluginModuleSetupPayload, 'docId'>,
+  ) => { [key in string]: number | { [key in string]: unknown } }
   /**
    * This is an optional function that some "remote" Store Plugins can provide to sync any pending writes that might have stacked because of a `syncDebounceMs`.
    */
@@ -133,7 +142,7 @@ export type PluginStreamActionPayload<SpecificPluginModuleConfig = PluginModuleC
  * Should handle 'stream' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc). Should return `StreamResponse` when acting as a "remote" Store Plugin, and `DoOnStream` when acting as "local" Store Plugin.
  */
 export type PluginStreamAction = (
-  payload: PluginStreamActionPayload
+  payload: PluginStreamActionPayload,
 ) => StreamResponse | DoOnStream | Promise<StreamResponse | DoOnStream>
 
 export type PluginFetchActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = MergeDeep<
@@ -150,7 +159,7 @@ export type PluginFetchActionPayload<SpecificPluginModuleConfig = PluginModuleCo
  * Should handle 'fetch' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc). Should return `FetchResponse` when acting as a "remote" Store Plugin, and `DoOnFetch` when acting as "local" Store Plugin.
  */
 export type PluginFetchAction = (
-  payload: PluginFetchActionPayload
+  payload: PluginFetchActionPayload,
 ) => FetchResponse | DoOnFetch | Promise<FetchResponse | DoOnFetch>
 
 export type PluginFetchCountActionPayload<T = PluginModuleConfig> = Omit<
@@ -159,11 +168,35 @@ export type PluginFetchCountActionPayload<T = PluginModuleConfig> = Omit<
 >
 
 /**
- * Should handle 'fetchCount' for collections. Should return `FetchCountResponse` when acting as a "remote" Store Plugin, and `DoOnFetchCount` when acting as "local" Store Plugin.
+ * Should handle 'fetchCount' for collections. Should return `FetchAggregateResponse` when acting as a "remote" Store Plugin, and `DoOnFetchAggregate` when acting as "local" Store Plugin.
  */
 export type PluginFetchCountAction = (
-  payload: PluginFetchCountActionPayload
-) => FetchCountResponse | DoOnFetchCount | Promise<FetchCountResponse | DoOnFetchCount>
+  payload: PluginFetchCountActionPayload,
+) =>
+  | FetchAggregateResponse
+  | DoOnFetchAggregate
+  | Promise<FetchAggregateResponse | DoOnFetchAggregate>
+
+export type PluginFetchAggregateActionPayload<T = PluginModuleConfig> = Omit<
+  MergeDeep<
+    PluginActionPayloadBase<T>,
+    {
+      /** The target fieldPath */
+      payload: string
+    }
+  >,
+  'docId'
+>
+
+/**
+ * Should handle 'fetchSum' 'fetchAverage' for collections. Should return `FetchAggregateResponse` when acting as a "remote" Store Plugin, and `DoOnFetchAggregate` when acting as "local" Store Plugin.
+ */
+export type PluginFetchAggregateAction = (
+  payload: PluginFetchAggregateActionPayload,
+) =>
+  | FetchAggregateResponse
+  | DoOnFetchAggregate
+  | Promise<FetchAggregateResponse | DoOnFetchAggregate>
 
 export type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = MergeDeep<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
@@ -182,7 +215,7 @@ export type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleCo
  *   - `SyncBatch` If the plugin batches multiple write actions together, it will return the sync batch information
  */
 export type PluginWriteAction = (
-  payload: PluginWriteActionPayload
+  payload: PluginWriteActionPayload,
 ) => undefined | Promise<undefined | SyncBatch>
 
 export type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = MergeDeep<
@@ -202,7 +235,7 @@ export type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleC
  *   - `[string, SyncBatch]` if the plugin batches multiple write actions together — (1) the new document's ID (2) the sync batch information
  */
 export type PluginInsertAction = (
-  payload: PluginInsertActionPayload
+  payload: PluginInsertActionPayload,
 ) => string | Promise<string | [string, SyncBatch]>
 
 export type PluginDeletePropActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> =
@@ -227,7 +260,7 @@ export type PluginDeletePropActionPayload<SpecificPluginModuleConfig = PluginMod
  *   - `SyncBatch` If the plugin batches multiple write actions together, it will return the sync batch information
  */
 export type PluginDeletePropAction = (
-  payload: PluginDeletePropActionPayload
+  payload: PluginDeletePropActionPayload,
 ) => undefined | Promise<undefined | SyncBatch>
 
 export type PluginDeleteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = MergeDeep<
@@ -247,7 +280,7 @@ export type PluginDeleteActionPayload<SpecificPluginModuleConfig = PluginModuleC
  *   - `SyncBatch` If the plugin batches multiple write actions together, it will return the sync batch information
  */
 export type PluginDeleteAction = (
-  payload: PluginDeleteActionPayload
+  payload: PluginDeleteActionPayload,
 ) => undefined | Promise<undefined | SyncBatch>
 
 export type PluginRevertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = MergeDeep<
@@ -357,14 +390,14 @@ export type FetchResponse = {
  */
 export type DoOnFetch = (
   docData: { [key: string]: unknown } | undefined,
-  docMetadata: DocMetadata | 'error'
+  docMetadata: DocMetadata | 'error',
 ) => { [key: string]: unknown } | undefined
 
 /**
  * The remote store should document count after retrieving it from the server
  */
-export type FetchCountResponse = { count: number }
+export type FetchAggregateResponse = number
 /**
  * The local store should provide a function that will store the fetchCount when it comes in from the remote store.
  */
-export type DoOnFetchCount = (payload: FetchCountResponse) => undefined
+export type DoOnFetchAggregate = (payload: FetchAggregateResponse) => undefined

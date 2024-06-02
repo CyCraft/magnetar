@@ -1,6 +1,6 @@
 import type {
-  DoOnFetchCount,
-  FetchCountResponse,
+  DoOnFetchAggregate,
+  FetchAggregateResponse,
   PathWhereIdentifier,
   PluginFetchCountAction,
   PluginFetchCountActionPayload,
@@ -10,21 +10,23 @@ import { SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin.js'
 
 export function fetchCountActionFactory(
   pathCountDic: { [collectionPath in PathWhereIdentifier]?: number },
-  simpleStoreOptions: SimpleStoreOptions
+  simpleStoreOptions: SimpleStoreOptions,
 ): PluginFetchCountAction {
   return function ({
     collectionPath,
     actionConfig,
     pluginModuleConfig,
-  }: PluginFetchCountActionPayload<SimpleStoreModuleConfig>): FetchCountResponse | DoOnFetchCount {
+  }: PluginFetchCountActionPayload<SimpleStoreModuleConfig>):
+    | FetchAggregateResponse
+    | DoOnFetchAggregate {
     const pathId = getPathWhereIdentifier(collectionPath, pluginModuleConfig)
 
-    const doOnFetchCountAction: DoOnFetchCount = ({ count }) => {
+    const doOnFetchAggregateAction: DoOnFetchAggregate = (count) => {
       // abort updating local state if the payload was set to undefined
       if (count === undefined) return
 
       pathCountDic[pathId] = count
     }
-    return doOnFetchCountAction
+    return doOnFetchAggregateAction
   }
 }

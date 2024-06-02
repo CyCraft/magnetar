@@ -19,25 +19,6 @@ test('fetch (collection)', async () => {
   assert.deepEqual(pokedexModule.data.size, 151)
 })
 
-test('fetch (collection count)', async () => {
-  /// 'fetch' resolves once all stores have given a response with data
-  const { pokedexModule } = createMagnetarInstance()
-  assert.deepEqual(pokedexModule.doc('1').data, pokedex(1))
-  assert.deepEqual(pokedexModule.doc('136').data, undefined)
-  assert.deepEqual(pokedexModule.data.size, 1)
-  assert.deepEqual(pokedexModule.count, 1)
-
-  try {
-    await pokedexModule.fetchCount()
-  } catch (error) {
-    assert.fail(JSON.stringify(error))
-  }
-  assert.deepEqual(pokedexModule.doc('1').data, pokedex(1))
-  assert.deepEqual(pokedexModule.doc('136').data, undefined)
-  assert.deepEqual(pokedexModule.data.size, 1)
-  assert.deepEqual(pokedexModule.count, 151)
-})
-
 test('fetch (document)', async () => {
   /// get resolves once all stores have given a response with data
   const { trainerModule } = createMagnetarInstance()

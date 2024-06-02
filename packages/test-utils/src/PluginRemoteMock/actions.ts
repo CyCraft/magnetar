@@ -1,9 +1,9 @@
 import type {
   Clauses,
   DoOnFetch,
-  DoOnFetchCount,
+  DoOnFetchAggregate,
   DoOnStream,
-  FetchCountResponse,
+  FetchAggregateResponse,
   FetchResponse,
   PluginDeleteAction,
   PluginDeleteActionPayload,
@@ -11,6 +11,8 @@ import type {
   PluginDeletePropActionPayload,
   PluginFetchAction,
   PluginFetchActionPayload,
+  PluginFetchAggregateAction,
+  PluginFetchAggregateActionPayload,
   PluginFetchCountAction,
   PluginFetchCountActionPayload,
   PluginInsertAction,
@@ -26,12 +28,13 @@ import type {
 import { filterDataPerClauses } from '@magnetarjs/utils'
 import { pick } from 'filter-anything'
 import { isFullArray, isFullString, isNumber, isPromise } from 'is-what'
+import { getProp } from 'path-to-prop'
 import { generateRandomId, pokedexMap, throwIfEmulatedError, waitMs } from '../helpers/index.js'
 import { RemoteStoreOptions, StorePluginModuleConfig } from './index.js'
 
 export function writeActionFactory(
   storePluginOptions: RemoteStoreOptions,
-  actionName: 'merge' | 'assign' | 'replace'
+  actionName: 'merge' | 'assign' | 'replace',
 ): PluginWriteAction {
   return async function ({
     payload,
@@ -70,7 +73,7 @@ export function insertActionFactory(storePluginOptions: RemoteStoreOptions): Plu
 }
 
 export function deletePropActionFactory(
-  storePluginOptions: RemoteStoreOptions
+  storePluginOptions: RemoteStoreOptions,
 ): PluginDeletePropAction {
   return async function ({
     payload,
@@ -106,7 +109,7 @@ export function deleteActionFactory(storePluginOptions: RemoteStoreOptions): Plu
 function mockDataRetrieval(
   collectionPath: string | undefined,
   docId: string | undefined,
-  pluginModuleConfig: StorePluginModuleConfig
+  pluginModuleConfig: StorePluginModuleConfig,
 ): { [key: string]: unknown }[] {
   if (docId === 'trainer') return [{ name: 'Luca', age: 10, dream: 'job' }]
 
@@ -167,13 +170,13 @@ export function fetchActionFactory(storePluginOptions: RemoteStoreOptions): Plug
 }
 
 export function fetchCountActionFactory(
-  storePluginOptions: RemoteStoreOptions
+  storePluginOptions: RemoteStoreOptions,
 ): PluginFetchCountAction {
   return async function ({
     collectionPath,
     pluginModuleConfig,
   }: PluginFetchCountActionPayload<StorePluginModuleConfig>): Promise<
-    DoOnFetchCount | FetchCountResponse
+    DoOnFetchAggregate | FetchAggregateResponse
   > {
     // this is custom logic to be implemented by the plugin author
 
@@ -184,7 +187,44 @@ export function fetchCountActionFactory(
       setTimeout(() => {
         // this mocks an error during execution
         const dataRetrieved = mockDataRetrieval(collectionPath, undefined, pluginModuleConfig)
-        resolve({ count: dataRetrieved.length })
+        resolve(dataRetrieved.length)
+      }, 1)
+    })
+  }
+}
+
+export function fetchAggregateActionFactory(
+  kind: 'sum' | 'average',
+  storePluginOptions: RemoteStoreOptions,
+): PluginFetchAggregateAction {
+  return async function ({
+    payload,
+    collectionPath,
+    pluginModuleConfig,
+  }: PluginFetchAggregateActionPayload<StorePluginModuleConfig>): Promise<
+    DoOnFetchAggregate | FetchAggregateResponse
+  > {
+    // this is custom logic to be implemented by the plugin author
+
+    // this mocks an error during execution
+    // throwIfEmulatedError(payload, storePluginOptions)
+    // fetch from cache/or from a remote store with logic you implement here
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        // this mocks an error during execution
+        const dataRetrieved = mockDataRetrieval(collectionPath, undefined, pluginModuleConfig)
+        const total = dataRetrieved.reduce((total, obj) => {
+          const value = getProp(obj, payload)
+          if (!isNumber(value)) return total
+          return total + value
+        }, 0)
+        if (kind === 'sum') {
+          resolve(total)
+        } else if (kind === 'average') {
+          resolve(total / dataRetrieved.length)
+        } else {
+          resolve(NaN)
+        }
       }, 1)
     })
   }

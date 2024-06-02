@@ -3,14 +3,18 @@ import {
   FetchMetaDataCollection,
   MagnetarDeleteAction,
   MagnetarFetchAction,
+  MagnetarFetchAverageAction,
   MagnetarFetchCountAction,
+  MagnetarFetchSumAction,
   MagnetarInsertAction,
   MagnetarStreamAction,
 } from './types/actions.js'
 import { Query, WhereFilterOp, WhereFilterValue } from './types/clauses.js'
 import { DeepPropType } from './types/utils/DeepPropType.js'
 import { DefaultTo } from './types/utils/DefaultTo.js'
+import { PartialDeep } from './types/utils/PartialDeep.js'
 import { OPathsWithOptional } from './types/utils/Paths.js'
+import { PickNumbers } from './types/utils/PickNumbers.js'
 
 export type CollectionInstance<
   DocDataType extends { [key: string]: any } = { [key: string]: any },
@@ -24,6 +28,14 @@ export type CollectionInstance<
    * Represents `data.size` of your collection, however, calling `fetchCount()` will update just this `count`, from where on it will no longer be linked to `data.size`.
    */
   count: number
+  /**
+   * Holds the fetched "sum" of the fields on which you called `fetchSum()` so far. This only gets updated when `fetchSum` is called, it is not automatically updated when local `data` changes.
+   */
+  sum: PartialDeep<PickNumbers<DocDataType>>
+  /**
+   * Holds the fetched "average" of the fields on which you called `fetchAverage()` so far. This only gets updated when `fetchAverage` is called, it is not automatically updated when local `data` changes.
+   */
+  average: PartialDeep<PickNumbers<DocDataType>>
   /**
    * `doc` is available on every collection for chaining
    * @see {@link DocFn}
@@ -68,6 +80,14 @@ export type CollectionInstance<
    */
   fetchCount: MagnetarFetchCountAction
   /**
+   * @see {@link MagnetarFetchSumAction}
+   */
+  fetchSum: MagnetarFetchSumAction<DocDataType>
+  /**
+   * @see {@link MagnetarFetchAverageAction}
+   */
+  fetchAverage: MagnetarFetchAverageAction<DocDataType>
+  /**
    * @see {@link MagnetarFetchAction}
    */
   fetch: MagnetarFetchAction<DocDataType, 'collection'>
@@ -90,7 +110,7 @@ export type CollectionInstance<
    */
   orderBy: (
     fieldPath: OPathsWithOptional<DocDataType>,
-    direction?: 'asc' | 'desc'
+    direction?: 'asc' | 'desc',
   ) => CollectionInstance<DocDataType, GranularTypes>
   /**
    * Chainable filter. Returns {@link CollectionInstance} with filter applied.
@@ -102,7 +122,7 @@ export type CollectionInstance<
   where: <Path extends OPathsWithOptional<DocDataType>, WhereOp extends WhereFilterOp>(
     fieldPath: Path,
     operator: WhereOp,
-    value: WhereFilterValue<WhereOp, DefaultTo<DeepPropType<DocDataType, Path>, any>>
+    value: WhereFilterValue<WhereOp, DefaultTo<DeepPropType<DocDataType, Path>, any>>,
   ) => CollectionInstance<DocDataType, GranularTypes>
   /**
    * Chainable filter. Returns {@link CollectionInstance} with filter applied.

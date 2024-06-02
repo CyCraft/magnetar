@@ -3,8 +3,8 @@ import { MakeRestoreBackup, Vue3StoreModuleConfig, Vue3StoreOptions } from '../C
 
 export function revertActionFactory(
   data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
-  Vue3StoreOptions: Vue3StoreOptions,
-  restoreBackup: MakeRestoreBackup
+  vue3StoreOptions: Vue3StoreOptions,
+  restoreBackup: MakeRestoreBackup,
 ): PluginRevertAction {
   return function ({
     payload,

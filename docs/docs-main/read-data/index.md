@@ -99,11 +99,47 @@ pokedex.fetch({ force: true })
 You can fetch and immediately return a document's data. This is optimistic by default — meaning it will only make an API call once and otherwise return the _already fetched data_. Add the `force` option to force multiple fetch calls.
 
 ```js
-// this will only fetch the data once, and from there on always return the same data:
-const bulbasaurData = await magnetar.doc('pokedex/001').fetch()
+// this will only fetch the data once, and from there on always return the already fetched data:
+const bulbasaurData = await magnetar.collection('pokedex').doc('001').fetch()
 
 // every time this is executed, it will (re)fetch and return the data:
-const bulbasaurData = await magnetar.doc('pokedex/001').fetch({ force: true })
+const bulbasaurData = await magnetar.collection('pokedex').doc('001').fetch({ force: true })
+
+// after fetching the data is also available at `.data`:
+magnetar.collection('pokedex').doc('001').data
+```
+
+### Fetch Collection Count
+
+You can also fetch the count of documents in a collection:
+
+```js
+const count = await magnetar.collection('pokedex').fetchCount() // 151
+
+// after fetching, the count is also available at `.count`:
+magnetar.collection('pokedex').count // 151
+```
+
+### Fetch the Sum of a field
+
+You can also fetch the sum of a field in a collection:
+
+```js
+const sum = await magnetar.collection('pokedex').fetchSum('base.HP') // 9696
+
+// after fetching, the sum is also available at `.sum`:
+magnetar.collection('pokedex').sum // { base: { HP: 9696 } }
+```
+
+### Fetch an Average of a field
+
+You can also fetch the average of a field in a collection:
+
+```js
+const average = await magnetar.collection('pokedex').fetchSum('base.HP') // 64.2
+
+// after fetching, the average is also available at `.average`:
+magnetar.collection('pokedex').average // { base: { HP: 64.2 } }
 ```
 
 ## Stream Realtime Updates

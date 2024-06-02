@@ -6,7 +6,7 @@ import { PartialDeep } from './utils/PartialDeep.js'
  */
 export type OnAddedFn<DocDataType extends { [key: string]: any } = { [key: string]: any }> = (
   docData: PartialDeep<DocDataType>,
-  docMetadata: DocMetadata
+  docMetadata: DocMetadata,
 ) => DocDataType | undefined
 
 /**
@@ -14,7 +14,7 @@ export type OnAddedFn<DocDataType extends { [key: string]: any } = { [key: strin
  */
 export type OnModifiedFn<DocDataType extends { [key: string]: any } = { [key: string]: any }> = (
   docData: PartialDeep<DocDataType>,
-  docMetadata: DocMetadata
+  docMetadata: DocMetadata,
 ) => PartialDeep<DocDataType> | undefined
 
 /**
@@ -22,7 +22,7 @@ export type OnModifiedFn<DocDataType extends { [key: string]: any } = { [key: st
  */
 export type OnRemovedFn = (
   docData: { [key: string]: any } | string | undefined,
-  docMetadata: DocMetadata
+  docMetadata: DocMetadata,
 ) => { [key: string]: any } | string | undefined
 
 /**

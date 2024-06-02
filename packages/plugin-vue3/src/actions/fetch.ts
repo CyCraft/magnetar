@@ -14,7 +14,7 @@ import { insertActionFactory } from './insert.js'
 export function fetchActionFactory(
   data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
   exists: { [docPath: string]: undefined | 'error' | boolean },
-  Vue3StoreOptions: Vue3StoreOptions
+  vue3StoreOptions: Vue3StoreOptions,
 ): PluginFetchAction {
   return function ({
     payload,
@@ -97,7 +97,7 @@ export function fetchActionFactory(
 
       insertActionFactory(
         data,
-        Vue3StoreOptions
+        vue3StoreOptions,
       )({
         payload: _payload,
         collectionPath,

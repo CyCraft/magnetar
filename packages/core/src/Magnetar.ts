@@ -82,7 +82,7 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     moduleConfig: ModuleConfig = {},
     moduleType: 'doc' | 'collection',
     docFn: DocFn,
-    collectionFn: CollectionFn
+    collectionFn: CollectionFn,
   ): CollectionInstance | DocInstance {
     throwIfInvalidModulePath(modulePath, moduleType)
 
@@ -95,7 +95,12 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     const fetchPromises = mapGetOrSet(
       fetchPromiseMap,
       pathFilterIdentifier,
-      (): FetchPromises => ({ fetch: new Map(), fetchCount: new Map() })
+      (): FetchPromises => ({
+        fetch: new Map(),
+        fetchCount: new Map(),
+        fetchSum: new Map(),
+        fetchAverage: new Map(),
+      }),
     )
     // Create the FetchMeta helpers for this module
     const pathWhereOrderByIdentifier = getPathWhereOrderByIdentifier(modulePath, moduleConfig)
@@ -112,7 +117,7 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
     // grab the stream related functions
     function cacheStream(
       closeStreamFn: () => void,
-      streamingPromise: Promise<void> | null
+      streamingPromise: Promise<void> | null,
     ): undefined {
       closeStreamFnMap.set(pathFilterIdentifier, closeStreamFn)
       streamingPromiseMap.set(pathFilterIdentifier, streamingPromise)
@@ -156,7 +161,7 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
         globalConfig,
         docFn,
         collectionFn,
-        streamAndFetchPromises
+        streamAndFetchPromises,
       )
     }
 
@@ -167,7 +172,7 @@ export function Magnetar(magnetarConfig: GlobalConfig): MagnetarInstance {
       docFn,
       collectionFn,
       streamAndFetchPromises,
-      fetchMeta
+      fetchMeta,
     )
   }
 

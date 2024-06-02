@@ -6,8 +6,8 @@ import { MakeRestoreBackup, Vue3StoreModuleConfig, Vue3StoreOptions } from '../C
 
 export function deletePropActionFactory(
   data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
-  Vue3StoreOptions: Vue3StoreOptions,
-  makeBackup?: MakeRestoreBackup
+  vue3StoreOptions: Vue3StoreOptions,
+  makeBackup?: MakeRestoreBackup,
 ): PluginDeletePropAction {
   return function ({
     payload,

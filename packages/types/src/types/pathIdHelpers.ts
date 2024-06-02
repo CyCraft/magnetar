@@ -15,7 +15,7 @@ export enum PathFilterIdentifier {
  */
 export function getPathFilterIdentifier(
   modulePath: string,
-  moduleConfig: ModuleConfig
+  moduleConfig: ModuleConfig,
 ): PathFilterIdentifier {
   const { query, where, orderBy, startAfter, limit } = moduleConfig
   const config = JSON.stringify({ query, where, orderBy, startAfter, limit })
@@ -36,7 +36,7 @@ export enum PathWhereOrderByIdentifier {
  */
 export function getPathWhereOrderByIdentifier(
   modulePath: string,
-  moduleConfig: ModuleConfig
+  moduleConfig: ModuleConfig,
 ): PathWhereOrderByIdentifier {
   const { query, where, orderBy } = moduleConfig
   const config = JSON.stringify({ query, where, orderBy })
@@ -57,7 +57,7 @@ export enum PathWhereIdentifier {
  */
 export function getPathWhereIdentifier(
   modulePath: string,
-  moduleConfig: ModuleConfig
+  moduleConfig: ModuleConfig,
 ): PathWhereIdentifier {
   const { query, where, orderBy } = moduleConfig
   const config = JSON.stringify({ query, where, orderBy })

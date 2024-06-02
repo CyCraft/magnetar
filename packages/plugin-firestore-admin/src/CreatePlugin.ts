@@ -4,6 +4,7 @@ import type { Firestore } from 'firebase-admin/firestore'
 import { deleteActionFactory } from './actions/delete.js'
 import { deletePropActionFactory } from './actions/deleteProp.js'
 import { fetchActionFactory } from './actions/fetch.js'
+import { fetchAggregateActionFactory } from './actions/fetchAggregate.js'
 import { fetchCountActionFactory } from './actions/fetchCount.js'
 import { insertActionFactory } from './actions/insert.js'
 import { writeActionFactory } from './actions/mergeAssignReplace.js'
@@ -14,7 +15,7 @@ export type FirestoreAdminPluginOptions = FirestorePluginOptions<Firestore>
 export type { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'
 
 function firestorePluginOptionsWithDefaults(
-  firestorePluginOptions: FirestoreAdminPluginOptions
+  firestorePluginOptions: FirestoreAdminPluginOptions,
 ): Required<FirestoreAdminPluginOptions> {
   return {
     syncDebounceMs: 1000,
@@ -48,7 +49,7 @@ export type BatchSyncMap = Map<string, BatchSync>
  * ```
  */
 export const CreatePlugin: MagnetarPlugin<FirestoreAdminPluginOptions> = (
-  firestorePluginOptions: FirestoreAdminPluginOptions
+  firestorePluginOptions: FirestoreAdminPluginOptions,
 ): PluginInstance => {
   const pluginOptions = firestorePluginOptionsWithDefaults(firestorePluginOptions)
 
@@ -66,6 +67,8 @@ export const CreatePlugin: MagnetarPlugin<FirestoreAdminPluginOptions> = (
   // the plugin must try to implement logic for every `ActionName`
   const fetch = fetchActionFactory(pluginOptions)
   const fetchCount = fetchCountActionFactory(pluginOptions)
+  const fetchSum = fetchAggregateActionFactory('sum', pluginOptions)
+  const fetchAverage = fetchAggregateActionFactory('average', pluginOptions)
   const stream = streamActionFactory(pluginOptions)
   const insert = insertActionFactory(batchSyncMap, pluginOptions)
   const _merge = writeActionFactory(batchSyncMap, pluginOptions, 'merge')
@@ -77,6 +80,8 @@ export const CreatePlugin: MagnetarPlugin<FirestoreAdminPluginOptions> = (
   const actions = {
     fetch,
     fetchCount,
+    fetchSum,
+    fetchAverage,
     stream,
     insert,
     merge: _merge,
