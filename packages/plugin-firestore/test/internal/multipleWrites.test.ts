@@ -541,7 +541,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
 }
 {
   const testName = 'multiple writes (insert → delete) to the same record'
-  test.only(testName, async () => {
+  test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName)
     await firestoreDeepEqual(testName, 'pokedex/1', undefined)
     assert.deepEqual(pokedexModule.doc('1').data, undefined)
