@@ -35,7 +35,7 @@ export type MagnetarInstance = {
      * magnetar.clearAllData({ exclude: ['users'] })
      * ```
      */
-    options?: { exclude?: CollectionName[] }
+    options?: { exclude?: CollectionName[] },
   ) => Promise<void>
   /**
    * Close all streams of the entire Magnetar instance
@@ -54,7 +54,7 @@ export type MagnetarInstance = {
      * magnetar.closeAllStreams({ exclude: ['users'] })
      * ```
      */
-    options?: { exclude?: CollectionName[] }
+    options?: { exclude?: CollectionName[] },
   ) => Promise<void>
 }
 
@@ -79,7 +79,7 @@ export type CollectionFn = <
   GranularTypes extends { insert: { [key: string]: any } } = { insert: DocDataType },
 >(
   idOrPath: string,
-  moduleConfig?: ModuleConfig<DocDataType>
+  moduleConfig?: ModuleConfig<DocDataType>,
 ) => CollectionInstance<DocDataType, GranularTypes>
 
 /**
@@ -91,5 +91,5 @@ export type DocFn<DocDataTypeInherited extends { [key: string]: any } = { [key: 
   GranularTypes extends { insert: { [key: string]: any } } = { insert: DocDataType },
 >(
   idOrPath: string,
-  moduleConfig?: ModuleConfig<DocDataType>
+  moduleConfig?: ModuleConfig<DocDataType>,
 ) => DocInstance<DocDataType, GranularTypes>
