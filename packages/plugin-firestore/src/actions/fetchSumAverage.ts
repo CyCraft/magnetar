@@ -28,7 +28,7 @@ export function fetchSumAverageActionFactory(
     const querySnapshot = await getAggregateFromServer(query, {
       TEMP_FIELD_NAME: kind === 'sum' ? sum(payload) : average(payload),
     })
-    const count = querySnapshot.data()['TEMP_FIELD_NAME']
-    return count
+    const result = querySnapshot.data()['TEMP_FIELD_NAME']
+    return result
   }
 }
