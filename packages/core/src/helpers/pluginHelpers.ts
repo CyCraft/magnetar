@@ -32,7 +32,7 @@ export function isDoOnFetchAggregate(payload: any): payload is DoOnFetchAggregat
  * FetchResponse type guard
  */
 export function isFetchAggregateResponse(payload: any): payload is FetchAggregateResponse {
-  return isPlainObject(payload) && isNumber(payload['count'])
+  return isNumber(payload)
 }
 
 /**
