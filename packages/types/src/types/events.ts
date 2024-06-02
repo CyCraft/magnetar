@@ -75,15 +75,15 @@ type EventPayloadPropResult = {
 export type EventFnBefore = (args: EventSharedPayload) => void | Promise<void>
 
 export type EventFnSuccess = (
-  args: MergeDeep<EventSharedPayload, EventPayloadPropResult>
+  args: MergeDeep<EventSharedPayload, EventPayloadPropResult>,
 ) => void | Promise<void>
 
 export type EventFnError = (
-  args: MergeDeep<EventSharedPayload, { error: any }>
+  args: MergeDeep<EventSharedPayload, { error: any }>,
 ) => void | Promise<void>
 
 export type EventFnRevert = (
-  args: MergeDeep<Omit<EventSharedPayload, 'abort'>, { result: unknown }>
+  args: MergeDeep<Omit<EventSharedPayload, 'abort'>, { result: unknown }>,
 ) => void | Promise<void>
 
 export type EventFn = EventFnBefore | EventFnSuccess | EventFnError | EventFnRevert

@@ -17,7 +17,7 @@ export type ModifyDeletePropPayload = (payload: string | string[]) => string | s
  */
 export type ModifyReadPayload = (
   payload: { [key: string]: any } | undefined,
-  docId?: string | undefined
+  docId?: string | undefined,
 ) => { [key: string]: any } | undefined
 
 /**
