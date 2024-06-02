@@ -5,13 +5,15 @@ import type {
   CollectionFn,
   DocFn,
   DoOnFetch,
-  DoOnFetchCount,
+  DoOnFetchAggregate,
   FetchMetaDataCollection,
   FetchPromises,
   FetchResponse,
   GlobalConfig,
   MagnetarFetchAction,
+  MagnetarFetchAverageAction,
   MagnetarFetchCountAction,
+  MagnetarFetchSumAction,
   ModuleConfig,
   OnAddedFn,
   SyncBatch,
@@ -26,8 +28,8 @@ import { getPluginModuleConfig } from '../helpers/moduleHelpers.js'
 import { getCollectionWriteLocks } from '../helpers/pathHelpers.js'
 import {
   isDoOnFetch,
-  isDoOnFetchCount,
-  isFetchCountResponse,
+  isDoOnFetchAggregate,
+  isFetchAggregateResponse,
   isFetchResponse,
 } from '../helpers/pluginHelpers.js'
 import { throwIfNoFnsToExecute } from '../helpers/throwFns.js'
@@ -46,12 +48,16 @@ export type HandleFetchPerStoreParams = {
 }
 
 export function handleFetchPerStore<
-  TActionName extends Extract<ActionName, 'fetch' | 'fetchCount'>,
+  TActionName extends Extract<ActionName, 'fetch' | 'fetchCount' | 'fetchSum' | 'fetchAverage'>,
 >(sharedParams: HandleFetchPerStoreParams, actionName: TActionName): ActionTernary<TActionName>
 export function handleFetchPerStore(
   sharedParams: HandleFetchPerStoreParams,
-  actionName: Extract<ActionName, 'fetch' | 'fetchCount'>
-): MagnetarFetchCountAction | MagnetarFetchAction<any> {
+  actionName: Extract<ActionName, 'fetch' | 'fetchCount' | 'fetchSum' | 'fetchAverage'>,
+):
+  | MagnetarFetchAction<any>
+  | MagnetarFetchCountAction
+  | MagnetarFetchSumAction<any>
+  | MagnetarFetchAverageAction<any> {
   const { collectionPath, _docId, moduleConfig, globalConfig, fetchPromises, writeLockMap, docFn, collectionFn, setLastFetched } = sharedParams // prettier-ignore
 
   // returns the action the dev can call with myModule.insert() etc.
@@ -92,17 +98,17 @@ export function handleFetchPerStore(
         const modifyPayloadFnsMap = getModifyPayloadFnsMap(
           globalConfig.modifyPayloadOn,
           moduleConfig.modifyPayloadOn,
-          actionConfig.modifyPayloadOn
+          actionConfig.modifyPayloadOn,
         )
         const modifyReadResponseMap = getModifyReadResponseFnsMap(
           globalConfig.modifyReadResponseOn,
           moduleConfig.modifyReadResponseOn,
-          actionConfig.modifyReadResponseOn
+          actionConfig.modifyReadResponseOn,
         )
         const eventNameFnsMap = getEventNameFnsMap(
           globalConfig.on,
           moduleConfig.on,
-          actionConfig.on
+          actionConfig.on,
         )
         const storesToExecute: string[] =
           actionConfig.executionOrder ||
@@ -113,7 +119,7 @@ export function handleFetchPerStore(
           []
         throwIfNoFnsToExecute(storesToExecute)
         // update the payload
-        if (actionName !== 'fetchCount') {
+        if (actionName === 'fetch') {
           for (const modifyFn of modifyPayloadFnsMap[actionName]) {
             payload = modifyFn(payload, docId)
           }
@@ -138,17 +144,17 @@ export function handleFetchPerStore(
          */
         const doOnFetchFns: DoOnFetch[] = []
         /**
-         * each each time a store returns a `FetchCountResponse` then all `doOnFetchCount` need to be executed
+         * each each time a store returns a `FetchAggregateResponse` then all `DoOnFetchAggregate` need to be executed
          */
-        const doOnFetchCountFns: DoOnFetchCount[] = []
+        const doOnFetchAggregateFns: DoOnFetchAggregate[] = []
         /**
          * Fetching on a collection should return a map with just the fetched records for that API call
          */
         const collectionFetchResult = new Map<string, { [key: string]: any }>()
         /**
-         * the result of fetchCount
+         * the result of fetchCount / fetchSum / fetchAverage
          */
-        let fetchCount = NaN
+        let fetchAggregate = NaN
 
         /**
          * All possible results from the plugins.
@@ -226,16 +232,20 @@ export function handleFetchPerStore(
           }
 
           // special handling for 'fetch' (resultFromPlugin will always be `FetchResponse | OnAddedFn`)
-          if (actionName === 'fetchCount') {
-            if (isDoOnFetchCount(resultFromPlugin)) {
-              doOnFetchCountFns.push(resultFromPlugin)
+          if (
+            actionName === 'fetchCount' ||
+            actionName === 'fetchSum' ||
+            actionName === 'fetchAverage'
+          ) {
+            if (isDoOnFetchAggregate(resultFromPlugin)) {
+              doOnFetchAggregateFns.push(resultFromPlugin)
             }
-            if (isFetchCountResponse(resultFromPlugin)) {
-              for (const doOnFetchCountFn of doOnFetchCountFns) {
-                doOnFetchCountFn(resultFromPlugin)
+            if (isFetchAggregateResponse(resultFromPlugin)) {
+              for (const doOnFetchAggregateFn of doOnFetchAggregateFns) {
+                doOnFetchAggregateFn(resultFromPlugin)
               }
-              if (isNaN(fetchCount) || resultFromPlugin.count > fetchCount) {
-                fetchCount = resultFromPlugin.count
+              if (isNaN(fetchAggregate) || resultFromPlugin > fetchAggregate) {
+                fetchAggregate = resultFromPlugin
               }
             }
           }
@@ -244,9 +254,13 @@ export function handleFetchPerStore(
 
         fetchPromises[actionName].delete(fetchPromiseKey)
 
-        if (actionName === 'fetchCount') {
+        if (
+          actionName === 'fetchCount' ||
+          actionName === 'fetchSum' ||
+          actionName === 'fetchAverage'
+        ) {
           // return the fetchCount
-          resolve(fetchCount)
+          resolve(fetchAggregate)
           return
         }
 

@@ -7,7 +7,9 @@ import type {
   GlobalConfig,
   MagnetarDeleteAction,
   MagnetarFetchAction,
+  MagnetarFetchAverageAction,
   MagnetarFetchCountAction,
+  MagnetarFetchSumAction,
   MagnetarInsertAction,
   ModuleConfig,
   OrderByClause,
@@ -19,6 +21,7 @@ import type {
 import { merge, mergeAndConcat } from 'merge-anything'
 import {
   executeSetupModulePerStore,
+  getAggregateFromDataStore,
   getCountFromDataStore,
   getDataFromDataStore,
   proxify,
@@ -47,7 +50,10 @@ export function createCollectionWithContext(
     closeStream: () => void
     closeAllStreams: () => void
   },
-  fetchMeta: { get: () => FetchMetaDataCollection; set: (payload: FetchMetaDataCollection) => void }
+  fetchMeta: {
+    get: () => FetchMetaDataCollection
+    set: (payload: FetchMetaDataCollection) => void
+  },
 ): CollectionInstance {
   const { writeLockMap, fetchPromises, cacheStream, streaming, closeStream, closeAllStreams } = streamAndFetchPromises // prettier-ignore
 
@@ -82,9 +88,11 @@ export function createCollectionWithContext(
   const _delete = handleWritePerStore(writeParams, 'delete') as MagnetarDeleteAction //prettier-ignore
   const fetch = handleFetchPerStore(fetchParams, 'fetch') as MagnetarFetchAction<{ [key: string]: unknown }, 'collection'> //prettier-ignore
   const fetchCount = handleFetchPerStore(fetchParams, 'fetchCount') as MagnetarFetchCountAction // prettier-ignore
+  const fetchSum = handleFetchPerStore(fetchParams, 'fetchSum') as MagnetarFetchSumAction // prettier-ignore
+  const fetchAverage = handleFetchPerStore(fetchParams, 'fetchAverage') as MagnetarFetchAverageAction // prettier-ignore
   const stream = handleStreamPerStore([collectionPath, undefined], moduleConfig, globalConfig, 'write', streaming, cacheStream, writeLockMap) // prettier-ignore
 
-  const actions = { stream, fetch, fetchCount, insert, delete: _delete }
+  const actions = { stream, fetch, fetchCount, fetchSum, fetchAverage, insert, delete: _delete }
 
   // Every store will have its 'setupModule' function executed
   executeSetupModulePerStore(globalConfig.stores, [collectionPath, undefined], moduleConfig)
@@ -122,19 +130,22 @@ export function createCollectionWithContext(
 
   const queryFns = { query, where, orderBy, limit, startAfter }
 
-  const moduleInstance: Omit<CollectionInstance, 'data' | 'fetched' | 'count'> = {
-    doc,
-    id,
-    path,
-    streaming,
-    closeStream,
-    closeAllStreams,
-    ...actions,
-    ...queryFns,
-  }
+  const moduleInstance: Omit<CollectionInstance, 'data' | 'fetched' | 'count' | 'sum' | 'average'> =
+    {
+      doc,
+      id,
+      path,
+      streaming,
+      closeStream,
+      closeAllStreams,
+      ...actions,
+      ...queryFns,
+    }
 
   return proxify(moduleInstance, {
     count: () => getCountFromDataStore(moduleConfig, globalConfig, collectionPath),
+    sum: () => getAggregateFromDataStore('sum', moduleConfig, globalConfig, collectionPath),
+    average: () => getAggregateFromDataStore('average', moduleConfig, globalConfig, collectionPath),
     data: () => getDataFromDataStore(moduleConfig, globalConfig, collectionPath),
     fetched: fetchMeta.get,
   })

@@ -15,6 +15,7 @@ import { deleteActionFactory } from './actions/delete.js'
 import { deletePropActionFactory } from './actions/deleteProp.js'
 import { fetchActionFactory } from './actions/fetch.js'
 import { fetchCountActionFactory } from './actions/fetchCount.js'
+import { fetchSumAverageActionFactory } from './actions/fetchSumAverage.js'
 import { insertActionFactory } from './actions/insert.js'
 import { writeActionFactory } from './actions/mergeAssignReplace.js'
 import { revertActionFactory } from './actions/revert.js'
@@ -39,13 +40,19 @@ export type MakeRestoreBackup = (collectionPath: string, docId: string) => void
 // the plugin implements the logic for all actions that a can be called from a Magnetar module instance
 // each action must have the proper for both collection and doc type modules
 export const CreatePlugin: MagnetarPlugin<SimpleStoreOptions> = (
-  simpleStoreOptions: SimpleStoreOptions
+  simpleStoreOptions: SimpleStoreOptions,
 ): PluginInstance => {
   // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
   const data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> } = {}
   const exists: { [docPath: string]: undefined | 'error' | boolean } = {}
   const pathCountDic: { [pathId in PathWhereIdentifier]?: number } = {}
+  const pathSumDic: {
+    [pathId in PathWhereIdentifier]?: { [key in string]: number | { [key in string]: unknown } }
+  } = {}
+  const pathAverageDic: {
+    [pathId in PathWhereIdentifier]?: { [key in string]: number | { [key in string]: unknown } }
+  } = {}
 
   const dataBackups: { [collectionPath: string]: Map<string, { [key: string]: unknown }[]> } = {}
   const makeBackup: MakeRestoreBackup = (collectionPath, docId) => {
@@ -143,6 +150,21 @@ export const CreatePlugin: MagnetarPlugin<SimpleStoreOptions> = (
   /**
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's count is accessed.
    */
+  const getModuleAggregate = (
+    kind: 'sum' | 'average',
+    {
+      collectionPath,
+      pluginModuleConfig = {},
+    }: Omit<PluginModuleSetupPayload<SimpleStoreModuleConfig>, 'docId'>,
+  ): { [key in string]: number | { [key in string]: unknown } } => {
+    const pathId = getPathWhereIdentifier(collectionPath, pluginModuleConfig)
+    const dic = kind === 'sum' ? pathSumDic[pathId] : pathAverageDic[pathId]
+    return dic ?? {}
+  }
+
+  /**
+   * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's count is accessed.
+   */
   const getModuleCount = ({
     collectionPath,
     pluginModuleConfig = {},
@@ -168,6 +190,8 @@ export const CreatePlugin: MagnetarPlugin<SimpleStoreOptions> = (
   // the plugin must try to implement logic for every `ActionName`
   const fetch = fetchActionFactory(data, exists, simpleStoreOptions)
   const fetchCount = fetchCountActionFactory(pathCountDic, simpleStoreOptions)
+  const fetchSum = fetchSumAverageActionFactory(pathSumDic, simpleStoreOptions)
+  const fetchAverage = fetchSumAverageActionFactory(pathAverageDic, simpleStoreOptions)
   const stream = streamActionFactory(data, simpleStoreOptions)
   const insert = insertActionFactory(data, simpleStoreOptions, makeBackup)
   const _merge = writeActionFactory(data, simpleStoreOptions, 'merge', makeBackup)
@@ -184,6 +208,8 @@ export const CreatePlugin: MagnetarPlugin<SimpleStoreOptions> = (
     actions: {
       fetch,
       fetchCount,
+      fetchSum,
+      fetchAverage,
       stream,
       insert,
       merge: _merge,
@@ -196,6 +222,7 @@ export const CreatePlugin: MagnetarPlugin<SimpleStoreOptions> = (
     getModuleData,
     getModuleExists,
     getModuleCount,
+    getModuleAggregate,
   }
   return instance
 }

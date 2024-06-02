@@ -4,12 +4,13 @@ import { EventNameFnMap } from './events.js'
 import { ModifyPayloadFnMap } from './modifyPayload.js'
 import { ModifyReadResponseFnMap } from './modifyReadResponse.js'
 import { PartialDeep } from './utils/PartialDeep.js'
+import { OPathsWithOptional } from './utils/Paths.js'
 
 /**
  * these are all the actions that Magnetar streamlines, whichever plugin is used
  * these actions are executable from a `MagnetarModule` and handled by each plugin individually
  */
-export type ActionName = 'fetch' | 'fetchCount' | 'stream' | 'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp' | 'delete' // prettier-ignore
+export type ActionName = 'fetch' | 'fetchCount' | 'fetchSum' | 'fetchAverage' | 'stream' | 'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp' | 'delete' // prettier-ignore
 
 /**
  * You can pass options to this action specifically;
@@ -47,7 +48,7 @@ export type MagnetarStreamAction<
    * TODO
    * @deprecated — should deprecated this "general" action config and replace with one specific for this action
    */
-  actionConfig?: ActionConfig<DocDataType>
+  actionConfig?: ActionConfig<DocDataType>,
 ) => Promise<void>
 
 /**
@@ -77,7 +78,7 @@ export type MagnetarFetchAction<
    * TODO
    * @deprecated — should deprecated this "general" action config and replace with one specific for this action
    */
-  actionConfig?: ActionConfig<DocDataType>
+  actionConfig?: ActionConfig<DocDataType>,
 ) => Promise<calledFrom extends 'collection' ? Map<string, DocDataType> : DocDataType | undefined>
 
 /**
@@ -91,6 +92,34 @@ export type MagnetarFetchAction<
  * magnetar.collection('pokedex').count // 151
  */
 export type MagnetarFetchCountAction = () => Promise<number>
+
+/**
+ * Fetches a collection's document sum for a the passed fieldPath and caches this sum to your local store's state.
+ * @returns the document sum that was fetched.
+ * @example
+ * magnetar.collection('pokedex').sum // {}
+ *
+ * const sum = await magnetar.collection('pokedex').fetchSum('base.HP')
+ * sum // 10_000
+ * magnetar.collection('pokedex').sum // { base: { HP: 10_000 } }
+ */
+export type MagnetarFetchSumAction<
+  DocDataType extends { [key: string]: any } = { [key: string]: any },
+> = (fieldPath: OPathsWithOptional<DocDataType>) => Promise<number>
+
+/**
+ * Fetches a collection's document average for a the passed fieldPath and caches this average to your local store's state.
+ * @returns the document average that was fetched.
+ * @example
+ * magnetar.collection('pokedex').average // 0
+ *
+ * const average = await magnetar.collection('pokedex').fetchAverage('base.HP')
+ * average // 88
+ * magnetar.collection('pokedex').average // { base: { HP: 88 } }
+ */
+export type MagnetarFetchAverageAction<
+  DocDataType extends { [key: string]: any } = { [key: string]: any },
+> = (fieldPath: OPathsWithOptional<DocDataType>) => Promise<number>
 
 /**
  * @returns The new `doc()` instance after inserting. You can access the inserted `id` by checking this returned instance.
@@ -107,7 +136,7 @@ export type MagnetarInsertAction<
    * TODO
    * @deprecated — should deprecated this "general" action config and replace with one specific for this action
    */
-  actionConfig?: ActionConfig<DocDataType>
+  actionConfig?: ActionConfig<DocDataType>,
 ) => Promise<DocInstance<DocDataType>>
 
 /**
@@ -121,7 +150,7 @@ export type MagnetarWriteAction<
    * TODO
    * @deprecated — should deprecated this "general" action config and replace with one specific for this action
    */
-  actionConfig?: ActionConfig<DocDataType>
+  actionConfig?: ActionConfig<DocDataType>,
 ) => Promise<DocDataType>
 
 /**
@@ -135,7 +164,7 @@ export type MagnetarDeletePropAction<
    * TODO
    * @deprecated — should deprecated this "general" action config and replace with one specific for this action
    */
-  actionConfig?: ActionConfig<DocDataType>
+  actionConfig?: ActionConfig<DocDataType>,
 ) => Promise<Partial<DocDataType>>
 
 /**
@@ -150,13 +179,15 @@ export type MagnetarDeleteAction = (
    * TODO
    * @deprecated — should deprecated this "general" action config and replace with one specific for this action
    */
-  actionConfig?: ActionConfig
+  actionConfig?: ActionConfig,
 ) => Promise<void>
 
 /**
  * All fetch promises with the payload passed to `fetch(payload)` as key (JSON.stringify) and the "fetch promise" as value. In case `fetch()` had no payload, use `undefined`
  */
-export type FetchPromises = { [key in 'fetch' | 'fetchCount']: Map<string, Promise<any>> }
+export type FetchPromises = {
+  [key in 'fetch' | 'fetchCount' | 'fetchSum' | 'fetchAverage']: Map<string, Promise<any>>
+}
 
 /**
  * Meta data on the last fetch call for a collection().

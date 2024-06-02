@@ -1,6 +1,6 @@
 import type {
-  DoOnFetchCount,
-  FetchCountResponse,
+  DoOnFetchAggregate,
+  FetchAggregateResponse,
   PathWhereIdentifier,
   PluginFetchCountAction,
   PluginFetchCountActionPayload,
@@ -10,21 +10,23 @@ import { Vue3StoreModuleConfig, Vue3StoreOptions } from '../CreatePlugin.js'
 
 export function fetchCountActionFactory(
   pathCountDic: { [collectionPath in PathWhereIdentifier]?: number },
-  Vue3StoreOptions: Vue3StoreOptions
+  vue3StoreOptions: Vue3StoreOptions,
 ): PluginFetchCountAction {
   return function ({
     collectionPath,
     actionConfig,
     pluginModuleConfig,
-  }: PluginFetchCountActionPayload<Vue3StoreModuleConfig>): FetchCountResponse | DoOnFetchCount {
+  }: PluginFetchCountActionPayload<Vue3StoreModuleConfig>):
+    | FetchAggregateResponse
+    | DoOnFetchAggregate {
     const pathId = getPathWhereIdentifier(collectionPath, pluginModuleConfig)
 
-    const doOnFetchCountAction: DoOnFetchCount = ({ count }) => {
+    const doOnFetchAggregateAction: DoOnFetchAggregate = (count) => {
       // abort updating local state if the payload was set to undefined
       if (count === undefined) return
 
       pathCountDic[pathId] = count
     }
-    return doOnFetchCountAction
+    return doOnFetchAggregateAction
   }
 }

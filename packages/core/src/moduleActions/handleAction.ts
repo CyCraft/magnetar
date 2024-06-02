@@ -2,15 +2,16 @@ import type {
   ActionConfig,
   ActionName,
   DoOnFetch,
-  DoOnFetchCount,
+  DoOnFetchAggregate,
   EventNameFnsMap,
-  FetchCountResponse,
+  FetchAggregateResponse,
   FetchResponse,
   OnAddedFn,
   PluginDeleteAction,
   PluginDeletePropAction,
   PluginFetchAction,
   PluginFetchCountAction,
+  PluginFetchSumAverageAction,
   PluginInsertAction,
   PluginModuleConfig,
   PluginWriteAction,
@@ -27,7 +28,7 @@ export async function handleAction(args: {
   docId: string | undefined
   modulePath: string
   pluginModuleConfig: PluginModuleConfig
-  pluginAction: PluginFetchCountAction | PluginFetchAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction // prettier-ignore
+  pluginAction: PluginFetchAction | PluginFetchCountAction | PluginFetchSumAverageAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction // prettier-ignore
   payload: undefined | { [key: string]: unknown } | { [key: string]: unknown }[] | string | string[]
   actionConfig: ActionConfig
   eventNameFnsMap: EventNameFnsMap
@@ -38,8 +39,8 @@ export async function handleAction(args: {
 }): Promise<
   | undefined
   | string
-  | FetchCountResponse
-  | DoOnFetchCount
+  | FetchAggregateResponse
+  | DoOnFetchAggregate
   | FetchResponse
   | DoOnFetch
   | OnAddedFn
@@ -75,7 +76,7 @@ export async function handleAction(args: {
     stopExecutionAfterAction()
     return
   }
-  let result: undefined | string | FetchCountResponse | DoOnFetchCount | FetchResponse | DoOnFetch | SyncBatch | [string, SyncBatch] // prettier-ignore
+  let result: undefined | string | FetchAggregateResponse | DoOnFetchAggregate | FetchResponse | DoOnFetch | SyncBatch | [string, SyncBatch] // prettier-ignore
   try {
     // triggering the action provided by the plugin
     result = await pluginAction({

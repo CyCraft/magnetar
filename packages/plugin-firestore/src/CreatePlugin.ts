@@ -8,6 +8,7 @@ import { deleteActionFactory } from './actions/delete.js'
 import { deletePropActionFactory } from './actions/deleteProp.js'
 import { fetchActionFactory } from './actions/fetch.js'
 import { fetchCountActionFactory } from './actions/fetchCount.js'
+import { fetchSumAverageActionFactory } from './actions/fetchSumAverage.js'
 import { insertActionFactory } from './actions/insert.js'
 import { writeActionFactory } from './actions/mergeAssignReplace.js'
 import { revertActionFactory } from './actions/revert.js'
@@ -22,7 +23,7 @@ export type { FirestoreModuleConfig } from '@magnetarjs/utils-firestore'
 // - FirestoreModuleConfig
 
 function firestorePluginOptionsWithDefaults(
-  firestorePluginOptions: FirestorePluginOptions
+  firestorePluginOptions: FirestorePluginOptions,
 ): Required<FirestorePluginOptions> {
   return {
     syncDebounceMs: 1000,
@@ -56,7 +57,7 @@ export type BatchSyncMap = Map<string, BatchSync>
  * ```
  */
 export const CreatePlugin: MagnetarPlugin<FirestorePluginOptions> = (
-  firestorePluginOptions: FirestorePluginOptions
+  firestorePluginOptions: FirestorePluginOptions,
 ): PluginInstance => {
   const pluginOptions = firestorePluginOptionsWithDefaults(firestorePluginOptions)
 
@@ -74,6 +75,8 @@ export const CreatePlugin: MagnetarPlugin<FirestorePluginOptions> = (
   // the plugin must try to implement logic for every `ActionName`
   const fetch = fetchActionFactory(pluginOptions)
   const fetchCount = fetchCountActionFactory(pluginOptions)
+  const fetchSum = fetchSumAverageActionFactory('sum', pluginOptions)
+  const fetchAverage = fetchSumAverageActionFactory('average', pluginOptions)
   const stream = streamActionFactory(pluginOptions)
   const insert = insertActionFactory(batchSyncMap, pluginOptions)
   const _merge = writeActionFactory(batchSyncMap, pluginOptions, 'merge')
@@ -85,6 +88,8 @@ export const CreatePlugin: MagnetarPlugin<FirestorePluginOptions> = (
   const actions = {
     fetch,
     fetchCount,
+    fetchSum,
+    fetchAverage,
     stream,
     insert,
     merge: _merge,

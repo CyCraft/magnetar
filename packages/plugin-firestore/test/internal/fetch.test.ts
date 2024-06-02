@@ -46,14 +46,16 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
     assert.deepEqual(pokedexModule.data.size, 0)
     assert.deepEqual(pokedexModule.count, 0)
 
+    let result: number
     try {
-      await pokedexModule.fetchCount()
+      result = await pokedexModule.fetchCount()
       await pokedexModule.fetch({ force: true })
     } catch (error) {
       assert.fail(JSON.stringify(error))
     }
     assert.deepEqual(pokedexModule.data.size, 151)
     assert.deepEqual(pokedexModule.count, 151)
+    assert.deepEqual(result, 151)
   })
 }
 {

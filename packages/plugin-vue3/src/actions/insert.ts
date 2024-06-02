@@ -5,8 +5,8 @@ import { MakeRestoreBackup, Vue3StoreModuleConfig, Vue3StoreOptions } from '../C
 
 export function insertActionFactory(
   data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
-  Vue3StoreOptions: Vue3StoreOptions,
-  makeBackup?: MakeRestoreBackup
+  vue3StoreOptions: Vue3StoreOptions,
+  makeBackup?: MakeRestoreBackup,
 ): PluginInsertAction {
   return function ({
     payload,
@@ -22,7 +22,7 @@ export function insertActionFactory(
         ? payload['id']
         : isNumber(payload['id'])
           ? `${payload['id']}`
-          : Vue3StoreOptions.generateRandomId())
+          : vue3StoreOptions.generateRandomId())
 
     if (makeBackup) makeBackup(collectionPath, _docId)
 

@@ -12,7 +12,7 @@ import { throwIfNolocalStoreName } from './throwFns.js'
  */
 export function getPluginModuleConfig(
   moduleConfig: ModuleConfig,
-  storeName: string
+  storeName: string,
 ): PluginModuleConfig {
   const { query, where, orderBy, limit, startAfter, configPerStore = {} } = moduleConfig
   const extraStoreConfig = isPlainObject(configPerStore[storeName]) ? configPerStore[storeName] : {}
@@ -30,7 +30,7 @@ export function getPluginModuleConfig(
 export function executeSetupModulePerStore(
   globalConfigStores: GlobalConfig['stores'],
   [collectionPath, docId]: [string, string | undefined],
-  moduleConfig: ModuleConfig
+  moduleConfig: ModuleConfig,
 ): undefined {
   for (const storeName in globalConfigStores) {
     const { setupModule } = globalConfigStores[storeName] ?? {}
@@ -50,7 +50,7 @@ export function getDataFromDataStore(
   moduleConfig: ModuleConfig,
   globalConfig: GlobalConfig,
   collectionPath: string,
-  docId?: string
+  docId?: string,
 ): { [key: string]: any } | Map<string, { [key: string]: any }> {
   const localStoreName = globalConfig.localStoreName
   throwIfNolocalStoreName(localStoreName)
@@ -67,7 +67,7 @@ export function getDataFromDataStore(
 export function getExistsFromDataStore(
   globalConfig: GlobalConfig,
   collectionPath: string,
-  docId: string
+  docId: string,
 ): undefined | 'error' | boolean {
   const localStoreName = globalConfig.localStoreName
   throwIfNolocalStoreName(localStoreName)
@@ -83,7 +83,7 @@ export function getExistsFromDataStore(
 export function getCountFromDataStore(
   moduleConfig: ModuleConfig,
   globalConfig: GlobalConfig,
-  collectionPath: string
+  collectionPath: string,
 ): number {
   const localStoreName = globalConfig.localStoreName
   throwIfNolocalStoreName(localStoreName)
@@ -94,6 +94,24 @@ export function getCountFromDataStore(
   const pluginModuleConfig = getPluginModuleConfig(moduleConfig, localStoreName)
 
   return getModuleCount({ collectionPath, pluginModuleConfig })
+}
+
+/** Executes the `getModuleAggregate` function from the store specified as 'localStoreName' */
+export function getAggregateFromDataStore(
+  kind: 'sum' | 'average',
+  moduleConfig: ModuleConfig,
+  globalConfig: GlobalConfig,
+  collectionPath: string,
+): { [key in string]: number | { [key in string]: unknown } } {
+  const localStoreName = globalConfig.localStoreName
+  throwIfNolocalStoreName(localStoreName)
+  const getModuleAggregate = globalConfig.stores[localStoreName]?.getModuleAggregate
+  if (!getModuleAggregate) {
+    throw new Error('The data store did not provide a getModuleAggregate function!')
+  }
+  const pluginModuleConfig = getPluginModuleConfig(moduleConfig, localStoreName)
+
+  return getModuleAggregate(kind, { collectionPath, pluginModuleConfig })
 }
 
 /**

@@ -1,6 +1,6 @@
 import type {
-  DoOnFetchCount,
-  FetchCountResponse,
+  DoOnFetchAggregate,
+  FetchAggregateResponse,
   PathWhereIdentifier,
   PluginFetchCountAction,
   PluginFetchCountActionPayload,
@@ -10,24 +10,26 @@ import { StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin.js'
 
 export function fetchCountActionFactory(
   pathCountDic: { [collectionPath in PathWhereIdentifier]?: number },
-  storePluginOptions: StorePluginOptions
+  storePluginOptions: StorePluginOptions,
 ): PluginFetchCountAction {
   return function ({
     actionConfig,
     collectionPath,
     pluginModuleConfig,
-  }: PluginFetchCountActionPayload<StorePluginModuleConfig>): FetchCountResponse | DoOnFetchCount {
+  }: PluginFetchCountActionPayload<StorePluginModuleConfig>):
+    | FetchAggregateResponse
+    | DoOnFetchAggregate {
     // this mocks an error during execution
     // throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
     const pathId = getPathWhereIdentifier(collectionPath, pluginModuleConfig)
 
-    const doOnFetchCountAction: DoOnFetchCount = ({ count }) => {
+    const doOnFetchAggregateAction: DoOnFetchAggregate = (count) => {
       // abort updating local state if the payload was set to undefined
       if (count === undefined) return
 
       pathCountDic[pathId] = count
     }
-    return doOnFetchCountAction
+    return doOnFetchAggregateAction
   }
 }

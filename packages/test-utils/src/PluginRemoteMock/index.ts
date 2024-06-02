@@ -11,6 +11,7 @@ import {
   deletePropActionFactory,
   fetchActionFactory,
   fetchCountActionFactory,
+  fetchSumAverageActionFactory,
   insertActionFactory,
   revertActionFactory,
   streamActionFactory,
@@ -36,11 +37,13 @@ export type StorePluginModuleConfig = {
 // the plugin implements the logic for all actions that a can be called from a Magnetar module instance
 // each action must have the proper for both collection and doc type modules
 export const CreatePlugin: MagnetarPlugin<RemoteStoreOptions> = (
-  storePluginOptions: RemoteStoreOptions
+  storePluginOptions: RemoteStoreOptions,
 ): PluginInstance => {
   // the plugin must try to implement logic for every `ActionName`
   const fetch = fetchActionFactory(storePluginOptions)
   const fetchCount = fetchCountActionFactory(storePluginOptions)
+  const fetchSum = fetchSumAverageActionFactory('sum', storePluginOptions)
+  const fetchAverage = fetchSumAverageActionFactory('average', storePluginOptions)
   const stream = streamActionFactory(storePluginOptions)
   const insert = insertActionFactory(storePluginOptions)
   const _merge = writeActionFactory(storePluginOptions, 'merge')
@@ -56,6 +59,8 @@ export const CreatePlugin: MagnetarPlugin<RemoteStoreOptions> = (
     actions: {
       fetch,
       fetchCount,
+      fetchSum,
+      fetchAverage,
       stream,
       insert,
       merge: _merge,

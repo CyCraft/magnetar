@@ -6,9 +6,9 @@ import { MakeRestoreBackup, Vue3StoreModuleConfig, Vue3StoreOptions } from '../C
 
 export function writeActionFactory(
   data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
-  Vue3StoreOptions: Vue3StoreOptions,
+  vue3StoreOptions: Vue3StoreOptions,
   actionName: 'merge' | 'assign' | 'replace',
-  makeBackup?: MakeRestoreBackup
+  makeBackup?: MakeRestoreBackup,
 ): PluginWriteAction {
   return function ({
     payload,

@@ -11,7 +11,7 @@ import { insertActionFactory } from './insert.js'
 
 export function streamActionFactory(
   data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
-  Vue3StoreOptions: Vue3StoreOptions
+  vue3StoreOptions: Vue3StoreOptions,
 ): PluginStreamAction {
   return function ({
     payload,
@@ -33,7 +33,7 @@ export function streamActionFactory(
         const _docId = docId || `${meta.id}`
         insertActionFactory(
           data,
-          Vue3StoreOptions
+          vue3StoreOptions,
         )({
           payload,
           collectionPath,
@@ -50,7 +50,7 @@ export function streamActionFactory(
         const _docId = docId || `${meta.id}`
         insertActionFactory(
           data,
-          Vue3StoreOptions
+          vue3StoreOptions,
         )({
           payload,
           collectionPath,
@@ -72,7 +72,7 @@ export function streamActionFactory(
         const [_cPath, _dId] = collectionPathDocIdToDelete
         deleteActionFactory(
           data,
-          Vue3StoreOptions
+          vue3StoreOptions,
         )({
           payload: undefined,
           collectionPath: _cPath,

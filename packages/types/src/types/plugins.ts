@@ -27,8 +27,10 @@ export type MagnetarPlugin<PluginOptions> = (pluginOptions: PluginOptions) => Pl
  */
 export type PluginInstance = {
   actions: {
-    fetchCount?: PluginFetchCountAction
     fetch?: PluginFetchAction
+    fetchCount?: PluginFetchCountAction
+    fetchSum?: PluginFetchSumAverageAction
+    fetchAverage?: PluginFetchSumAverageAction
     stream?: PluginStreamAction
     insert?: PluginInsertAction
     merge?: PluginWriteAction
@@ -61,6 +63,13 @@ export type PluginInstance = {
    * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's `.count` is accessed. The `modulePath` will always be that of a "collection". It must return the fetched doc count, or fall back to `.data.size` in case it hasn't fetched the doc count yet.
    */
   getModuleCount?: (pluginModuleSetupPayload: Omit<PluginModuleSetupPayload, 'docId'>) => number
+  /**
+   * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's `.count` is accessed. The `modulePath` will always be that of a "collection". It must return the fetched doc sum/average for the fields requested so far
+   */
+  getModuleAggregate?: (
+    kind: 'sum' | 'average',
+    pluginModuleSetupPayload: Omit<PluginModuleSetupPayload, 'docId'>,
+  ) => { [key in string]: number | { [key in string]: unknown } }
   /**
    * This is an optional function that some "remote" Store Plugins can provide to sync any pending writes that might have stacked because of a `syncDebounceMs`.
    */
@@ -159,11 +168,35 @@ export type PluginFetchCountActionPayload<T = PluginModuleConfig> = Omit<
 >
 
 /**
- * Should handle 'fetchCount' for collections. Should return `FetchCountResponse` when acting as a "remote" Store Plugin, and `DoOnFetchCount` when acting as "local" Store Plugin.
+ * Should handle 'fetchCount' for collections. Should return `FetchAggregateResponse` when acting as a "remote" Store Plugin, and `DoOnFetchAggregate` when acting as "local" Store Plugin.
  */
 export type PluginFetchCountAction = (
   payload: PluginFetchCountActionPayload,
-) => FetchCountResponse | DoOnFetchCount | Promise<FetchCountResponse | DoOnFetchCount>
+) =>
+  | FetchAggregateResponse
+  | DoOnFetchAggregate
+  | Promise<FetchAggregateResponse | DoOnFetchAggregate>
+
+export type PluginFetchSumAverageActionPayload<T = PluginModuleConfig> = Omit<
+  MergeDeep<
+    PluginActionPayloadBase<T>,
+    {
+      /** The target fieldPath */
+      payload: string
+    }
+  >,
+  'docId'
+>
+
+/**
+ * Should handle 'fetchSum' 'fetchAverage' for collections. Should return `FetchAggregateResponse` when acting as a "remote" Store Plugin, and `DoOnFetchAggregate` when acting as "local" Store Plugin.
+ */
+export type PluginFetchSumAverageAction = (
+  payload: PluginFetchSumAverageActionPayload,
+) =>
+  | FetchAggregateResponse
+  | DoOnFetchAggregate
+  | Promise<FetchAggregateResponse | DoOnFetchAggregate>
 
 export type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = MergeDeep<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
@@ -363,8 +396,8 @@ export type DoOnFetch = (
 /**
  * The remote store should document count after retrieving it from the server
  */
-export type FetchCountResponse = { count: number }
+export type FetchAggregateResponse = number
 /**
  * The local store should provide a function that will store the fetchCount when it comes in from the remote store.
  */
-export type DoOnFetchCount = (payload: FetchCountResponse) => undefined
+export type DoOnFetchAggregate = (payload: FetchAggregateResponse) => undefined

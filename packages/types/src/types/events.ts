@@ -1,9 +1,9 @@
 import { ActionName } from './actions.js'
 import {
   DoOnFetch,
-  DoOnFetchCount,
+  DoOnFetchAggregate,
   DoOnStream,
-  FetchCountResponse,
+  FetchAggregateResponse,
   FetchResponse,
   PluginModuleConfig,
   StreamResponse,
@@ -62,8 +62,8 @@ type EventPayloadPropResult = {
   result:
     | undefined
     | string
-    | FetchCountResponse
-    | DoOnFetchCount
+    | FetchAggregateResponse
+    | DoOnFetchAggregate
     | FetchResponse
     | DoOnFetch
     | StreamResponse
