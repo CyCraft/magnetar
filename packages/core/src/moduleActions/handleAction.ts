@@ -10,8 +10,8 @@ import type {
   PluginDeleteAction,
   PluginDeletePropAction,
   PluginFetchAction,
+  PluginFetchAggregateAction,
   PluginFetchCountAction,
-  PluginFetchSumAverageAction,
   PluginInsertAction,
   PluginModuleConfig,
   PluginWriteAction,
@@ -28,7 +28,7 @@ export async function handleAction(args: {
   docId: string | undefined
   modulePath: string
   pluginModuleConfig: PluginModuleConfig
-  pluginAction: PluginFetchAction | PluginFetchCountAction | PluginFetchSumAverageAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction // prettier-ignore
+  pluginAction: PluginFetchAction | PluginFetchCountAction | PluginFetchAggregateAction | PluginWriteAction | PluginDeletePropAction | PluginDeleteAction | PluginInsertAction // prettier-ignore
   payload: undefined | { [key: string]: unknown } | { [key: string]: unknown }[] | string | string[]
   actionConfig: ActionConfig
   eventNameFnsMap: EventNameFnsMap

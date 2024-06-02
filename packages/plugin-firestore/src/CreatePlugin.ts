@@ -7,8 +7,8 @@ import type { Firestore } from 'firebase/firestore'
 import { deleteActionFactory } from './actions/delete.js'
 import { deletePropActionFactory } from './actions/deleteProp.js'
 import { fetchActionFactory } from './actions/fetch.js'
+import { fetchAggregateActionFactory } from './actions/fetchAggregate.js'
 import { fetchCountActionFactory } from './actions/fetchCount.js'
-import { fetchSumAverageActionFactory } from './actions/fetchSumAverage.js'
 import { insertActionFactory } from './actions/insert.js'
 import { writeActionFactory } from './actions/mergeAssignReplace.js'
 import { revertActionFactory } from './actions/revert.js'
@@ -75,8 +75,8 @@ export const CreatePlugin: MagnetarPlugin<FirestorePluginOptions> = (
   // the plugin must try to implement logic for every `ActionName`
   const fetch = fetchActionFactory(pluginOptions)
   const fetchCount = fetchCountActionFactory(pluginOptions)
-  const fetchSum = fetchSumAverageActionFactory('sum', pluginOptions)
-  const fetchAverage = fetchSumAverageActionFactory('average', pluginOptions)
+  const fetchSum = fetchAggregateActionFactory('sum', pluginOptions)
+  const fetchAverage = fetchAggregateActionFactory('average', pluginOptions)
   const stream = streamActionFactory(pluginOptions)
   const insert = insertActionFactory(batchSyncMap, pluginOptions)
   const _merge = writeActionFactory(batchSyncMap, pluginOptions, 'merge')

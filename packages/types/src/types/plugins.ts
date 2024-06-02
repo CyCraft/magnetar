@@ -29,8 +29,8 @@ export type PluginInstance = {
   actions: {
     fetch?: PluginFetchAction
     fetchCount?: PluginFetchCountAction
-    fetchSum?: PluginFetchSumAverageAction
-    fetchAverage?: PluginFetchSumAverageAction
+    fetchSum?: PluginFetchAggregateAction
+    fetchAverage?: PluginFetchAggregateAction
     stream?: PluginStreamAction
     insert?: PluginInsertAction
     merge?: PluginWriteAction
@@ -177,7 +177,7 @@ export type PluginFetchCountAction = (
   | DoOnFetchAggregate
   | Promise<FetchAggregateResponse | DoOnFetchAggregate>
 
-export type PluginFetchSumAverageActionPayload<T = PluginModuleConfig> = Omit<
+export type PluginFetchAggregateActionPayload<T = PluginModuleConfig> = Omit<
   MergeDeep<
     PluginActionPayloadBase<T>,
     {
@@ -191,8 +191,8 @@ export type PluginFetchSumAverageActionPayload<T = PluginModuleConfig> = Omit<
 /**
  * Should handle 'fetchSum' 'fetchAverage' for collections. Should return `FetchAggregateResponse` when acting as a "remote" Store Plugin, and `DoOnFetchAggregate` when acting as "local" Store Plugin.
  */
-export type PluginFetchSumAverageAction = (
-  payload: PluginFetchSumAverageActionPayload,
+export type PluginFetchAggregateAction = (
+  payload: PluginFetchAggregateActionPayload,
 ) =>
   | FetchAggregateResponse
   | DoOnFetchAggregate

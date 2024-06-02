@@ -10,8 +10,8 @@ import {
   deleteActionFactory,
   deletePropActionFactory,
   fetchActionFactory,
+  fetchAggregateActionFactory,
   fetchCountActionFactory,
-  fetchSumAverageActionFactory,
   insertActionFactory,
   revertActionFactory,
   streamActionFactory,
@@ -42,8 +42,8 @@ export const CreatePlugin: MagnetarPlugin<RemoteStoreOptions> = (
   // the plugin must try to implement logic for every `ActionName`
   const fetch = fetchActionFactory(storePluginOptions)
   const fetchCount = fetchCountActionFactory(storePluginOptions)
-  const fetchSum = fetchSumAverageActionFactory('sum', storePluginOptions)
-  const fetchAverage = fetchSumAverageActionFactory('average', storePluginOptions)
+  const fetchSum = fetchAggregateActionFactory('sum', storePluginOptions)
+  const fetchAverage = fetchAggregateActionFactory('average', storePluginOptions)
   const stream = streamActionFactory(storePluginOptions)
   const insert = insertActionFactory(storePluginOptions)
   const _merge = writeActionFactory(storePluginOptions, 'merge')

@@ -1,22 +1,22 @@
 import type {
   FetchAggregateResponse,
-  PluginFetchSumAverageAction,
-  PluginFetchSumAverageActionPayload,
+  PluginFetchAggregateAction,
+  PluginFetchAggregateActionPayload,
 } from '@magnetarjs/types'
 import { FirestoreModuleConfig, getFirestoreCollectionPath } from '@magnetarjs/utils-firestore'
 import { average, getAggregateFromServer, sum } from 'firebase/firestore'
 import { FirestorePluginOptions } from '../CreatePlugin.js'
 import { getQueryInstance } from '../helpers/getFirestore.js'
 
-export function fetchSumAverageActionFactory(
+export function fetchAggregateActionFactory(
   kind: 'sum' | 'average',
   firestorePluginOptions: Required<FirestorePluginOptions>,
-): PluginFetchSumAverageAction {
+): PluginFetchAggregateAction {
   return async function ({
     payload,
     collectionPath,
     pluginModuleConfig,
-  }: PluginFetchSumAverageActionPayload<FirestoreModuleConfig>): Promise<FetchAggregateResponse> {
+  }: PluginFetchAggregateActionPayload<FirestoreModuleConfig>): Promise<FetchAggregateResponse> {
     const { db, debug } = firestorePluginOptions
     // in case of a doc module
     const _collectionPath = getFirestoreCollectionPath(collectionPath, pluginModuleConfig, firestorePluginOptions) // prettier-ignore

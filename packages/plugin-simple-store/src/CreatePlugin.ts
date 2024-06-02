@@ -14,8 +14,8 @@ import { isArray, isNumber, isPlainObject } from 'is-what'
 import { deleteActionFactory } from './actions/delete.js'
 import { deletePropActionFactory } from './actions/deleteProp.js'
 import { fetchActionFactory } from './actions/fetch.js'
+import { fetchAggregateActionFactory } from './actions/fetchAggregate.js'
 import { fetchCountActionFactory } from './actions/fetchCount.js'
-import { fetchSumAverageActionFactory } from './actions/fetchSumAverage.js'
 import { insertActionFactory } from './actions/insert.js'
 import { writeActionFactory } from './actions/mergeAssignReplace.js'
 import { revertActionFactory } from './actions/revert.js'
@@ -190,8 +190,8 @@ export const CreatePlugin: MagnetarPlugin<SimpleStoreOptions> = (
   // the plugin must try to implement logic for every `ActionName`
   const fetch = fetchActionFactory(data, exists, simpleStoreOptions)
   const fetchCount = fetchCountActionFactory(pathCountDic, simpleStoreOptions)
-  const fetchSum = fetchSumAverageActionFactory(pathSumDic, simpleStoreOptions)
-  const fetchAverage = fetchSumAverageActionFactory(pathAverageDic, simpleStoreOptions)
+  const fetchSum = fetchAggregateActionFactory(pathSumDic, simpleStoreOptions)
+  const fetchAverage = fetchAggregateActionFactory(pathAverageDic, simpleStoreOptions)
   const stream = streamActionFactory(data, simpleStoreOptions)
   const insert = insertActionFactory(data, simpleStoreOptions, makeBackup)
   const _merge = writeActionFactory(data, simpleStoreOptions, 'merge', makeBackup)

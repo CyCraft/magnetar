@@ -11,10 +11,10 @@ import type {
   PluginDeletePropActionPayload,
   PluginFetchAction,
   PluginFetchActionPayload,
+  PluginFetchAggregateAction,
+  PluginFetchAggregateActionPayload,
   PluginFetchCountAction,
   PluginFetchCountActionPayload,
-  PluginFetchSumAverageAction,
-  PluginFetchSumAverageActionPayload,
   PluginInsertAction,
   PluginInsertActionPayload,
   PluginRevertAction,
@@ -193,15 +193,15 @@ export function fetchCountActionFactory(
   }
 }
 
-export function fetchSumAverageActionFactory(
+export function fetchAggregateActionFactory(
   kind: 'sum' | 'average',
   storePluginOptions: RemoteStoreOptions,
-): PluginFetchSumAverageAction {
+): PluginFetchAggregateAction {
   return async function ({
     payload,
     collectionPath,
     pluginModuleConfig,
-  }: PluginFetchSumAverageActionPayload<StorePluginModuleConfig>): Promise<
+  }: PluginFetchAggregateActionPayload<StorePluginModuleConfig>): Promise<
     DoOnFetchAggregate | FetchAggregateResponse
   > {
     // this is custom logic to be implemented by the plugin author

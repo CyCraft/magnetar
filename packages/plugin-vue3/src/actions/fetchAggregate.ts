@@ -2,28 +2,28 @@ import type {
   DoOnFetchAggregate,
   FetchAggregateResponse,
   PathWhereIdentifier,
-  PluginFetchSumAverageAction,
-  PluginFetchSumAverageActionPayload,
+  PluginFetchAggregateAction,
+  PluginFetchAggregateActionPayload,
 } from '@magnetarjs/types'
 import { getPathWhereIdentifier } from '@magnetarjs/types'
 import { merge } from 'merge-anything'
 import { nestifyObject } from 'nestify-anything'
-import { StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin.js'
+import { Vue3StoreModuleConfig, Vue3StoreOptions } from '../CreatePlugin.js'
 
-export function fetchSumAverageActionFactory(
+export function fetchAggregateActionFactory(
   pathAggregateDic: {
     [collectionPath in PathWhereIdentifier]?: {
       [key in string]: number | { [key in string]: unknown }
     }
   },
-  storePluginOptions: StorePluginOptions,
-): PluginFetchSumAverageAction {
+  vue3StoreOptions: Vue3StoreOptions,
+): PluginFetchAggregateAction {
   return function ({
     payload,
     collectionPath,
     actionConfig,
     pluginModuleConfig,
-  }: PluginFetchSumAverageActionPayload<StorePluginModuleConfig>):
+  }: PluginFetchAggregateActionPayload<Vue3StoreModuleConfig>):
     | FetchAggregateResponse
     | DoOnFetchAggregate {
     const pathId = getPathWhereIdentifier(collectionPath, pluginModuleConfig)

@@ -15,8 +15,8 @@ import { reactive } from 'vue'
 import { deleteActionFactory } from './actions/delete.js'
 import { deletePropActionFactory } from './actions/deleteProp.js'
 import { fetchActionFactory } from './actions/fetch.js'
+import { fetchAggregateActionFactory } from './actions/fetchAggregate.js'
 import { fetchCountActionFactory } from './actions/fetchCount.js'
-import { fetchSumAverageActionFactory } from './actions/fetchSumAverage.js'
 import { insertActionFactory } from './actions/insert.js'
 import { writeActionFactory } from './actions/mergeAssignReplace.js'
 import { revertActionFactory } from './actions/revert.js'
@@ -198,8 +198,8 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
   // the plugin must try to implement logic for every `ActionName`
   const fetch = fetchActionFactory(data, exists, vue3StoreOptions)
   const fetchCount = fetchCountActionFactory(pathCountDic, vue3StoreOptions)
-  const fetchSum = fetchSumAverageActionFactory(pathSumDic, vue3StoreOptions)
-  const fetchAverage = fetchSumAverageActionFactory(pathAverageDic, vue3StoreOptions)
+  const fetchSum = fetchAggregateActionFactory(pathSumDic, vue3StoreOptions)
+  const fetchAverage = fetchAggregateActionFactory(pathAverageDic, vue3StoreOptions)
   const stream = streamActionFactory(data, vue3StoreOptions)
   const insert = insertActionFactory(data, vue3StoreOptions, makeBackup)
   const _merge = writeActionFactory(data, vue3StoreOptions, 'merge', makeBackup)
