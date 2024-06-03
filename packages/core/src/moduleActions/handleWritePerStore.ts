@@ -14,8 +14,10 @@ import type {
   SyncBatch,
   WriteLock,
 } from '@magnetarjs/types'
+import { isStoreSplit } from '@magnetarjs/utils'
 import { mapGetOrSet } from 'getorset-anything'
-import { isFullArray, isFullString } from 'is-what'
+import { isAnyObject, isFullArray, isFullString } from 'is-what'
+import { mapObject } from 'map-anything'
 import { getEventNameFnsMap } from '../helpers/eventHelpers.js'
 import { getModifyPayloadFnsMap } from '../helpers/modifyPayload.js'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers.js'
@@ -105,9 +107,24 @@ export function handleWritePerStore(
           (globalConfig.executionOrder || {})['write'] ||
           []
         throwIfNoFnsToExecute(storesToExecute)
+
+        const unwrapStoreSplits = (payloadChunk: any, storeName: string): any => {
+          return isStoreSplit(payloadChunk)
+            ? payloadChunk.storePayloadDic[storeName]
+            : isAnyObject(payloadChunk)
+              ? mapObject(payloadChunk, (value) => unwrapStoreSplits(value, storeName))
+              : payloadChunk
+        }
         // update the payload
+        let storePayloadDic = storesToExecute.reduce<{
+          [key: string]: any
+          cache?: any
+        }>((dic, storeName) => ({ ...dic, [storeName]: unwrapStoreSplits(payload, storeName) }), {})
+
         for (const modifyFn of modifyPayloadFnsMap[actionName]) {
-          payload = modifyFn(payload, docId)
+          storePayloadDic = mapObject(storePayloadDic, (payloadValue) =>
+            modifyFn(payloadValue, docId),
+          )
         }
 
         // create the abort mechanism
@@ -152,7 +169,7 @@ export function handleWritePerStore(
                 modulePath,
                 pluginModuleConfig,
                 pluginAction,
-                payload, // should always use the payload as passed originally for clarity
+                payload: storePayloadDic[storeName], // should always use the payload as passed originally for clarity
                 actionConfig,
                 eventNameFnsMap,
                 onError,
@@ -170,7 +187,7 @@ export function handleWritePerStore(
               const pluginModuleConfig = getPluginModuleConfig(moduleConfig, storeToRevert)
               if (pluginRevertAction) {
                 await pluginRevertAction({
-                  payload,
+                  payload: storePayloadDic[storeName],
                   actionConfig,
                   collectionPath,
                   docId,
@@ -181,7 +198,7 @@ export function handleWritePerStore(
               }
               // revert eventFns, handle and await each eventFn in sequence
               for (const fn of eventNameFnsMap.revert) {
-                await fn({ payload, result: resultFromPlugin, actionName, storeName, collectionPath, docId, path: modulePath, pluginModuleConfig }) // prettier-ignore
+                await fn({ payload: storePayloadDic[storeName], result: resultFromPlugin, actionName, storeName, collectionPath, docId, path: modulePath, pluginModuleConfig }) // prettier-ignore
               }
             }
             writeLock.resolve()

@@ -192,3 +192,25 @@ for (const pkmn of newPokemon) {
 ```
 
 Same goes for other methods to delete or modify data.
+
+## Pass Different Data to Different Stores
+
+You can import the `storeSplit` function and use it in any write call (insert, merge, replace, etc.) to write a different payload between your cache store vs your other stores.
+
+The function's return type will be whatever you pass to the `cache` key. The cache value will be written to your cache plugin's store, and for the other keys you can use any other stores names that you have set up in your magnetar instance.
+
+```ts
+import { storeSplit } from '@magnetarjs/utils'
+
+magnetar
+  .collection('user')
+  .doc('1')
+  .merge({
+    name: 'updated name',
+    // ...
+    dateUpdated: storeSplit({
+      cache: new Date(),
+      remote: serverTimestamp(),
+    }),
+  })
+```
