@@ -37,12 +37,12 @@ export function fetchActionFactory(
           startAfter,
         })
         if (collectionData.size > 0) {
-          const localDocs: DocMetadata[] = [...collectionData.entries()].map(([_docId, data]) => ({
+          const cachedDocs: DocMetadata[] = [...collectionData.entries()].map(([_docId, data]) => ({
             data,
             exists: 'unknown',
             id: _docId,
           }))
-          const fetchResponse: FetchResponse = { docs: localDocs }
+          const fetchResponse: FetchResponse = { docs: cachedDocs }
           return fetchResponse // if size === 0 fall through to returning DoOnFetch down below
         }
       }
@@ -52,13 +52,13 @@ export function fetchActionFactory(
        */
       const itSureExists = exists[`${collectionPath}/${docId}`] === true
       if (docId && itSureExists) {
-        const localDoc = data[collectionPath]?.get(docId)
+        const cachedDoc = data[collectionPath]?.get(docId)
         // if already fetched
-        if (localDoc) {
+        if (cachedDoc) {
           const fetchResponse: FetchResponse = {
             docs: [
               {
-                data: localDoc,
+                data: cachedDoc,
                 exists: 'unknown',
                 id: docId,
               },
@@ -67,7 +67,7 @@ export function fetchActionFactory(
           return fetchResponse
         }
         // if not yet fetched
-        if (!localDoc) {
+        if (!cachedDoc) {
           // fall through to returning DoOnFetch down below
         }
       }
@@ -92,7 +92,7 @@ export function fetchActionFactory(
         exists[docPath] = meta.exists
       }
 
-      // abort updating local state if the payload is undefined
+      // abort updating local cache state if the payload is undefined
       if (_payload === undefined) return
 
       insertActionFactory(

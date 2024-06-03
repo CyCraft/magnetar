@@ -52,7 +52,7 @@ It's also become clear that these modules might be better off each having their 
 
 > Why do you need to define both `modifyPayloadOn.insert` and `modifyReadResponseOn.added` ?
 
-- `modifyPayloadOn.insert` — is triggered every time you write data locally (which is then synced to the server with those default values)
+- `modifyPayloadOn.insert` — is triggered every time you write data locally to cache (which is then synced to the server with those default values)
 - `modifyReadResponseOn.added` — is triggered every time data comes in from your remote store (the server)
 
 To learn more about these functions and other possibilities read [Hooks and Events](../hooks-and-events/).
@@ -96,7 +96,7 @@ import { pokedexModule } from 'pokedexModule.js'
   // making a read request will retrieve docs with the fixed query enabled:
   await pokedexModule.fetch()
 
-  // accessing local data will also filter on just docs as per the fixed query:
+  // accessing cached data will also filter on just docs as per the fixed query:
   pokedexModule.data.values()
 })()
 ```
@@ -167,7 +167,7 @@ async function searchPokemon(type) {
 }
 ```
 
-As you can see in the example, using a query in Magnetar is very powerful because it will not only query your read requests to the remote store, but can also apply that same query when reading your local data.
+As you can see in the example, using a query in Magnetar is very powerful because it will not only query your read requests to the remote store, but can also apply that same query when reading your cached data.
 
 You can find more information on reading data at [Read Data](../read-data/#query-data-filter-order-by-limit).
 

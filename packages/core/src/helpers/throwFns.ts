@@ -1,6 +1,5 @@
 import type { DoOnStreamFns, StreamResponse } from '@magnetarjs/types'
 import { isCollectionModule, isDocModule } from '@magnetarjs/utils'
-import { isFullString } from 'is-what'
 
 export function logError(errorMessage: string): undefined {
   console.error('[@magnetarjs error]\n', errorMessage)
@@ -13,7 +12,7 @@ export function logErrorAndThrow(errorMessage: string): undefined {
 
 export function throwOnIncompleteStreamResponses(
   streamInfoPerStore: { [storeName: string]: StreamResponse },
-  doOnStreamFns: DoOnStreamFns
+  doOnStreamFns: DoOnStreamFns,
 ): undefined {
   const noStreamLogic = !Object.keys(streamInfoPerStore).length
   if (noStreamLogic) {
@@ -36,15 +35,9 @@ export function throwIfNoFnsToExecute(storesToExecute: string[]): undefined {
   }
 }
 
-export function throwIfNolocalStoreName(localStoreName: string): undefined {
-  if (isFullString(localStoreName)) return
-  const errorMessage = `No 'localStoreName' provided.`
-  logErrorAndThrow(errorMessage)
-}
-
 export function throwIfInvalidModulePath(
   modulePath: string,
-  moduleType: 'collection' | 'doc'
+  moduleType: 'collection' | 'doc',
 ): undefined {
   let errorMessage = ''
   if (moduleType === 'collection') {

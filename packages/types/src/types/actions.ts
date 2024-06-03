@@ -16,8 +16,8 @@ export type ActionName = 'fetch' | 'fetchCount' | 'fetchSum' | 'fetchAverage' | 
  * You can pass options to this action specifically;
  * This is what the dev can provide as second param when executing any action in addition to the payload.
  * @example
- * // first update the server and await that before updating the local store:
- * { executionOrder: ['remote', 'local'] }
+ * // first update the server and await that before updating the local cache store:
+ * { executionOrder: ['remote', 'cache'] }
  * @example
  * // don't throw errors for this action, wherever it might fail
  * { onError: 'continue' }
@@ -52,8 +52,8 @@ export type MagnetarStreamAction<
 ) => Promise<void>
 
 /**
- * Fetches document(s) and adds the data to your local store's state.
- * Fetch is optimistic by default — if it can find the doc's data in your local state, it will return that and prevent any remote fetches.
+ * Fetches document(s) and adds the data to your local cache store's state.
+ * Fetch is optimistic by default — if it can find the doc's data in your local cache state, it will return that and prevent any remote fetches.
  * You can force a re-fetch by passing `{ force: true }`
  * @returns the document(s) data that was fetched. If you need to access other metadata that was retrieved during fetching, you can use `modifyReadResponse.added`.
  * @example
@@ -82,7 +82,7 @@ export type MagnetarFetchAction<
 ) => Promise<calledFrom extends 'collection' ? Map<string, DocDataType> : DocDataType | undefined>
 
 /**
- * Fetches a collection's document count and caches this count to your local store's state.
+ * Fetches a collection's document count and caches this count to your local cache store's state.
  * @returns the document count that was fetched.
  * @example
  * magnetar.collection('pokedex').count // 0
@@ -94,7 +94,7 @@ export type MagnetarFetchAction<
 export type MagnetarFetchCountAction = () => Promise<number>
 
 /**
- * Fetches a collection's document sum for a the passed fieldPath and caches this sum to your local store's state.
+ * Fetches a collection's document sum for a the passed fieldPath and caches this sum to your local cache store's state.
  * @returns the document sum that was fetched.
  * @example
  * magnetar.collection('pokedex').sum // {}
@@ -108,7 +108,7 @@ export type MagnetarFetchSumAction<
 > = (fieldPath: OPathsWithOptional<DocDataType>) => Promise<number>
 
 /**
- * Fetches a collection's document average for a the passed fieldPath and caches this average to your local store's state.
+ * Fetches a collection's document average for a the passed fieldPath and caches this average to your local cache store's state.
  * @returns the document average that was fetched.
  * @example
  * magnetar.collection('pokedex').average // 0
@@ -140,7 +140,7 @@ export type MagnetarInsertAction<
 ) => Promise<DocInstance<DocDataType>>
 
 /**
- * @returns the new document data after applying the changes to the local document (including any modifications from modifyPayloadOn)
+ * @returns the new document data after applying the changes to the cached document (including any modifications from modifyPayloadOn)
  */
 export type MagnetarWriteAction<
   DocDataType extends { [key: string]: any } = { [key: string]: any },
@@ -154,7 +154,7 @@ export type MagnetarWriteAction<
 ) => Promise<DocDataType>
 
 /**
- * @returns the new document data after applying the changes to the local document (including any modifications from modifyPayloadOn)
+ * @returns the new document data after applying the changes to the cached document (including any modifications from modifyPayloadOn)
  */
 export type MagnetarDeletePropAction<
   DocDataType extends { [key: string]: any } = { [key: string]: any },

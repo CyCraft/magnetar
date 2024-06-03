@@ -28,7 +28,7 @@ export function handleStreamPerStore(
   actionType: ActionType,
   streaming: () => Promise<void> | null,
   cacheStream: (closeStreamFn: () => void, streamingPromise: Promise<void> | null) => void,
-  writeLockMap: Map<string, WriteLock>
+  writeLockMap: Map<string, WriteLock>,
 ): MagnetarStreamAction {
   // returns the action the dev can call with myModule.insert() etc.
   return async function (payload?: any, actionConfig: ActionConfig = {}): Promise<void> {
@@ -41,12 +41,12 @@ export function handleStreamPerStore(
     const modifyPayloadFnsMap = getModifyPayloadFnsMap(
       globalConfig.modifyPayloadOn,
       moduleConfig.modifyPayloadOn,
-      actionConfig.modifyPayloadOn
+      actionConfig.modifyPayloadOn,
     )
     const modifyReadResponseMap = getModifyReadResponseFnsMap(
       globalConfig.modifyReadResponseOn,
       moduleConfig.modifyReadResponseOn,
-      actionConfig.modifyReadResponseOn
+      actionConfig.modifyReadResponseOn,
     )
     const storesToExecute: string[] =
       actionConfig.executionOrder ||
@@ -102,7 +102,7 @@ export function handleStreamPerStore(
 
         return executeOnFns({
           modifyReadResultFns: modifyReadResponseFns.added,
-          localStoreFns: doOnStreamFns.added,
+          cacheStoreFns: doOnStreamFns.added,
           payload: result.payload,
           docMetaData: result.meta,
         })
@@ -123,7 +123,7 @@ export function handleStreamPerStore(
 
         return executeOnFns({
           modifyReadResultFns: modifyReadResponseFns.added,
-          localStoreFns: doOnStreamFns.added,
+          cacheStoreFns: doOnStreamFns.added,
           payload: result.payload,
           docMetaData: result.meta,
         })
@@ -137,7 +137,7 @@ export function handleStreamPerStore(
 
         return executeOnFns({
           modifyReadResultFns: modifyReadResponseFns.removed,
-          localStoreFns: doOnStreamFns.removed,
+          cacheStoreFns: doOnStreamFns.removed,
           payload: _payload,
           docMetaData: _meta,
         })

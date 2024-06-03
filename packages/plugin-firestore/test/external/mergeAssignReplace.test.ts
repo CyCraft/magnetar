@@ -86,7 +86,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
   })
 }
 {
-  // these tests are not really testing reverting the remote store, only the local store:
+  // these tests are not really testing reverting the remote store, only the cache store:
   const testName = 'revert: merge'
   test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName, {
@@ -108,7 +108,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
   })
 }
 {
-  // these tests are not really testing reverting the remote store, only the local store:
+  // these tests are not really testing reverting the remote store, only the cache store:
   const testName = 'revert: assign'
   test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName, {
@@ -130,7 +130,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
   })
 }
 {
-  // these tests are not really testing reverting the remote store, only the local store:
+  // these tests are not really testing reverting the remote store, only the cache store:
   const testName = 'revert: replace'
   test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName, {

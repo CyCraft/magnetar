@@ -24,7 +24,7 @@ test('fetch: can mutate payload & read response (config in global magnetar insta
             payloadInSuccessEvent = payload
           },
         },
-      }
+      },
     )
     // the remote result SHOULD HAVE the applied defaults
     assert.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123', force: true })
@@ -32,7 +32,7 @@ test('fetch: can mutate payload & read response (config in global magnetar insta
   } catch (error) {
     assert.fail(JSON.stringify(error))
   }
-  // the local store SHOULD HAVE the applied defaults
+  // the cache store SHOULD HAVE the applied defaults
   assert.deepEqual(magnetar.collection('pokedex').data.get('136'), { ...pokedex(136), seen: true })
 })
 
@@ -56,10 +56,10 @@ test('stream: can mutate payload & read response (config in global magnetar inst
           payloadInSuccessEvent = payload
         },
       },
-    }
+    },
   )
   await waitMs(600)
-  // the local store SHOULD HAVE the applied defaults
+  // the cache store SHOULD HAVE the applied defaults
   assert.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123' })
   assert.deepEqual(magnetar.collection('pokedex').data.get('2'), { ...pokedex(2), seen: true })
 })
@@ -83,7 +83,7 @@ test('insert: can mutate payload (config in global magnetar instance)', async ()
   } catch (error) {
     assert.fail(JSON.stringify(error))
   }
-  // the local store SHOULD HAVE the applied defaults
+  // the cache store SHOULD HAVE the applied defaults
   assert.deepEqual(magnetar.collection('pokedex').data.get('7'), { ...pokedex(7), seen: true })
   assert.deepEqual(magnetar.collection('pokedex').data.get('10'), { ...pokedex(10), seen: true })
   assert.deepEqual(magnetar.collection('pokedex').data.get('25'), { ...pokedex(25), seen: true })
@@ -112,7 +112,7 @@ test('fetch: can mutate payload & read response (config in module)', async () =>
             payloadInSuccessEvent = payload
           },
         },
-      }
+      },
     )
     // the remote result SHOULD HAVE the applied defaults
     assert.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123', force: true })
@@ -120,7 +120,7 @@ test('fetch: can mutate payload & read response (config in module)', async () =>
   } catch (error) {
     assert.fail(JSON.stringify(error))
   }
-  // the local store SHOULD HAVE the applied defaults
+  // the cache store SHOULD HAVE the applied defaults
   assert.deepEqual(pokedexModule.data.get('136'), { ...pokedex(136), seen: true })
 })
 
@@ -145,10 +145,10 @@ test('stream: can mutate payload & read response (config in module)', async () =
           payloadInSuccessEvent = payload
         },
       },
-    }
+    },
   )
   await waitMs(600)
-  // the local store SHOULD HAVE the applied defaults
+  // the cache store SHOULD HAVE the applied defaults
   assert.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123' })
   assert.deepEqual(pokedexModule.data.get('2'), { ...pokedex(2), seen: true })
 })
@@ -170,7 +170,7 @@ test('insert: can mutate payload (config in module)', async () => {
   } catch (error) {
     assert.fail(JSON.stringify(error))
   }
-  // the local store SHOULD HAVE the applied defaults
+  // the cache store SHOULD HAVE the applied defaults
   assert.deepEqual(pokedexModule.data.get('7'), { ...pokedex(7), seen: true })
 })
 
@@ -196,7 +196,7 @@ test('fetch: can mutate payload & read response (config in action)', async () =>
             payloadInSuccessEvent = payload
           },
         },
-      }
+      },
     )
     // the remote result SHOULD HAVE the applied defaults
     assert.deepEqual(result.get('1'), { ...pokedex(1), seen: true })
@@ -205,7 +205,7 @@ test('fetch: can mutate payload & read response (config in action)', async () =>
   } catch (error) {
     assert.fail(JSON.stringify(error))
   }
-  // the local store SHOULD HAVE the applied defaults
+  // the cache store SHOULD HAVE the applied defaults
   assert.deepEqual(pokedexModule.data.get('1'), { ...pokedex(1), seen: true })
   assert.deepEqual(pokedexModule.data.get('136'), { ...pokedex(136), seen: true })
 })
@@ -230,11 +230,11 @@ test('stream: can mutate payload & read response (config in action)', async () =
           payloadInSuccessEvent = payload
         },
       },
-    }
+    },
   )
   await waitMs(600)
   assert.deepEqual(payloadInSuccessEvent, { auth: 'Bearer 123123' })
-  // the local store SHOULD HAVE the applied defaults
+  // the cache store SHOULD HAVE the applied defaults
   assert.deepEqual(pokedexModule.data.get('1'), { ...pokedex(1), seen: true })
   assert.deepEqual(pokedexModule.data.get('2'), { ...pokedex(2), seen: true })
 })
@@ -256,7 +256,7 @@ test('insert: can mutate payload (config in action)', async () => {
   } catch (error) {
     assert.fail(JSON.stringify(error))
   }
-  // the local store SHOULD HAVE the applied defaults
+  // the cache store SHOULD HAVE the applied defaults
   assert.deepEqual(pokedexModule.data.get('1'), { ...pokedex(1) })
   assert.deepEqual(pokedexModule.data.get('7'), { ...pokedex(7), seen: true })
 })
@@ -281,8 +281,8 @@ test('insert: can mutate payload (config in module - action from doc)', async ()
   } catch (error) {
     assert.fail(JSON.stringify(error))
   }
-  // the local store result not from pokedexModule SHOULD NOT HAVE the applied defaults
+  // the cache store result not from pokedexModule SHOULD NOT HAVE the applied defaults
   assert.deepEqual(pokedexModule.data.get('7'), { ...pokedex(7), seen: true })
-  // the local store SHOULD HAVE the applied defaults
+  // the cache store SHOULD HAVE the applied defaults
   assert.deepEqual(pokedexModule.data.get('10'), { ...pokedex(10) })
 })

@@ -7,6 +7,40 @@
 - Magnetar is now ESM only. This means you need to use `import` instead of `require`.
 - Magnetar now requires Node v18+.
 - `@magnetarjs/plugin-vue2` was removed.
+- `local` store plugin now needs to be called `cache`
+
+Before:
+
+```js
+import { CreatePlugin as PluginVue3 } from '@magnetarjs/plugin-vue3'
+
+const local = PluginVue3({ generateRandomId })
+const remote = ...
+
+export const magnetar = Magnetar({
+  localStoreName: 'local',
+  stores: { local, remote },
+  executionOrder: {
+    read: ['local', 'remote'],
+    write: ['local', 'remote'],
+    // ...
+```
+
+After:
+
+```js
+import { CreatePlugin as PluginVue3 } from '@magnetarjs/plugin-vue3'
+
+const cache = PluginVue3({ generateRandomId })
+const remote = ...
+
+export const magnetar = Magnetar({
+  stores: { cache, remote },
+  executionOrder: {
+    read: ['cache', 'remote'],
+    write: ['cache', 'remote'],
+    // ...
+```
 
 ## v0.4.0
 
@@ -30,7 +64,7 @@ firebase.initializeApp({
 // initialise PluginFirestore
 import { CreatePlugin as PluginFirestore } from '@magnetarjs/plugin-firestore'
 
-const remote = PluginFirestore.CreatePlugin({ firebaseInstance: firebase })
+const remote = PluginFirestore({ firebaseInstance: firebase })
 ```
 
 After:
@@ -48,7 +82,7 @@ const db = getFirestore(firebaseApp)
 // initialise PluginFirestore
 import { CreatePlugin as PluginFirestore } from '@magnetarjs/plugin-firestore'
 
-const remote = PluginFirestore.CreatePlugin({ db })
+const remote = PluginFirestore({ db })
 ```
 
 ## v0.3.0

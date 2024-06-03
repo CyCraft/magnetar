@@ -4,10 +4,10 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
 import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
 
 {
-  const testName = 'revert: (remote → local) insert (document)'
+  const testName = 'revert: (remote → cache) insert (document)'
   test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName)
-    const payload = { ...pokedex(7), shouldFail: 'local' }
+    const payload = { ...pokedex(7), shouldFail: 'cache' }
     assert.deepEqual(pokedexModule.doc('7').data, undefined)
 
     const squirtle = pokedexModule.doc('7')
@@ -15,7 +15,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
     try {
       await squirtle.insert(payload, {
         onError: 'revert',
-        executionOrder: ['remote', 'local'],
+        executionOrder: ['remote', 'cache'],
         on: {
           success: async ({ storeName }) => {
             if (storeName !== 'remote') return
@@ -33,15 +33,15 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
   })
 }
 {
-  const testName = 'revert: (remote → local) insert (collection) → random ID'
+  const testName = 'revert: (remote → cache) insert (collection) → random ID'
   test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName)
-    const payload = { ...pokedex(7), shouldFail: 'local' }
+    const payload = { ...pokedex(7), shouldFail: 'cache' }
 
     try {
       await pokedexModule.insert(payload, {
         onError: 'revert',
-        executionOrder: ['remote', 'local'],
+        executionOrder: ['remote', 'cache'],
         on: {
           success: async ({ storeName }) => {
             if (storeName !== 'remote') return
@@ -62,9 +62,9 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
 // Todo: currently not possible
 // see: https://github.com/cycraft/core/issues/2
 // {
-//   const testName = 'revert: (remote → local) delete (document)'
+//   const testName = 'revert: (remote → cache) delete (document)'
 //   test(testName, async t => {
-//     const payload = { ...pokedex(7), shouldFailDelete: 'local' }
+//     const payload = { ...pokedex(7), shouldFailDelete: 'cache' }
 //     const { pokedexModule } = await createMagnetarInstance(testName)
 //     assert.deepEqual(pokedexModule.doc('7').data, undefined)
 //     await pokedexModule.insert(payload)
@@ -75,7 +75,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
 //         .doc('7')
 //         .delete(undefined, {
 //           onError: 'revert',
-//           executionOrder: ['remote', 'local'],
+//           executionOrder: ['remote', 'cache'],
 //           on: {
 //             success: async ({ storeName }) => {
 //               if (storeName !== 'remote') return
@@ -99,7 +99,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
 // }
 
 {
-  // this tests is _not really_ testing reverting the remote store, they test if the local store is reverted and if the remote store stays untouched on an error
+  // this tests is _not really_ testing reverting the remote store, they test if the cache store is reverted and if the remote store stays untouched on an error
   const testName = 'revert: merge (with extra checks)'
   test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName, {
@@ -114,7 +114,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
         onError: 'revert',
         on: {
           success: ({ storeName }) => {
-            if (storeName !== 'local') return
+            if (storeName !== 'cache') return
             const expectedMidway = {
               id: 1,
               name: 'Bulbasaur',
@@ -142,7 +142,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
   })
 }
 {
-  // this tests is _not really_ testing reverting the remote store, they test if the local store is reverted and if the remote store stays untouched on an error
+  // this tests is _not really_ testing reverting the remote store, they test if the cache store is reverted and if the remote store stays untouched on an error
   const testName = 'revert: assign (with extra checks)'
   test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName, {
@@ -157,7 +157,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
         onError: 'revert',
         on: {
           success: ({ storeName }) => {
-            if (storeName !== 'local') return
+            if (storeName !== 'cache') return
             const expectedMidway = {
               id: 1,
               name: 'Bulbasaur',
@@ -180,7 +180,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
   })
 }
 {
-  // this tests is _not really_ testing reverting the remote store, they test if the local store is reverted and if the remote store stays untouched on an error
+  // this tests is _not really_ testing reverting the remote store, they test if the cache store is reverted and if the remote store stays untouched on an error
   const testName = 'revert: replace (with extra checks)'
   test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance(testName, {
@@ -195,7 +195,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
         onError: 'revert',
         on: {
           success: ({ storeName }) => {
-            if (storeName !== 'local') return
+            if (storeName !== 'cache') return
             const expectedMidway = { base: { HP: undefined } }
             assert.deepEqual(pokedexModule.doc('1').data, expectedMidway as any)
           },

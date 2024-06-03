@@ -11,7 +11,7 @@ import { insertActionFactory } from './insert.js'
 
 export function streamActionFactory(
   data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
-  simpleStoreOptions: SimpleStoreOptions
+  simpleStoreOptions: SimpleStoreOptions,
 ): PluginStreamAction {
   return function ({
     payload,
@@ -27,13 +27,13 @@ export function streamActionFactory(
     // hover over the prop names below to see more info on when they are triggered:
     const doOnStream: DoOnStream = {
       added: (payload, meta) => {
-        // abort updating local state if the payload was set to undefined
+        // abort updating local cache state if the payload was set to undefined
         if (payload === undefined) return undefined
 
         const _docId = docId || `${meta.id}`
         insertActionFactory(
           data,
-          simpleStoreOptions
+          simpleStoreOptions,
         )({
           payload,
           collectionPath,
@@ -44,13 +44,13 @@ export function streamActionFactory(
         return undefined
       },
       modified: (payload, meta) => {
-        // abort updating local state if the payload was set to undefined
+        // abort updating local cache state if the payload was set to undefined
         if (payload === undefined) return undefined
 
         const _docId = docId || `${meta.id}`
         insertActionFactory(
           data,
-          simpleStoreOptions
+          simpleStoreOptions,
         )({
           payload,
           collectionPath,
@@ -61,7 +61,7 @@ export function streamActionFactory(
         return undefined
       },
       removed: (payload, meta) => {
-        // abort updating local state if the payload was set to undefined
+        // abort updating local cache state if the payload was set to undefined
         if (payload === undefined) return undefined
 
         const collectionPathDocIdToDelete: [string, string] = isFullString(docId)
@@ -72,7 +72,7 @@ export function streamActionFactory(
         const [_cPath, _dId] = collectionPathDocIdToDelete
         deleteActionFactory(
           data,
-          simpleStoreOptions
+          simpleStoreOptions,
         )({
           payload: undefined,
           collectionPath: _cPath,

@@ -25,11 +25,12 @@ export type ExecutionOrderConfig = {
  * The Magnetar global options. Can be overwritten on a per-module or per-action basis.
  */
 export type GlobalConfig = {
-  /**
-   * the storeName of the plugin that will keep your local data cache for usage with your client.
-   */
-  localStoreName: StoreName
-  stores: { [storeName: string]: PluginInstance }
+  stores: {
+    /** the cache store, this plugin is responsible for the data to be linked to your UI */
+    cache: PluginInstance
+    /** any other stores you can choose the key name of */
+    [storeName: string]: PluginInstance
+  }
   executionOrder?: ExecutionOrderConfig
   onError?: 'revert' | 'continue' | 'stop'
   modifyPayloadOn?: ModifyPayloadFnMap

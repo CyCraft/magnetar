@@ -121,7 +121,7 @@ pokedexModule.doc('abc').insert({ name: 'Unown', type: undefined })
 
 ### Remove Certain Values
 
-Some remote stores (eg. Firestore) do not allow the value `undefined`. In this case you can set up a hook that completely removes `undefined` before the data is sent to your local and remote stores. For this example we're going to use a tiny helper utility I wrote called [remove-anything](https://github.com/mesqueeb/remove-anything).
+Some remote stores (eg. Firestore) do not allow the value `undefined`. In this case you can set up a hook that completely removes `undefined` before the data is sent to your cache and remote stores. For this example we're going to use a tiny helper utility I wrote called [remove-anything](https://github.com/mesqueeb/remove-anything).
 
 ```js
 import { removeProp } from 'remove-anything'
@@ -172,7 +172,7 @@ The config you can pass for `modifyReadResponseOn` is an object with the followi
 - `modified` — triggered every time data is modified on your remote store (the server), during the method `stream`
 - `removed` — triggered every time data is removed from your remote store (the server) OR if a document satisfy the query filters of your module anymore, during the method `stream`
 
-Your `modifyReadResponseOn`-function will receive a `payload` as param which is the _incoming data_ and **must** return that `payload` again. The main purpose is that you can modify the payload before it is added to your local store.
+Your `modifyReadResponseOn`-function will receive a `payload` as param which is the _incoming data_ and **must** return that `payload` again. The main purpose is that you can modify the payload before it is added to your local cache store.
 
 Here we give some examples with common use cases.
 
@@ -205,7 +205,7 @@ pokedexModule.stream()
 
 > documentation below is still WIP
 
-> hint: returning `undefined` will discard the document change and do nothing with the local store
+> hint: returning `undefined` will discard the document change and do nothing with the local cache store
 
 ### Accessing Metadata when Reading Data
 

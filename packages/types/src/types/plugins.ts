@@ -44,27 +44,27 @@ export type PluginInstance = {
    */
   revert: PluginRevertAction
   /**
-   * This must be provided by Store Plugins that have "local" data. It is triggered ONCE when the module (doc or collection) is instantiated. In any case, an empty Map for the collectionPath (to be derived from the modulePath) must be set up.
+   * This must be provided by Store Plugins that have "cache" data. It is triggered ONCE when the module (doc or collection) is instantiated. In any case, an empty Map for the collectionPath (to be derived from the modulePath) must be set up.
    */
   setupModule?: (pluginModuleSetupPayload: PluginModuleSetupPayload) => void
   /**
-   * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's `.data` is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
+   * This must be provided by Store Plugins that have "cache" data. It is triggered EVERY TIME the module's `.data` is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
    */
   getModuleData?: (
     pluginModuleSetupPayload: PluginModuleSetupPayload,
   ) => { [key: string]: any } | Map<string, { [key: string]: any }>
   /**
-   * This must be provided by Store Plugins that have "local" data. It should signify wether or not the document exists. Must return `undefined` when not sure (if the document was never fetched). It is triggered EVERY TIME the module's `.data` is accessed.
+   * This must be provided by Store Plugins that have "cache" data. It should signify wether or not the document exists. Must return `undefined` when not sure (if the document was never fetched). It is triggered EVERY TIME the module's `.data` is accessed.
    */
   getModuleExists?: (
     pluginModuleSetupPayload: Pick<PluginModuleSetupPayload, 'collectionPath' | 'docId'>,
   ) => undefined | 'error' | boolean
   /**
-   * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's `.count` is accessed. The `modulePath` will always be that of a "collection". It must return the fetched doc count, or fall back to `.data.size` in case it hasn't fetched the doc count yet.
+   * This must be provided by Store Plugins that have "cache" data. It is triggered EVERY TIME the module's `.count` is accessed. The `modulePath` will always be that of a "collection". It must return the fetched doc count, or fall back to `.data.size` in case it hasn't fetched the doc count yet.
    */
   getModuleCount?: (pluginModuleSetupPayload: Omit<PluginModuleSetupPayload, 'docId'>) => number
   /**
-   * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's `.count` is accessed. The `modulePath` will always be that of a "collection". It must return the fetched doc sum/average for the fields requested so far
+   * This must be provided by Store Plugins that have "cache" data. It is triggered EVERY TIME the module's `.count` is accessed. The `modulePath` will always be that of a "collection". It must return the fetched doc sum/average for the fields requested so far
    */
   getModuleAggregate?: (
     kind: 'sum' | 'average',
@@ -77,7 +77,7 @@ export type PluginInstance = {
 }
 
 /**
- * Where, orderBy, limit clauses or extra config a dev might pass when instanciates a module as second param (under `configPerStore`). Eg. `collection('pokedex', { configPerStore: { local: pluginModuleConfig } })`
+ * Where, orderBy, limit clauses or extra config a dev might pass when instanciates a module as second param (under `configPerStore`). Eg. `collection('pokedex', { configPerStore: { cache: pluginModuleConfig } })`
  */
 export type PluginModuleConfig = Clauses & { [key in string]: any }
 
@@ -132,14 +132,14 @@ export type PluginStreamActionPayload<SpecificPluginModuleConfig = PluginModuleC
     payload: { [key: string]: any } | undefined
     /**
      * MustExecuteOnRead:
-     * The functions for 'added', 'modified' and 'removed' **must** be executed by the plugin whenever the stream sees any of these changes. These are the functions that will pass the data to the other "local" Store Plugins.
+     * The functions for 'added', 'modified' and 'removed' **must** be executed by the plugin whenever the stream sees any of these changes. These are the functions that will pass the data to the other "cache" Store Plugins.
      */
     mustExecuteOnRead: MustExecuteOnRead
   }
 >
 
 /**
- * Should handle 'stream' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc). Should return `StreamResponse` when acting as a "remote" Store Plugin, and `DoOnStream` when acting as "local" Store Plugin.
+ * Should handle 'stream' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc). Should return `StreamResponse` when acting as a "remote" Store Plugin, and `DoOnStream` when acting as "cache" Store Plugin.
  */
 export type PluginStreamAction = (
   payload: PluginStreamActionPayload,
@@ -156,7 +156,7 @@ export type PluginFetchActionPayload<SpecificPluginModuleConfig = PluginModuleCo
 >
 
 /**
- * Should handle 'fetch' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc). Should return `FetchResponse` when acting as a "remote" Store Plugin, and `DoOnFetch` when acting as "local" Store Plugin.
+ * Should handle 'fetch' for collections & docs. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc). Should return `FetchResponse` when acting as a "remote" Store Plugin, and `DoOnFetch` when acting as "cache" Store Plugin.
  */
 export type PluginFetchAction = (
   payload: PluginFetchActionPayload,
@@ -168,7 +168,7 @@ export type PluginFetchCountActionPayload<T = PluginModuleConfig> = Omit<
 >
 
 /**
- * Should handle 'fetchCount' for collections. Should return `FetchAggregateResponse` when acting as a "remote" Store Plugin, and `DoOnFetchAggregate` when acting as "local" Store Plugin.
+ * Should handle 'fetchCount' for collections. Should return `FetchAggregateResponse` when acting as a "remote" Store Plugin, and `DoOnFetchAggregate` when acting as "cache" Store Plugin.
  */
 export type PluginFetchCountAction = (
   payload: PluginFetchCountActionPayload,
@@ -189,7 +189,7 @@ export type PluginFetchAggregateActionPayload<T = PluginModuleConfig> = Omit<
 >
 
 /**
- * Should handle 'fetchSum' 'fetchAverage' for collections. Should return `FetchAggregateResponse` when acting as a "remote" Store Plugin, and `DoOnFetchAggregate` when acting as "local" Store Plugin.
+ * Should handle 'fetchSum' 'fetchAverage' for collections. Should return `FetchAggregateResponse` when acting as a "remote" Store Plugin, and `DoOnFetchAggregate` when acting as "cache" Store Plugin.
  */
 export type PluginFetchAggregateAction = (
   payload: PluginFetchAggregateActionPayload,
@@ -329,27 +329,27 @@ export type PluginActionTernary<TActionName extends ActionName> = TActionName ex
 export type StreamResponse = { streaming: Promise<void>; stop: () => void }
 
 /**
- * Plugin's response to a 'stream' action, when acting as a "local" Store Plugin.
+ * Plugin's response to a 'stream' action, when acting as a "cache" Store Plugin.
  */
 export type DoOnStream = {
   /**
    * 'added' will/should be triggered per document on 3 occasions: on 'fetch' when a document is read; on 'stream' when initial documents are read; on 'stream' when there are consequent insertions of documents on the end-point.
    *
-   * As local store plugin this should be a function that covers the logic to save the payload to the local state.
+   * As local cache store plugin this should be a function that covers the logic to save the payload to the local cache state.
    * As remote store plugin this is what must be executed during the events.
    */
   added?: OnAddedFn
   /**
    * 'modified' will/should be triggered per document on 1 occasion: on 'stream' when a document that was already read through that stream once before is modified on the end-point.
    *
-   * As local store plugin this should be a function that covers the logic to update the payload in the local state.
+   * As local cache store plugin this should be a function that covers the logic to update the payload in the local cache state.
    * As remote store plugin this is what must be executed during the events.
    */
   modified?: OnModifiedFn
   /**
    * 'removed' will/should be triggered per document on 2 occasions: on 'stream' when a document is "deleted" on the end-point; when a document doesn't adhere to the "stream clauses" any more.
    *
-   * As local store plugin this should be a function that covers the logic to remove the payload from the local state.
+   * As local cache store plugin this should be a function that covers the logic to remove the payload from the local cache state.
    * As remote store plugin this is what must be executed during the events.
    */
   removed?: OnRemovedFn
@@ -366,7 +366,7 @@ export type DoOnStreamFns = {
 
 /**
  * MustExecuteOnRead:
- * The functions for 'added', 'modified' and 'removed' **must** be executed by the plugin whenever the stream sees any of these changes. These are the functions that will pass the data to the other "local" Store Plugins.
+ * The functions for 'added', 'modified' and 'removed' **must** be executed by the plugin whenever the stream sees any of these changes. These are the functions that will pass the data to the other "cache" Store Plugins.
  */
 export type MustExecuteOnRead = Required<DoOnStream>
 
@@ -386,7 +386,7 @@ export type FetchResponse = {
 }
 
 /**
- * Plugin's response to a 'fetch' action, when acting as a "local" Store Plugin.
+ * Plugin's response to a 'fetch' action, when acting as a "cache" Store Plugin.
  */
 export type DoOnFetch = (
   docData: { [key: string]: unknown } | undefined,
@@ -398,6 +398,6 @@ export type DoOnFetch = (
  */
 export type FetchAggregateResponse = number
 /**
- * The local store should provide a function that will store the fetchCount when it comes in from the remote store.
+ * The local cache store should provide a function that will store the fetchCount when it comes in from the remote store.
  */
 export type DoOnFetchAggregate = (payload: FetchAggregateResponse) => undefined

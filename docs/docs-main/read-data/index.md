@@ -7,23 +7,23 @@ There are two ways to retrieve data from your remote stores. Either of these met
 
 ## Fetch Data Once
 
-When you get data by executing `fetch()`, the data will be fetched from a server by your "remote" store plugin and then added to your module's data by your "local" store plugin.
+When you get data by executing `fetch()`, the data will be fetched from a server by your "remote" store plugin and then added to your module's data by your "cache" store plugin.
 
 For displaying fetched data in the DOM see the [Displaying data in the DOM](../setup/#displaying-data-in-the-dom).
 
 ### Fetch a Single Document
 
-When you call `fetch()` on a document module, your remote store will go and fetch the document from your database and add it to your local store.
+When you call `fetch()` on a document module, your remote store will go and fetch the document from your database and add it to your local cache store.
 
 ```javascript
 const bulbasaur = magnetar.doc('pokedex/001')
 
-// bulbasaur's data is not yet in local data
+// bulbasaur's data is not yet in cached data
 // bulbasaur.data ≈ {}
 
 await bulbasaur.fetch()
 
-// now it is available locally:
+// now it is available:
 
 const data = bulbasaur.data
 // bulbasaur.data ≈ { name: 'Bulbasaur' }
@@ -144,9 +144,9 @@ magnetar.collection('pokedex').average // { base: { HP: 64.2 } }
 
 ## Stream Realtime Updates
 
-When you set up a _**stream**_ for a document or collection, just like `fetch()`, your the data will be fetched from a server by your _remote_ store plugin and then added to your module's _local_ data.
+When you set up a _**stream**_ for a document or collection, just like `fetch()`, your the data will be fetched from a server by your _remote_ store plugin and then added to your module's _cache_ data.
 
-Afterwards, any changes to this document remotely will automatically be reflected in your module's _local_ data while the stream is open.
+Afterwards, any changes to this document remotely will automatically be reflected in your module's _cache_ data while the stream is open.
 
 Please note: a streaming promise will never resolve as long as your stream is open! There is **no way** to know when or how many documents will be loaded in, as this depends on your remote store.
 
@@ -265,10 +265,10 @@ There are founr methods to query more specific data in a collection:
 
 You can execute and chain these methods on collections to create a _queried module_ that is just like a regular module but with your query applied.
 
-When you apply a query it affects both the remote and local stores:
+When you apply a query it affects both the remote and cache stores:
 
 - If you make a `fetch()` call with a _queried module_, it will pass the queries to the remote store, which will make sure that your query is applied to the API call.
-- If you access module data with a _queried module_, the local store will also make sure that your query is applied to whatever data it returns.
+- If you access module data with a _queried module_, the local cache store will also make sure that your query is applied to whatever data it returns.
 
 ```js
 const pokedexModule = magnetar.collection('pokedex')
@@ -312,7 +312,7 @@ magnetar
 ```
 <!-- prettier-ignore-end -->
 
-For now read the Firestore documentation on [Simple and Compound Queries](https://firebase.google.com/docs/firestore/query-data/queries). The concept is inspired by Firestore, but with Magnetar _every_ local and remote store plugin implements the proper logic to work with these kind of queries!
+For now read the Firestore documentation on [Simple and Compound Queries](https://firebase.google.com/docs/firestore/query-data/queries). The concept is inspired by Firestore, but with Magnetar _every_ cache and remote store plugin implements the proper logic to work with these kind of queries!
 
 More Magnetar specific information on this will come soon.
 

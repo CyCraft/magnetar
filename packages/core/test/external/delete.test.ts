@@ -29,12 +29,12 @@ test('delete (collection)', async () => {
   assert.deepEqual(pokedexModule.data.get('1'), undefined)
 })
 
-test('revert: delete (local → remote)', async () => {
+test('revert: delete (cache → remote)', async () => {
   const { trainerModule } = createMagnetarInstance()
   assert.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
   try {
-    await trainerModule.delete('remote', { onError: 'revert', executionOrder: ['local', 'remote'] }) // mocks error on delete for remote store mock
+    await trainerModule.delete('remote', { onError: 'revert', executionOrder: ['cache', 'remote'] }) // mocks error on delete for remote store mock
   } catch (error) {
     assert.isTrue(!!error)
   }
@@ -43,12 +43,12 @@ test('revert: delete (local → remote)', async () => {
 })
 
 // todo: for this test to work we need to mock a data pool for the remote plugin mock
-// test('revert: delete (remote → local)', async t => {
+// test('revert: delete (remote → cache)', async t => {
 //   const { trainerModule } = createMagnetarInstance()
 //   assert.deepEqual(trainerModule.data, { age: 10, name: 'Luca' })
 
 //   try {
-//     await trainerModule.delete('local', { onError: 'revert', executionOrder: ['remote', 'local'] }) // mocks error on delete for remote store mock
+//     await trainerModule.delete('cache', { onError: 'revert', executionOrder: ['remote', 'cache'] }) // mocks error on delete for remote store mock
 //   } catch (error) {
 //     assert.isTrue(!!error)
 //   }

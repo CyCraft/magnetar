@@ -4,11 +4,11 @@
 
 TLDR; Firestore SDK **charges you on every read**. Magnetar does cache management for free.
 
-Firestore has its own implementation of locally cached data. However, every time you access that data it will also double check if the data is up to date with the server. This means that you are charged money every time you simply want to use your data locally.
+Firestore has its own implementation of locally cached data. However, every time you access that data it will also double check if the data is up to date with the server. This means that you are charged money every time you simply want to use your cached data locally.
 
 When you think about this, most devs end up saving the data in some sort of object or in a state management library Vue data or Vuex/Redux. This means that you then have to add write logic to write the data back to the database either way.
 
-Magnetar's goal is to replace all this logic you need to write yourself to read and write data, providing its own local store so you can more easily prevent Firebase from charging you when reading docs you already fetched.
+Magnetar's goal is to replace all this logic you need to write yourself to read and write data, providing its own local cache store so you can more easily prevent Firebase from charging you when reading docs you already fetched.
 
 ## Why did you build Magnetar?
 
@@ -26,13 +26,13 @@ I'm the creator of [Vuex Easy Firestore](https://mesqueeb.github.io/vuex-easy-fi
 <!-- ![](/architecture/magnetar-architecture.png) -->
 <img src="/architecture/magnetar-architecture.png" style="width: 100%" />
 
-## Why the concept of local/remote store plugins?
+## Why the concept of cache/remote store plugins?
 
 I wanted Magnetar to be compatible with a wide variety of use cases and projects.
 
 When it comes to remote stores, I wanted to be able to use Firestore but competitors like Fauna and Supabase also looked interesting. I didn't want to limit the future to just Firestore.
 
-When it comes to local stores, there are different approaches again. A simple store that just works with a Map or Object is tricky to make reactive out of the box for Vue projects. Adding reactivity out of the box needed a different implementation for Vue 2 and Vue 3. Again, not to limit the future and prevent code bloat, using a similar plugin system for local stores was the way to go.
+When it comes to local cache stores, there are different approaches again. A simple store that just works with a Map or Object is tricky to make reactive out of the box for Vue projects. Adding reactivity out of the box needed a different implementation for Vue 2 and Vue 3. Again, not to limit the future and prevent code bloat, using a similar plugin system for local cache stores was the way to go.
 
 Finally I also like the idea of having your own data caching options. I'm planning to also add store plugins that work with localStorage, indexedDB, etc. All of this meant that a store plugin system was the best choice!
 

@@ -27,7 +27,7 @@ export function streamActionFactory(
     // hover over the prop names below to see more info on when they are triggered:
     const doOnStream: DoOnStream = {
       added: (payload, meta) => {
-        // abort updating local state if the payload was set to undefined
+        // abort updating local cache state if the payload was set to undefined
         if (payload === undefined) return undefined
 
         const _docId = docId || `${meta.id}`
@@ -44,7 +44,7 @@ export function streamActionFactory(
         return undefined
       },
       modified: (payload, meta) => {
-        // abort updating local state if the payload was set to undefined
+        // abort updating local cache state if the payload was set to undefined
         if (payload === undefined) return undefined
 
         const _docId = docId || `${meta.id}`
@@ -61,7 +61,7 @@ export function streamActionFactory(
         return undefined
       },
       removed: (payload, meta) => {
-        // abort updating local state if the payload was set to undefined
+        // abort updating local cache state if the payload was set to undefined
         if (payload === undefined) return undefined
 
         const collectionPathDocIdToDelete: [string, string] = isFullString(docId)

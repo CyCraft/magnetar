@@ -62,6 +62,8 @@
     "vue-store",
     "firestore",
     "data-store",
+    "data-cache",
+    "cache-store",
     "local-store",
     "remote-store",
     "global-store",

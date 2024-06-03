@@ -36,7 +36,7 @@ export async function createMagnetarInstance(
   }: {
     insertDocs?: { [path: string]: { [key: string]: any } }
     remoteConfig?: { [key: string]: any }
-  } = {}
+  } = {},
 ): Promise<{
   pokedexModule: CollectionInstance<PokedexModuleData>
   trainerModule: DocInstance<TrainerModuleData>
@@ -64,21 +64,20 @@ export async function createMagnetarInstance(
   await Promise.all(insertPromises)
 
   // create & prepare the modules
-  const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
+  const cache = CreatePluginLocal({ storeName: 'cache', generateRandomId })
   const remote = CreatePluginRemote({ db })
   const magnetar = Magnetar({
-    localStoreName: 'local',
-    stores: { local, remote },
+    stores: { cache, remote },
     executionOrder: {
-      read: ['local', 'remote'],
-      write: ['local', 'remote'],
-      delete: ['local', 'remote'],
+      read: ['cache', 'remote'],
+      write: ['cache', 'remote'],
+      delete: ['cache', 'remote'],
     },
   })
 
   const pokedexModule = magnetar.collection<PokedexModuleData>('pokedex', {
     configPerStore: {
-      local: { initialData: initialEntriesPokedex },
+      cache: { initialData: initialEntriesPokedex },
       remote: { firestorePath: `magnetarTests/${testName}/pokedex`, ...remoteConfig },
     },
   })
@@ -101,7 +100,7 @@ export async function createMagnetarInstance(
 
   const trainerModule = magnetar.doc<TrainerModuleData>('app-data/trainer', {
     configPerStore: {
-      local: { initialData: getInitialDataDocument() },
+      cache: { initialData: getInitialDataDocument() },
       remote: { firestorePath: `magnetarTests/${testName}`, ...remoteConfig },
     },
   })

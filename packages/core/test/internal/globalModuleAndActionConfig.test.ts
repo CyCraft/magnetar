@@ -6,25 +6,24 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
 const CreatePluginLocal = PluginMockLocal.CreatePlugin
 
 test('emits global, module and action events', async () => {
-  const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
+  const cache = CreatePluginLocal({ storeName: 'cache', generateRandomId })
   const ranAllEvents: any[] = []
   const magnetar = Magnetar({
-    localStoreName: 'local',
-    stores: { local },
+    stores: { cache },
     executionOrder: {
-      read: ['local'],
-      write: ['local'],
+      read: ['cache'],
+      write: ['cache'],
     },
     on: {
       before: ({ payload, storeName }) => {
-        if (storeName === 'local') ranAllEvents.push(payload)
+        if (storeName === 'cache') ranAllEvents.push(payload)
       },
     },
   })
   const usersModule = magnetar.collection('users', {
     on: {
       before: ({ payload, storeName }) => {
-        if (storeName === 'local') ranAllEvents.push(payload)
+        if (storeName === 'cache') ranAllEvents.push(payload)
       },
     },
   })
@@ -33,7 +32,7 @@ test('emits global, module and action events', async () => {
   const result = await usersModule.insert(insertPayload, {
     on: {
       before: ({ payload, storeName }) => {
-        if (storeName === 'local') ranAllEvents.push(payload)
+        if (storeName === 'cache') ranAllEvents.push(payload)
       },
     },
   })
@@ -42,13 +41,12 @@ test('emits global, module and action events', async () => {
 })
 
 test('can modify payload in global, module and action settings', async () => {
-  const local = CreatePluginLocal({ storeName: 'local', generateRandomId })
+  const cache = CreatePluginLocal({ storeName: 'cache', generateRandomId })
   const magnetar = Magnetar({
-    localStoreName: 'local',
-    stores: { local },
+    stores: { cache },
     executionOrder: {
-      read: ['local'],
-      write: ['local'],
+      read: ['cache'],
+      write: ['cache'],
     },
     modifyPayloadOn: {
       insert: (payload) => {
@@ -86,7 +84,7 @@ test('can overwrite execution order', async () => {
   await pokedexModule.insert(insertPayload)
   let ranAllEvents: string[] = []
   await pokedexModule.doc('7').delete(undefined, {
-    executionOrder: ['local', 'remote'],
+    executionOrder: ['cache', 'remote'],
     on: {
       before: ({ payload, storeName }) => {
         ranAllEvents.push(storeName)
@@ -96,11 +94,11 @@ test('can overwrite execution order', async () => {
       },
     },
   })
-  assert.deepEqual(ranAllEvents, ['local', 'local', 'remote', 'remote'])
+  assert.deepEqual(ranAllEvents, ['cache', 'cache', 'remote', 'remote'])
   await pokedexModule.insert(insertPayload)
   ranAllEvents = []
   await pokedexModule.doc('7').delete(undefined, {
-    executionOrder: ['remote', 'local'],
+    executionOrder: ['remote', 'cache'],
     on: {
       before: ({ payload, storeName }) => {
         ranAllEvents.push(storeName)
@@ -110,5 +108,5 @@ test('can overwrite execution order', async () => {
       },
     },
   })
-  assert.deepEqual(ranAllEvents, ['remote', 'remote', 'local', 'local'])
+  assert.deepEqual(ranAllEvents, ['remote', 'remote', 'cache', 'cache'])
 })

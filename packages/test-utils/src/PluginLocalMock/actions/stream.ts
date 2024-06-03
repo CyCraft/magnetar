@@ -12,7 +12,7 @@ import { insertActionFactory } from './insert.js'
 
 export function streamActionFactory(
   data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
-  storePluginOptions: StorePluginOptions
+  storePluginOptions: StorePluginOptions,
 ): PluginStreamAction {
   return function ({
     payload,
@@ -32,12 +32,12 @@ export function streamActionFactory(
     // hover over the prop names below to see more info on when they are triggered:
     const doOnStream: DoOnStream = {
       added: (payload, meta) => {
-        // abort updating local state if the payload was set to undefined
+        // abort updating local cache state if the payload was set to undefined
         if (payload === undefined) return undefined
 
         insertActionFactory(
           data,
-          storePluginOptions
+          storePluginOptions,
         )({
           payload,
           collectionPath,
@@ -48,12 +48,12 @@ export function streamActionFactory(
         return undefined
       },
       modified: (payload, meta) => {
-        // abort updating local state if the payload was set to undefined
+        // abort updating local cache state if the payload was set to undefined
         if (payload === undefined) return undefined
 
         insertActionFactory(
           data,
-          storePluginOptions
+          storePluginOptions,
         )({
           payload,
           collectionPath,
@@ -70,12 +70,12 @@ export function streamActionFactory(
             ? [collectionPath, payload]
             : [collectionPath, meta.id]
         const [_cPath, _dId] = collectionPathDocIdToDelete
-        // abort updating local state if the payload was set to undefined
+        // abort updating local cache state if the payload was set to undefined
         if (payload === undefined) return undefined
 
         deleteActionFactory(
           data,
-          storePluginOptions
+          storePluginOptions,
         )({
           payload: undefined,
           collectionPath: _cPath,

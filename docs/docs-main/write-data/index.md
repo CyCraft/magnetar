@@ -17,7 +17,7 @@ pokedexModule.insert({ name: 'squirtle' })
 
 This is what happens:
 
-Your document is passed to both your store plugins. The local store plugin is responsible caching this document, and your remote store plugin is responsible for making the API call to your database.
+Your document is passed to both your store plugins. The local cache store plugin is responsible caching this document, and your remote store plugin is responsible for making the API call to your database.
 
 ### Access the New Document
 
@@ -46,7 +46,7 @@ Since your remote store will make an API call, insert will always returns a prom
 
 > If the insert promise only resolves **after** the remote store API call, how is this Optimistic UI?
 
-Awaiting an insert promise will never be _Optimistic_! However, when you insert a new document, your _local_ store is responsible for generating a new ID and saving the data in your module's cache. This part is done immediately and is therefore _Optimistic_!
+Awaiting an insert promise will never be _Optimistic_! However, when you insert a new document, your _cache_ store is responsible for generating a new ID and saving the data in your module's cache. This part is done immediately and is therefore _Optimistic_!
 
 > How can I achieve Optimistic UI then? (How can I display changes immediately in the UI?)
 

@@ -36,8 +36,7 @@ export type FirestorePluginOptions<Firestore extends Client.Firestore | Admin.Fi
    *
    * // add to magnetar during initialisation
    * const magnetar = Magnetar({
-   *   localStoreName: 'local',
-   *   stores: { local, remote },
+   *   stores: { cache, remote },
    *   // ...
    * }
    * ```
@@ -56,8 +55,7 @@ export type FirestorePluginOptions<Firestore extends Client.Firestore | Admin.Fi
    *
    * // add to magnetar during initialisation
    * const magnetar = Magnetar({
-   *   localStoreName: 'local',
-   *   stores: { local, remote },
+   *   stores: { cache, remote },
    *   // ...
    * }
    * ```

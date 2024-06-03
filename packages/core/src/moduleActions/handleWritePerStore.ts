@@ -43,7 +43,7 @@ export function handleWritePerStore(
   actionName: Extract<
     ActionName,
     'insert' | 'merge' | 'assign' | 'replace' | 'deleteProp' | 'delete'
-  >
+  >,
 ):
   | MagnetarWriteAction<any>
   | MagnetarInsertAction<any>
@@ -59,7 +59,7 @@ export function handleWritePerStore(
       return { promise: null, resolve: () => undefined, countdown: null }
     })
 
-    // we need to create a promise we'll resolve later to prevent any incoming docs from being written to the local state during this time
+    // we need to create a promise we'll resolve later to prevent any incoming docs from being written to the cache store during this time
     if (writeLock.promise === null) {
       writeLock.promise = new Promise<void>((resolve) => {
         writeLock.resolve = () => {
@@ -90,12 +90,12 @@ export function handleWritePerStore(
         const modifyPayloadFnsMap = getModifyPayloadFnsMap(
           globalConfig.modifyPayloadOn,
           moduleConfig.modifyPayloadOn,
-          actionConfig.modifyPayloadOn
+          actionConfig.modifyPayloadOn,
         )
         const eventNameFnsMap = getEventNameFnsMap(
           globalConfig.on,
           moduleConfig.on,
-          actionConfig.on
+          actionConfig.on,
         )
         const storesToExecute: string[] =
           actionConfig.executionOrder ||

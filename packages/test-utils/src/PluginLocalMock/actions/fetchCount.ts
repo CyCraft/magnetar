@@ -25,7 +25,7 @@ export function fetchCountActionFactory(
     const pathId = getPathWhereIdentifier(collectionPath, pluginModuleConfig)
 
     const doOnFetchAggregateAction: DoOnFetchAggregate = (count) => {
-      // abort updating local state if the payload was set to undefined
+      // abort updating local cache state if the payload was set to undefined
       if (count === undefined) return
 
       pathCountDic[pathId] = count

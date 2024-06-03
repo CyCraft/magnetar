@@ -5,7 +5,7 @@
 To instantiate Magnetar, you need to first instantiate the store plugins you will use:
 
 1. instantiate a plugin for a _**remote**_ data store
-2. instantiate a plugin for a _**local**_ data store
+2. instantiate a plugin for a local _**cache**_ data store
 3. _then_ instantiate the Magnetar instance with those plugins
 
 ### Example
@@ -13,7 +13,7 @@ To instantiate Magnetar, you need to first instantiate the store plugins you wil
 This is a complete setup example which uses:
 
 - the **Firestore** plugin for remote data store
-- the **Vue 3** plugin for local data store
+- the **Vue 3** plugin for local cache data store
 
 > Please note: in reality it's cleaner to have **all imports at the top**
 
@@ -42,21 +42,20 @@ function generateRandomId () { return doc(collection(db, 'random')).id }
 const remote = PluginFirestore.CreatePlugin({ db })
 
 // ---------------------------------------
-// 2. the plugin vue3 for local data store
-//    create the local store plugin instance & pass your `generateRandomId`:
+// 2. the plugin vue3 for cache data store
+//    create the cache store plugin instance & pass your `generateRandomId`:
 // ---------------------------------------
-const local = PluginVue3.CreatePlugin({ generateRandomId })
+const cache = PluginVue3.CreatePlugin({ generateRandomId })
 
 // -----------------------------------------------------
 // 3. instantiate the Magnetar instance with the store plugins
 // -----------------------------------------------------
 export const magnetar = Magnetar({
-  stores: { local, remote },
-  localStoreName: 'local',
+  stores: { cache, remote },
   executionOrder: {
-    read: ['local', 'remote'],
-    write: ['local', 'remote'],
-    delete: ['local', 'remote'],
+    read: ['cache', 'remote'],
+    write: ['cache', 'remote'],
+    delete: ['cache', 'remote'],
   },
   on: { success: logger }, // disable this on production builds
 })
@@ -65,8 +64,7 @@ export const magnetar = Magnetar({
 
 Some info on the main Magnetar instance props:
 
-- `stores` ⸺ an object with the store name as key and the store plugin instance as value
-- `localStoreName` ⸺ the name of the store that saves data locally
+- `stores` ⸺ an object with the store name as key and the store plugin instance as value, needs at least one plugin for the `cache` key, the other keys you can choose the name
 - `executionOrder` ⸺ the execution order of your stores, this order is required for optimistic UI (but can be flipped)
 - `on` ⸺ event listeners for anything that happens in Magnetar, see the [Events chapter](../hooks-and-events/) for more info
 
@@ -100,7 +98,7 @@ export const trainerModule = magnetar.doc('app-data/trainer')
 
 Using your collection or document modules, you can access the `data`, `id` and several methods.
 
-**Any data accessed is readonly!** To "mutate" the data, you **have** to use the provided methods. This is good because any kind of mutation is supposed to go through a function so it can be synced to your local & remote stores.
+**Any data accessed is readonly!** To "mutate" the data, you **have** to use the provided methods. This is good because any kind of mutation is supposed to go through a function so it can be synced to your local cache & remote stores.
 
 Here we show some of the data and methods you can access on a module:
 
@@ -121,8 +119,8 @@ pokedexModule.insert({ name: 'Squirtle' }) // inserts a new document
 pokedexModule.delete('001') // deletes a document
 
 // methods to read data
-pokedexModule.fetch() // fetches documents from the remote store & adds them locally
-pokedexModule.stream() // opens a database stream & adds incoming documents locally
+pokedexModule.fetch() // fetches documents from the remote store & caches them locally
+pokedexModule.stream() // opens a database stream & caches incoming documents locally
 ```
 
 ### Document Modules
@@ -147,8 +145,8 @@ pokemonModule.deleteProp('name') // deletes a property from the document
 pokemonModule.delete() // deletes the document
 
 // methods to read data
-pokemonModule.fetch() // fetches the document from the remote store & adds it locally
-pokemonModule.stream() // opens a database stream & keeps the document up to date locally
+pokemonModule.fetch() // fetches the document from the remote store & caches it locally
+pokemonModule.stream() // opens a database stream & keeps the cached document up to date locally
 ```
 
 ## Displaying Data in the DOM
@@ -160,7 +158,7 @@ Here we show to how make sure your DOM is updated reactively whenever this data 
 
 ### Vue Example
 
-In Vue you must make sure you use the Vue 2 or Vue 3 plugin as local store which will enable reactivity.
+In Vue you must make sure you use the Vue 2 or Vue 3 plugin as local cache store which will enable reactivity.
 
 You can use a computed prop to show the data in your template like so:
 

@@ -27,7 +27,7 @@ test('insert: emits before & success events', async () => {
   await pokedexModule.insert(insertPayload, {
     on: {
       before: ({ payload, storeName }) => {
-        if (storeName === 'local') {
+        if (storeName === 'cache') {
           assert.deepEqual(payload, insertPayload)
           ranAllEvents.push(1)
         }
@@ -37,7 +37,7 @@ test('insert: emits before & success events', async () => {
         }
       },
       success: ({ payload, storeName }) => {
-        if (storeName === 'local') {
+        if (storeName === 'cache') {
           assert.deepEqual(payload, insertPayload)
           ranAllEvents.push(1)
         }
@@ -58,7 +58,7 @@ test('insert: can abort in before events', async () => {
     const result = await pokedexModule.insert(insertPayload, {
       on: {
         before: ({ payload, abort, storeName }) => {
-          if (storeName === 'local') {
+          if (storeName === 'cache') {
             abort()
           }
           if (storeName === 'remote') assert.fail()
@@ -67,7 +67,7 @@ test('insert: can abort in before events', async () => {
           assert.fail()
         },
         error: ({ storeName }) => {
-          if (storeName === 'local') assert.fail()
+          if (storeName === 'cache') assert.fail()
         },
       },
     })
@@ -85,13 +85,13 @@ test('insert: can abort in success events', async () => {
     const result = await pokedexModule.insert(insertPayload, {
       on: {
         before: ({ payload, storeName }) => {
-          if (storeName === 'local') {
+          if (storeName === 'cache') {
             ranAllEvents.push(1)
           }
           if (storeName === 'remote') assert.fail()
         },
         success: ({ payload, abort, storeName }) => {
-          if (storeName === 'local') {
+          if (storeName === 'cache') {
             ranAllEvents.push(1)
             abort()
           }

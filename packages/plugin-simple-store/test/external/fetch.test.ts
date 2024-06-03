@@ -41,7 +41,7 @@ test('fetch (document) if unfetched', async () => {
     assert.fail(JSON.stringify(error))
   }
   // even though we haven't _force_ fetched, the data is still fetched
-  // because even though the the local state was already there, we had never executed `fetch` or `stream` once in this session
+  // because even though the the cached state was already there, we had never executed `fetch` or `stream` once in this session
   assert.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })
 

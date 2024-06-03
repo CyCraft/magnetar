@@ -6,21 +6,21 @@ The idea of Magnetar is that you only need to learn how to work with one syntax 
 
 In most cases you use Magnetar with two store plugins installed:
 
-- A "local" store plugin, for the data you need cached while using the app. (like Vuex or a simple global object)
+- A "cache" store plugin, for the data you need cached while using the app. (like Vuex or a simple global object)
 - A "remote" store plugin, for the remote data stored. (like Firestore or any other database)
 
-**When reading data:** the _remote_ store will fetch the data; the _local_ store will then add that data for you, so you can easily access and use it in your app.
+**When reading data:** the _remote_ store will fetch the data; the _cache_ store will then add that data for you, so you can easily access and use it in your app.
 
-**When writing data:** the _local_ store will save your changes in its cache; the _remote_ will then make an API call to your database. <small>(you can also flip this around, so the local store is only updated after the remote one)</small>
+**When writing data:** the _cache_ store will save your changes in its cache; the _remote_ will then make an API call to your database. <small>(you can also flip this around, so the local cache store is only updated after the remote one)</small>
 
 ### List of Plugins
 
 Available store plugins
 
 - Firestore (remote)
-- Simple Store (local)
-- Vue 2 (local)
-- Vue 3 (local)
+- Simple Store (cache)
+- Vue 2 (cache)
+- Vue 3 (cache)
 
 Planned store plugins (TBD)
 
@@ -75,6 +75,6 @@ const myDoc = magnetar.collection('some-collection').doc('some-doc')
 
 ### The Purpose of a Collection/Doc Path
 
-Each collection and doc need to have a _path_ that points to that collection. The purpose of this path is to become the identifier where your local store will save your documents.
+Each collection and doc need to have a _path_ that points to that collection. The purpose of this path is to become the identifier where your local cache store will save your documents.
 
 By default a _path_ is the same _path_ to the data in your remote store. Eg. a doc module with path `users/abc123` will represent the same document as in your database at that path.

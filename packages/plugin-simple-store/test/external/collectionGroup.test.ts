@@ -9,7 +9,7 @@ test('fetch (collectionGroup)', async () => {
   //   } catch (error) {
   //     assert.fail(JSON.stringify(error))
   //   }
-  //   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
+  //   // the cache store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
   //   assert.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 })
 
@@ -23,6 +23,6 @@ test('fetch (collectionGroup)', async () => {
 //   } catch (error) {
 //     assert.fail(JSON.stringify(error))
 //   }
-//   // the local store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
+//   // the cache store should have updated its data to the remote store (via the plugin's onNextStoresSuccess handler)
 //   assert.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job' })
 // })

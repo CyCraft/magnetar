@@ -76,7 +76,7 @@ test('stream (doc) but updating multiple times in between stream', async () => {
 
   // now the first change comes back from the server:
   await Promise.all([p3.resolve(), await p3.promise])
-  // WE MUST MAKE SURE THAT `colour: 'blue'` is not undone in our local state!!!
+  // WE MUST MAKE SURE THAT `colour: 'blue'` is not undone in our cached state!!!
   assert.deepEqual(trainerModule.data, { name: 'Luca', age: 10, dream: 'job', colour: 'blue' })
 
   // now the second change comes back from the server:

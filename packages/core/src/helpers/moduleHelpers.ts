@@ -1,6 +1,5 @@
 import type { GlobalConfig, ModuleConfig, PluginModuleConfig } from '@magnetarjs/types'
 import { isFunction, isPlainObject } from 'is-what'
-import { throwIfNolocalStoreName } from './throwFns.js'
 
 /**
  * Extracts the PluginModuleConfig from the ModuleConfig
@@ -41,37 +40,33 @@ export function executeSetupModulePerStore(
   }
 }
 
-/** Executes the `getModuleData` function from the store specified as 'localStoreName' */
+/** Executes the `getModuleData` function from the store specified as 'cache' */
 export function getDataFromDataStore(moduleConfig: ModuleConfig, globalConfig: GlobalConfig, collectionPath: string): Map<string, { [key: string]: any }> // prettier-ignore
-/** Executes the `getModuleData` function from the store specified as 'localStoreName' */
+/** Executes the `getModuleData` function from the store specified as 'cache' */
 export function getDataFromDataStore(moduleConfig: ModuleConfig, globalConfig: GlobalConfig, collectionPath: string, docId: string): { [key: string]: any } // prettier-ignore
-/** Executes the `getModuleData` function from the store specified as 'localStoreName' */
+/** Executes the `getModuleData` function from the store specified as 'cache' */
 export function getDataFromDataStore(
   moduleConfig: ModuleConfig,
   globalConfig: GlobalConfig,
   collectionPath: string,
   docId?: string,
 ): { [key: string]: any } | Map<string, { [key: string]: any }> {
-  const localStoreName = globalConfig.localStoreName
-  throwIfNolocalStoreName(localStoreName)
-  const getModuleData = globalConfig.stores[localStoreName]?.getModuleData
+  const getModuleData = globalConfig.stores['cache']?.getModuleData
   if (!getModuleData) {
     throw new Error('The data store did not provide a getModuleData function!')
   }
-  const pluginModuleConfig = getPluginModuleConfig(moduleConfig, localStoreName)
+  const pluginModuleConfig = getPluginModuleConfig(moduleConfig, 'cache')
 
   return getModuleData({ collectionPath, docId, pluginModuleConfig })
 }
 
-/** Executes the `getModuleData` function from the store specified as 'localStoreName' */
+/** Executes the `getModuleData` function from the store specified as 'cache' */
 export function getExistsFromDataStore(
   globalConfig: GlobalConfig,
   collectionPath: string,
   docId: string,
 ): undefined | 'error' | boolean {
-  const localStoreName = globalConfig.localStoreName
-  throwIfNolocalStoreName(localStoreName)
-  const getModuleExists = globalConfig.stores[localStoreName]?.getModuleExists
+  const getModuleExists = globalConfig.stores['cache']?.getModuleExists
   if (!getModuleExists) {
     throw new Error('The data store did not provide a getModuleExists function!')
   }
@@ -79,37 +74,33 @@ export function getExistsFromDataStore(
   return getModuleExists({ collectionPath, docId })
 }
 
-/** Executes the `getModuleCount` function from the store specified as 'localStoreName' */
+/** Executes the `getModuleCount` function from the store specified as 'cache' */
 export function getCountFromDataStore(
   moduleConfig: ModuleConfig,
   globalConfig: GlobalConfig,
   collectionPath: string,
 ): number {
-  const localStoreName = globalConfig.localStoreName
-  throwIfNolocalStoreName(localStoreName)
-  const getModuleCount = globalConfig.stores[localStoreName]?.getModuleCount
+  const getModuleCount = globalConfig.stores['cache']?.getModuleCount
   if (!getModuleCount) {
     throw new Error('The data store did not provide a getModuleCount function!')
   }
-  const pluginModuleConfig = getPluginModuleConfig(moduleConfig, localStoreName)
+  const pluginModuleConfig = getPluginModuleConfig(moduleConfig, 'cache')
 
   return getModuleCount({ collectionPath, pluginModuleConfig })
 }
 
-/** Executes the `getModuleAggregate` function from the store specified as 'localStoreName' */
+/** Executes the `getModuleAggregate` function from the store specified as 'cache' */
 export function getAggregateFromDataStore(
   kind: 'sum' | 'average',
   moduleConfig: ModuleConfig,
   globalConfig: GlobalConfig,
   collectionPath: string,
 ): { [key in string]: number | { [key in string]: unknown } } {
-  const localStoreName = globalConfig.localStoreName
-  throwIfNolocalStoreName(localStoreName)
-  const getModuleAggregate = globalConfig.stores[localStoreName]?.getModuleAggregate
+  const getModuleAggregate = globalConfig.stores['cache']?.getModuleAggregate
   if (!getModuleAggregate) {
     throw new Error('The data store did not provide a getModuleAggregate function!')
   }
-  const pluginModuleConfig = getPluginModuleConfig(moduleConfig, localStoreName)
+  const pluginModuleConfig = getPluginModuleConfig(moduleConfig, 'cache')
 
   return getModuleAggregate(kind, { collectionPath, pluginModuleConfig })
 }

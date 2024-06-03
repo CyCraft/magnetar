@@ -136,7 +136,7 @@ export function handleFetchPerStore(
         }
 
         /**
-         * each each time a store returns a `FetchResponse` then it must first go through all on added fns to potentially modify the retuned payload before writing locally
+         * each each time a store returns a `FetchResponse` then it must first go through all on added fns to potentially modify the retuned payload before writing to cache
          */
         const doOnAddedFns: OnAddedFn[] = modifyReadResponseMap.added
         /**
@@ -213,12 +213,12 @@ export function handleFetchPerStore(
               for (const docMetaData of docs) {
                 const docResult = executeOnFns({
                   modifyReadResultFns: doOnAddedFns,
-                  localStoreFns: doOnFetchFns,
+                  cacheStoreFns: doOnFetchFns,
                   payload: docMetaData.data,
                   docMetaData,
                 })
                 // after doing all `doOnAddedFns` (modifying the read result)
-                // and all `doOnFetchFns` (adding it to the local store)
+                // and all `doOnFetchFns` (adding it to the local cache store)
                 // we still have a record, so must return it when resolving the fetch action
                 if (docResult) collectionFetchResult.set(docMetaData.id, docResult)
 

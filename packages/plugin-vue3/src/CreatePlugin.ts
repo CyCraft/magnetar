@@ -50,7 +50,7 @@ export type MakeRestoreBackup = (collectionPath: string, docId: string) => void
 export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
   vue3StoreOptions: Vue3StoreOptions,
 ): PluginInstance => {
-  // this is the local state of the plugin, each plugin that acts as a "local Store Plugin" should have something similar
+  // this is the local cache state of the plugin, each plugin that acts as a "cache Store Plugin" should have something similar
   // do not define the store plugin data on the top level! Be sure to define it inside the scope of the plugin function!!
   const data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> } = {}
   const exists: { [docPath: string]: undefined | 'error' | boolean } = reactive({})
@@ -93,7 +93,7 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
   }
 
   /**
-   * This must be provided by Store Plugins that have "local" data. It is triggered ONCE when the module (doc or collection) is instantiated. In any case, an empty Map for the collectionPath (to be derived from the modulePath) must be set up.
+   * This must be provided by Store Plugins that have "cache" data. It is triggered ONCE when the module (doc or collection) is instantiated. In any case, an empty Map for the collectionPath (to be derived from the modulePath) must be set up.
    */
   const modulesAlreadySetup = new Set()
   const setupModule = ({
@@ -122,7 +122,7 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
   }
 
   /**
-   * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
+   * This must be provided by Store Plugins that have "cache" data. It is triggered EVERY TIME the module's data is accessed. The `modulePath` will be either that of a "collection" or a "doc". When it's a collection, it must return a Map with the ID as key and the doc data as value `Map<string, DocDataType>`. When it's a "doc" it must return the doc data directly `DocDataType`.
    */
   const getModuleData = ({
     collectionPath,
@@ -146,7 +146,7 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
   }
 
   /**
-   * This must be provided by Store Plugins that have "local" data. It should signify wether or not the document exists. Must return `undefined` when not sure (if the document was never fetched). It is triggered EVERY TIME the module's `.data` is accessed.
+   * This must be provided by Store Plugins that have "cache" data. It should signify wether or not the document exists. Must return `undefined` when not sure (if the document was never fetched). It is triggered EVERY TIME the module's `.data` is accessed.
    */
   const getModuleExists = ({
     collectionPath,
@@ -156,7 +156,7 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
   }
 
   /**
-   * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's count is accessed.
+   * This must be provided by Store Plugins that have "cache" data. It is triggered EVERY TIME the module's count is accessed.
    */
   const getModuleAggregate = (
     kind: 'sum' | 'average',
@@ -171,7 +171,7 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
   }
 
   /**
-   * This must be provided by Store Plugins that have "local" data. It is triggered EVERY TIME the module's count is accessed.
+   * This must be provided by Store Plugins that have "cache" data. It is triggered EVERY TIME the module's count is accessed.
    */
   const getModuleCount = ({
     collectionPath,

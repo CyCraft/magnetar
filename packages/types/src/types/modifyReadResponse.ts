@@ -26,7 +26,7 @@ export type OnRemovedFn = (
 ) => { [key: string]: any } | string | undefined
 
 /**
- * These functions will be executed everytime BEFORE documents are added/modified/deleted in your local data store. The function defined will receive the payload with changes from the server. You can then modify and return this payload.
+ * These functions will be executed everytime BEFORE documents are added/modified/deleted in your cache data store. The function defined will receive the payload with changes from the server. You can then modify and return this payload.
  */
 export type ModifyReadResponseFnMap<
   DocDataType extends { [key: string]: any } = { [key: string]: any },
@@ -46,7 +46,7 @@ export type ModifyReadResponseFnMap<
 }
 
 /**
- * These functions will be executed everytime BEFORE documents are added/modified/deleted in your local data store. The function defined will receive the payload with changes from the server. You can then modify and return this payload.
+ * These functions will be executed everytime BEFORE documents are added/modified/deleted in your cache data store. The function defined will receive the payload with changes from the server. You can then modify and return this payload.
  */
 export type ModifyReadResponseFnsMap = {
   added: OnAddedFn[]

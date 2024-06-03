@@ -11,18 +11,18 @@ import type {
  */
 export function executeOnFns<Payload extends { [key: string]: any } | string | undefined>(params: {
   modifyReadResultFns: (OnAddedFn | OnModifiedFn | OnRemovedFn)[]
-  localStoreFns: (DoOnFetch | OnAddedFn | OnModifiedFn | OnRemovedFn)[]
+  cacheStoreFns: (DoOnFetch | OnAddedFn | OnModifiedFn | OnRemovedFn)[]
   payload: Payload
   docMetaData: DocMetadata
 }): Payload | undefined {
-  const { modifyReadResultFns, localStoreFns, payload, docMetaData } = params
+  const { modifyReadResultFns, cacheStoreFns, payload, docMetaData } = params
 
   let newPayload = payload
   for (const fn of modifyReadResultFns) {
     // we only want to execute these when there is a payload
     if (newPayload) newPayload = fn(newPayload as any, docMetaData) as any
   }
-  for (const fn of localStoreFns) {
+  for (const fn of cacheStoreFns) {
     // we only want to execute these always, regardless wether or not there's a payload
     newPayload = fn(newPayload as any, docMetaData) as any
   }

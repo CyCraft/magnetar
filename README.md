@@ -2,7 +2,7 @@
 
 # Magnetar 🌟
 
-A framework-agnostic syncing solution that auto-connects any DB/API with your local data store and has optimistic-UI built in.
+A framework-agnostic syncing solution that auto-connects any DB/API with your local cache data store and has optimistic-UI built in.
 
 ```sh
 npm i magnetar

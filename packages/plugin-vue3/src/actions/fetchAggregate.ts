@@ -29,7 +29,7 @@ export function fetchAggregateActionFactory(
     const pathId = getPathWhereIdentifier(collectionPath, pluginModuleConfig)
 
     const doOnFetchSumAggregate: DoOnFetchAggregate = (count) => {
-      // abort updating local state if the payload was set to undefined
+      // abort updating local cache state if the payload was set to undefined
       if (count === undefined) return
 
       pathAggregateDic[pathId] = merge(

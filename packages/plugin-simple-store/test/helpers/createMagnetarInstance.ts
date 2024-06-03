@@ -27,26 +27,25 @@ export function createMagnetarInstance(): {
   trainerModule: DocInstance<TrainerModuleData>
   magnetar: MagnetarInstance
 } {
-  const local = CreatePluginLocal({ generateRandomId })
+  const cache = CreatePluginLocal({ generateRandomId })
   const remote = CreatePluginRemote({ storeName: 'remote' })
   const magnetar = Magnetar({
-    localStoreName: 'local',
-    stores: { local, remote },
+    stores: { cache, remote },
     executionOrder: {
-      read: ['local', 'remote'],
-      write: ['local', 'remote'],
-      delete: ['local', 'remote'],
+      read: ['cache', 'remote'],
+      write: ['cache', 'remote'],
+      delete: ['cache', 'remote'],
     },
   })
   const pokedexModule = magnetar.collection<PokedexModuleData>('pokedex', {
     configPerStore: {
-      local: { initialData: getInitialDataCollection() }, // path for the plugin
+      cache: { initialData: getInitialDataCollection() }, // path for the plugin
       remote: {}, // path for the plugin
     },
   })
   const trainerModule = magnetar.doc<TrainerModuleData>('app-data/trainer', {
     configPerStore: {
-      local: { initialData: getInitialDataDocument() }, // path for the plugin
+      cache: { initialData: getInitialDataDocument() }, // path for the plugin
       remote: {}, // path for the plugin
     },
   })

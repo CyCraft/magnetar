@@ -29,11 +29,11 @@ export type CollectionInstance<
    */
   count: number
   /**
-   * Holds the fetched "sum" of the fields on which you called `fetchSum()` so far. This only gets updated when `fetchSum` is called, it is not automatically updated when local `data` changes.
+   * Holds the fetched "sum" of the fields on which you called `fetchSum()` so far. This only gets updated when `fetchSum` is called, it is not automatically updated when local cached `data` changes.
    */
   sum: PartialDeep<PickNumbers<DocDataType>>
   /**
-   * Holds the fetched "average" of the fields on which you called `fetchAverage()` so far. This only gets updated when `fetchAverage` is called, it is not automatically updated when local `data` changes.
+   * Holds the fetched "average" of the fields on which you called `fetchAverage()` so far. This only gets updated when `fetchAverage` is called, it is not automatically updated when local cached `data` changes.
    */
   average: PartialDeep<PickNumbers<DocDataType>>
   /**

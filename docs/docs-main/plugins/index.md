@@ -75,7 +75,7 @@ function generateRandomId() {
   // this function is used when you execute `insert` without specifying an ID
 }
 
-const local = PluginVue3.CreatePlugin({ generateRandomId })
+const cache = PluginVue3.CreatePlugin({ generateRandomId })
 ```
 
 ## Simple Store
@@ -95,5 +95,5 @@ function generateRandomId() {
   // this function is used when you execute `insert` without specifying an ID
 }
 
-const local = PluginSimpleStore.CreatePlugin({ generateRandomId })
+const cache = PluginSimpleStore.CreatePlugin({ generateRandomId })
 ```
