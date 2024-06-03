@@ -16,7 +16,6 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build": "del-cli dist && tsc",
-    "dev": "pnpm build --watch",
     "start-emulators": "export FIRESTORE_EMULATOR_HOST=\"localhost:8119\"",
     "test": "npm run start-emulators && firebase emulators:exec --only firestore \"node --import @cycraft/run-ts ./test/helpers/scripts/execAllTests.ts\""
   },
@@ -28,8 +27,8 @@
     "firebase-admin": "^12.1.1"
   },
   "dependencies": {
-    "@magnetarjs/types": "workspace:*",
-    "@magnetarjs/utils-firestore": "workspace:*",
+    "@magnetarjs/types": "*",
+    "@magnetarjs/utils-firestore": "*",
     "flatten-anything": "^3.0.5",
     "getorset-anything": "^0.1.0",
     "is-what": "^5.0.0",

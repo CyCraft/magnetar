@@ -16,7 +16,6 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build": "del-cli dist && tsc",
-    "dev": "pnpm build --watch",
     "test": "echo none"
   },
   "author": "Luca Ban - Mesqueeb",
@@ -24,7 +23,7 @@
   "license": "TBD",
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
-    "@magnetarjs/types": "workspace:*",
+    "@magnetarjs/types": "*",
     "fast-sort": "^3.4.0",
     "is-what": "^5.0.0",
     "path-to-prop": "^2.0.4"

@@ -7,41 +7,44 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:nuxt-firestore": "pnpm --filter dev-nuxt-firestore dev",
-    "dev:vue3-firestore": "pnpm --filter dev-vue3-firestore dev",
-    "dev:ui": "pnpm --filter @magnetarjs/ui dev",
+    "dev:nuxt-firestore": "npm run -w=dev-nuxt-firestore dev",
+    "dev:vue3-firestore": "npm run -w=dev-vue3-firestore dev",
+    "dev:ui": "npm run -w=@magnetarjs/ui dev",
     "dep:del-all": "npm exec --workspaces -- del-cli node_modules && del-cli node_modules",
-    "dep:update-minor": "ncu --target minor -u && pnpm --parallel exec ncu --target minor -u && echo \"review git changes and install with ni\"",
+    "dep:update-minor": "ncu --target minor -u && npm --parallel exec ncu --target minor -u && echo \"review git changes and install with ni\"",
     "dep:update-major": "ncu -ws -u && echo \"review git changes and install with ni\"",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:deploy": "pnpm docs:build && firebase deploy --only hosting && git add -A && git commit -m \"chore: deploy\"",
+    "docs:deploy": "npm docs:build && firebase deploy --only hosting && git add -A && git commit -m \"chore: deploy\"",
     "docs:serve": "vitepress serve docs",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
     "build-and-commit": "npm run build && git add -A && git commit -m \"chore: build\"",
-    "build:nuxt-firestore": "pnpm --filter dev-nuxt-firestore build",
-    "generate:nuxt-firestore": "pnpm --filter dev-nuxt-firestore generate",
-    "preview:nuxt-firestore": "pnpm --filter dev-nuxt-firestore preview",
+    "build:nuxt-firestore": "npm run -w=dev-nuxt-firestore build",
+    "generate:nuxt-firestore": "npm run -w=dev-nuxt-firestore generate",
+    "preview:nuxt-firestore": "npm run -w=dev-nuxt-firestore preview",
     "test": "turbo run test",
-    "_test:admin-broken": "pnpm test:core && pnpm test:plugin-simple-store && pnpm test:plugin-vue3 && pnpm test:plugin-firestore-admin",
-    "test:core": "pnpm --filter=@magnetarjs/core test",
-    "test:plugin-firestore": "pnpm --filter=@magnetarjs/plugin-firestore test",
-    "test:plugin-firestore-admin": "pnpm --filter=@magnetarjs/plugin-firestore-admin test",
-    "test:plugin-simple-store": "pnpm --filter=@magnetarjs/plugin-simple-store test",
-    "test:plugin-vue3": "pnpm --filter=@magnetarjs/plugin-vue3 test",
+    "_test:admin-broken": "npm test:core && npm test:plugin-simple-store && npm test:plugin-vue3 && npm test:plugin-firestore-admin",
+    "test:core": "npm run -w=@magnetarjs/core test",
+    "test:plugin-firestore": "npm run -w=@magnetarjs/plugin-firestore test",
+    "test:plugin-firestore-admin": "npm run -w=@magnetarjs/plugin-firestore-admin test",
+    "test:plugin-simple-store": "npm run -w=@magnetarjs/plugin-simple-store test",
+    "test:plugin-vue3": "npm run -w=@magnetarjs/plugin-vue3 test",
     "prettier:run": "prettier --write \"packages/*/src/**/*.{vue,ts}\" && prettier --write \"docs/**/*.{vue,ts,md}\"",
     "lint": "eslint",
-    "release": "pnpm build && bumpp package.json packages/*/package.json --commit --push --tag && pnpm -r publish --access public"
+    "release": "npm build && bumpp package.json packages/*/package.json --commit --push --tag && npm -r publish --access public"
+  },
+  "overrides": {
+    "chart.js": "^4.4.3"
   },
   "devDependencies": {
     "@cycraft/eslint": "^0.3.0",
     "@cycraft/run-ts": "^0.0.0",
     "@cycraft/tsconfig": "^0.1.2",
-    "@magnetarjs/core": "workspace:*",
-    "@magnetarjs/plugin-firestore": "workspace:*",
-    "@magnetarjs/plugin-vue3": "workspace:*",
-    "@magnetarjs/test-utils": "workspace:*",
+    "@magnetarjs/core": "*",
+    "@magnetarjs/plugin-firestore": "*",
+    "@magnetarjs/plugin-vue3": "*",
+    "@magnetarjs/test-utils": "*",
     "@vitejs/plugin-vue": "^5.0.5",
     "@vue/typescript": "^1.8.20",
     "array-shuffle": "^3.0.0",
@@ -78,16 +81,5 @@
   },
   "engines": {
     "node": ">=18"
-  },
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "@algolia/client-search",
-        "@firebase/app-types",
-        "@types/react",
-        "react-dom",
-        "react"
-      ]
-    }
   }
 }

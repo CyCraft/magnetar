@@ -16,7 +16,6 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build": "del-cli dist && tsc",
-    "dev": "pnpm build --watch",
     "test": "firebase emulators:exec --only firestore \"node --import @cycraft/run-ts ./test/helpers/scripts/execAllTests.ts\""
   },
   "author": "Luca Ban - Mesqueeb",
@@ -27,9 +26,9 @@
     "firebase": "^10.12.2"
   },
   "dependencies": {
-    "@magnetarjs/types": "workspace:*",
-    "@magnetarjs/utils": "workspace:*",
-    "@magnetarjs/utils-firestore": "workspace:*",
+    "@magnetarjs/types": "*",
+    "@magnetarjs/utils": "*",
+    "@magnetarjs/utils-firestore": "*",
     "flatten-anything": "^3.0.5",
     "getorset-anything": "^0.1.0",
     "is-what": "^5.0.0",

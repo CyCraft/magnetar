@@ -18,16 +18,15 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build": "del-cli dist && tsc",
-    "dev": "pnpm build --watch",
     "test": "echo none"
   },
   "dependencies": {
-    "@magnetarjs/core": "workspace:*",
-    "@magnetarjs/plugin-firestore": "workspace:*",
-    "@magnetarjs/plugin-simple-store": "workspace:*",
-    "@magnetarjs/plugin-vue3": "workspace:*",
-    "@magnetarjs/types": "workspace:*",
-    "@magnetarjs/utils": "workspace:*"
+    "@magnetarjs/core": "*",
+    "@magnetarjs/plugin-firestore": "*",
+    "@magnetarjs/plugin-simple-store": "*",
+    "@magnetarjs/plugin-vue3": "*",
+    "@magnetarjs/types": "*",
+    "@magnetarjs/utils": "*"
   },
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "keywords": [

@@ -19,12 +19,11 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build": "del-cli dist && tsc",
-    "dev": "pnpm build --watch",
     "test": "echo none"
   },
   "dependencies": {
-    "@magnetarjs/types": "workspace:*",
-    "@magnetarjs/utils": "workspace:*",
+    "@magnetarjs/types": "*",
+    "@magnetarjs/utils": "*",
     "copy-anything": "^3.0.5",
     "filter-anything": "^3.0.7",
     "getorset-anything": "^0.1.0",

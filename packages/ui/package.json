@@ -27,9 +27,9 @@
     "vue": "^3.4.27"
   },
   "dependencies": {
-    "@magnetarjs/core": "workspace:*",
-    "@magnetarjs/types": "workspace:*",
-    "@magnetarjs/utils": "workspace:*",
+    "@magnetarjs/core": "*",
+    "@magnetarjs/types": "*",
+    "@magnetarjs/utils": "*",
     "@vueuse/core": "^10.10.0",
     "array-shuffle": "^3.0.0",
     "chart.js": "^4.4.3",

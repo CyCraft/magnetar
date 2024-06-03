@@ -10,20 +10,22 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2.2.4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          version: 8
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+          fetch-depth: 2
+          ref: ${{ github.ref }}
+      - name: Set up Node.js 18
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          node-version: 18
+          cache: 'npm'
+      - name: Install Dependencies
+        run: npm ci
       - name: Build
         run: npm run docs:build
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - name: Deploy Docs
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_CYCRAFT_ECOSYSTEM }}'
