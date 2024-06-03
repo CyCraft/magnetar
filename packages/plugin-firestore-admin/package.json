@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/plugin-firestore-admin",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "type": "module",
   "sideEffects": false,
   "description": "Magnetar plugin firestore-admin",
