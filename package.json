@@ -32,7 +32,7 @@
     "test:plugin-vue3": "npm run -w=@magnetarjs/plugin-vue3 test",
     "prettier:run": "prettier --write \"packages/*/src/**/*.{vue,ts}\" && prettier --write \"docs/**/*.{vue,ts,md}\"",
     "lint": "eslint",
-    "release": "npm run build && bumpp package.json packages/*/package.json --commit --push --tag && npm -r publish --access public"
+    "release": "npm run lint && npm run typecheck && npm run build && bumpp package.json packages/*/package.json --commit --push --tag && npm -r publish --access public"
   },
   "overrides": {
     "chart.js": "^4.4.3"
