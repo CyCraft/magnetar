@@ -136,7 +136,7 @@ magnetar.collection('pokedex').sum // { base: { HP: 9696 } }
 You can also fetch the average of a field in a collection:
 
 ```js
-const average = await magnetar.collection('pokedex').fetchSum('base.HP') // 64.2
+const average = await magnetar.collection('pokedex').fetchAverage('base.HP') // 64.2
 
 // after fetching, the average is also available at `.average`:
 magnetar.collection('pokedex').average // { base: { HP: 64.2 } }
