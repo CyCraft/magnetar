@@ -1,6 +1,7 @@
 import { isAnyObject } from 'is-what'
 
-export const storeSplitSymbol = Symbol('storeSplit')
+/** Using an actual symbol causes issues in production host apps for whatever reason... */
+export const storeSplitSymbol = 'MAGNETAR_SYMBOL_storeSplit'
 
 /**
  * A storeSplit function allows you to apply a different payload between your cache store vs your other stores.
