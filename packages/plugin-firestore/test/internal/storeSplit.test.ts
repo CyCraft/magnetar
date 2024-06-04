@@ -77,3 +77,40 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
     assert.deepEqual(doc.data?.base.HP as any, '9000')
   })
 }
+{
+  const testName = 'write: insert (collection) → random ID in hook with storeSplit'
+  test(testName, async () => {
+    const { pokedexModule, magnetar } = await createMagnetarInstance(testName)
+
+    const payload = pokedex(7)
+    const module = await pokedexModule
+      .insert(payload, {
+        modifyPayloadOn: {
+          insert: (_payload) =>
+            ({
+              ..._payload,
+              base: { ..._payload.base, HP: storeSplit({ cache: 9000, remote: '9000' }) },
+              id: Math.random().toString(36).substring(7),
+            }) as any,
+        },
+      })
+      .catch((e: any) => assert.fail(e.message))
+
+    assert.deepEqual(module.id, module.data?.id as any)
+    assert.deepEqual(module.data, {
+      ...payload,
+      base: { ...payload.base, HP: 9000 },
+      id: module.id as any,
+    })
+    assert.deepEqual(pokedexModule.data.get(module.id), module.data)
+    // check data of new references
+    assert.deepEqual(pokedexModule.doc(`${module.id}`).data, module.data)
+    assert.deepEqual(magnetar.doc(`pokedex/${module.id}`).data, module.data)
+    assert.deepEqual(magnetar.collection('pokedex').doc(`${module.id}`).data, module.data)
+
+    await firestoreDeepEqual(testName, `pokedex/${module.id}`, {
+      ...module.data,
+      base: { ...module.data?.base, HP: '9000' },
+    })
+  })
+}

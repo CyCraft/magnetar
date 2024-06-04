@@ -13,7 +13,7 @@ import { applySyncBatch, createWriteBatch } from '../helpers/batchHelpers.js'
 
 export function insertActionFactory(
   batchSyncMap: BatchSyncMap,
-  firestorePluginOptions: Required<FirestorePluginOptions>
+  firestorePluginOptions: Required<FirestorePluginOptions>,
 ): PluginInsertAction {
   return async function ({
     payload,
@@ -39,7 +39,7 @@ export function insertActionFactory(
     const batchSync = mapGetOrSet(
       batchSyncMap,
       collectionPath,
-      (): BatchSync => batchSyncFactory(firestorePluginOptions, createWriteBatch, applySyncBatch)
+      (): BatchSync => batchSyncFactory(firestorePluginOptions, createWriteBatch, applySyncBatch),
     )
 
     const result = await batchSync.insert(documentPath, payload, syncDebounceMs)

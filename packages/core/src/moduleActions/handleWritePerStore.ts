@@ -115,17 +115,21 @@ export function handleWritePerStore(
               ? mapObject(payloadChunk, (value) => unwrapStoreSplits(value, storeName))
               : payloadChunk
         }
-        // update the payload
-        let storePayloadDic = storesToExecute.reduce<{
+
+        let payloadModified = payload
+        for (const modifyFn of modifyPayloadFnsMap[actionName]) {
+          /** it's important to only execute the hooks once! */
+          payloadModified = modifyFn(payloadModified)
+        }
+
+        /** Now let's create a separate payload per store */
+        const storePayloadDic = storesToExecute.reduce<{
           [key: string]: any
           cache?: any
-        }>((dic, storeName) => ({ ...dic, [storeName]: unwrapStoreSplits(payload, storeName) }), {})
-
-        for (const modifyFn of modifyPayloadFnsMap[actionName]) {
-          storePayloadDic = mapObject(storePayloadDic, (payloadValue, storeName) =>
-            unwrapStoreSplits(modifyFn(payloadValue, docId), `${storeName}`),
-          )
-        }
+        }>(
+          (dic, storeName) => ({ ...dic, [storeName]: unwrapStoreSplits(payloadModified, storeName) }), // prettier-ignore
+          {},
+        )
 
         // create the abort mechanism
         type StopExecution = boolean | 'revert'
