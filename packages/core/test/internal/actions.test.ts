@@ -31,6 +31,24 @@ test('write: insert (document) → set ID via payload', async () => {
   assert.deepEqual(magnetar.collection('pokedex').doc('007').data, payload as any)
 })
 
+test('write: insert (document) → set ID via hook', async () => {
+  const { pokedexModule, magnetar } = createMagnetarInstance()
+  const payload = pokedex(7)
+  assert.deepEqual(pokedexModule.data.get('7'), undefined)
+  assert.deepEqual(pokedexModule.data.get('007'), undefined)
+  await pokedexModule.insert(payload, {
+    modifyPayloadOn: {
+      insert: (_payload) => ({..._payload, id: '007'} as any),
+    },
+  }).catch((e: any) => assert.fail(e.message)) // prettier-ignore
+  // check data of references executed on
+  assert.deepEqual(pokedexModule.data.get('007'), { ...payload, id: '007' } as any)
+  // check data of new references
+  assert.deepEqual(pokedexModule.doc('007').data, { ...payload, id: '007' } as any)
+  assert.deepEqual(magnetar.doc('pokedex/007').data, { ...payload, id: '007' } as any)
+  assert.deepEqual(magnetar.collection('pokedex').doc('007').data, { ...payload, id: '007' } as any)
+})
+
 test('write: insert (collection) → random ID', async () => {
   const { pokedexModule, magnetar } = createMagnetarInstance()
   const payload = pokedex(7)
