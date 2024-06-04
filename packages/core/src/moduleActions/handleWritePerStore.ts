@@ -122,8 +122,8 @@ export function handleWritePerStore(
         }>((dic, storeName) => ({ ...dic, [storeName]: unwrapStoreSplits(payload, storeName) }), {})
 
         for (const modifyFn of modifyPayloadFnsMap[actionName]) {
-          storePayloadDic = mapObject(storePayloadDic, (payloadValue) =>
-            modifyFn(payloadValue, docId),
+          storePayloadDic = mapObject(storePayloadDic, (payloadValue, storeName) =>
+            unwrapStoreSplits(modifyFn(payloadValue, docId), `${storeName}`),
           )
         }
 
