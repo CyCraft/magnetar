@@ -4,7 +4,7 @@ import { merge } from 'merge-anything'
 import { assert, test } from 'vitest'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
 
-test('write: insert (document)', async () => {
+test('write: insert (document) → set ID via doc instance', async () => {
   const { pokedexModule, magnetar } = createMagnetarInstance()
   const payload = pokedex(7)
   assert.deepEqual(pokedexModule.data.get('7'), undefined)
@@ -15,6 +15,20 @@ test('write: insert (document)', async () => {
   assert.deepEqual(pokedexModule.doc('7').data, payload)
   assert.deepEqual(magnetar.doc('pokedex/7').data, payload)
   assert.deepEqual(magnetar.collection('pokedex').doc('7').data, payload)
+})
+
+test('write: insert (document) → set ID via payload', async () => {
+  const { pokedexModule, magnetar } = createMagnetarInstance()
+  const payload = { ...pokedex(7), id: '007' }
+  assert.deepEqual(pokedexModule.data.get('7'), undefined)
+  assert.deepEqual(pokedexModule.data.get('007'), undefined)
+  await pokedexModule.insert(payload as any).catch((e: any) => assert.fail(e.message)) // prettier-ignore
+  // check data of references executed on
+  assert.deepEqual(pokedexModule.data.get('007'), payload as any)
+  // check data of new references
+  assert.deepEqual(pokedexModule.doc('007').data, payload as any)
+  assert.deepEqual(magnetar.doc('pokedex/007').data, payload as any)
+  assert.deepEqual(magnetar.collection('pokedex').doc('007').data, payload as any)
 })
 
 test('write: insert (collection) → random ID', async () => {
