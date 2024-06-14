@@ -111,7 +111,7 @@ export function handleWritePerStore(
         const unwrapStoreSplits = (payloadChunk: any, storeName: string): any => {
           return isStoreSplit(payloadChunk)
             ? payloadChunk.storePayloadDic[storeName]
-            : isAnyObject(payloadChunk)
+            : isAnyObject(payloadChunk) && payloadChunk.constructor.name === 'Object'
               ? mapObject(payloadChunk, (value) => unwrapStoreSplits(value, storeName))
               : payloadChunk
         }
