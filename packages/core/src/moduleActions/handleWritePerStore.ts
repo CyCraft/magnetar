@@ -16,7 +16,7 @@ import type {
 } from '@magnetarjs/types'
 import { isStoreSplit } from '@magnetarjs/utils'
 import { mapGetOrSet } from 'getorset-anything'
-import { isAnyObject, isFullArray, isFullString } from 'is-what'
+import { isFullArray, isFullString, isPlainObject } from 'is-what'
 import { mapObject } from 'map-anything'
 import { getEventNameFnsMap } from '../helpers/eventHelpers.js'
 import { getModifyPayloadFnsMap } from '../helpers/modifyPayload.js'
@@ -111,7 +111,7 @@ export function handleWritePerStore(
         const unwrapStoreSplits = (payloadChunk: any, storeName: string): any => {
           return isStoreSplit(payloadChunk)
             ? payloadChunk.storePayloadDic[storeName]
-            : isAnyObject(payloadChunk)
+            : isPlainObject(payloadChunk)
               ? mapObject(payloadChunk, (value) => unwrapStoreSplits(value, storeName))
               : payloadChunk
         }
