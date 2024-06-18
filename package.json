@@ -59,7 +59,6 @@
     "npm-check-updates": "^16.14.20",
     "roll-anything": "^3.0.4",
     "sass": "^1.77.4",
-    "tsup": "^8.0.2",
     "turbo": "^1.13.3",
     "typescript": "^5.4.5",
     "vite": "^5.2.12",
