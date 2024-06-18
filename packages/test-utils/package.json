@@ -24,13 +24,13 @@
   "dependencies": {
     "@magnetarjs/types": "*",
     "@magnetarjs/utils": "*",
-    "copy-anything": "^3.0.5",
-    "filter-anything": "^3.0.7",
-    "getorset-anything": "^0.1.0",
-    "is-what": "^5.0.0",
-    "merge-anything": "^5.1.7",
-    "nestify-anything": "^3.0.0",
-    "path-to-prop": "^2.0.4"
+    "copy-anything": "^4.0.2",
+    "filter-anything": "^4.0.2",
+    "getorset-anything": "^1.0.1",
+    "is-what": "^5.0.2",
+    "merge-anything": "^6.0.2",
+    "nestify-anything": "^3.0.2",
+    "path-to-prop": "^3.0.0"
   },
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "bugs": "https://github.com/cycraft/magnetar/issues",

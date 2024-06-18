@@ -25,8 +25,8 @@
   "dependencies": {
     "@magnetarjs/types": "*",
     "fast-sort": "^3.4.0",
-    "is-what": "^5.0.0",
-    "path-to-prop": "^2.0.4"
+    "is-what": "^5.0.2",
+    "path-to-prop": "^3.0.0"
   },
   "keywords": [
     "magnetar",
