@@ -26,7 +26,7 @@
     "@magnetarjs/types": "*",
     "fast-sort": "^3.4.0",
     "is-what": "^5.0.2",
-    "path-to-prop": "^3.0.0"
+    "path-to-prop": "^3.0.1"
   },
   "keywords": [
     "magnetar",

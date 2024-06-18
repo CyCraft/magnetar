@@ -37,7 +37,7 @@
     "is-what": "^5.0.2",
     "merge-anything": "^6.0.2",
     "nestify-anything": "^3.0.2",
-    "path-to-prop": "3.0.0"
+    "path-to-prop": "^3.0.1"
   },
   "keywords": [
     "reactive-store",
