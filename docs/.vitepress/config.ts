@@ -12,7 +12,6 @@ export default defineConfig({
     },
     siteTitle: 'Magnetar Docs',
     socialLinks: [{ icon: 'github', link: 'https://github.com/cycraft/magnetar' }],
-
     sidebar: [
       {
         text: '',
@@ -56,9 +55,8 @@ export default defineConfig({
         ],
       },
     ],
-
     footer: {
-      message: 'Made with 💛 by Mesqueeb',
+      message: 'Made with 💜 by <a href="https://github.com/mesqueeb">Luca Ban - mesqueeb</a>',
     },
   },
 })
