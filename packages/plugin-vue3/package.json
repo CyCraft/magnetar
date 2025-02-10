@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/plugin-vue3",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "type": "module",
   "sideEffects": false,
   "description": "Magnetar plugin vue3",
