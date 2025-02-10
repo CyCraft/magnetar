@@ -80,12 +80,12 @@ function toggleItemDone(item: Item) {
 
 <style lang="sass" scoped>
 .todo-app
-  background: black
-  @media (prefers-color-scheme: light)
-    background: #f7f7f7
   padding: 1rem
   border-radius: 1rem
   margin: 0 1rem
+  background: black
+  @media (prefers-color-scheme: light)
+    background: #f7f7f7
   button
     border-radius: 0.3rem
     border: none
