@@ -5,5 +5,5 @@ await setupTestDatabase()
 await execa({
   preferLocal: true,
   stdout: 'inherit',
-})`vitest run --testTimeout 15000 external/stream.test.ts`
+})`vitest run --testTimeout 15000`
 process.exit(0)
