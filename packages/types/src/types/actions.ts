@@ -39,11 +39,26 @@ export type ActionConfig<DocDataType extends { [key: string]: any } = { [key: st
 /**
  * Opens a continuous stream to a document or collection.
  * @returns the open stream promise. This will never resolve as long as the stream is open.
+ * @param payload - Optional payload. For remote stores like Firestore, can include `onFirstData` callback to detect when initial snapshot arrives. It will be executed even on first Data OR on when it was determined there was no data on the server.
+ * @example
+ * // Basic stream
+ * collection('pokedex').stream()
+ * @example
+ * // With onFirstData callback (Firestore plugins)
+ * let isLoading = true
+ * collection('pokedex').stream({ onFirstData: () => isLoading = false })
+ * @example
+ * // Insert initial doc
+ * collection('pokedex').stream({ onFirstData: ({ empty }) => {
+ *   if (empty) {
+ *     collection('pokedex').insert({ name: 'Bulbasaur' })
+ *   }
+ * }})
  */
 export type MagnetarStreamAction<
   DocDataType extends { [key: string]: any } = { [key: string]: any },
 > = (
-  payload?: any | undefined,
+  payload?: { onFirstData?: (params: { empty: boolean }) => void } | any | undefined,
   /**
    * TODO
    * @deprecated — should deprecated this "general" action config and replace with one specific for this action

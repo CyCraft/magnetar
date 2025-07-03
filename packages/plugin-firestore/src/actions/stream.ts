@@ -14,7 +14,7 @@ import { FirestorePluginOptions } from '../CreatePlugin.js'
 import { docSnapshotToDocMetadata, getQueryInstance } from '../helpers/getFirestore.js'
 
 export function streamActionFactory(
-  firestorePluginOptions: Required<FirestorePluginOptions>
+  firestorePluginOptions: Required<FirestorePluginOptions>,
 ): PluginStreamAction {
   return function ({
     payload,
@@ -25,6 +25,10 @@ export function streamActionFactory(
   }: PluginStreamActionPayload<FirestoreModuleConfig>): StreamResponse {
     const { added, modified, removed } = mustExecuteOnRead
     const { db, debug } = firestorePluginOptions
+
+    // Extract onFirstData callback from payload if provided
+    const onFirstData = payload?.onFirstData
+
     let resolveStream: (() => void) | undefined
     let rejectStream: (() => void) | undefined
     const streaming = new Promise<void>((resolve, reject) => {
@@ -32,6 +36,8 @@ export function streamActionFactory(
       rejectStream = reject
     })
     let closeStream: any
+    let firstDataReceived = false
+
     // in case of a doc module
     if (docId) {
       const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
@@ -42,6 +48,12 @@ export function streamActionFactory(
           //       we should always execute `added/modified`
           //       because `core` handles overlapping calls for us
 
+          // Call onFirstData on first snapshot (whether doc exists or not)
+          if (!firstDataReceived && onFirstData) {
+            firstDataReceived = true
+            onFirstData({ empty: !docSnapshot.exists() })
+          }
+
           // do nothing if the doc doesn't exist
           if (!docSnapshot.exists()) return
           // serverChanges only
@@ -49,7 +61,7 @@ export function streamActionFactory(
           const docMetadata = docSnapshotToDocMetadata(docSnapshot)
           if (docData) added(docData, docMetadata)
         },
-        rejectStream
+        rejectStream,
       )
     }
     // in case of a collection module
@@ -62,6 +74,12 @@ export function streamActionFactory(
           // even if `docSnapshot.metadata.hasPendingWrites`
           //       we should always execute `added/modified`
           //       because `core` handles overlapping calls for us
+
+          // Call onFirstData on first snapshot (whether collection has docs or not)
+          if (!firstDataReceived && onFirstData) {
+            firstDataReceived = true
+            onFirstData({ empty: querySnapshot.empty })
+          }
 
           // serverChanges only
           querySnapshot
@@ -81,7 +99,7 @@ export function streamActionFactory(
               }
             })
         },
-        rejectStream
+        rejectStream,
       )
     }
     function stop(): void {

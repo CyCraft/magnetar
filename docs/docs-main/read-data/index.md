@@ -254,9 +254,34 @@ magnetar
 console.log('The stream was opened!')
 ```
 
+### Detecting Initial Data Load
+
+For remote stores like Firestore, you can use the `onFirstData` callback to detect when the initial snapshot has been received, regardless of whether documents exist or not. This is useful for managing loading states:
+
+```js
+// Basic loading state management
+let isLoading = true
+collection('pokedex').stream({
+  onFirstData: () => (isLoading = false),
+})
+```
+
+```js
+// Insert initial document if collection is empty
+collection('pokedex').stream({
+  onFirstData: ({ empty }) => {
+    if (empty) {
+      collection('pokedex').insert({ name: 'Bulbasaur' })
+    }
+  },
+})
+```
+
+The `onFirstData` callback receives an object with an `empty` boolean property that indicates whether the initial snapshot contained any documents.
+
 ## Query Data (filter, order by, limit...)
 
-There are founr methods to query more specific data in a collection:
+There are four methods to query more specific data in a collection:
 
 - `where`
 - `orderBy`

@@ -129,7 +129,9 @@ export type PluginStreamActionPayload<SpecificPluginModuleConfig = PluginModuleC
     /**
      * Whatever payload was passed to the action that was triggered
      */
-    payload: { [key: string]: any } | undefined
+    payload:
+      | ({ onFirstData?: (params: { empty: boolean }) => void } & { [key: string]: any })
+      | undefined
     /**
      * MustExecuteOnRead:
      * The functions for 'added', 'modified' and 'removed' **must** be executed by the plugin whenever the stream sees any of these changes. These are the functions that will pass the data to the other "cache" Store Plugins.

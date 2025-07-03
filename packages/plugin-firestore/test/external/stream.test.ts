@@ -60,7 +60,7 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
     // the queried instance only has these 3 Pokemon
     assert.deepEqual(
       [...pokedexModuleWithQuery.data.values()],
-      [pokedex(6), pokedex(38), pokedex(78)]
+      [pokedex(6), pokedex(38), pokedex(78)],
     )
     assert.deepEqual(pokedexModule.data.size, 3)
   })
@@ -79,5 +79,131 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
     }
 
     assert.isTrue(!!error)
+  })
+}
+
+{
+  const testName = 'stream with onFirstData callback (non-empty collection)'
+  test(testName, async () => {
+    const { pokedexModule } = await createMagnetarInstance('read')
+    let onFirstDataCalled = false
+    let onFirstDataCallCount = 0
+    let onFirstDataEmptyValue: boolean | undefined = undefined
+
+    // Test with onFirstData callback
+    pokedexModule
+      .stream({
+        onFirstData: ({ empty }: { empty: boolean }) => {
+          onFirstDataCalled = true
+          onFirstDataCallCount++
+          onFirstDataEmptyValue = empty
+        },
+      })
+      .catch((e: any) => assert.fail(e.message))
+
+    // Wait for initial data to arrive
+    await waitMs(100)
+
+    // onFirstData should be called once when initial snapshot arrives
+    assert.deepEqual(onFirstDataCalled, true)
+    assert.deepEqual(onFirstDataCallCount, 1)
+    assert.deepEqual(onFirstDataEmptyValue, false)
+
+    // Close the stream
+    pokedexModule.closeStream()
+
+    // onFirstData should not be called again
+    await waitMs(100)
+    assert.deepEqual(onFirstDataCallCount, 1)
+  })
+}
+{
+  const testName = 'stream with onFirstData callback (empty collection)'
+  test(testName, async () => {
+    const { magnetar } = await createMagnetarInstance('read')
+    let onFirstDataCalled = false
+
+    // Create a collection that should be empty (using a path allowed by security rules)
+    const emptyCollection = magnetar.collection('emptyCollection', {
+      configPerStore: {
+        remote: { firestorePath: 'magnetarTests/read/emptyCollection' },
+      },
+    })
+
+    // Test with onFirstData callback on empty collection
+    emptyCollection
+      .stream({
+        onFirstData: ({ empty }: { empty: boolean }) => {
+          onFirstDataCalled = true
+        },
+      })
+      .catch((e: any) => assert.fail(e.message))
+
+    // Wait for initial snapshot to arrive
+    await waitMs(100)
+
+    // onFirstData should be called even for empty collections
+    assert.deepEqual(onFirstDataCalled, true)
+
+    // Close the stream
+    emptyCollection.closeStream()
+  })
+}
+{
+  const testName = 'stream with onFirstData callback (non-existing doc)'
+  test(testName, async () => {
+    const { magnetar } = await createMagnetarInstance('read')
+    let onFirstDataCalled = false
+    let onFirstDataEmptyValue: boolean | undefined = undefined
+
+    const nonExistingDoc = magnetar.doc('pokedex/does-not-exist', {
+      configPerStore: {
+        remote: { firestorePath: 'magnetarTests/read/pokedex/does-not-exist' },
+      },
+    })
+
+    nonExistingDoc
+      .stream({
+        onFirstData: ({ empty }: { empty: boolean }) => {
+          onFirstDataCalled = true
+          onFirstDataEmptyValue = empty
+        },
+      })
+      .catch((e: any) => assert.fail(e.message))
+
+    await waitMs(100)
+    assert.deepEqual(onFirstDataCalled, true)
+    assert.deepEqual(onFirstDataEmptyValue, true)
+    nonExistingDoc.closeStream()
+  })
+}
+{
+  const testName = 'stream with onFirstData callback (existing doc)'
+  test(testName, async () => {
+    const { magnetar } = await createMagnetarInstance('read', {
+      insertDocs: { 'pokedex/1': pokedex(1) },
+    })
+    let onFirstDataCalled = false
+    let onFirstDataEmptyValue: boolean | undefined = undefined
+
+    const existingDoc = magnetar.doc('pokedex/1', {
+      configPerStore: {
+        remote: { firestorePath: 'magnetarTests/read/pokedex/1' },
+      },
+    })
+
+    existingDoc
+      .stream({
+        onFirstData: ({ empty }: { empty: boolean }) => {
+          onFirstDataCalled = true
+          onFirstDataEmptyValue = empty
+        },
+      })
+      .catch((e: any) => assert.fail(e.message))
+
+    await waitMs(100)
+    assert.deepEqual(onFirstDataCalled, true)
+    assert.deepEqual(onFirstDataEmptyValue, false)
+    existingDoc.closeStream()
   })
 }

@@ -240,6 +240,10 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
   }: PluginStreamActionPayload<StorePluginModuleConfig>): Promise<StreamResponse | DoOnStream> {
     // this is custom logic to be implemented by the plugin author
 
+    // Extract onFirstData callback from payload if provided
+    const onFirstData = payload?.onFirstData
+    let firstDataProcessed = false
+
     // we'll mock opening a stream
     const dataRetrieved = !docId
       ? mockDataRetrieval(collectionPath, docId, pluginModuleConfig)
@@ -265,7 +269,14 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
         const promise = payload[i]
         if (!promise) return
         promise.then(() => {
-          if (data) mustExecuteOnRead.added(data, metaData)
+          if (data) {
+            // Call onFirstData on first data processed
+            if (!firstDataProcessed && onFirstData) {
+              firstDataProcessed = true
+              onFirstData({ empty: false })
+            }
+            mustExecuteOnRead.added(data, metaData)
+          }
         })
         return
       }
@@ -276,9 +287,27 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
         // mock when the stream is already stopped
         if (stopStreaming.stopped) return
         // else go ahead and actually trigger the mustExecuteOnRead function
-        if (data) mustExecuteOnRead.added(data, metaData)
+        if (data) {
+          // Call onFirstData on first data processed
+          if (!firstDataProcessed && onFirstData) {
+            firstDataProcessed = true
+            onFirstData({ empty: false })
+          }
+          mustExecuteOnRead.added(data, metaData)
+        }
       }, waitTime)
     })
+
+    // If no data is expected and onFirstData is provided, call it immediately
+    if (onFirstData && !firstDataProcessed && dataRetrieved.length === 0) {
+      // For empty collections, call onFirstData immediately
+      setTimeout(() => {
+        if (!firstDataProcessed) {
+          firstDataProcessed = true
+          onFirstData({ empty: true })
+        }
+      }, 0)
+    }
 
     // this mocks the opening of the stream
     const streaming = new Promise<void>((resolve, reject) => {
