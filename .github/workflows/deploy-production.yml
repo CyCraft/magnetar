@@ -15,17 +15,17 @@ jobs:
         with:
           fetch-depth: 2
           ref: ${{ github.ref }}
-      - name: Set up Node.js 18
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: '20'
           cache: 'npm'
       - name: Install Dependencies
         run: npm ci
       - name: Build
         run: npm run docs:build
       - name: Deploy Docs
-        uses: FirebaseExtended/action-hosting-deploy@v0
+        uses: FirebaseExtended/action-hosting-deploy@v0.9.0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_CYCRAFT_ECOSYSTEM }}'
