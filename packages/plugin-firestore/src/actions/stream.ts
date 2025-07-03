@@ -49,7 +49,12 @@ export function streamActionFactory(
           //       because `core` handles overlapping calls for us
 
           // Call onFirstData on first snapshot (whether doc exists or not)
-          if (!firstDataReceived && onFirstData) {
+          if (
+            !firstDataReceived &&
+            onFirstData &&
+            !docSnapshot.metadata.fromCache &&
+            !docSnapshot.metadata.hasPendingWrites
+          ) {
             firstDataReceived = true
             onFirstData({ empty: !docSnapshot.exists() })
           }
@@ -76,7 +81,12 @@ export function streamActionFactory(
           //       because `core` handles overlapping calls for us
 
           // Call onFirstData on first snapshot (whether collection has docs or not)
-          if (!firstDataReceived && onFirstData) {
+          if (
+            !firstDataReceived &&
+            onFirstData &&
+            !querySnapshot.metadata.fromCache &&
+            !querySnapshot.metadata.hasPendingWrites
+          ) {
             firstDataReceived = true
             onFirstData({ empty: querySnapshot.empty })
           }
