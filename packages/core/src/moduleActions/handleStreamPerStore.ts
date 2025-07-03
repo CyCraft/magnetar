@@ -34,7 +34,13 @@ export function handleStreamPerStore(
   return async function (payload?: any, actionConfig: ActionConfig = {}): Promise<void> {
     // return the same stream promise if it's already open
     const foundStream = streaming()
-    if (isPromise(foundStream)) return foundStream
+    if (isPromise(foundStream)) {
+      // If onFirstData is provided and stream is already open, call it with existingStream flag
+      if (payload?.onFirstData) {
+        payload.onFirstData({ empty: undefined, existingStream: true })
+      }
+      return foundStream
+    }
 
     // get all the config needed to perform this action
     const eventNameFnsMap = getEventNameFnsMap(globalConfig.on, moduleConfig.on, actionConfig.on)

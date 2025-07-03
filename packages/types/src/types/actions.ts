@@ -58,7 +58,9 @@ export type ActionConfig<DocDataType extends { [key: string]: any } = { [key: st
 export type MagnetarStreamAction<
   DocDataType extends { [key: string]: any } = { [key: string]: any },
 > = (
-  payload?: { onFirstData?: (params: { empty: boolean }) => void } | any | undefined,
+  payload?:
+    | { onFirstData?: (params: { empty?: boolean; existingStream?: boolean }) => void }
+    | undefined,
   /**
    * TODO
    * @deprecated — should deprecated this "general" action config and replace with one specific for this action

@@ -130,7 +130,7 @@ export type PluginStreamActionPayload<SpecificPluginModuleConfig = PluginModuleC
      * Whatever payload was passed to the action that was triggered
      */
     payload:
-      | ({ onFirstData?: (params: { empty: boolean }) => void } & { [key: string]: any })
+      | { onFirstData?: (params: { empty?: boolean; existingStream?: boolean }) => void }
       | undefined
     /**
      * MustExecuteOnRead:
