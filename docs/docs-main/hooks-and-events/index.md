@@ -203,28 +203,164 @@ pokedexModule.stream()
 
 ### Prevent Doc Removal During Stream
 
-> documentation below is still WIP
+When using Firestore streams with `where` clauses, documents can be removed from your local cache if they no longer match the query filters. This happens when a document's data changes and no longer satisfies the stream's conditions.
 
-> hint: returning `undefined` will discard the document change and do nothing with the local cache store
+You can prevent this automatic removal by returning `undefined` from the `removed` hook. This keeps the document in your local cache even when it no longer matches the stream's where clause.
+
+**Real-world example**: In a Pokemon game, you might have a stream showing only Pokemon that are "available for battle" (not fainted, not in the PC, etc.). But you want to keep legendary Pokemon visible in the UI even if they temporarily become unavailable, so players can see their stats and plan their team.
+
+```js
+const pokedexModule = magnetar.collection('pokedex')
+
+// Stream only Pokemon available for battle, but keep ALL in cache when they faint
+pokedexModule
+  .where('status', '==', 'available')
+  .where('hp', '>', 0)
+  .orderBy('level', 'desc')
+  .stream(undefined, {
+    modifyReadResponseOn: {
+      removed: (payload) => {
+        // Keep ALL Pokemon in cache even if they become unavailable
+        // This allows us to see their stats and plan our team
+        return undefined // This prevents removal from local cache
+      },
+    },
+  })
+
+// Later, when any Pokemon faints (hp becomes 0):
+// - Firestore removes it from the stream because hp <= 0
+// - Our removed hook prevents it from being removed from local cache
+// - The Pokemon stays visible in the UI for reference and team planning
+// - We can still see their stats, moves, and other information
+```
 
 ### Accessing Metadata when Reading Data
 
-> documentation WIP
+When reading data from your remote store, you can access metadata as a second parameter in your `modifyReadResponseOn` functions. This metadata contains the full Firestore DocumentSnapshot, which includes the document ID and other server-side information.
 
-> hint: you can access the metadata as second param
+**Real-world example**: You might want to add the document ID to your data in the frontend cache, but not store it as a field in the Firestore document itself. This is useful when you want to keep your database documents clean while still having easy access to the ID in your frontend code.
+
+```js
+const pokedexModule = magnetar.collection('pokedex', {
+  modifyReadResponseOn: {
+    added: (payload, metadata) => {
+      // Add the document ID to the data for frontend use
+      return {
+        ...payload,
+        id: metadata.id, // Add ID from metadata to the document data
+      }
+    },
+    modified: (payload, metadata) => {
+      // Ensure the ID is always present when documents are modified
+      return {
+        ...payload,
+        id: metadata.id,
+      }
+    },
+  },
+})
+
+// Now when you access the data in your frontend:
+// pokedexModule.doc('001').data // { name: 'Bulbasaur', type: 'grass', id: '001' }
+//
+// Instead of having to do:
+// const pokemon = pokedexModule.doc('001').data
+// const pokemonWithId = { ...pokemon, id: '001' }
+```
 
 ## Events
 
-> documentation WIP
-
-on
-
-> hint: use case: toasts
-
-> hint: use case: developer logging (see setup for now)
+Magnetar provides a global event system that you can use to listen to various actions happening throughout your app. This is useful for showing toasts, logging, analytics, or any other side effects.
 
 ### Global Events
 
-> documentation WIP
+You can set up global events when you instantiate Magnetar. These events will be triggered for all modules and actions.
 
-> hint: you can setup global events when you instantiate magnetar
+```js
+import { logger } from '@magnetarjs/utils'
+
+export const magnetar = Magnetar({
+  stores: { cache, remote },
+  executionOrder: {
+    read: ['cache', 'remote'],
+    write: ['cache', 'remote'],
+    delete: ['cache', 'remote'],
+  },
+  on: {
+    // Log all successful actions
+    success: (event) => {
+      console.log('✅ Success:', event.actionName, event.path)
+    },
+    // Show toast for errors
+    error: (event) => {
+      showToast(`Error: ${event.error.message}`, 'error')
+    },
+    // Track analytics for writes
+    before: (event) => {
+      if (
+        event.actionName === 'insert' ||
+        event.actionName === 'merge' ||
+        event.actionName === 'replace'
+      ) {
+        analytics.track('data_written', {
+          action: event.actionName,
+          path: event.path,
+          store: event.storeName,
+        })
+      }
+    },
+  },
+})
+```
+
+### Available Events
+
+The following events are available:
+
+- `before` — triggered before any action starts
+- `success` — triggered when any action completes successfully
+- `error` — triggered when any action fails
+- `revert` — triggered when an action is reverted due to an error
+
+Each event object contains:
+
+- `actionName` — the action that was performed (fetch, insert, merge, etc.)
+- `path` — the module path where the action occurred
+- `storeName` — the store name where the action occurred
+- `payload` — the data involved in the action
+- `collectionPath` — the collection path
+- `docId` — the document ID (if applicable)
+- `pluginModuleConfig` — the module configuration
+- `error` — error details (for error events only)
+- `result` — the result of the action (for success events)
+- `abort` — function to abort the action (for before events)
+
+### Debug Logging
+
+Magnetar provides a built-in logger for debugging database operations. Enable it by adding the logger to your success events:
+
+```js
+import { logger } from '@magnetarjs/utils'
+
+export const magnetar = Magnetar({
+  stores: { cache, remote },
+  on: {
+    success: logger, // Logs all successful operations
+  },
+})
+```
+
+The logger outputs formatted messages like:
+
+```
+💫 [magnetar] db.collection('pokedex').where('type', '==', 'fire').fetch() fetch()
+💫 [magnetar] db.collection('pokedex').doc('006').insert({ name: 'Charizard' }) insert()
+```
+
+**Important**: Disable logging in production:
+
+```js
+on: {
+  success: import.meta.env.DEV ? logger : undefined,
+}
+```
