@@ -180,6 +180,9 @@ import { magnetar } from 'magnetarSetup.js'
 
 const userId = 'abc123'
 const userPokedexModule = magnetar.collection(`users/${userId}/pokedex`)
+// OR
+const users = magnetar.collection('users')
+const userPokedexModule = users.doc(userId).collection('pokedex')
 ```
 
 In your app you probably need to encapsulate this in a function which you can trigger once you have the user ID:
@@ -187,11 +190,13 @@ In your app you probably need to encapsulate this in a function which you can tr
 ```js
 import { magnetar } from 'magnetarSetup.js'
 
+const users = magnetar.collection('users')
+
 /**
- * @param {string} userId - this must be fetched first to instantiate the pokedexModule module
+ * @param {string} userId - this must be fetched first to instantiate the pokedexModule
  */
 export const userPokedexModule = (userId) => {
-  return magnetar.collection(`users/${userId}/pokedex`)
+  return users.doc(userId).collection('pokedex')
 }
 ```
 
