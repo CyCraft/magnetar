@@ -273,7 +273,7 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
             // Call onFirstData on first data processed
             if (!firstDataProcessed && onFirstData) {
               firstDataProcessed = true
-              onFirstData({ empty: false })
+              setTimeout(() => onFirstData({ empty: false }), 0)
             }
             mustExecuteOnRead.added(data, metaData)
           }
@@ -291,7 +291,7 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
           // Call onFirstData on first data processed
           if (!firstDataProcessed && onFirstData) {
             firstDataProcessed = true
-            onFirstData({ empty: false })
+            setTimeout(() => onFirstData({ empty: false }), 0)
           }
           mustExecuteOnRead.added(data, metaData)
         }
@@ -304,7 +304,7 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
       setTimeout(() => {
         if (!firstDataProcessed) {
           firstDataProcessed = true
-          onFirstData({ empty: true })
+          setTimeout(() => onFirstData({ empty: true }), 0)
         }
       }, 0)
     }

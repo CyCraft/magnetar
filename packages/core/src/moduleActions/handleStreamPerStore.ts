@@ -37,7 +37,7 @@ export function handleStreamPerStore(
     if (isPromise(foundStream)) {
       // If onFirstData is provided and stream is already open, call it with existingStream flag
       if (payload?.onFirstData) {
-        payload.onFirstData({ empty: undefined, existingStream: true })
+        setTimeout(() => payload.onFirstData({ empty: undefined, existingStream: true }), 0)
       }
       return foundStream
     }

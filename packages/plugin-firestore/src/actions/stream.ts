@@ -56,7 +56,7 @@ export function streamActionFactory(
             !docSnapshot.metadata.hasPendingWrites
           ) {
             firstDataReceived = true
-            onFirstData({ empty: !docSnapshot.exists() })
+            setTimeout(() => onFirstData({ empty: !docSnapshot.exists() }), 0)
           }
 
           // do nothing if the doc doesn't exist
@@ -88,7 +88,7 @@ export function streamActionFactory(
             !querySnapshot.metadata.hasPendingWrites
           ) {
             firstDataReceived = true
-            onFirstData({ empty: querySnapshot.empty })
+            setTimeout(() => onFirstData({ empty: querySnapshot.empty }), 0)
           }
 
           // serverChanges only

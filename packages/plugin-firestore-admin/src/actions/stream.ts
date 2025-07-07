@@ -50,7 +50,7 @@ export function streamActionFactory(
           // Call onFirstData on first snapshot (whether doc exists or not)
           if (!firstDataReceived && onFirstData) {
             firstDataReceived = true
-            onFirstData({ empty: !docSnapshot.exists })
+            setTimeout(() => onFirstData({ empty: !docSnapshot.exists }), 0)
           }
 
           // do nothing if the doc doesn't exist
@@ -74,7 +74,7 @@ export function streamActionFactory(
           // Call onFirstData on first snapshot (whether collection has docs or not)
           if (!firstDataReceived && onFirstData) {
             firstDataReceived = true
-            onFirstData({ empty: querySnapshot.empty })
+            setTimeout(() => onFirstData({ empty: querySnapshot.empty }), 0)
           }
 
           // serverChanges only
