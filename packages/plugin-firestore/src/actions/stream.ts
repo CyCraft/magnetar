@@ -43,6 +43,7 @@ export function streamActionFactory(
       const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
       closeStream = onSnapshot(
         doc(db, documentPath),
+        { includeMetadataChanges: true },
         (docSnapshot: DocumentSnapshot<{ [key: string]: unknown }>) => {
           // even if `docSnapshot.metadata.hasPendingWrites`
           //       we should always execute `added/modified`

@@ -22,7 +22,6 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
     assert.deepEqual(pokedexModule.data.size, 151)
   })
 }
-
 {
   const testName = 'stream (empty collection with read access)'
   test(testName, async () => {
@@ -38,17 +37,65 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
     // Ensure it starts empty
     assert.deepEqual(emptyReadable.data.size, 0)
 
+    // Collect onFirstData payloads
+    const onFirstDataPayloads: { empty?: boolean; existingStream?: boolean }[] = []
+
     // Start stream and ensure no errors are thrown
-    emptyReadable.stream().catch((e: any) => assert.fail(e.message))
+    emptyReadable
+      .stream({ onFirstData: (payload) => onFirstDataPayloads.push(payload) })
+      .catch((e: any) => assert.fail(e.message))
 
     // Wait briefly for initial snapshot
     await waitMs(1000)
+
+    // Start a second stream with the same params; its onFirstData should also trigger
+    emptyReadable
+      .stream({ onFirstData: (payload) => onFirstDataPayloads.push(payload) })
+      .catch((e: any) => assert.fail(e.message))
+
+    // Give the second stream a moment
+    await waitMs(1000)
+
+    // onFirstData should be called and indicate empty collection for first
+    // and return existingStream for the second
+    assert.deepEqual(onFirstDataPayloads[0], { empty: true })
+    assert.deepEqual(onFirstDataPayloads[1], { empty: undefined, existingStream: true })
 
     // Should remain empty
     assert.deepEqual(emptyReadable.data.size, 0)
 
     // Close the stream
     emptyReadable.closeStream()
+  })
+}
+
+{
+  const testName = 'stream non-empty collection then stream doc on same dataset'
+  test(testName, async () => {
+    const { pokedexModule } = await createMagnetarInstance('read')
+
+    const onFirstDataPayloads: { empty?: boolean; existingStream?: boolean }[] = []
+
+    // Ensure collection ends up with data
+    pokedexModule
+      .stream({ onFirstData: (payload) => onFirstDataPayloads.push(payload) })
+      .catch((e: any) => assert.fail(e.message))
+    await waitMs(1000)
+
+    // Now open a stream on a specific doc within the same dataset
+    pokedexModule
+      .doc('1')
+      .stream({ onFirstData: (payload) => onFirstDataPayloads.push(payload) })
+      .catch((e: any) => assert.fail(e.message))
+
+    await waitMs(1000)
+
+    // For existing doc, empty should be false
+    assert.deepEqual(onFirstDataPayloads[0], { empty: false })
+    assert.deepEqual(onFirstDataPayloads[1], { empty: false })
+
+    // Close streams
+    pokedexModule.closeAllStreams()
   })
 }
 {
@@ -236,10 +283,9 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
     existingDoc.closeStream()
   })
 }
-
 {
   const testName = 'stream with onFirstData callback (existing stream)'
-  test.only(testName, async () => {
+  test(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance('read')
     let onFirstDataCallCount = 0
     const onFirstDataPayloads: { empty?: boolean; existingStream?: boolean }[] = []
@@ -255,7 +301,7 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
       .catch((e: any) => assert.fail(e.message))
 
     // Wait for first stream to be established
-    await waitMs(100)
+    await waitMs(1000)
 
     // Start second stream (should return existing stream)
     pokedexModule
