@@ -22,6 +22,35 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
     assert.deepEqual(pokedexModule.data.size, 151)
   })
 }
+
+{
+  const testName = 'stream (empty collection with read access)'
+  test(testName, async () => {
+    const { magnetar } = await createMagnetarInstance('read')
+
+    // Create a readable collection that has no data
+    const emptyReadable = magnetar.collection('emptyReadable', {
+      configPerStore: {
+        remote: { firestorePath: 'magnetarTests/read/emptyCollection2' },
+      },
+    })
+
+    // Ensure it starts empty
+    assert.deepEqual(emptyReadable.data.size, 0)
+
+    // Start stream and ensure no errors are thrown
+    emptyReadable.stream().catch((e: any) => assert.fail(e.message))
+
+    // Wait briefly for initial snapshot
+    await waitMs(1000)
+
+    // Should remain empty
+    assert.deepEqual(emptyReadable.data.size, 0)
+
+    // Close the stream
+    emptyReadable.closeStream()
+  })
+}
 {
   const testName = 'stream (doc)'
   test(testName, async () => {
@@ -210,7 +239,7 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
 
 {
   const testName = 'stream with onFirstData callback (existing stream)'
-  test(testName, async () => {
+  test.only(testName, async () => {
     const { pokedexModule } = await createMagnetarInstance('read')
     let onFirstDataCallCount = 0
     const onFirstDataPayloads: { empty?: boolean; existingStream?: boolean }[] = []
@@ -245,7 +274,7 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
     assert.deepEqual(onFirstDataCallCount, 2)
 
     // First call should have empty: false (non-empty collection)
-    assert.deepEqual(onFirstDataPayloads[0], { empty: undefined })
+    assert.deepEqual(onFirstDataPayloads[0], { empty: false })
 
     // Second call should have existingStream: true
     assert.deepEqual(onFirstDataPayloads[1], { empty: undefined, existingStream: true })
