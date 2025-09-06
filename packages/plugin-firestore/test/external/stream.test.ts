@@ -23,6 +23,48 @@ import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
   })
 }
 {
+  const testName = 'stream with onFirstData (empty collection), close and stream again'
+  test(testName, async () => {
+    const { magnetar } = await createMagnetarInstance('read')
+
+    const emptyReadable = magnetar.collection('emptyReopen', {
+      configPerStore: {
+        remote: { firestorePath: 'magnetarTests/read/emptyReopen' },
+      },
+    })
+
+    const onFirstDataPayloads: { empty?: boolean }[] = []
+
+    // First stream
+    emptyReadable
+      .stream({ onFirstData: (payload) => onFirstDataPayloads.push(payload) })
+      .catch((e: any) => assert.fail(e.message))
+
+    // Wait for initial snapshot
+    await waitMs(500)
+
+    // Close all streams and wait a tick
+    emptyReadable.closeAllStreams()
+    await waitMs(10)
+
+    // Second stream
+    emptyReadable
+      .stream({ onFirstData: (payload) => onFirstDataPayloads.push(payload) })
+      .catch((e: any) => assert.fail(e.message))
+
+    // Wait for second snapshot
+    await waitMs(500)
+
+    // Expect onFirstData twice, both indicating empty collection
+    assert.deepEqual(onFirstDataPayloads.length, 2)
+    assert.deepEqual(onFirstDataPayloads[0], { empty: true })
+    assert.deepEqual(onFirstDataPayloads[1], { empty: true })
+
+    // Cleanup
+    emptyReadable.closeAllStreams()
+  })
+}
+{
   const testName = 'stream (empty collection with read access)'
   test(testName, async () => {
     const { magnetar } = await createMagnetarInstance('read')
