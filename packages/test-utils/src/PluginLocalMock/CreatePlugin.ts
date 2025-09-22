@@ -8,7 +8,6 @@ import type {
 import { getPathWhereIdentifier } from '@magnetarjs/types'
 import { filterDataPerClauses } from '@magnetarjs/utils'
 import { copy } from 'copy-anything'
-import { pick } from 'filter-anything'
 import { mapGetOrSet, objGetOrSet } from 'getorset-anything'
 import { isArray, isNumber, isPlainObject } from 'is-what'
 import { deleteActionFactory } from './actions/delete.js'
@@ -127,14 +126,7 @@ export const CreatePlugin: MagnetarPlugin<StorePluginOptions> = (
     if (docId) return dataCollectionMap.get(docId)
     // if it's a collection, we must return the dataCollectionMap but with applied query clauses
     // but remember, the return type MUST be a map with id as keys and the docs as value
-    const clauses: Clauses = pick(pluginModuleConfig, [
-      'query',
-      'where',
-      'orderBy',
-      'limit',
-      'startAfter',
-    ])
-
+    const clauses: Clauses = pluginModuleConfig
     return filterDataPerClauses(dataCollectionMap, clauses)
   }
 
@@ -175,14 +167,7 @@ export const CreatePlugin: MagnetarPlugin<StorePluginOptions> = (
     if (isNumber(count)) return count
 
     // if we didn't have any cached count yet, we must return the size of the dataCollectionMap but with applied query clauses
-    const clauses: Clauses = pick(pluginModuleConfig, [
-      'query',
-      'where',
-      'orderBy',
-      'limit',
-      'startAfter',
-    ])
-
+    const clauses: Clauses = pluginModuleConfig
     const dataCollectionMap = objGetOrSet(data, collectionPath, () => new Map())
     const dataFiltered = filterDataPerClauses(dataCollectionMap, clauses)
     return dataFiltered.size

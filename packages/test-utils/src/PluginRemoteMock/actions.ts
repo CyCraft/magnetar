@@ -26,7 +26,6 @@ import type {
   StreamResponse,
 } from '@magnetarjs/types'
 import { filterDataPerClauses } from '@magnetarjs/utils'
-import { pick } from 'filter-anything'
 import { isFullArray, isFullString, isNumber, isPromise } from 'is-what'
 import { getProp } from 'path-to-prop'
 import { generateRandomId, pokedexMap, throwIfEmulatedError, waitMs } from '../helpers/index.js'
@@ -121,13 +120,7 @@ function mockDataRetrieval(
       return result ? [result] : []
     }
 
-    const clauses: Clauses = pick(pluginModuleConfig, [
-      'query',
-      'where',
-      'orderBy',
-      'limit',
-      'startAfter',
-    ])
+    const clauses: Clauses = pluginModuleConfig
     const filteredMap = filterDataPerClauses(_pokedexMap, clauses)
     return [...filteredMap.values()]
   }

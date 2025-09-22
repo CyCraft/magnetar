@@ -32,7 +32,6 @@
     "@magnetarjs/types": "*",
     "@magnetarjs/utils": "*",
     "copy-anything": "^4.0.2",
-    "filter-anything": "^4.0.2",
     "getorset-anything": "^1.0.1",
     "is-what": "^5.0.2",
     "merge-anything": "^6.0.2",

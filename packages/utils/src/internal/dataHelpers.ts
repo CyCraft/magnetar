@@ -50,12 +50,12 @@ function passesWhere(docData: { [key: string]: unknown }, whereQuery: WhereClaus
 function passesQuery(docData: { [key: string]: unknown }, queryClause: QueryClause): boolean {
   if ('and' in queryClause) {
     return queryClause.and.every((clause) =>
-      isArray(clause) ? passesWhere(docData, clause) : passesQuery(docData, clause)
+      isArray(clause) ? passesWhere(docData, clause) : passesQuery(docData, clause),
     )
   }
   // if ('or' in queryClause)
   return queryClause.or.some((clause) =>
-    isArray(clause) ? passesWhere(docData, clause) : passesQuery(docData, clause)
+    isArray(clause) ? passesWhere(docData, clause) : passesQuery(docData, clause),
   )
 }
 
@@ -64,7 +64,7 @@ function passesQuery(docData: { [key: string]: unknown }, queryClause: QueryClau
  */
 export function filterDataPerClauses(
   dataCollectionMap: Map<string, { [key: string]: unknown }>,
-  clauses: Clauses
+  clauses: Clauses,
 ): Map<string, { [key: string]: unknown }> {
   const queryClauses = clauses.query || []
   const whereClauses = clauses.where || []
@@ -86,7 +86,7 @@ export function filterDataPerClauses(
     const passedQuery = queryClauses.every((queryClause) => passesQuery(docData, queryClause))
     if (!passedQuery) return
     const passedWhereFilters = whereClauses.every((whereClause) =>
-      passesWhere(docData, whereClause)
+      passesWhere(docData, whereClause),
     )
     if (!passedWhereFilters) return
     entries.push([docId, docData])
@@ -101,7 +101,7 @@ export function filterDataPerClauses(
       carry.push(sorter)
       return carry
     },
-    [] as ISortByObjectSorter<[string, { [key: string]: unknown }]>[]
+    [] as ISortByObjectSorter<[string, { [key: string]: unknown }]>[],
   )
   entries = orderByClauses.length ? sort(entries).by(by) : entries
   // startAfter

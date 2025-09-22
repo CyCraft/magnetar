@@ -25,7 +25,6 @@
   "dependencies": {
     "@magnetarjs/types": "*",
     "@magnetarjs/utils": "*",
-    "filter-anything": "^4.0.2",
     "getorset-anything": "^1.0.1",
     "is-what": "^5.0.2",
     "map-anything": "^3.0.1",

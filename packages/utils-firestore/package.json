@@ -25,7 +25,6 @@
   "dependencies": {
     "@magnetarjs/types": "*",
     "@magnetarjs/utils": "*",
-    "flatten-anything": "^4.0.1",
     "getorset-anything": "^1.0.1",
     "is-what": "^5.0.2",
     "merge-anything": "^6.0.2",
