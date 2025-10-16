@@ -47,7 +47,7 @@ const newStack = (): Stack => ({
  * @param {Record<string, unknown>} payload
  * @returns {number}
  */
-function countOperations(payload: { [key: string]: unknown }): number {
+function countOperations(_payload: { [key: string]: unknown }): number {
   const count = 1
   // todo: when actions like serverTimestamp, arrayUnion and increment are supported, count them here
   return count
@@ -111,6 +111,9 @@ export function batchSyncFactory(
     try {
       applySyncBatch(writeBatch as any, stack.batch, db as any)
     } catch (error) {
+      if (debug) {
+        logWithFlair('Error while preparing Firestore write batch', { error, batch: stack.batch })
+      }
       stack.rejects.forEach((rej) => rej(error))
       if (state.queue.length) {
         triggerSync(0)
@@ -125,7 +128,12 @@ export function batchSyncFactory(
     writeBatch
       .commit()
       .then(() => stack.resolves.forEach((res) => res()))
-      .catch((error: unknown) => stack.rejects.forEach((rej) => rej(error)))
+      .catch((error: unknown) => {
+        if (debug) {
+          logWithFlair('Firestore batch commit failed', { error, batch: stack.batch })
+        }
+        stack.rejects.forEach((rej) => rej(error))
+      })
       .finally(() => {
         if (state.queue.length) {
           triggerSync(0)

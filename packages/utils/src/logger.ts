@@ -1,5 +1,5 @@
 import type { EventFnSuccess, QueryClause, WhereClause } from '@magnetarjs/types'
-import { isArray, isFullArray, isNumber } from 'is-what'
+import { isAnyObject, isArray, isFullArray, isNumber } from 'is-what'
 
 /**
  * `Line-height: 2` is to prevent line overlapping on Safari
@@ -7,11 +7,19 @@ import { isArray, isFullArray, isNumber } from 'is-what'
 const LOGGER_STYLE =
   'background: #0e0f15; color: #af98e6; border-radius: 4px; padding: 6px 10px; line-height: 2;'
 
+const LOGGER_STYLE_ERROR =
+  'background: #b91c1c; color: #ffffff; border-radius: 4px; padding: 6px 10px; line-height: 2;'
+
 /**
  * Logs to the console with `console.info` and colors.
  */
 export function logWithFlair(message: string, ...args: any[]): undefined {
-  console.info(`%c💫 [magnetar] ${message}`, LOGGER_STYLE, ...args)
+  const isError = args.some((a) => isAnyObject(a) && !!a?.['error'])
+  if (isError) {
+    console.error(`%c💫 [magnetar] ${message}`, LOGGER_STYLE_ERROR, ...args)
+  } else {
+    console.info(`%c💫 [magnetar] ${message}`, LOGGER_STYLE, ...args)
+  }
 }
 
 let lastGroupLogTime = 0
@@ -38,7 +46,7 @@ function shouldLog(params: any, preventLogFor: number) {
 export function logWithFlairGroup(
   title: string,
   nestedMessage: string,
-  options?: { preventLogFor: number }
+  options?: { preventLogFor: number },
 ): undefined {
   if (options && !shouldLog([title, nestedMessage], options.preventLogFor)) return
 
@@ -51,12 +59,12 @@ function stringifyQueryClause(q: QueryClause): string {
   return 'or' in q
     ? `or(${q.or
         .map((clause) =>
-          isArray(clause) ? stringifyWhereClause(clause) : stringifyQueryClause(clause)
+          isArray(clause) ? stringifyWhereClause(clause) : stringifyQueryClause(clause),
         )
         .join(', ')})`
     : `and(${q.and
         .map((clause) =>
-          isArray(clause) ? stringifyWhereClause(clause) : stringifyQueryClause(clause)
+          isArray(clause) ? stringifyWhereClause(clause) : stringifyQueryClause(clause),
         )
         .join(', ')})`
 }

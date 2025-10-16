@@ -1,8 +1,8 @@
 import type { DoOnStreamFns, StreamResponse } from '@magnetarjs/types'
-import { isCollectionModule, isDocModule } from '@magnetarjs/utils'
+import { isCollectionModule, isDocModule, logWithFlair } from '@magnetarjs/utils'
 
 export function logError(errorMessage: string): undefined {
-  console.error('[@magnetarjs error]\n', errorMessage)
+  logWithFlair(errorMessage, { error: true })
 }
 
 export function logErrorAndThrow(errorMessage: string): undefined {
