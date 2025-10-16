@@ -6,6 +6,9 @@ export default defineConfig({
   head: [['link', { rel: 'icon', type: 'image/svg+xml', href: '/icons/magnetar-icon.svg' }]],
   lastUpdated: true,
   themeConfig: {
+    search: {
+      provider: 'local',
+    },
     logo: {
       light: '/media/magnetar-logo-dark.svg',
       dark: '/media/magnetar-logo-white.svg',
