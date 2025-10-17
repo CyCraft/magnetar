@@ -1,8 +1,8 @@
-import { isCollectionModule, isDocModule } from '@magnetarjs/utils'
+import { isCollectionModule, isDocModule, logWithFlair } from '@magnetarjs/utils'
 import { isFullString } from 'is-what'
 
 export function logError(errorMessage: string): undefined {
-  console.error('[@magnetarjs/plugin-firestore error]\n', errorMessage)
+  logWithFlair('@magnetarjs/plugin-firestore', { error: true }, errorMessage)
 }
 
 export function logErrorAndThrow(errorMessage: string): undefined {
@@ -12,7 +12,7 @@ export function logErrorAndThrow(errorMessage: string): undefined {
 
 export function throwIfInvalidFirestorePath(
   firestorePath: string,
-  moduleType?: 'collection' | 'doc'
+  moduleType?: 'collection' | 'doc',
 ): undefined {
   let errorMessage = ''
   // no firestorePath found
