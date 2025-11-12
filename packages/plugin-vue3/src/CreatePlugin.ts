@@ -9,7 +9,7 @@ import { getPathWhereIdentifier } from '@magnetarjs/types'
 import { filterDataPerClauses } from '@magnetarjs/utils'
 import { copy } from 'copy-anything'
 import { mapGetOrSet, objGetOrSet } from 'getorset-anything'
-import { isArray, isNumber, isPlainObject } from 'is-what'
+import { isArray, isNumber, isPlainObject, isString } from 'is-what'
 import { reactive } from 'vue'
 import { deleteActionFactory } from './actions/delete.js'
 import { deletePropActionFactory } from './actions/deleteProp.js'
@@ -130,7 +130,7 @@ export const CreatePlugin: MagnetarPlugin<Vue3StoreOptions> = (
   }: PluginModuleSetupPayload<Vue3StoreModuleConfig>): any => {
     const dataCollectionMap = objGetOrSet(data, collectionPath, () => reactive(new Map()))
     // if it's a doc, return the specific doc
-    if (docId) return dataCollectionMap.get(docId)
+    if (isString(docId)) return dataCollectionMap.get(docId)
     // if it's a collection, we must return the dataCollectionMap but with applied query clauses
     // but remember, the return type MUST be a map with id as keys and the docs as value
     const clauses: Clauses = pluginModuleConfig

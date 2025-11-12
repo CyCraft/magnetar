@@ -9,6 +9,7 @@ import {
   getFirestoreDocPath,
 } from '@magnetarjs/utils-firestore'
 import type { DocumentChange, DocumentSnapshot, QuerySnapshot } from 'firebase-admin/firestore'
+import { isString } from 'is-what'
 import { FirestoreAdminPluginOptions } from '../CreatePlugin.js'
 import { docSnapshotToDocMetadata, getQueryInstance } from '../helpers/getFirestore.js'
 
@@ -38,7 +39,7 @@ export function streamActionFactory(
     let firstDataReceived = false
 
     // in case of a doc module
-    if (docId) {
+    if (isString(docId)) {
       const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
       closeStream = db
         .doc(documentPath)

@@ -26,7 +26,7 @@ import type {
   StreamResponse,
 } from '@magnetarjs/types'
 import { filterDataPerClauses } from '@magnetarjs/utils'
-import { isFullArray, isFullString, isNumber, isPromise } from 'is-what'
+import { isFullArray, isFullString, isNumber, isPromise, isString } from 'is-what'
 import { getProp } from 'path-to-prop'
 import { generateRandomId, pokedexMap, throwIfEmulatedError, waitMs } from '../helpers/index.js'
 import { RemoteStoreOptions, StorePluginModuleConfig } from './index.js'
@@ -115,7 +115,7 @@ function mockDataRetrieval(
   if (collectionPath === 'pokedex') {
     const _pokedexMap = pokedexMap()
 
-    if (docId) {
+    if (isString(docId)) {
       const result = _pokedexMap.get(docId)
       return result ? [result] : []
     }

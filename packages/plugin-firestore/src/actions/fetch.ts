@@ -12,11 +12,12 @@ import {
 } from '@magnetarjs/utils-firestore'
 import type { DocumentSnapshot, QueryDocumentSnapshot } from 'firebase/firestore'
 import { doc, getDoc, getDocs } from 'firebase/firestore'
+import { isString } from 'is-what'
 import { FirestorePluginOptions } from '../CreatePlugin.js'
 import { docSnapshotToDocMetadata, getQueryInstance } from '../helpers/getFirestore.js'
 
 export function fetchActionFactory(
-  firestorePluginOptions: Required<FirestorePluginOptions>
+  firestorePluginOptions: Required<FirestorePluginOptions>,
 ): PluginFetchAction {
   return async function ({
     payload,
@@ -27,7 +28,7 @@ export function fetchActionFactory(
     const { db, debug } = firestorePluginOptions
     // in case of a doc module
     let snapshots: (DocumentSnapshot | QueryDocumentSnapshot)[] | undefined
-    if (docId) {
+    if (isString(docId)) {
       const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
       const query = doc(db, documentPath)
       const warnNoResponse = debug
