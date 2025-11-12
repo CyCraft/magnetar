@@ -180,6 +180,12 @@ export function batchSyncFactory(
     const { payload, operationCount } = preparePayload(_payload)
     const stack = await prepareStack(operationCount)
 
+    // discard any previously queued operations for this document that would be superseded by insert
+    stack.batch.merge.delete(documentPath)
+    stack.batch.assign.delete(documentPath)
+    stack.batch.deleteProp.delete(documentPath)
+    stack.batch.delete.delete(documentPath)
+    stack.batch.replace.delete(documentPath)
     stack.batch.insert.set(documentPath, payload)
 
     const promise = prepareReturnPromise(stack)
@@ -201,16 +207,18 @@ export function batchSyncFactory(
       stack = await prepareStack(operationCount)
     }
 
-    // when queueing a `replace` we need to update this payload instead
+    // we need to update the payload if we already have any of `replace`, `insert` or `assign`
     const replacePayload = stack.batch.replace.get(documentPath)
+    const insertPayload = stack.batch.insert.get(documentPath)
+    const assignPayload = stack.batch.assign.get(documentPath)
     if (replacePayload) {
       stack.batch.replace.set(documentPath, { ...replacePayload, ...payload })
-    }
-
-    // otherwise combine with any previous payload
-    if (!replacePayload) {
-      const previousPayload = stack.batch.assign.get(documentPath)
-      stack.batch.assign.set(documentPath, { ...previousPayload, ...payload })
+    } else if (insertPayload) {
+      stack.batch.insert.set(documentPath, { ...insertPayload, ...payload })
+    } else if (assignPayload) {
+      stack.batch.assign.set(documentPath, { ...assignPayload, ...payload })
+    } else {
+      stack.batch.assign.set(documentPath, payload)
     }
 
     const promise = prepareReturnPromise(stack)
@@ -241,16 +249,18 @@ export function batchSyncFactory(
       stack = await prepareStack(operationCount)
     }
 
-    // when queueing a `replace` we need to update this payload instead
+    // we need to update the payload if we already have any of `replace`, `insert` or `assign`
     const replacePayload = stack.batch.replace.get(documentPath)
+    const insertPayload = stack.batch.insert.get(documentPath)
+    const mergePayload = stack.batch.merge.get(documentPath)
     if (replacePayload) {
       stack.batch.replace.set(documentPath, mergeObjects(replacePayload, payloadSafe))
-    }
-
-    // otherwise combine with any previous payload
-    if (!replacePayload) {
-      const previousPayload = stack.batch.merge.get(documentPath) || {}
-      stack.batch.merge.set(documentPath, mergeObjects(previousPayload, payloadSafe))
+    } else if (insertPayload) {
+      stack.batch.insert.set(documentPath, mergeObjects(insertPayload, payloadSafe))
+    } else if (mergePayload) {
+      stack.batch.merge.set(documentPath, mergeObjects(mergePayload, payloadSafe))
+    } else {
+      stack.batch.merge.set(documentPath, payloadSafe)
     }
 
     const promise = prepareReturnPromise(stack)
@@ -264,14 +274,14 @@ export function batchSyncFactory(
     debounceMsOverwrite?: number,
   ): Promise<SyncBatch> {
     const { payload, operationCount } = preparePayload(_payload)
-    let stack = await prepareStack(operationCount)
+    const stack = await prepareStack(operationCount)
 
-    // flush! Because these writes cannot be combined
-    if (stack.batch.deleteProp.has(documentPath)) {
-      await forceSyncEarly()
-      stack = await prepareStack(operationCount)
-    }
-
+    // discard any previously queued operations for this document that would be superseded by replace
+    stack.batch.deleteProp.delete(documentPath)
+    stack.batch.merge.delete(documentPath)
+    stack.batch.assign.delete(documentPath)
+    stack.batch.delete.delete(documentPath)
+    stack.batch.insert.delete(documentPath)
     stack.batch.replace.set(documentPath, payload)
 
     const promise = prepareReturnPromise(stack)
@@ -285,14 +295,26 @@ export function batchSyncFactory(
     debounceMsOverwrite?: number,
   ): Promise<SyncBatch> {
     const operationCount = 1
-    const stack = await prepareStack(operationCount)
+    let stack = await prepareStack(operationCount)
 
-    const map = stack.batch.deleteProp
+    // if a full overwrite is queued, we cannot combine deleteProp meaningfully → be on the safe side and flush first
+    if (
+      stack.batch.insert.has(documentPath) ||
+      stack.batch.replace.has(documentPath) ||
+      stack.batch.assign.has(documentPath) ||
+      stack.batch.merge.has(documentPath)
+    ) {
+      await forceSyncEarly()
+      stack = await prepareStack(operationCount)
+    }
+    // only apply if we're not deleting this document
+    if (!stack.batch.delete.has(documentPath)) {
+      const map = stack.batch.deleteProp
 
-    const set = mapGetOrSet(map, documentPath, (): Set<string> => new Set())
+      const set = mapGetOrSet(map, documentPath, (): Set<string> => new Set())
 
-    propPaths.forEach((p) => set.add(p))
-
+      propPaths.forEach((p) => set.add(p))
+    }
     const promise = prepareReturnPromise(stack)
     triggerSync(debounceMsOverwrite)
     return promise
@@ -305,9 +327,9 @@ export function batchSyncFactory(
 
     // all these changes don't matter anymore, so let's remove them from the stack.batch
     stack.batch.insert.delete(documentPath)
+    stack.batch.replace.delete(documentPath)
     stack.batch.merge.delete(documentPath)
     stack.batch.assign.delete(documentPath)
-    stack.batch.replace.delete(documentPath)
     stack.batch.deleteProp.delete(documentPath)
 
     stack.batch.delete.add(documentPath)
