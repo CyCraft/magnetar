@@ -1,18 +1,30 @@
 import type { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/types'
 import { objGetOrSet } from 'getorset-anything'
-import { isFullString, isNumber } from 'is-what'
+import { isArray, isFullString, isNumber, isPlainObject } from 'is-what'
 import { MakeRestoreBackup, SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin.js'
+
+function isEqual(a: unknown, b: unknown): boolean {
+  if (isArray(a) && isArray(b)) {
+    return a.length === b.length && a.every((item, index) => isEqual(item, b[index]))
+  }
+  if (isPlainObject(a) && isPlainObject(b)) {
+    const aKeys = Object.keys(a)
+    const bKeys = Object.keys(b)
+    return aKeys.length === bKeys.length && aKeys.every((key) => isEqual(a[key], b[key]))
+  }
+  return a === b
+}
 
 export function insertActionFactory(
   data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
   simpleStoreOptions: SimpleStoreOptions,
-  makeBackup?: MakeRestoreBackup
+  makeBackup?: MakeRestoreBackup,
 ): PluginInsertAction {
   return function ({
     payload,
     collectionPath,
     docId,
-    pluginModuleConfig,
+    pluginModuleConfig: _pluginModuleConfig,
   }: PluginInsertActionPayload<SimpleStoreModuleConfig>): string {
     const collectionMap = objGetOrSet(data, collectionPath, () => new Map())
 
@@ -26,15 +38,18 @@ export function insertActionFactory(
 
     if (makeBackup) makeBackup(collectionPath, _docId)
 
-    // reset the doc to be able to overwrite
-    collectionMap.set(_docId, {})
-    const docDataToMutate = collectionMap.get(_docId)
-
-    if (!docDataToMutate)
-      throw new Error(`Document data not found for id: ${collectionPath} ${_docId}`)
-
+    // get current state
+    const currentDoc = collectionMap.get(_docId)
+    // if the doc does not exist yet, create it with the incoming payload
+    if (!isPlainObject(currentDoc)) {
+      collectionMap.set(_docId, payload)
+      return _docId
+    }
+    // shallow merge: set only changed keys; do not delete absent keys
     Object.entries(payload).forEach(([key, value]) => {
-      docDataToMutate[key] = value
+      if (!isEqual(currentDoc[key], value)) {
+        currentDoc[key] = value
+      }
     })
     return _docId
   }

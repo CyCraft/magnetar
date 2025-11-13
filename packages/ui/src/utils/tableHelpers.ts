@@ -17,16 +17,9 @@ export function mapUnshift<K, V>(map: Map<K, V>, ...newEntries: [K, V][]): Map<K
   return new Map([...newEntries, ...oldEntries])
 }
 
-export function isEqual(a: any | any[], b: any | any[]): boolean {
-  if (isArray(a) && isArray(b)) {
-    return a.length === b.length && a.every((item, index) => item === b[index])
-  }
-  return a === b
-}
-
 export function clausesEqual(
   clause1?: WhereClause | QueryClause,
-  clause2?: WhereClause | QueryClause
+  clause2?: WhereClause | QueryClause,
 ): boolean {
   return !!clause1 && !!clause2 && JSON.stringify(clause1) === JSON.stringify(clause2)
 }
@@ -110,7 +103,7 @@ export function filtersAndColumnsToInitialState(params: {
  * @see https://firebase.google.com/docs/firestore/query-data/order-limit-data#limitations
  */
 export function getRequiredOrderByBasedOnFilters(
-  filtersState?: null | FiltersState
+  filtersState?: null | FiltersState,
 ): EntryOfOrderByState[] {
   if (!filtersState) return []
 
@@ -172,7 +165,7 @@ function combineWhereClausesWherePossible(whereClauses: WhereClause[]): WhereCla
     const [fieldPath, op, value] = whereClause
 
     const addToPreviousWhere = result.find(
-      (w) => w[0] === fieldPath && (w[1] === op || w[1] === 'in' || w[1] === 'not-in')
+      (w) => w[0] === fieldPath && (w[1] === op || w[1] === 'in' || w[1] === 'not-in'),
     )
 
     if (!addToPreviousWhere) {
@@ -198,7 +191,7 @@ function combineWhereClausesWherePossible(whereClauses: WhereClause[]): WhereCla
 
 export function filterStateToClauses(
   state: FiltersState,
-  filters: MUIFilter<any, any>[]
+  filters: MUIFilter<any, any>[],
 ): {
   /** `filterIndex` is needed to be able to clear the filters again */
   filterIndex: number
@@ -278,7 +271,7 @@ export function filterStateToClauses(
 }
 
 export function orderByStateToClauses(
-  state: OrderByState
+  state: OrderByState,
 ): [fieldPath: OPaths<any>, direction: 'asc' | 'desc'][] {
   return [...state.entries()].map(([path, direction]) => [path, direction])
 }
@@ -287,7 +280,7 @@ export function calcCollection(
   collection: CollectionInstance<any>,
   filtersState: FiltersState,
   orderByState: OrderByState,
-  filters: MUIFilter<any, any>[]
+  filters: MUIFilter<any, any>[],
 ): CollectionInstance<any> {
   const clauses = filterStateToClauses(filtersState, filters).map(({ result }) => result)
   for (const whereOrQuery of clauses) {
@@ -311,7 +304,7 @@ export function calcCollection(
 export function splitOnLink(text: string): { kind: 'text' | 'link'; content: string }[] {
   /** this regex checks for links */
   const regex = new RegExp(
-    /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\\/%=~_|$])/gi
+    /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\\/%=~_|$])/gi,
   )
 
   const matches = text.matchAll(regex)

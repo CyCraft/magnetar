@@ -118,6 +118,27 @@ bulbasaur.deleteProp('moves.tackle')
 // bulbasaur.data ≈ { name: 'Bulbasaur', moves: { leafAttack: true } }
 ```
 
+## Advice to never remove props once added
+
+Removing props is not ideal when a stream is open. Incoming snapshots can be behind your latest local writes, which risks a “mutation bounce”. Magnetar mitigates this in two ways:
+
+- During an ongoing write, incoming stream updates are deferred per document and only the latest snapshot is applied after the write finishes.
+- The cache store plugins apply incoming snapshots as a shallow merge: it updates changed props but does not delete missing props.
+
+This combination avoids older snapshots removing newer locally added props. For example:
+
+1. we add prop `a`
+2. prop `a` mutation is sent to the server
+3. we add prop `b`
+4. prop `b` mutation is sent to the server
+5. the snapshot that includes only prop `a` comes in via stream (older)
+   - if treated as the full source of truth, this would remove `b`
+6. updated document after prop `b` was added comes back in via stream
+
+To avoid this, we do not remove props from local data when applying incoming snapshots that have fewer props. Therefore, removing props while a stream is open is not recommended, as it may not be reflected locally.
+
+Our advice is instead of removing props, it's always better to set them to `null` instead.
+
 ## Modify a Document
 
 There are three methods you can use to modify documents:
@@ -176,6 +197,8 @@ bulbasaur.replace({ level: 16 })
 ```
 
 In the example above, Bulbasaur **lost** all of its data and it was replaced with whatever was passed.
+
+However, in case this document also has an open stream on another client, that other client might not see the values be removed in their local state. Therefore, we advice to never reduce the amount of props with `replace` or `deleteProp`. Instead, use `null`, so replace with `{ name: null, type: null, level: 16 }`. See our [advice to never remove props once added](#advice-to-never-remove-props-once-added) for more details.
 
 ## Batch Insert / Delete / Modify
 
