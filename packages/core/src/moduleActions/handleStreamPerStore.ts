@@ -113,6 +113,8 @@ export function handleStreamPerStore(
               docMetaData: result.meta,
             })
           })
+          // prevent immediate execution while there's a write lock
+          return
         }
         return executeOnFns({
           modifyReadResultFns: modifyReadResponseFns.added,
@@ -142,6 +144,8 @@ export function handleStreamPerStore(
               docMetaData: result.meta,
             })
           })
+          // prevent immediate execution while there's a write lock
+          return
         }
         return executeOnFns({
           modifyReadResultFns: modifyReadResponseFns.modified,
@@ -166,6 +170,8 @@ export function handleStreamPerStore(
               docMetaData: _meta,
             })
           })
+          // prevent immediate execution while there's a write lock
+          return
         }
 
         return executeOnFns({
