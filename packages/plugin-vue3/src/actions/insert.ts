@@ -24,7 +24,7 @@ export function insertActionFactory(
     payload,
     collectionPath,
     docId,
-    pluginModuleConfig,
+    pluginModuleConfig: _pluginModuleConfig,
   }: PluginInsertActionPayload<Vue3StoreModuleConfig>): string {
     const collectionMap = objGetOrSet(data, collectionPath, () => new Map())
 
@@ -45,15 +45,9 @@ export function insertActionFactory(
       collectionMap.set(_docId, payload)
       return _docId
     }
-    // delete keys that no longer exist
-    Object.keys(currentDoc).forEach((key) => {
-      if (!(key in payload)) {
-        Reflect.deleteProperty(currentDoc, key)
-      }
-    })
     // set only changed keys that already exist locally; drop brand-new keys
     Object.entries(payload).forEach(([key, value]) => {
-      if (key in currentDoc && !isEqual(currentDoc[key], value)) {
+      if (!isEqual(currentDoc[key], value)) {
         currentDoc[key] = value
       }
     })
