@@ -16,7 +16,7 @@
     "dep:update-major": "ncu -ws -u && echo \"review git changes and install with ni\"",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:deploy": "npm docs:build && firebase deploy --only hosting && git add -A && git commit -m \"chore: deploy\"",
+    "docs:deploy": "npm run docs:build && firebase deploy --only hosting && git add -A && git commit -m \"chore: deploy\"",
     "docs:serve": "vitepress serve docs",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
