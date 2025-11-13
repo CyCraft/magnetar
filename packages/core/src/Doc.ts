@@ -40,7 +40,7 @@ export function createDocWithContext(
     cacheStream: (closeStreamFn: () => void, streamingPromise: Promise<void> | null) => void
     streaming: () => Promise<void> | null
     closeStream: () => void
-  }
+  },
 ): DocInstance {
   const { writeLockMap, fetchPromises, cacheStream, streaming, closeStream } = streamAndFetchPromises // prettier-ignore
 
