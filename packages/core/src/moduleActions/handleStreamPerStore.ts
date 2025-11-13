@@ -18,7 +18,7 @@ import { getModifyReadResponseFnsMap } from '../helpers/modifyReadResponse.js'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers.js'
 import { isDoOnStream } from '../helpers/pluginHelpers.js'
 import { throwIfNoFnsToExecute, throwOnIncompleteStreamResponses } from '../helpers/throwFns.js'
-import { getDocAfterWritelock, writeLockPromise } from '../helpers/writeLockHelpers.js'
+import { getDocAfterWritelock } from '../helpers/writeLockHelpers.js'
 import { handleStream } from './handleStream.js'
 
 export function handleStreamPerStore(
@@ -92,54 +92,81 @@ export function handleStreamPerStore(
      * this is what must be executed by a plugin store that implemented "stream" functionality
      */
     const mustExecuteOnRead: Required<DoOnStream> = {
-      added: async (_payload, _meta) => {
+      /** musn't be async to avoid an issue where it can't group UI updates in 1 tick, when many docs come in */
+      added: (_payload, _meta) => {
         // check if there's a WriteLock for the document:
         const docIdentifier = `${collectionPath}/${_meta.id}`
-        const result = await getDocAfterWritelock({
-          writeLockMap,
-          docIdentifier,
-          lastIncomingDocs,
-          meta: _meta,
-          payload: _payload,
-        })
-
-        // if `undefined` nothing further must be done
-        if (!result) return
-
+        // check if there's a WriteLock for the document
+        const writeLock = writeLockMap.get(docIdentifier)
+        if (writeLock && isPromise(writeLock.promise)) {
+          // add to lastIncoming map
+          lastIncomingDocs.set(docIdentifier, { payload: _payload, meta: _meta })
+          writeLock.promise.then(() => {
+            // ...
+            const result = getDocAfterWritelock({ docIdentifier, lastIncomingDocs })
+            // if `undefined` nothing further must be done
+            if (!result) return
+            return executeOnFns({
+              modifyReadResultFns: modifyReadResponseFns.added,
+              cacheStoreFns: doOnStreamFns.added,
+              payload: result.payload,
+              docMetaData: result.meta,
+            })
+          })
+        }
         return executeOnFns({
           modifyReadResultFns: modifyReadResponseFns.added,
           cacheStoreFns: doOnStreamFns.added,
-          payload: result.payload,
-          docMetaData: result.meta,
+          payload: _payload,
+          docMetaData: _meta,
         })
       },
-      modified: async (_payload, _meta) => {
+      /** musn't be async to avoid an issue where it can't group UI updates in 1 tick, when many docs come in */
+      modified: (_payload, _meta) => {
         // check if there's a WriteLock for the document:
         const docIdentifier = `${collectionPath}/${_meta.id}`
-        const result = await getDocAfterWritelock({
-          writeLockMap,
-          docIdentifier,
-          lastIncomingDocs,
-          meta: _meta,
-          payload: _payload,
-        })
-
-        // if `undefined` nothing further must be done
-        if (!result) return
-
+        // check if there's a WriteLock for the document
+        const writeLock = writeLockMap.get(docIdentifier)
+        if (writeLock && isPromise(writeLock.promise)) {
+          // add to lastIncoming map
+          lastIncomingDocs.set(docIdentifier, { payload: _payload, meta: _meta })
+          writeLock.promise.then(() => {
+            // ...
+            const result = getDocAfterWritelock({ docIdentifier, lastIncomingDocs })
+            // if `undefined` nothing further must be done
+            if (!result) return
+            return executeOnFns({
+              modifyReadResultFns: modifyReadResponseFns.modified,
+              cacheStoreFns: doOnStreamFns.modified,
+              payload: result.payload,
+              docMetaData: result.meta,
+            })
+          })
+        }
         return executeOnFns({
-          modifyReadResultFns: modifyReadResponseFns.added,
-          cacheStoreFns: doOnStreamFns.added,
-          payload: result.payload,
-          docMetaData: result.meta,
+          modifyReadResultFns: modifyReadResponseFns.modified,
+          cacheStoreFns: doOnStreamFns.modified,
+          payload: _payload,
+          docMetaData: _meta,
         })
       },
-      removed: async (_payload, _meta) => {
+      /** musn't be async to avoid an issue where it can't group UI updates in 1 tick, when many docs come in */
+      removed: (_payload, _meta) => {
         // check if there's a WriteLock for the document
         const docIdentifier = `${collectionPath}/${_meta.id}`
         // must delete any piled up writeLock docs if by now it's deleted
         lastIncomingDocs.delete(docIdentifier)
-        await writeLockPromise(writeLockMap, docIdentifier)
+        const writeLock = writeLockMap.get(docIdentifier)
+        if (writeLock && isPromise(writeLock.promise)) {
+          writeLock.promise.then(() => {
+            return executeOnFns({
+              modifyReadResultFns: modifyReadResponseFns.removed,
+              cacheStoreFns: doOnStreamFns.removed,
+              payload: _payload,
+              docMetaData: _meta,
+            })
+          })
+        }
 
         return executeOnFns({
           modifyReadResultFns: modifyReadResponseFns.removed,

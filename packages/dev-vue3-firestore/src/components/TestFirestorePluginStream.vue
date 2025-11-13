@@ -5,6 +5,10 @@ import TodoApp from './TodoApp.vue'
 
 type Item = { title: string; id: string; isDone: boolean }
 
+function defaultsItem(payload: Partial<Item>): Item {
+  return { title: '', id: '', isDone: false, ...payload }
+}
+
 const itemsModule = magnetar.collection<Item>('magnetarTests/dev-firestore/items')
 
 // @ts-ignore — added to window to be able to play around in the console
@@ -12,7 +16,12 @@ window.itemsModule = itemsModule
 
 onBeforeMount(async () => {
   try {
-    await itemsModule.stream()
+    await itemsModule.stream(undefined, {
+      modifyReadResponseOn: {
+        added: (payload, metadata) => defaultsItem({ ...payload, id: metadata.id }),
+        modified: (payload, metadata) => defaultsItem({ ...payload, id: metadata.id }),
+      },
+    })
   } catch (error) {
     console.error(`stream closed unexpectedly with error:`, error)
   }
@@ -30,6 +39,7 @@ const alphabetically = ref(false)
 
 /** The items shown based on the filter */
 const items = computed<Item[]>(() => {
+  console.log(`items running`)
   const _showAll = showAll.value
   const _alphabetically = alphabetically.value
 
@@ -63,6 +73,12 @@ function deleteItem(item: Item) {
   console.log(`delete item → `, item)
   itemsModule.delete(item.id)
 }
+
+function testModification() {
+  for (const item of items.value) {
+    itemsModule.doc(item.id).merge({ title: item.title + '.' })
+  }
+}
 </script>
 
 <template>
@@ -73,6 +89,9 @@ function deleteItem(item: Item) {
       <input type="checkbox" name="" v-model="showAll" id="all" />
       <label for="order" style="padding-left: 1rem">alphabetically</label>
       <input type="checkbox" name="" v-model="alphabetically" id="order" />
+    </div>
+    <div style="margin: 1rem">
+      <button @click="() => testModification()">test updating {{ items.length }} items</button>
     </div>
     <TodoApp @add="addItem" @edit="editItem" @delete="deleteItem" :items="items" />
   </div>

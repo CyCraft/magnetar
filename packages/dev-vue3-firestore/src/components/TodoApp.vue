@@ -55,6 +55,7 @@ function toggleItemDone(item: Item) {
       class="_item"
       :class="item.isDone ? '_is-done' : ''"
     >
+      {{ (item.id ?? 'noid').slice(0, 4) }}
       <button class="_done" @click="() => toggleItemDone(item)">
         {{ item.isDone ? '☑️' : '◻️' }}
       </button>
