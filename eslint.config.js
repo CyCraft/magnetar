@@ -2,7 +2,7 @@ import config from '@cycraft/eslint/config'
 
 export default [
   {
-    ignores: ['**/dist/*'],
+    ignores: ['**/dist/*', '**/docs/*'],
   },
   ...config,
   {
