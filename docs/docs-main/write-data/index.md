@@ -237,3 +237,24 @@ magnetar
     }),
   })
 ```
+
+**Example: Array union with storeSplit**
+
+You can use `arrayUnion` for the remote store and compute a local union for your cache store:
+
+```ts
+import { storeSplit } from '@magnetarjs/utils'
+import { arrayUnion } from 'firebase/firestore' // Firestore plugin
+
+const user = magnetar.collection('user').doc('1')
+const existingHobbies = user.data.hobbies || []
+
+await user.merge({
+  hobbies: storeSplit({
+    // cache: compute a union locally (no duplicates)
+    cache: [...new Set([...existingHobbies, 'kayaking'])],
+    // remote: rely on Firestore arrayUnion
+    remote: arrayUnion('kayaking'),
+  }),
+})
+```

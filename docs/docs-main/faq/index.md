@@ -1,5 +1,9 @@
 # Frequently Asked Questions
 
+## How do I use Firebase helpers like arrayUnion or serverTimestamp?
+
+Use store-split payloads so your remote store can receive Firestore helpers, while your cache store receives a compatible value. See the [storeSplit examples in the write guide](../write-data/#pass-different-data-to-different-stores).
+
 ## Why not just use Firebase SDK? (since the syntax is so similar)
 
 TLDR; Firestore SDK **charges you on every read**. Magnetar does cache management for free.
