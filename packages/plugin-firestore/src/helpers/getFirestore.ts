@@ -29,15 +29,15 @@ function applyQueryClause(queryClause: QueryClause): QueryCompositeFilterConstra
   if ('and' in queryClause) {
     return and(
       ...queryClause.and.map((clause) =>
-        isArray(clause) ? where(...clause) : applyQueryClause(clause)
-      )
+        isArray(clause) ? where(...clause) : applyQueryClause(clause),
+      ),
     )
   }
   if ('or' in queryClause) {
     return or(
       ...queryClause.or.map((clause) =>
-        isArray(clause) ? where(...clause) : applyQueryClause(clause)
-      )
+        isArray(clause) ? where(...clause) : applyQueryClause(clause),
+      ),
     )
   }
   throw new Error('invalid query')
@@ -47,7 +47,7 @@ function applyQueryClauseDebug(queryClause: QueryClause): string {
   if ('and' in queryClause) {
     const params = queryClause.and
       .map((clause) =>
-        isArray(clause) ? `where(${arrStr(clause)})` : applyQueryClauseDebug(clause)
+        isArray(clause) ? `where(${arrStr(clause)})` : applyQueryClauseDebug(clause),
       )
       .join(', ')
     return `and(${params})`
@@ -55,7 +55,7 @@ function applyQueryClauseDebug(queryClause: QueryClause): string {
   if ('or' in queryClause) {
     const params = queryClause.or
       .map((clause) =>
-        isArray(clause) ? `where(${arrStr(clause)})` : applyQueryClauseDebug(clause)
+        isArray(clause) ? `where(${arrStr(clause)})` : applyQueryClauseDebug(clause),
       )
       .join(', ')
     return `or(${params})`
@@ -70,7 +70,7 @@ export function getQueryInstance(
   collectionPath: string,
   config: FirestoreModuleConfig,
   db: Firestore,
-  debug: boolean
+  debug: boolean,
 ): Query {
   let q: CollectionReference | Query
 
@@ -107,7 +107,7 @@ export function getQueryInstance(
       q,
       Array.isArray(config.startAfter)
         ? startAfter(...config.startAfter)
-        : startAfter(config.startAfter)
+        : startAfter(config.startAfter),
     )
     qDebugString = `query(${qDebugString}, ${
       Array.isArray(config.startAfter)
@@ -132,12 +132,12 @@ const myQuery = ${qDebugString}
 
 getDocs(myQuery)
     .then(console.info)
-    .error(console.error)`,
-      { preventLogFor: 10_000 }
+    .catch(console.error)`,
+      { preventLogFor: 10_000 },
     )
     if (!(window as any).magnetarDebugAddFirebaseToWindowExplained) {
       logWithFlair(
-        `execute \`magnetarDebugAddFirebaseToWindow()\` to add these Firebase JS SDK variables to the window for debugging: db, getDocs, onSnapshot, getCountFromServer, and, collection, collectionGroup, limit, or, orderBy, query, startAfter, where`
+        `execute \`magnetarDebugAddFirebaseToWindow()\` to add these Firebase JS SDK variables to the window for debugging: db, getDocs, onSnapshot, getCountFromServer, and, collection, collectionGroup, limit, or, orderBy, query, startAfter, where`,
       )
       ;(window as any).magnetarDebugAddFirebaseToWindow = () => {
         ;(window as any).db = db
@@ -164,7 +164,7 @@ getDocs(myQuery)
 export function docSnapshotToDocMetadata(
   docSnapshot:
     | DocumentSnapshot<{ [key: string]: unknown }>
-    | QueryDocumentSnapshot<{ [key: string]: unknown }>
+    | QueryDocumentSnapshot<{ [key: string]: unknown }>,
 ): DocMetadata {
   const docMetaData: DocMetadata = {
     data: docSnapshot.data(),
