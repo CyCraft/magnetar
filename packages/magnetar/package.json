@@ -1,6 +1,6 @@
 {
   "name": "magnetar",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "type": "module",
   "description": "State-management done right with automatic sync to remote databases and services. Framework-agnostic & optimistic-UI built-in 🌟",
   "exports": {
