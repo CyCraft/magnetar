@@ -111,6 +111,15 @@ export function handleStreamPerStore(
               cacheStoreFns: doOnStreamFns.added,
               payload: result.payload,
               docMetaData: result.meta,
+              eventFns: eventNameFnsMap,
+              eventContext: {
+                collectionPath,
+                docId: result.meta.id,
+                path: docIdentifier,
+                pluginModuleConfig: getPluginModuleConfig(moduleConfig, 'cache'),
+                storeName: 'cache',
+                streamEvent: 'added',
+              },
             })
           })
           // prevent immediate execution while there's a write lock
@@ -121,6 +130,15 @@ export function handleStreamPerStore(
           cacheStoreFns: doOnStreamFns.added,
           payload: _payload,
           docMetaData: _meta,
+          eventFns: eventNameFnsMap,
+          eventContext: {
+            collectionPath,
+            docId: _meta.id,
+            path: docIdentifier,
+            pluginModuleConfig: getPluginModuleConfig(moduleConfig, 'cache'),
+            storeName: 'cache',
+            streamEvent: 'added',
+          },
         })
       },
       /** musn't be async to avoid an issue where it can't group UI updates in 1 tick, when many docs come in */
@@ -142,6 +160,15 @@ export function handleStreamPerStore(
               cacheStoreFns: doOnStreamFns.modified,
               payload: result.payload,
               docMetaData: result.meta,
+              eventFns: eventNameFnsMap,
+              eventContext: {
+                collectionPath,
+                docId: result.meta.id,
+                path: docIdentifier,
+                pluginModuleConfig: getPluginModuleConfig(moduleConfig, 'cache'),
+                storeName: 'cache',
+                streamEvent: 'modified',
+              },
             })
           })
           // prevent immediate execution while there's a write lock
@@ -152,6 +179,15 @@ export function handleStreamPerStore(
           cacheStoreFns: doOnStreamFns.modified,
           payload: _payload,
           docMetaData: _meta,
+          eventFns: eventNameFnsMap,
+          eventContext: {
+            collectionPath,
+            docId: _meta.id,
+            path: docIdentifier,
+            pluginModuleConfig: getPluginModuleConfig(moduleConfig, 'cache'),
+            storeName: 'cache',
+            streamEvent: 'modified',
+          },
         })
       },
       /** musn't be async to avoid an issue where it can't group UI updates in 1 tick, when many docs come in */
@@ -168,6 +204,15 @@ export function handleStreamPerStore(
               cacheStoreFns: doOnStreamFns.removed,
               payload: _payload,
               docMetaData: _meta,
+              eventFns: eventNameFnsMap,
+              eventContext: {
+                collectionPath,
+                docId: _meta.id,
+                path: docIdentifier,
+                pluginModuleConfig: getPluginModuleConfig(moduleConfig, 'cache'),
+                storeName: 'cache',
+                streamEvent: 'removed',
+              },
             })
           })
           // prevent immediate execution while there's a write lock
@@ -179,6 +224,15 @@ export function handleStreamPerStore(
           cacheStoreFns: doOnStreamFns.removed,
           payload: _payload,
           docMetaData: _meta,
+          eventFns: eventNameFnsMap,
+          eventContext: {
+            collectionPath,
+            docId: _meta.id,
+            path: docIdentifier,
+            pluginModuleConfig: getPluginModuleConfig(moduleConfig, 'cache'),
+            storeName: 'cache',
+            streamEvent: 'removed',
+          },
         })
       },
     }

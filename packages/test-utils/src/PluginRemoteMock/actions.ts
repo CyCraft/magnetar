@@ -229,6 +229,7 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
     collectionPath,
     docId,
     pluginModuleConfig,
+    actionConfig,
     mustExecuteOnRead,
   }: PluginStreamActionPayload<StorePluginModuleConfig>): Promise<StreamResponse | DoOnStream> {
     // this is custom logic to be implemented by the plugin author
@@ -237,31 +238,75 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
     const onFirstData = payload?.onFirstData
     let firstDataProcessed = false
 
+    // Check if streamSendsData is provided in config (for testing)
+    const streamSendsData = (actionConfig as any)?.streamSendsData
+
     // we'll mock opening a stream
-    const dataRetrieved = !docId
-      ? mockDataRetrieval(collectionPath, docId, pluginModuleConfig)
-      : [
-          { name: 'Luca', age: 10 },
-          { name: 'Luca', age: 10 },
-          { name: 'Luca', age: 10, dream: 'job' },
-          { name: 'Luca', age: 10, dream: 'job', colour: 'blue' },
-        ]
+    const dataRetrieved = streamSendsData
+      ? isFullArray(streamSendsData)
+        ? streamSendsData
+        : [streamSendsData]
+      : !docId
+        ? mockDataRetrieval(collectionPath, docId, pluginModuleConfig)
+        : [
+            { name: 'Luca', age: 10 },
+            { name: 'Luca', age: 10 },
+            { name: 'Luca', age: 10, dream: 'job' },
+            { name: 'Luca', age: 10, dream: 'job', colour: 'blue' },
+          ]
     const stopStreaming = {
       stopped: false,
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       stop: () => {},
     }
-    // this mocks actual data coming in at different intervals
-    dataRetrieved.forEach((data: { [key: string]: any }, i) => {
-      const metaData = { data, id: data['id'] || docId, exists: true }
 
-      // we can simulate new docs coming in by manually triggerering promises
-      if (isFullArray(payload) && payload.every(isPromise)) {
-        // the payload is an array full of promises!
-        // in this case we will emit every time the promises at the index is triggered
-        const promise = payload[i]
-        if (!promise) return
-        promise.then(() => {
+    // If streamSendsData is provided, send all data at setTimeout 10, then trigger onFirstData
+    if (streamSendsData) {
+      setTimeout(() => {
+        if (stopStreaming.stopped) return
+        // Send all items
+        dataRetrieved.forEach((data: { [key: string]: any }) => {
+          if (data) {
+            const metaData = { data, id: data['id'] || docId, exists: true }
+            mustExecuteOnRead.added(data, metaData)
+          }
+        })
+        // After all items are sent, trigger onFirstData
+        if (!firstDataProcessed && onFirstData && dataRetrieved.length > 0) {
+          firstDataProcessed = true
+          setTimeout(() => onFirstData({ empty: false }), 0)
+        }
+      }, 10)
+    } else {
+      // this mocks actual data coming in at different intervals
+      dataRetrieved.forEach((data: { [key: string]: any }, i) => {
+        const metaData = { data, id: data['id'] || docId, exists: true }
+
+        // we can simulate new docs coming in by manually triggerering promises
+        if (isFullArray(payload) && payload.every(isPromise)) {
+          // the payload is an array full of promises!
+          // in this case we will emit every time the promises at the index is triggered
+          const promise = payload[i]
+          if (!promise) return
+          promise.then(() => {
+            if (data) {
+              // Call onFirstData on first data processed
+              if (!firstDataProcessed && onFirstData) {
+                firstDataProcessed = true
+                setTimeout(() => onFirstData({ empty: false }), 0)
+              }
+              mustExecuteOnRead.added(data, metaData)
+            }
+          })
+          return
+        }
+
+        // otherwise emulate server response with setTimeout (can be wonky in automated tests)
+        const waitTime = 10 + i * 200
+        setTimeout(() => {
+          // mock when the stream is already stopped
+          if (stopStreaming.stopped) return
+          // else go ahead and actually trigger the mustExecuteOnRead function
           if (data) {
             // Call onFirstData on first data processed
             if (!firstDataProcessed && onFirstData) {
@@ -270,26 +315,9 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
             }
             mustExecuteOnRead.added(data, metaData)
           }
-        })
-        return
-      }
-
-      // otherwise emulate server response with setTimeout (can be wonky in automated tests)
-      const waitTime = 10 + i * 200
-      setTimeout(() => {
-        // mock when the stream is already stopped
-        if (stopStreaming.stopped) return
-        // else go ahead and actually trigger the mustExecuteOnRead function
-        if (data) {
-          // Call onFirstData on first data processed
-          if (!firstDataProcessed && onFirstData) {
-            firstDataProcessed = true
-            setTimeout(() => onFirstData({ empty: false }), 0)
-          }
-          mustExecuteOnRead.added(data, metaData)
-        }
-      }, waitTime)
-    })
+        }, waitTime)
+      })
+    }
 
     // If no data is expected and onFirstData is provided, call it immediately
     if (onFirstData && !firstDataProcessed && dataRetrieved.length === 0) {

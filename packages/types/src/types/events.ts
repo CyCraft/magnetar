@@ -14,6 +14,14 @@ import { MergeDeep } from './utils/MergeDeep.js'
 // events
 export type EventName = 'before' | 'success' | 'error' | 'revert'
 
+/**
+ * The type of stream event when actionName is 'stream'.
+ * - 'added': A new document was added to the stream
+ * - 'modified': An existing document was modified
+ * - 'removed': A document was removed from the stream
+ */
+export type StreamEvent = 'added' | 'modified' | 'removed'
+
 type EventSharedPayload = {
   /**
    * The path of just the collection
@@ -56,6 +64,13 @@ type EventSharedPayload = {
    * others: () => void
    */
   abort: () => void
+  /**
+   * Only present when actionName is 'stream'. Indicates the type of stream event:
+   * - 'added': A new document was added to the stream
+   * - 'modified': An existing document was modified
+   * - 'removed': A document was removed from the stream
+   */
+  streamEvent?: StreamEvent | undefined
 }
 
 type EventPayloadPropResult = {
