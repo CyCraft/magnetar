@@ -1,3 +1,4 @@
+import { WriteLock } from '../Magnetar.js'
 import { ActionConfig, ActionName } from './actions.js'
 import { Clauses } from './clauses.js'
 import { DocMetadata } from './core.js'
@@ -137,6 +138,10 @@ export type PluginStreamActionPayload<SpecificPluginModuleConfig = PluginModuleC
      * The functions for 'added', 'modified' and 'removed' **must** be executed by the plugin whenever the stream sees any of these changes. These are the functions that will pass the data to the other "cache" Store Plugins.
      */
     mustExecuteOnRead: MustExecuteOnRead
+    /**
+     * Write lock map to check for collection-level write locks before processing stream changes
+     */
+    writeLockMap: Map<string, WriteLock>
   }
 >
 
