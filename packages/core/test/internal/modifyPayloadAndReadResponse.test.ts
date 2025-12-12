@@ -53,7 +53,7 @@ test('stream: can mutate payload & read response (config in global magnetar inst
     {
       on: {
         before: ({ payload }) => {
-          payloadInSuccessEvent = payload
+          if (!payloadInSuccessEvent) payloadInSuccessEvent = payload
         },
       },
     },
@@ -142,7 +142,7 @@ test('stream: can mutate payload & read response (config in module)', async () =
     {
       on: {
         before: ({ payload }) => {
-          payloadInSuccessEvent = payload
+          if (!payloadInSuccessEvent) payloadInSuccessEvent = payload
         },
       },
     },
@@ -227,7 +227,7 @@ test('stream: can mutate payload & read response (config in action)', async () =
       modifyReadResponseOn: { added: addSeen },
       on: {
         before: ({ payload }) => {
-          payloadInSuccessEvent = payload
+          if (!payloadInSuccessEvent) payloadInSuccessEvent = payload
         },
       },
     },
