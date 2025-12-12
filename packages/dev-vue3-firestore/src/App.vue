@@ -5,7 +5,7 @@ import TestFirestorePluginFetch from './components/TestFirestorePluginFetch.vue'
 import TestFirestorePluginStream from './components/TestFirestorePluginStream.vue'
 import TestVanillaJsSDK from './components/TestVanillaJsSDK.vue'
 
-const example = ref<'stream' | 'fetch' | 'vanilla'>('stream')
+const example = ref<'stream' | 'fetch' | 'vanilla' | null>(null)
 </script>
 
 <template>
@@ -13,15 +13,15 @@ const example = ref<'stream' | 'fetch' | 'vanilla'>('stream')
     <ButtonToggle
       v-model="example"
       :options="[
-        { label: 'Stream Example', value: 'stream' },
         { label: 'Fetch Example', value: 'fetch' },
+        { label: 'Stream Example', value: 'stream' },
         { label: 'Vanilla JS SDK Test', value: 'vanilla' },
       ]"
       style="margin-bottom: 1rem"
     />
 
-    <TestFirestorePluginStream v-if="example === 'stream'" />
     <TestFirestorePluginFetch v-if="example === 'fetch'" />
+    <TestFirestorePluginStream v-if="example === 'stream'" />
     <TestVanillaJsSDK v-if="example === 'vanilla'" />
   </div>
 </template>
