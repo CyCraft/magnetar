@@ -8,6 +8,7 @@
     "packages/*"
   ],
   "scripts": {
+    ":": "coloncli",
     "dev:nuxt-firestore": "npm run -w=dev-nuxt-firestore dev",
     "dev:vue3-firestore": "npm run -w=dev-vue3-firestore dev",
     "dev:ui": "npm run -w=@magnetarjs/ui dev",
@@ -51,6 +52,7 @@
     "array-shuffle": "^3.0.0",
     "browser-env": "^3.3.0",
     "bumpp": "^9.11.1",
+    "coloncli": "^0.1.0",
     "copyfiles": "^2.4.1",
     "del-cli": "^5.1.0",
     "esbuild": "^0.21.5",

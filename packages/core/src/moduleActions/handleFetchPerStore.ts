@@ -25,7 +25,6 @@ import { executeOnFns } from '../helpers/executeOnFns.js'
 import { getModifyPayloadFnsMap } from '../helpers/modifyPayload.js'
 import { getModifyReadResponseFnsMap } from '../helpers/modifyReadResponse.js'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers.js'
-import { getCollectionWriteLocks } from '../helpers/pathHelpers.js'
 import {
   isDoOnFetch,
   isDoOnFetchAggregate,
@@ -68,8 +67,8 @@ export function handleFetchPerStore(
     // return the same fetch promise early if it's not yet resolved
     if (actionName === 'fetch' && isPromise(foundFetchPromise)) return foundFetchPromise
 
-    // set up and/or reset te writeLock for write actions
-    const writeLockId = _docId ? `${collectionPath}/${_docId}` : collectionPath
+    // Check for collection-level write lock
+    const writeLockId = collectionPath
     const writeLock = writeLockMap.get(writeLockId)
 
     // eslint-disable-next-line no-async-promise-executor
@@ -85,11 +84,6 @@ export function handleFetchPerStore(
       // we need to await any writeLock _before_ fetching, to prevent grabbing outdated data
       if (actionName === 'fetch' && willForceFetch) {
         await writeLock?.promise
-        if (!_docId) {
-          // we need to await all promises of all docs in this collection...
-          const collectionWriteMaps = getCollectionWriteLocks(collectionPath, writeLockMap)
-          await Promise.allSettled(collectionWriteMaps.map((w) => w.promise))
-        }
       }
 
       try {

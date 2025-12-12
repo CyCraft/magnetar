@@ -10,7 +10,7 @@ import {
 } from '@magnetarjs/utils-firestore'
 import type { DocumentChange, DocumentSnapshot, QuerySnapshot } from 'firebase/firestore'
 import { doc, onSnapshot } from 'firebase/firestore'
-import { isString } from 'is-what'
+import { isPromise, isString } from 'is-what'
 import { FirestorePluginOptions } from '../CreatePlugin.js'
 import { docSnapshotToDocMetadata, getQueryInstance } from '../helpers/getFirestore.js'
 
@@ -23,6 +23,7 @@ export function streamActionFactory(
     docId,
     pluginModuleConfig,
     mustExecuteOnRead,
+    writeLockMap,
   }: PluginStreamActionPayload<FirestoreModuleConfig>): StreamResponse {
     const { added, modified, removed } = mustExecuteOnRead
     const { db, debug } = firestorePluginOptions
@@ -42,25 +43,53 @@ export function streamActionFactory(
     // in case of a doc module
     if (isString(docId)) {
       const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
+
+      // Pool doc snapshots that arrive while waiting for write lock
+      let pendingSnapshot: DocumentSnapshot<{ [key: string]: unknown }> | null = null
+      let isProcessing = false
+
+      const processDocSnapshot = (docSnapshot: DocumentSnapshot<{ [key: string]: unknown }>) => {
+        // do nothing if the doc doesn't exist
+        if (!docSnapshot.exists()) return
+        // serverChanges only
+        const docData = docSnapshot.data()
+        const docMetadata = docSnapshotToDocMetadata(docSnapshot)
+        if (docData) added(docData, docMetadata)
+      }
+
       closeStream = onSnapshot(
         doc(db, documentPath),
-        (docSnapshot: DocumentSnapshot<{ [key: string]: unknown }>) => {
+        async (docSnapshot: DocumentSnapshot<{ [key: string]: unknown }>) => {
           // even if `docSnapshot.metadata.hasPendingWrites`
           //       we should always execute `added/modified`
           //       because `core` handles overlapping calls for us
 
-          // Call onFirstData on first snapshot (whether doc exists or not)
+          // Store latest snapshot (only need the most recent for a single doc)
+          pendingSnapshot = docSnapshot
+
+          // If already processing, let the current processor handle it
+          if (isProcessing) return
+
+          // Check for write lock
+          const collectionWriteLock = writeLockMap.get(collectionPath)
+          if (collectionWriteLock && isPromise(collectionWriteLock.promise)) {
+            isProcessing = true
+            await collectionWriteLock.promise
+          }
+
+          // Process the latest pending snapshot
+          if (pendingSnapshot) {
+            const snapshot = pendingSnapshot
+            pendingSnapshot = null
+            processDocSnapshot(snapshot)
+          }
+
+          // Call onFirstData after processing (after write lock, whether doc exists or not)
           if (!firstDataReceived && onFirstData) {
             firstDataReceived = true
             setTimeout(() => onFirstData({ empty: !docSnapshot.exists() }), 0)
           }
-
-          // do nothing if the doc doesn't exist
-          if (!docSnapshot.exists()) return
-          // serverChanges only
-          const docData = docSnapshot.data()
-          const docMetadata = docSnapshotToDocMetadata(docSnapshot)
-          if (docData) added(docData, docMetadata)
+          isProcessing = false
         },
         rejectStream,
       )
@@ -69,36 +98,63 @@ export function streamActionFactory(
     else if (!docId) {
       const _collectionPath = getFirestoreCollectionPath(collectionPath, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
       const query = getQueryInstance(_collectionPath, pluginModuleConfig, db, debug)
+
+      // Pool querySnapshots that arrive while waiting for write lock
+      const pendingSnapshots: QuerySnapshot[] = []
+      let isProcessing = false
+
+      const processDocChanges = (querySnapshot: QuerySnapshot) => {
+        querySnapshot
+          .docChanges()
+          .forEach((docChange: DocumentChange<{ [key: string]: unknown }>) => {
+            const docSnapshot = docChange.doc
+            const docData = docSnapshot.data()
+            const docMetadata = docSnapshotToDocMetadata(docSnapshot)
+            if (docChange.type === 'added' && docData) {
+              added(docData, docMetadata)
+            }
+            if (docChange.type === 'modified' && docData) {
+              modified(docData, docMetadata)
+            }
+            if (docChange.type === 'removed') {
+              removed(docData, docMetadata)
+            }
+          })
+      }
+
       closeStream = onSnapshot(
         query,
-        (querySnapshot: QuerySnapshot) => {
+        async (querySnapshot: QuerySnapshot) => {
           // even if `docSnapshot.metadata.hasPendingWrites`
           //       we should always execute `added/modified`
           //       because `core` handles overlapping calls for us
 
-          // Call onFirstData on first snapshot (whether collection has docs or not)
+          // Add to pending pool
+          pendingSnapshots.push(querySnapshot)
+
+          // If already processing, let the current processor handle it
+          if (isProcessing) return
+
+          // Check for write lock
+          const collectionWriteLock = writeLockMap.get(collectionPath)
+          if (collectionWriteLock && isPromise(collectionWriteLock.promise)) {
+            isProcessing = true
+            await collectionWriteLock.promise
+          }
+
+          // Process all pending snapshots synchronously
+          let snapshot = pendingSnapshots.shift()
+          while (snapshot) {
+            processDocChanges(snapshot)
+            snapshot = pendingSnapshots.shift()
+          }
+
+          // Call onFirstData after processing (after write lock, whether collection has docs or not)
           if (!firstDataReceived && onFirstData) {
             firstDataReceived = true
             setTimeout(() => onFirstData({ empty: querySnapshot.empty }), 0)
           }
-
-          // serverChanges only
-          querySnapshot
-            .docChanges()
-            .forEach((docChange: DocumentChange<{ [key: string]: unknown }>) => {
-              const docSnapshot = docChange.doc
-              const docData = docSnapshot.data()
-              const docMetadata = docSnapshotToDocMetadata(docSnapshot)
-              if (docChange.type === 'added' && docData) {
-                added(docData, docMetadata)
-              }
-              if (docChange.type === 'modified' && docData) {
-                modified(docData, docMetadata)
-              }
-              if (docChange.type === 'removed') {
-                removed(docData, docMetadata)
-              }
-            })
+          isProcessing = false
         },
         rejectStream,
       )

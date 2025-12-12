@@ -5,6 +5,7 @@ import type {
   PluginModuleConfig,
   PluginStreamAction,
   StreamResponse,
+  WriteLock,
 } from '@magnetarjs/types'
 
 /**
@@ -21,6 +22,7 @@ export async function handleStream(args: {
   actionName: 'stream'
   storeName: string
   mustExecuteOnRead: Required<DoOnStream>
+  writeLockMap: Map<string, WriteLock>
 }): Promise<StreamResponse | DoOnStream> {
   const {
     collectionPath,
@@ -33,6 +35,7 @@ export async function handleStream(args: {
     actionName,
     storeName,
     mustExecuteOnRead,
+    writeLockMap,
   } = args
   // no aborting possible in stream actions
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -56,6 +59,7 @@ export async function handleStream(args: {
       docId,
       pluginModuleConfig,
       mustExecuteOnRead,
+      writeLockMap,
     })
   } catch (error) {
     // handle and await each eventFn in sequence

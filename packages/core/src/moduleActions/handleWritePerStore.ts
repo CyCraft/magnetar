@@ -56,7 +56,8 @@ export function handleWritePerStore(
   // returns the action the dev can call with myModule.insert() etc.
   return function (payload?: any, actionConfig: ActionConfig = {}): Promise<any> {
     // set up and/or reset te writeLock for write actions
-    const writeLockId = _docId ? `${collectionPath}/${_docId}` : collectionPath
+    // Always use collection-level write lock
+    const writeLockId = collectionPath
     const writeLock = mapGetOrSet(writeLockMap, writeLockId, (): WriteLock => {
       return { promise: null, resolve: () => undefined, countdown: null }
     })

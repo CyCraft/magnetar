@@ -1,7 +1,6 @@
 import type {
   ActionConfig,
   ActionType,
-  DocMetadata,
   DoOnStream,
   DoOnStreamFns,
   GlobalConfig,
@@ -18,7 +17,6 @@ import { getModifyReadResponseFnsMap } from '../helpers/modifyReadResponse.js'
 import { getPluginModuleConfig } from '../helpers/moduleHelpers.js'
 import { isDoOnStream } from '../helpers/pluginHelpers.js'
 import { throwIfNoFnsToExecute, throwOnIncompleteStreamResponses } from '../helpers/throwFns.js'
-import { getDocAfterWritelock } from '../helpers/writeLockHelpers.js'
 import { handleStream } from './handleStream.js'
 
 export function handleStreamPerStore(
@@ -81,50 +79,13 @@ export function handleStreamPerStore(
     }
 
     /**
-     * Last incoming added/modified docs are cached here temporarily to prevent UI flashing because of the writeLock
-     */
-    const lastIncomingDocs = new Map<
-      string,
-      { payload: { [key: string]: unknown } | undefined; meta: DocMetadata }
-    >()
-
-    /**
      * this is what must be executed by a plugin store that implemented "stream" functionality
+     * Note: Write locks are handled by the remote plugin before calling these callbacks
      */
     const mustExecuteOnRead: Required<DoOnStream> = {
       /** musn't be async to avoid an issue where it can't group UI updates in 1 tick, when many docs come in */
       added: (_payload, _meta) => {
-        // check if there's a WriteLock for the document:
         const docIdentifier = `${collectionPath}/${_meta.id}`
-        // check if there's a WriteLock for the document
-        const writeLock = writeLockMap.get(docIdentifier)
-        if (writeLock && isPromise(writeLock.promise)) {
-          // add to lastIncoming map
-          lastIncomingDocs.set(docIdentifier, { payload: _payload, meta: _meta })
-          writeLock.promise.then(() => {
-            // ...
-            const result = getDocAfterWritelock({ docIdentifier, lastIncomingDocs })
-            // if `undefined` nothing further must be done
-            if (!result) return
-            return executeOnFns({
-              modifyReadResultFns: modifyReadResponseFns.added,
-              cacheStoreFns: doOnStreamFns.added,
-              payload: result.payload,
-              docMetaData: result.meta,
-              eventFns: eventNameFnsMap,
-              eventContext: {
-                collectionPath,
-                docId: result.meta.id,
-                path: docIdentifier,
-                pluginModuleConfig: getPluginModuleConfig(moduleConfig, 'cache'),
-                storeName: 'cache',
-                streamEvent: 'added',
-              },
-            })
-          })
-          // prevent immediate execution while there's a write lock
-          return
-        }
         return executeOnFns({
           modifyReadResultFns: modifyReadResponseFns.added,
           cacheStoreFns: doOnStreamFns.added,
@@ -143,37 +104,7 @@ export function handleStreamPerStore(
       },
       /** musn't be async to avoid an issue where it can't group UI updates in 1 tick, when many docs come in */
       modified: (_payload, _meta) => {
-        // check if there's a WriteLock for the document:
         const docIdentifier = `${collectionPath}/${_meta.id}`
-        // check if there's a WriteLock for the document
-        const writeLock = writeLockMap.get(docIdentifier)
-        if (writeLock && isPromise(writeLock.promise)) {
-          // add to lastIncoming map
-          lastIncomingDocs.set(docIdentifier, { payload: _payload, meta: _meta })
-          writeLock.promise.then(() => {
-            // ...
-            const result = getDocAfterWritelock({ docIdentifier, lastIncomingDocs })
-            // if `undefined` nothing further must be done
-            if (!result) return
-            return executeOnFns({
-              modifyReadResultFns: modifyReadResponseFns.modified,
-              cacheStoreFns: doOnStreamFns.modified,
-              payload: result.payload,
-              docMetaData: result.meta,
-              eventFns: eventNameFnsMap,
-              eventContext: {
-                collectionPath,
-                docId: result.meta.id,
-                path: docIdentifier,
-                pluginModuleConfig: getPluginModuleConfig(moduleConfig, 'cache'),
-                storeName: 'cache',
-                streamEvent: 'modified',
-              },
-            })
-          })
-          // prevent immediate execution while there's a write lock
-          return
-        }
         return executeOnFns({
           modifyReadResultFns: modifyReadResponseFns.modified,
           cacheStoreFns: doOnStreamFns.modified,
@@ -192,33 +123,7 @@ export function handleStreamPerStore(
       },
       /** musn't be async to avoid an issue where it can't group UI updates in 1 tick, when many docs come in */
       removed: (_payload, _meta) => {
-        // check if there's a WriteLock for the document
         const docIdentifier = `${collectionPath}/${_meta.id}`
-        // must delete any piled up writeLock docs if by now it's deleted
-        lastIncomingDocs.delete(docIdentifier)
-        const writeLock = writeLockMap.get(docIdentifier)
-        if (writeLock && isPromise(writeLock.promise)) {
-          writeLock.promise.then(() => {
-            return executeOnFns({
-              modifyReadResultFns: modifyReadResponseFns.removed,
-              cacheStoreFns: doOnStreamFns.removed,
-              payload: _payload,
-              docMetaData: _meta,
-              eventFns: eventNameFnsMap,
-              eventContext: {
-                collectionPath,
-                docId: _meta.id,
-                path: docIdentifier,
-                pluginModuleConfig: getPluginModuleConfig(moduleConfig, 'cache'),
-                storeName: 'cache',
-                streamEvent: 'removed',
-              },
-            })
-          })
-          // prevent immediate execution while there's a write lock
-          return
-        }
-
         return executeOnFns({
           modifyReadResultFns: modifyReadResponseFns.removed,
           cacheStoreFns: doOnStreamFns.removed,
@@ -256,6 +161,7 @@ export function handleStreamPerStore(
           actionName: 'stream',
           storeName,
           mustExecuteOnRead,
+          writeLockMap,
         })
         // if the plugin action for stream returns a "do on read" result
         if (isDoOnStream(result)) {
