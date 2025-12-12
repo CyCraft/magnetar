@@ -74,10 +74,31 @@ function deleteItem(item: Item) {
   itemsModule.delete(item.id)
 }
 
-function testModification() {
-  for (const item of items.value) {
-    itemsModule.doc(item.id).merge({ title: item.title + '.' })
+// function testModification() {
+//   for (const item of items.value) {
+//     itemsModule.doc(item.id).merge({ title: item.title + '.' })
+//   }
+// }
+async function testModification() {
+  const itemsToTest = items.value
+  if (itemsToTest.length === 0) {
+    console.warn('No items to test')
+    return
   }
+
+  console.log(`🧪 Testing ${itemsToTest.length} items - First loop`)
+  // First loop: update all items with 100ms syncDebounceMs
+  for (const item of itemsToTest) {
+    itemsModule.doc(item.id).merge({ title: item.title + '.' }, { syncDebounceMs: 100 })
+  }
+  await new Promise((resolve) => setTimeout(resolve, 100))
+
+  console.log(`🧪 Testing ${itemsToTest.length} items - Second loop`)
+  // Second loop: update all items again with 100ms syncDebounceMs
+  for (const item of itemsToTest) {
+    itemsModule.doc(item.id).merge({ title: item.title + '..' }, { syncDebounceMs: 100 })
+  }
+  await new Promise((resolve) => setTimeout(resolve, 100))
 }
 </script>
 
