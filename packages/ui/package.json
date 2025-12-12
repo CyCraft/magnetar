@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/ui",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "type": "module",
   "sideEffects": false,
   "description": "A fully functional table that automatically connects to your database powered by Magnetar 🌟",
