@@ -1,10 +1,5 @@
-import type { PluginInsertAction, PluginInsertActionPayload, SyncBatch } from '@magnetarjs/types'
-import {
-  BatchSync,
-  FirestoreModuleConfig,
-  batchSyncFactory,
-  getFirestoreDocPath,
-} from '@magnetarjs/utils-firestore'
+import type { PluginInsertAction } from '@magnetarjs/types'
+import { BatchSync, batchSyncFactory, getFirestoreDocPath } from '@magnetarjs/utils-firestore'
 import { mapGetOrSet } from 'getorset-anything'
 import { isFullString, isNumber } from 'is-what'
 import { BatchSyncMap, FirestoreAdminPluginOptions } from '../CreatePlugin.js'
@@ -12,15 +7,15 @@ import { applySyncBatch, createWriteBatch } from '../helpers/batchHelpers.js'
 
 export function insertActionFactory(
   batchSyncMap: BatchSyncMap,
-  firestorePluginOptions: Required<FirestoreAdminPluginOptions>
+  firestorePluginOptions: Required<FirestoreAdminPluginOptions>,
 ): PluginInsertAction {
-  return async function ({
+  const insert: PluginInsertAction = async ({
     payload,
     collectionPath,
     docId,
     actionConfig,
     pluginModuleConfig,
-  }: PluginInsertActionPayload<FirestoreModuleConfig>): Promise<[string, SyncBatch]> {
+  }) => {
     const { db } = firestorePluginOptions
     let _docId = docId
     if (!_docId) {
@@ -34,15 +29,16 @@ export function insertActionFactory(
     const documentPath = getFirestoreDocPath(collectionPath, _docId as string, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
     const syncDebounceMs = isNumber(actionConfig.syncDebounceMs)
       ? actionConfig.syncDebounceMs
-      : pluginModuleConfig.syncDebounceMs
+      : pluginModuleConfig['syncDebounceMs']
 
     const batchSync = mapGetOrSet(
       batchSyncMap,
       collectionPath,
-      (): BatchSync => batchSyncFactory(firestorePluginOptions, createWriteBatch, applySyncBatch)
+      (): BatchSync => batchSyncFactory(firestorePluginOptions, createWriteBatch, applySyncBatch),
     )
 
     const result = await batchSync.insert(documentPath, payload, syncDebounceMs)
     return [_docId as string, result]
   }
+  return insert
 }

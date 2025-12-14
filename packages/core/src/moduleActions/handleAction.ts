@@ -1,6 +1,7 @@
 import type {
   ActionConfig,
   ActionName,
+  CacheStoreAddedResult,
   DoOnFetch,
   DoOnFetchAggregate,
   EventNameFnsMap,
@@ -17,6 +18,7 @@ import type {
   PluginWriteAction,
   SyncBatch,
 } from '@magnetarjs/types'
+import { isCacheStoreAddedResult } from '@magnetarjs/types'
 
 /**
  * handleAction is responsible for executing (1) on.before (2) the action provided by the store plugin (3) on.error / on.success (4) optional: onNextStoresSuccess.
@@ -69,14 +71,14 @@ export async function handleAction(args: {
   }
   // handle and await each eventFn in sequence
   for (const fn of on.before) {
-    await fn({ payload, actionName, storeName, abort, collectionPath, docId, path: modulePath, pluginModuleConfig }) // prettier-ignore
+    await fn({ payload, actionName, storeName, abort, collectionPath, docId, path: modulePath, pluginModuleConfig, current: undefined, diffApplied: 'na' }) // prettier-ignore
   }
   // abort?
   if (abortExecution) {
     stopExecutionAfterAction()
     return
   }
-  let result: undefined | string | FetchAggregateResponse | DoOnFetchAggregate | FetchResponse | DoOnFetch | SyncBatch | [string, SyncBatch] // prettier-ignore
+  let result: undefined | string | FetchAggregateResponse | DoOnFetchAggregate | FetchResponse | DoOnFetch | CacheStoreAddedResult | SyncBatch | [string, SyncBatch] // prettier-ignore
   try {
     // triggering the action provided by the plugin
     result = await pluginAction({
@@ -89,7 +91,7 @@ export async function handleAction(args: {
   } catch (error) {
     // handle and await each eventFn in sequence
     for (const fn of on.error) {
-      await fn({ payload, actionName, storeName, abort, error, collectionPath, docId, path: modulePath, pluginModuleConfig }) // prettier-ignore
+      await fn({ payload, actionName, storeName, abort, error, collectionPath, docId, path: modulePath, pluginModuleConfig, current: undefined, diffApplied: 'na' }) // prettier-ignore
     }
     // abort?
     if (abortExecution || onError === 'stop') {
@@ -102,9 +104,15 @@ export async function handleAction(args: {
     }
     return error
   }
+
   // handle and await each eventFn in sequence
   for (const fn of on.success) {
-    await fn({ payload, result, actionName, storeName, abort, collectionPath, docId, path: modulePath, pluginModuleConfig }) // prettier-ignore
+    if (isCacheStoreAddedResult(result)) {
+      const { current, diffApplied } = result
+      await fn({ payload, result, actionName, storeName, abort, collectionPath, docId, path: modulePath, pluginModuleConfig, current, diffApplied }) // prettier-ignore
+    } else {
+      await fn({ payload, result, actionName, storeName, abort, collectionPath, docId, path: modulePath, pluginModuleConfig, current: undefined, diffApplied: 'na' }) // prettier-ignore
+    }
   }
   // abort?
   if (abortExecution) {

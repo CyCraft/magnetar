@@ -1,31 +1,20 @@
-import type { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/types'
+import type { PluginInsertAction } from '@magnetarjs/types'
+import { isEqual } from '@magnetarjs/utils'
 import { objGetOrSet } from 'getorset-anything'
-import { isArray, isFullString, isNumber, isPlainObject } from 'is-what'
-import { MakeRestoreBackup, Vue3StoreModuleConfig, Vue3StoreOptions } from '../CreatePlugin.js'
-
-function isEqual(a: unknown, b: unknown): boolean {
-  if (isArray(a) && isArray(b)) {
-    return a.length === b.length && a.every((item, index) => isEqual(item, b[index]))
-  }
-  if (isPlainObject(a) && isPlainObject(b)) {
-    const aKeys = Object.keys(a)
-    const bKeys = Object.keys(b)
-    return aKeys.length === bKeys.length && aKeys.every((key) => isEqual(a[key], b[key]))
-  }
-  return a === b
-}
+import { isFullString, isNumber, isPlainObject } from 'is-what'
+import { MakeRestoreBackup, Vue3StoreOptions } from '../CreatePlugin.js'
 
 export function insertActionFactory(
   data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
   vue3StoreOptions: Vue3StoreOptions,
   makeBackup?: MakeRestoreBackup,
 ): PluginInsertAction {
-  return function ({
+  const insert: PluginInsertAction = ({
     payload,
     collectionPath,
     docId,
     pluginModuleConfig: _pluginModuleConfig,
-  }: PluginInsertActionPayload<Vue3StoreModuleConfig>): string {
+  }) => {
     const collectionMap = objGetOrSet(data, collectionPath, () => new Map())
 
     const _docId =
@@ -43,14 +32,18 @@ export function insertActionFactory(
     // if the doc does not exist yet, create it with the incoming payload
     if (!isPlainObject(currentDoc)) {
       collectionMap.set(_docId, payload)
-      return _docId
+      // Return diff as the entire payload since doc didn't exist
+      return { id: _docId, current: payload, diffApplied: payload }
     }
-    // set only changed keys that already exist locally; drop brand-new keys
-    Object.entries(payload).forEach(([key, value]) => {
-      if (!isEqual(currentDoc[key], value)) {
-        currentDoc[key] = value
-      }
-    })
-    return _docId
+
+    // Calculate diff: only changed keys that already exist locally
+    const diffApplied: Partial<{ [key: string]: unknown }> = {}
+    for (const [key, value] of Object.entries(payload)) {
+      if (isEqual(currentDoc[key], value)) continue
+      diffApplied[key] = value
+      currentDoc[key] = value
+    }
+    return { id: _docId, current: currentDoc, diffApplied }
   }
+  return insert
 }

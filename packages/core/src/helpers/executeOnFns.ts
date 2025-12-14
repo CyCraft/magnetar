@@ -1,4 +1,5 @@
 import type {
+  CacheStoreAddedResult,
   DocMetadata,
   DoOnFetch,
   EventFnBefore,
@@ -9,6 +10,7 @@ import type {
   PluginModuleConfig,
   StreamEvent,
 } from '@magnetarjs/types'
+import { isCacheStoreAddedResult } from '@magnetarjs/types'
 
 /**
  * Context needed to execute stream event functions
@@ -60,6 +62,8 @@ export function executeOnFns<Payload extends { [key: string]: any } | string | u
       pluginModuleConfig: eventContext.pluginModuleConfig,
       streamEvent: eventContext.streamEvent,
       abort: () => (shouldAbort = true),
+      current: undefined,
+      diffApplied: 'na' as const,
     }
     for (const fn of eventFns.before) {
       if (shouldAbort) break
@@ -72,9 +76,16 @@ export function executeOnFns<Payload extends { [key: string]: any } | string | u
     // we only want to execute these when there is a payload
     if (newPayload) newPayload = fn(newPayload as any, docMetaData) as any
   }
+  let cacheStoreResult: CacheStoreAddedResult | undefined
   for (const fn of cacheStoreFns) {
     // we only want to execute these always, regardless wether or not there's a payload
-    newPayload = fn(newPayload as any, docMetaData) as any
+    const intermediaryResult = fn(newPayload as any, docMetaData) as any
+    if (isCacheStoreAddedResult(intermediaryResult)) {
+      cacheStoreResult = intermediaryResult
+      newPayload = intermediaryResult.current as any
+    } else {
+      newPayload = intermediaryResult
+    }
   }
 
   // Execute 'success' event functions (sync, fire-and-forget for async)
@@ -91,6 +102,8 @@ export function executeOnFns<Payload extends { [key: string]: any } | string | u
       streamEvent: eventContext.streamEvent,
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       abort: () => {}, // no-op for stream events
+      current: cacheStoreResult?.current,
+      diffApplied: cacheStoreResult?.diffApplied || ('na' as const),
     }
     for (const fn of eventFns.success) {
       fn(eventPayload) // fire-and-forget: don't await

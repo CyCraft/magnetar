@@ -2,7 +2,12 @@ import { WriteLock } from '../Magnetar.js'
 import { ActionConfig, ActionName } from './actions.js'
 import { Clauses } from './clauses.js'
 import { DocMetadata } from './core.js'
-import { OnAddedFn, OnModifiedFn, OnRemovedFn } from './modifyReadResponse.js'
+import {
+  CacheStoreAddedResult,
+  OnAddedFn,
+  OnModifiedFn,
+  OnRemovedFn,
+} from './modifyReadResponse.js'
 import { MergeDeep } from './utils/MergeDeep.js'
 
 // stores / plugins
@@ -223,7 +228,7 @@ export type PluginWriteActionPayload<SpecificPluginModuleConfig = PluginModuleCo
  */
 export type PluginWriteAction = (
   payload: PluginWriteActionPayload,
-) => undefined | Promise<undefined | SyncBatch>
+) => CacheStoreAddedResult | Promise<SyncBatch>
 
 export type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> = MergeDeep<
   PluginActionPayloadBase<SpecificPluginModuleConfig>,
@@ -238,12 +243,12 @@ export type PluginInsertActionPayload<SpecificPluginModuleConfig = PluginModuleC
 /**
  * Should handle 'insert' for collections & docs. Must return the new document's ID! When executed on a collection, the plugin must provide a newly generated ID. (use `getCollectionPathDocIdEntry(modulePath)` helper, based on what it returns, you know if it's a collection or doc)
  * @returns
- *   - `string` if the plugin writes one by one — the new document's ID
- *   - `[string, SyncBatch]` if the plugin batches multiple write actions together — (1) the new document's ID (2) the sync batch information
+ *   - [id, syncBatch] is returned by remote plugins
+ *   - `PluginCacheWriteActionResult` is returned by local cache store plugins
  */
 export type PluginInsertAction = (
   payload: PluginInsertActionPayload,
-) => string | Promise<string | [string, SyncBatch]>
+) => CacheStoreAddedResult | Promise<[string, SyncBatch]>
 
 export type PluginDeletePropActionPayload<SpecificPluginModuleConfig = PluginModuleConfig> =
   MergeDeep<

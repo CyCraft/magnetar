@@ -31,7 +31,7 @@ export function streamActionFactory(
         if (payload === undefined) return undefined
 
         const _docId = docId || `${meta.id}`
-        insertActionFactory(
+        return insertActionFactory(
           data,
           simpleStoreOptions,
         )({
@@ -41,14 +41,13 @@ export function streamActionFactory(
           actionConfig,
           pluginModuleConfig,
         })
-        return undefined
       },
       modified: (payload, meta) => {
         // abort updating local cache state if the payload was set to undefined
         if (payload === undefined) return undefined
 
         const _docId = docId || `${meta.id}`
-        insertActionFactory(
+        return insertActionFactory(
           data,
           simpleStoreOptions,
         )({
@@ -58,7 +57,6 @@ export function streamActionFactory(
           actionConfig,
           pluginModuleConfig,
         })
-        return undefined
       },
       removed: (payload, meta) => {
         // abort updating local cache state if the payload was set to undefined

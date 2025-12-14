@@ -1,21 +1,17 @@
-import type { PluginWriteAction, PluginWriteActionPayload } from '@magnetarjs/types'
+import type { PluginWriteAction } from '@magnetarjs/types'
+import { isEqual } from '@magnetarjs/utils'
 import { objGetOrSet } from 'getorset-anything'
 import { isPlainObject } from 'is-what'
 import { merge } from 'merge-anything'
-import { MakeRestoreBackup, SimpleStoreModuleConfig, SimpleStoreOptions } from '../CreatePlugin.js'
+import { MakeRestoreBackup, SimpleStoreOptions } from '../CreatePlugin.js'
 
 export function writeActionFactory(
   data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
   simpleStoreOptions: SimpleStoreOptions,
   actionName: 'merge' | 'assign' | 'replace',
-  makeBackup?: MakeRestoreBackup
+  makeBackup?: MakeRestoreBackup,
 ): PluginWriteAction {
-  return function ({
-    payload,
-    collectionPath,
-    docId,
-    pluginModuleConfig,
-  }: PluginWriteActionPayload<SimpleStoreModuleConfig>): undefined {
+  const write: PluginWriteAction = ({ payload, collectionPath, docId, pluginModuleConfig }) => {
     // write actions cannot be executed on collections
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 
@@ -30,20 +26,30 @@ export function writeActionFactory(
     if (!docDataToMutate)
       throw new Error(`Document data not found for id: ${collectionPath} ${docId}`)
 
+    const diffApplied: Partial<{ [key: string]: unknown }> = {}
+
     if (actionName === 'merge') {
-      Object.entries(payload).forEach(([key, value]) => {
+      for (const [key, value] of Object.entries(payload)) {
         const originalValue = docDataToMutate[key]
+        if (isEqual(originalValue, value)) continue
         if (isPlainObject(originalValue) && isPlainObject(value)) {
-          docDataToMutate[key] = merge(originalValue, value)
+          const newVal = merge(originalValue, value)
+          diffApplied[key] = newVal
+          docDataToMutate[key] = newVal
         } else {
+          diffApplied[key] = value
           docDataToMutate[key] = value
         }
-      })
+      }
     }
     if (actionName === 'assign' || actionName === 'replace') {
-      Object.entries(payload).forEach(([key, value]) => {
+      for (const [key, value] of Object.entries(payload)) {
+        if (isEqual(docDataToMutate[key], value)) continue
+        diffApplied[key] = value
         docDataToMutate[key] = value
-      })
+      }
     }
+    return { id: docId, current: docDataToMutate, diffApplied }
   }
+  return write
 }

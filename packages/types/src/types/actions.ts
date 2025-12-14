@@ -27,7 +27,7 @@ export type ActionConfig<DocDataType extends { [key: string]: any } = { [key: st
   onError?: 'revert' | 'continue' | 'stop'
   modifyPayloadOn?: ModifyPayloadFnMap<DocDataType>
   modifyReadResponseOn?: ModifyReadResponseFnMap<DocDataType>
-  on?: EventNameFnMap
+  on?: EventNameFnMap<DocDataType>
   /**
    * An option for remote stores like Firestore to delay a sync to the server and batch any additional actions made during the `syncDebounceMs`.
    */

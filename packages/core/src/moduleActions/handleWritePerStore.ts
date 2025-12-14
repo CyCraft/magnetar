@@ -14,6 +14,7 @@ import type {
   SyncBatch,
   WriteLock,
 } from '@magnetarjs/types'
+import { isCacheStoreAddedResult } from '@magnetarjs/types'
 import { isStoreSplit } from '@magnetarjs/utils'
 import { mapGetOrSet } from 'getorset-anything'
 import { isFullArray, isFullString, isPlainObject } from 'is-what'
@@ -203,7 +204,7 @@ export function handleWritePerStore(
               }
               // revert eventFns, handle and await each eventFn in sequence
               for (const fn of eventNameFnsMap.revert) {
-                await fn({ payload: storePayloadDic[storeName], result: resultFromPlugin, actionName, storeName, collectionPath, docId, path: modulePath, pluginModuleConfig }) // prettier-ignore
+                await fn({ payload: storePayloadDic[storeName], result: resultFromPlugin, actionName, storeName, collectionPath, docId, path: modulePath, pluginModuleConfig, current: undefined, diffApplied: 'na' }) // prettier-ignore
               }
             }
             writeLock.resolve()
@@ -211,15 +212,15 @@ export function handleWritePerStore(
             throw resultFromPlugin
           }
 
-          // special handling for 'insert' (resultFromPlugin will always be `string | [string, SyncBatch]`)
+          // special handling for 'insert' (resultFromPlugin can be `CacheStoreAddedResult | [string, SyncBatch]`)
           if (actionName === 'insert') {
             // update the modulePath if a doc with random ID was inserted in a collection
-            // if this is the case the result will be a string - the randomly genererated ID
             if (!docId) {
-              if (isFullString(resultFromPlugin)) {
+              if (isCacheStoreAddedResult(resultFromPlugin)) {
+                docId = resultFromPlugin.id
+              } else if (isFullString(resultFromPlugin)) {
                 docId = resultFromPlugin
-              }
-              if (isFullArray(resultFromPlugin) && isFullString(resultFromPlugin[0])) {
+              } else if (isFullArray(resultFromPlugin) && isFullString(resultFromPlugin[0])) {
                 docId = resultFromPlugin[0]
               }
               modulePath = [collectionPath, docId].filter(Boolean).join('/')

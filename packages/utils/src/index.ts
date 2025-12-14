@@ -1,6 +1,7 @@
 export * from './internal/countHelpers.js'
 export * from './internal/dataHelpers.js'
 export * from './internal/debugHelpers.js'
+export * from './internal/isEqual.js'
 export * from './internal/parseValueForFilters.js'
 export * from './internal/pathHelpers.js'
 export * from './internal/storeSplit.js'

@@ -51,7 +51,7 @@ export type ModuleConfig<DocDataType extends { [key: string]: any } = { [key: st
   onError?: 'revert' | 'continue' | 'stop'
   modifyPayloadOn?: ModifyPayloadFnMap<DocDataType>
   modifyReadResponseOn?: ModifyReadResponseFnMap<DocDataType>
-  on?: EventNameFnMap
+  on?: EventNameFnMap<DocDataType>
   /**
    * Custom config the dev can set per Store Plugin. This will be passed to the plugin's action handler.
    */

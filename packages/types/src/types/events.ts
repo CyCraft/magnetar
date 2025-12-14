@@ -1,4 +1,5 @@
 import { ActionName } from './actions.js'
+import { CacheStoreAddedResult } from './modifyReadResponse.js'
 import {
   DoOnFetch,
   DoOnFetchAggregate,
@@ -22,7 +23,7 @@ export type EventName = 'before' | 'success' | 'error' | 'revert'
  */
 export type StreamEvent = 'added' | 'modified' | 'removed'
 
-type EventSharedPayload = {
+type EventSharedPayload<DocDataType extends { [key: string]: any } = { [key: string]: any }> = {
   /**
    * The path of just the collection
    * @example 'pokedex/001/items'
@@ -46,7 +47,11 @@ type EventSharedPayload = {
    * delete actions: Record<string, any> | Record<string, any>[] | string | string[]
    * read actions: Record<string, any> | undefined
    */
-  payload: { [key: string]: any } | { [key: string]: any }[] | undefined | string | string[]
+  payload: { [key: string]: any } | undefined | string
+  /** A reference pointer to the current document data */
+  current: Readonly<DocDataType> | undefined
+  /** Magnetar only updates fields if they are different. The diff that was applied will be available here for success events. Returns 'na' for before, error, revert, or where the `actionName` does not relate, like eg. `fetch`. */
+  diffApplied: Readonly<Partial<DocDataType>> | 'removed' | 'na'
   /**
    * The action name for which the current event is being run
    */
@@ -77,6 +82,7 @@ type EventPayloadPropResult = {
   result:
     | undefined
     | string
+    | CacheStoreAddedResult
     | FetchAggregateResponse
     | DoOnFetchAggregate
     | FetchResponse
@@ -87,32 +93,32 @@ type EventPayloadPropResult = {
     | [string, SyncBatch]
 }
 
-export type EventFnBefore = (args: EventSharedPayload) => void | Promise<void>
-
-export type EventFnSuccess = (
-  args: MergeDeep<EventSharedPayload, EventPayloadPropResult>,
+export type EventFnBefore<DocDataType extends { [key: string]: any } = { [key: string]: any }> = (
+  args: EventSharedPayload<DocDataType>,
 ) => void | Promise<void>
 
-export type EventFnError = (
-  args: MergeDeep<EventSharedPayload, { error: any }>,
+export type EventFnSuccess<DocDataType extends { [key: string]: any } = { [key: string]: any }> = (
+  args: MergeDeep<EventSharedPayload<DocDataType>, EventPayloadPropResult>,
 ) => void | Promise<void>
 
-export type EventFnRevert = (
-  args: MergeDeep<Omit<EventSharedPayload, 'abort'>, { result: unknown }>,
+export type EventFnError<DocDataType extends { [key: string]: any } = { [key: string]: any }> = (
+  args: MergeDeep<EventSharedPayload<DocDataType>, { error: any }>,
 ) => void | Promise<void>
 
-export type EventFn = EventFnBefore | EventFnSuccess | EventFnError | EventFnRevert
+export type EventFnRevert<DocDataType extends { [key: string]: any } = { [key: string]: any }> = (
+  args: MergeDeep<Omit<EventSharedPayload<DocDataType>, 'abort'>, { result: unknown }>,
+) => void | Promise<void>
 
-export type EventNameFnMap = {
-  before?: EventFnBefore
-  success?: EventFnSuccess
-  error?: EventFnError
-  revert?: EventFnRevert
+export type EventNameFnMap<DocDataType extends { [key: string]: any } = { [key: string]: any }> = {
+  before?: EventFnBefore<DocDataType>
+  success?: EventFnSuccess<DocDataType>
+  error?: EventFnError<DocDataType>
+  revert?: EventFnRevert<DocDataType>
 }
 
-export type EventNameFnsMap = {
-  before: EventFnBefore[]
-  success: EventFnSuccess[]
-  error: EventFnError[]
-  revert: EventFnRevert[]
+export type EventNameFnsMap<DocDataType extends { [key: string]: any } = { [key: string]: any }> = {
+  before: EventFnBefore<DocDataType>[]
+  success: EventFnSuccess<DocDataType>[]
+  error: EventFnError<DocDataType>[]
+  revert: EventFnRevert<DocDataType>[]
 }

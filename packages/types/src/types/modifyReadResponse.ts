@@ -1,5 +1,31 @@
+import { isPlainObject } from 'is-what'
 import { DocMetadata } from './core.js'
 import { PartialDeep } from './utils/PartialDeep.js'
+
+/**
+ * - `id` the current/new document's ID
+ * - `current` is the reference pointer to the current document data
+ * - `diffApplied` is the diff that was applied to the document, this will be a partial even if an insert call was made but there was existing data present already
+ */
+export type CacheStoreAddedResult<
+  DocDataType extends { [key: string]: any } = { [key: string]: any },
+> = {
+  id: string
+  current: DocDataType
+  diffApplied: Partial<DocDataType>
+}
+
+export function isCacheStoreAddedResult<
+  DocDataType extends { [key: string]: any } = { [key: string]: any },
+>(result: unknown): result is CacheStoreAddedResult<DocDataType> {
+  return (
+    isPlainObject(result) &&
+    !!result['id'] &&
+    !!result['current'] &&
+    !!result['diffApplied'] &&
+    Object.keys(result).length === 3
+  )
+}
 
 /**
  * Can be used to modify docs that come in from 'stream' or 'fetch' actions, before they are added to your store data. When returning `undefined` they will be discarded & won't be added to the store data.
@@ -7,7 +33,7 @@ import { PartialDeep } from './utils/PartialDeep.js'
 export type OnAddedFn<DocDataType extends { [key: string]: any } = { [key: string]: any }> = (
   docData: PartialDeep<DocDataType>,
   docMetadata: DocMetadata,
-) => DocDataType | undefined
+) => CacheStoreAddedResult<DocDataType> | DocDataType | undefined
 
 /**
  * Is triggered only while a 'stream' is open, and can modify docs that were modified on another client, before they are updated to the store data. When returning `undefined` they will be discarded & the modifications won't be applied to the store data.

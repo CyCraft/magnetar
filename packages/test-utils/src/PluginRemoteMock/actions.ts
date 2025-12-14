@@ -16,14 +16,13 @@ import type {
   PluginFetchCountAction,
   PluginFetchCountActionPayload,
   PluginInsertAction,
-  PluginInsertActionPayload,
   PluginRevertAction,
   PluginRevertActionPayload,
   PluginStreamAction,
   PluginStreamActionPayload,
   PluginWriteAction,
-  PluginWriteActionPayload,
   StreamResponse,
+  SyncBatch,
 } from '@magnetarjs/types'
 import { filterDataPerClauses } from '@magnetarjs/utils'
 import { isFullArray, isFullString, isNumber, isPromise, isString } from 'is-what'
@@ -35,12 +34,12 @@ export function writeActionFactory(
   storePluginOptions: RemoteStoreOptions,
   actionName: 'merge' | 'assign' | 'replace',
 ): PluginWriteAction {
-  return async function ({
+  const write: PluginWriteAction = async ({
     payload,
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginWriteActionPayload<StorePluginModuleConfig>): Promise<undefined> {
+  }) => {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
@@ -48,27 +47,47 @@ export function writeActionFactory(
 
     // any write action other than `insert` cannot be executed on collections
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
+
+    const syncBatch: SyncBatch = {
+      insert: new Map(),
+      assign: new Map(),
+      merge: new Map(),
+      replace: new Map(),
+      deleteProp: new Map(),
+      delete: new Set(),
+    }
+
+    return syncBatch
   }
+  return write
 }
 
 export function insertActionFactory(storePluginOptions: RemoteStoreOptions): PluginInsertAction {
-  return async function ({
+  const insert: PluginInsertAction = async ({
     payload,
     collectionPath,
     docId,
     pluginModuleConfig,
-  }: PluginInsertActionPayload<StorePluginModuleConfig>): Promise<string> {
+  }) => {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
     await waitMs(1)
 
-    if (!docId) {
-      const id = generateRandomId()
-      return id
+    const syncBatch: SyncBatch = {
+      insert: new Map(),
+      assign: new Map(),
+      merge: new Map(),
+      replace: new Map(),
+      deleteProp: new Map(),
+      delete: new Set(),
     }
-    return docId
+
+    const id = docId || generateRandomId()
+    syncBatch.insert.set(id, payload)
+    return [id, syncBatch]
   }
+  return insert
 }
 
 export function deletePropActionFactory(

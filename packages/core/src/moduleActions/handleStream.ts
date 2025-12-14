@@ -44,7 +44,7 @@ export async function handleStream(args: {
 
   // handle and await each eventFn in sequence
   for (const fn of on.before) {
-    await fn({ payload, actionName, storeName, abort, collectionPath, docId, path, pluginModuleConfig }) // prettier-ignore
+    await fn({ payload, actionName, storeName, abort, collectionPath, docId, path, pluginModuleConfig, current: undefined, diffApplied: 'na' }) // prettier-ignore
   }
 
   let result: StreamResponse | DoOnStream
@@ -64,13 +64,13 @@ export async function handleStream(args: {
   } catch (error) {
     // handle and await each eventFn in sequence
     for (const fn of on.error) {
-      await fn({ payload, actionName, storeName, error, abort, collectionPath, docId, path, pluginModuleConfig }) // prettier-ignore
+      await fn({ payload, actionName, storeName, error, abort, collectionPath, docId, path, pluginModuleConfig, current: undefined, diffApplied: 'na' }) // prettier-ignore
     }
     throw error
   }
   // handle and await each eventFn in sequence
   for (const fn of on.success) {
-    await fn({ payload, result, actionName, storeName, abort, collectionPath, docId, path, pluginModuleConfig }) // prettier-ignore
+    await fn({ payload, result, actionName, storeName, abort, collectionPath, docId, path, pluginModuleConfig, current: undefined, diffApplied: 'na' }) // prettier-ignore
   }
   return result
 }

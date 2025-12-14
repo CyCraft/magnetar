@@ -1,20 +1,9 @@
 import type { PluginInsertAction, PluginInsertActionPayload } from '@magnetarjs/types'
+import { isEqual } from '@magnetarjs/utils'
 import { objGetOrSet } from 'getorset-anything'
-import { isArray, isFullString, isNumber, isPlainObject } from 'is-what'
+import { isFullString, isNumber, isPlainObject } from 'is-what'
 import { throwIfEmulatedError } from '../../helpers/index.js'
 import { MakeRestoreBackup, StorePluginModuleConfig, StorePluginOptions } from '../CreatePlugin.js'
-
-function isEqual(a: unknown, b: unknown): boolean {
-  if (isArray(a) && isArray(b)) {
-    return a.length === b.length && a.every((item, index) => isEqual(item, b[index]))
-  }
-  if (isPlainObject(a) && isPlainObject(b)) {
-    const aKeys = Object.keys(a)
-    const bKeys = Object.keys(b)
-    return aKeys.length === bKeys.length && aKeys.every((key) => isEqual(a[key], b[key]))
-  }
-  return a === b
-}
 
 export function insertActionFactory(
   data: { [collectionPath: string]: Map<string, { [key: string]: unknown }> },
@@ -26,7 +15,7 @@ export function insertActionFactory(
     collectionPath,
     docId,
     pluginModuleConfig: _pluginModuleConfig,
-  }: PluginInsertActionPayload<StorePluginModuleConfig>): string {
+  }: PluginInsertActionPayload<StorePluginModuleConfig>): ReturnType<PluginInsertAction> {
     // this mocks an error during execution
     throwIfEmulatedError(payload, storePluginOptions)
     // this is custom logic to be implemented by the plugin author
@@ -47,14 +36,19 @@ export function insertActionFactory(
     // if the doc does not exist yet, create it with the incoming payload
     if (!isPlainObject(currentDoc)) {
       collectionMap.set(_docId, payload)
-      return _docId
+      return {
+        id: _docId,
+        current: collectionMap.get(_docId),
+        diffApplied: collectionMap.get(_docId),
+      }
     }
     // shallow merge: set only changed keys; do not delete absent keys
-    Object.entries(payload).forEach(([key, value]) => {
-      if (!isEqual(currentDoc[key], value)) {
-        currentDoc[key] = value
-      }
-    })
-    return _docId
+    const diffApplied: Partial<{ [key: string]: unknown }> = {}
+    for (const [key, value] of Object.entries(payload)) {
+      if (isEqual(currentDoc[key], value)) continue
+      diffApplied[key] = value
+      currentDoc[key] = value
+    }
+    return { id: _docId, current: currentDoc, diffApplied }
   }
 }

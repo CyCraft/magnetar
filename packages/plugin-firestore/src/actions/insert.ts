@@ -1,10 +1,5 @@
-import type { PluginInsertAction, PluginInsertActionPayload, SyncBatch } from '@magnetarjs/types'
-import {
-  BatchSync,
-  FirestoreModuleConfig,
-  batchSyncFactory,
-  getFirestoreDocPath,
-} from '@magnetarjs/utils-firestore'
+import type { PluginInsertAction } from '@magnetarjs/types'
+import { BatchSync, batchSyncFactory, getFirestoreDocPath } from '@magnetarjs/utils-firestore'
 import { collection, doc } from 'firebase/firestore'
 import { mapGetOrSet } from 'getorset-anything'
 import { isFullString, isNumber } from 'is-what'
@@ -15,13 +10,13 @@ export function insertActionFactory(
   batchSyncMap: BatchSyncMap,
   firestorePluginOptions: Required<FirestorePluginOptions>,
 ): PluginInsertAction {
-  return async function ({
+  const insert: PluginInsertAction = async ({
     payload,
     collectionPath,
     docId,
     actionConfig,
     pluginModuleConfig,
-  }: PluginInsertActionPayload<FirestoreModuleConfig>): Promise<[string, SyncBatch]> {
+  }) => {
     const { db } = firestorePluginOptions
     let _docId = docId
     if (!_docId) {
@@ -34,7 +29,7 @@ export function insertActionFactory(
     const documentPath = getFirestoreDocPath(collectionPath, _docId as string, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
     const syncDebounceMs = isNumber(actionConfig.syncDebounceMs)
       ? actionConfig.syncDebounceMs
-      : pluginModuleConfig.syncDebounceMs
+      : pluginModuleConfig['syncDebounceMs']
 
     const batchSync = mapGetOrSet(
       batchSyncMap,
@@ -45,4 +40,5 @@ export function insertActionFactory(
     const result = await batchSync.insert(documentPath, payload, syncDebounceMs)
     return [_docId as string, result]
   }
+  return insert
 }

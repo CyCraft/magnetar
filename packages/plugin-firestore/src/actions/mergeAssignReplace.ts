@@ -1,10 +1,5 @@
-import type { PluginWriteAction, PluginWriteActionPayload, SyncBatch } from '@magnetarjs/types'
-import {
-  BatchSync,
-  batchSyncFactory,
-  FirestoreModuleConfig,
-  getFirestoreDocPath,
-} from '@magnetarjs/utils-firestore'
+import type { PluginWriteAction } from '@magnetarjs/types'
+import { BatchSync, batchSyncFactory, getFirestoreDocPath } from '@magnetarjs/utils-firestore'
 import { mapGetOrSet } from 'getorset-anything'
 import { isNumber } from 'is-what'
 import { BatchSyncMap, FirestorePluginOptions } from '../CreatePlugin.js'
@@ -13,26 +8,26 @@ import { applySyncBatch, createWriteBatch } from '../helpers/batchHelpers.js'
 export function writeActionFactory(
   batchSyncMap: BatchSyncMap,
   firestorePluginOptions: Required<FirestorePluginOptions>,
-  actionName: 'merge' | 'assign' | 'replace'
+  actionName: 'merge' | 'assign' | 'replace',
 ): PluginWriteAction {
-  return async function ({
+  const write: PluginWriteAction = async ({
     payload,
     collectionPath,
     docId,
     actionConfig,
     pluginModuleConfig,
-  }: PluginWriteActionPayload<FirestoreModuleConfig>): Promise<SyncBatch> {
+  }) => {
     if (!docId) throw new Error('An non-existent action was triggered on a collection')
 
     const documentPath = getFirestoreDocPath(collectionPath, docId, pluginModuleConfig, firestorePluginOptions) // prettier-ignore
     const syncDebounceMs = isNumber(actionConfig.syncDebounceMs)
       ? actionConfig.syncDebounceMs
-      : pluginModuleConfig.syncDebounceMs
+      : pluginModuleConfig['syncDebounceMs']
 
     const batchSync = mapGetOrSet(
       batchSyncMap,
       collectionPath,
-      (): BatchSync => batchSyncFactory(firestorePluginOptions, createWriteBatch, applySyncBatch)
+      (): BatchSync => batchSyncFactory(firestorePluginOptions, createWriteBatch, applySyncBatch),
     )
 
     if (actionName === 'assign') {
@@ -47,4 +42,5 @@ export function writeActionFactory(
     const result = await batchSync.merge(documentPath, payload, syncDebounceMs)
     return result
   }
+  return write
 }

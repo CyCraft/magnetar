@@ -35,7 +35,7 @@ export function streamActionFactory(
         // abort updating local cache state if the payload was set to undefined
         if (payload === undefined) return undefined
 
-        insertActionFactory(
+        return insertActionFactory(
           data,
           storePluginOptions,
         )({
@@ -45,13 +45,12 @@ export function streamActionFactory(
           actionConfig,
           pluginModuleConfig,
         })
-        return undefined
       },
       modified: (payload, meta) => {
         // abort updating local cache state if the payload was set to undefined
         if (payload === undefined) return undefined
 
-        insertActionFactory(
+        return insertActionFactory(
           data,
           storePluginOptions,
         )({
@@ -61,7 +60,6 @@ export function streamActionFactory(
           actionConfig,
           pluginModuleConfig,
         })
-        return undefined
       },
       removed: (payload, meta) => {
         const collectionPathDocIdToDelete: [string, string] = docId
