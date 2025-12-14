@@ -103,25 +103,6 @@ export function streamActionFactory(
       const pendingSnapshots: QuerySnapshot[] = []
       let isProcessing = false
 
-      const processDocChanges = (querySnapshot: QuerySnapshot) => {
-        querySnapshot
-          .docChanges()
-          .forEach((docChange: DocumentChange<{ [key: string]: unknown }>) => {
-            const docSnapshot = docChange.doc
-            const docData = docSnapshot.data()
-            const docMetadata = docSnapshotToDocMetadata(docSnapshot)
-            if (docChange.type === 'added' && docData) {
-              added(docData, docMetadata)
-            }
-            if (docChange.type === 'modified' && docData) {
-              modified(docData, docMetadata)
-            }
-            if (docChange.type === 'removed') {
-              removed(docData, docMetadata)
-            }
-          })
-      }
-
       closeStream = onSnapshot(
         query,
         async (querySnapshot: QuerySnapshot) => {
@@ -142,11 +123,41 @@ export function streamActionFactory(
             await collectionWriteLock.promise
           }
 
-          // Process all pending snapshots synchronously
+          // Merge all pending snapshots into a single map of docId -> final state
+          const mergedDocs = new Map<
+            string,
+            {
+              type: 'added' | 'modified' | 'removed'
+              docData: { [key: string]: unknown }
+              docMetadata: Parameters<typeof added>[1]
+            }
+          >()
+
           let snapshot = pendingSnapshots.shift()
           while (snapshot) {
-            processDocChanges(snapshot)
+            snapshot
+              .docChanges()
+              .forEach((docChange: DocumentChange<{ [key: string]: unknown }>) => {
+                const docSnapshot = docChange.doc
+                const docData = docSnapshot.data()
+                const docMetadata = docSnapshotToDocMetadata(docSnapshot)
+                // Always overwrite with the latest state for this doc
+                mergedDocs.set(docSnapshot.id, { type: docChange.type, docData, docMetadata })
+              })
             snapshot = pendingSnapshots.shift()
+          }
+
+          // Process the merged final states
+          for (const { type, docData, docMetadata } of mergedDocs.values()) {
+            if (type === 'added' && docData) {
+              added(docData, docMetadata)
+            }
+            if (type === 'modified' && docData) {
+              modified(docData, docMetadata)
+            }
+            if (type === 'removed') {
+              removed(docData, docMetadata)
+            }
           }
 
           // Call onFirstData after processing (after write lock, whether collection has docs or not)
