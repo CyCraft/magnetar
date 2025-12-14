@@ -1,6 +1,6 @@
 {
   "name": "dev-vue3-firestore",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "type": "module",
   "private": true,
   "scripts": {
