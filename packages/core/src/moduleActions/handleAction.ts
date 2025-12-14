@@ -46,6 +46,7 @@ export async function handleAction(args: {
   | FetchResponse
   | DoOnFetch
   | OnAddedFn
+  | CacheStoreAddedResult
   | SyncBatch
   | [string, SyncBatch]
   | unknown

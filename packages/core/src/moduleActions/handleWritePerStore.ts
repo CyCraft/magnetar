@@ -2,6 +2,7 @@ import type {
   ActionConfig,
   ActionName,
   ActionTernary,
+  CacheStoreAddedResult,
   CollectionFn,
   DocFn,
   FetchResponse,
@@ -158,6 +159,7 @@ export function handleWritePerStore(
           | unknown
           | FetchResponse
           | SyncBatch
+          | CacheStoreAddedResult
           | [string, SyncBatch]
         // handle and await each action in sequence
         for (const [i, storeName] of storesToExecute.entries()) {
