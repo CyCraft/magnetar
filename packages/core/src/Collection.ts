@@ -98,19 +98,22 @@ export function createCollectionWithContext(
   executeSetupModulePerStore(globalConfig.stores, [collectionPath, undefined], moduleConfig)
 
   function query(query: QueryClause): CollectionInstance {
-    const moduleConfigWithClause = mergeAndConcat(moduleConfig, { query: [query] })
+    const clause: ModuleConfig = { query: [query] }
+    const moduleConfigWithClause = mergeAndConcat(moduleConfig, clause)
     return collectionFn(path, moduleConfigWithClause)
   }
 
   function where(fieldPath: string, operator: WhereFilterOp, value: any): CollectionInstance {
     const whereClause: WhereClause = [fieldPath, operator, value]
-    const moduleConfigWithClause = mergeAndConcat(moduleConfig, { where: [whereClause] })
+    const clause: ModuleConfig = { where: [whereClause] }
+    const moduleConfigWithClause = mergeAndConcat(moduleConfig, clause)
     return collectionFn(path, moduleConfigWithClause)
   }
 
   function orderBy(fieldPath: string, direction: 'asc' | 'desc' = 'asc'): CollectionInstance {
     const orderByClause: OrderByClause = [fieldPath, direction]
-    const moduleConfigWithClause = mergeAndConcat(moduleConfig, { orderBy: [orderByClause] })
+    const clause: ModuleConfig = { orderBy: [orderByClause] }
+    const moduleConfigWithClause = mergeAndConcat(moduleConfig, clause)
     return collectionFn(path, moduleConfigWithClause)
   }
 

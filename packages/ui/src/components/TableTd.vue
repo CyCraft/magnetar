@@ -52,9 +52,13 @@ const codablePayload = computed<Parameters<Codable<any, any>>[0]>(() => ({
   isExpanded: isExpanded.value,
 }))
 
-/** Any type that has `Codable<...>` should be piped through this. */
+/**
+ * Any type that has `Codable<...>` should be piped through this.
+ * The `as T` is needed because TS can't subtract `Codable` from a union holding a bare
+ * type param: `T` itself might be a function, so the else branch stays the full union.
+ */
 function evaluateCodableProp<T>(prop: T | Codable<Record<string, any>, T>): T {
-  return isCodable(prop) ? prop(codablePayload.value) : prop
+  return isCodable(prop) ? prop(codablePayload.value) : (prop as T)
 }
 
 /**
