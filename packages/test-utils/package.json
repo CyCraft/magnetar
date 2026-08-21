@@ -1,6 +1,6 @@
 {
   "name": "@magnetarjs/test-utils",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "type": "module",
   "description": "magnetar test utils",
   "exports": {
