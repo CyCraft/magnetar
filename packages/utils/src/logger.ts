@@ -25,7 +25,7 @@ export function logWithFlair(message: string, ...args: any[]): undefined {
 let lastGroupLogTime = 0
 let lastGroupParams: unknown = null
 
-function shouldLog(params: any, preventLogFor: number) {
+function shouldLog(params: any, preventLogFor: number): boolean {
   const now = Date.now()
   // Check if the last log was less than 60000 milliseconds (1 minute) ago
   // and if the parameters are the same as the last call

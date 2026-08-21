@@ -8,7 +8,7 @@ import { db } from './initFirebase.js'
 
 const CreatePluginLocal = PluginMockLocal.CreatePlugin
 
-const getInitialDataDocument = () => ({ name: 'Luca', age: 10 })
+const getInitialDataDocument = (): { name: string; age: number } => ({ name: 'Luca', age: 10 })
 
 export type PokedexModuleData = PokedexEntry & {
   seen?: boolean
@@ -89,7 +89,7 @@ export async function createMagnetarInstance(
     },
   })
 
-  const movesModuleOf = (pkmnId: number) =>
+  const movesModuleOf = (pkmnId: number): CollectionInstance<MoveEntry> =>
     magnetar.collection<MoveEntry>(`pokedex/${pkmnId}/moves`, {
       configPerStore: {
         remote: {

@@ -4,7 +4,7 @@ import { DateDoc, createMagnetarInstance } from '../createMagnetarInstance.js'
 
 const immediate = { syncDebounceMs: 1 }
 
-export async function setupTestDatabase() {
+export async function setupTestDatabase(): Promise<void> {
   // setup read DB
   const { pokedexModule, trainerModule, datesModule, movesModuleOf } =
     await createMagnetarInstance('read')

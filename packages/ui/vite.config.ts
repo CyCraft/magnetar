@@ -12,7 +12,7 @@ export function pluginDts(): Plugin {
     writeBundle: {
       sequential: true,
       order: 'post',
-      async handler() {
+      async handler(): Promise<void> {
         await execa({
           cwd: path.resolve('./'),
           stdout: 'inherit',

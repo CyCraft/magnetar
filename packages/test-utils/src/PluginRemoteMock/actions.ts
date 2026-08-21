@@ -276,7 +276,7 @@ export function streamActionFactory(storePluginOptions: RemoteStoreOptions): Plu
     const stopStreaming = {
       stopped: false,
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      stop: () => {},
+      stop: (): void => {},
     }
 
     // If streamSendsData is provided, send all data at setTimeout 10, then trigger onFirstData

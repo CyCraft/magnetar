@@ -1,12 +1,13 @@
 import { pokedex, waitMs } from '@magnetarjs/test-utils'
 import { assert, test } from 'vitest'
+import type { PokedexModuleData } from '../helpers/createMagnetarInstance.js'
 import { createMagnetarInstance } from '../helpers/createMagnetarInstance.js'
 
 test('fetch: can mutate payload & read response (config in global magnetar instance)', async () => {
-  function addSeen(payload: any) {
+  function addSeen(payload: any): { [key: string]: unknown; seen: boolean } {
     return { ...payload, seen: true }
   }
-  function addToken(payload: any = {}) {
+  function addToken(payload: any = {}): { [key: string]: unknown; auth: string } {
     return { ...payload, auth: 'Bearer 123123' }
   }
   // get resolves once all stores have given a response with data
@@ -37,10 +38,10 @@ test('fetch: can mutate payload & read response (config in global magnetar insta
 })
 
 test('stream: can mutate payload & read response (config in global magnetar instance)', async () => {
-  function addSeen(payload: any) {
+  function addSeen(payload: any): { [key: string]: unknown; seen: boolean } {
     return { ...payload, seen: true }
   }
-  function addToken(payload: any = {}) {
+  function addToken(payload: any = {}): { [key: string]: unknown; auth: string } {
     return { ...payload, auth: 'Bearer 123123' }
   }
   const { magnetar } = createMagnetarInstance({
@@ -65,7 +66,7 @@ test('stream: can mutate payload & read response (config in global magnetar inst
 })
 
 test('insert: can mutate payload (config in global magnetar instance)', async () => {
-  function addSeen(payload: any) {
+  function addSeen(payload: any): { [key: string]: unknown; seen: boolean } | undefined {
     if (!('seen' in payload)) return { ...payload, seen: true }
   }
   // get resolves once all stores have given a response with data
@@ -90,10 +91,10 @@ test('insert: can mutate payload (config in global magnetar instance)', async ()
 })
 
 test('fetch: can mutate payload & read response (config in module)', async () => {
-  function addSeen(payload: any) {
+  function addSeen(payload: any): { [key: string]: unknown; seen: boolean } {
     return { ...payload, seen: true }
   }
-  function addToken(payload: any = {}) {
+  function addToken(payload: any = {}): { [key: string]: unknown; auth: string } {
     return { ...payload, auth: 'Bearer 123123' }
   }
   // get resolves once all stores have given a response with data
@@ -125,10 +126,10 @@ test('fetch: can mutate payload & read response (config in module)', async () =>
 })
 
 test('stream: can mutate payload & read response (config in module)', async () => {
-  function addSeen(payload: any) {
+  function addSeen(payload: any): { [key: string]: unknown; seen: boolean } {
     return { ...payload, seen: true }
   }
-  function addToken(payload: any = {}) {
+  function addToken(payload: any = {}): { [key: string]: unknown; auth: string } {
     return { ...payload, auth: 'Bearer 123123' }
   }
   const { magnetar } = createMagnetarInstance()
@@ -154,7 +155,7 @@ test('stream: can mutate payload & read response (config in module)', async () =
 })
 
 test('insert: can mutate payload (config in module)', async () => {
-  function addSeen(payload: any) {
+  function addSeen(payload: any): { [key: string]: unknown; seen: boolean } | undefined {
     if (!('seen' in payload)) return { ...payload, seen: true }
   }
   // get resolves once all stores have given a response with data
@@ -175,10 +176,10 @@ test('insert: can mutate payload (config in module)', async () => {
 })
 
 test('fetch: can mutate payload & read response (config in action)', async () => {
-  function addSeen(payload: any) {
+  function addSeen(payload: any): PokedexModuleData {
     return { ...payload, seen: true }
   }
-  function addToken(payload: any = {}) {
+  function addToken(payload: any = {}): { [key: string]: unknown; auth: string } {
     return { ...payload, auth: 'Bearer 123123' }
   }
   // get resolves once all stores have given a response with data
@@ -211,10 +212,10 @@ test('fetch: can mutate payload & read response (config in action)', async () =>
 })
 
 test('stream: can mutate payload & read response (config in action)', async () => {
-  function addSeen(payload: any) {
+  function addSeen(payload: any): PokedexModuleData {
     return { ...payload, seen: true }
   }
-  function addToken(payload: any = {}) {
+  function addToken(payload: any = {}): { [key: string]: unknown; auth: string } {
     return { ...payload, auth: 'Bearer 123123' }
   }
   const { pokedexModule } = createMagnetarInstance()
@@ -240,7 +241,7 @@ test('stream: can mutate payload & read response (config in action)', async () =
 })
 
 test('insert: can mutate payload (config in action)', async () => {
-  function addSeen(payload: any) {
+  function addSeen(payload: any): { [key: string]: unknown; seen: boolean } | undefined {
     if (!('seen' in payload)) return { ...payload, seen: true }
   }
   // get resolves once all stores have given a response with data
@@ -262,7 +263,7 @@ test('insert: can mutate payload (config in action)', async () => {
 })
 
 test('insert: can mutate payload (config in module - action from doc)', async () => {
-  function addSeen(payload: any) {
+  function addSeen(payload: any): { [key: string]: unknown; seen: boolean } | undefined {
     if (!('seen' in payload)) return { ...payload, seen: true }
   }
   // get resolves once all stores have given a response with data

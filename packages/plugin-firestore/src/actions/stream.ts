@@ -48,7 +48,9 @@ export function streamActionFactory(
       let pendingSnapshot: DocumentSnapshot<{ [key: string]: unknown }> | null = null
       let isProcessing = false
 
-      const processDocSnapshot = (docSnapshot: DocumentSnapshot<{ [key: string]: unknown }>) => {
+      const processDocSnapshot = (
+        docSnapshot: DocumentSnapshot<{ [key: string]: unknown }>,
+      ): void => {
         // do nothing if the doc doesn't exist
         if (!docSnapshot.exists()) return
         // serverChanges only

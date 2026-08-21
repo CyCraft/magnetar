@@ -7,7 +7,7 @@ import { setupTestDatabase } from './setupTestDatabase.js'
 async function findTestFilesWithOnly(rootDir: string): Promise<string[]> {
   const results: string[] = []
 
-  async function walk(dir: string) {
+  async function walk(dir: string): Promise<void> {
     const entries = await readdir(dir, { withFileTypes: true })
     for (const entry of entries) {
       if (entry.name === 'node_modules' || entry.name === 'dist') continue

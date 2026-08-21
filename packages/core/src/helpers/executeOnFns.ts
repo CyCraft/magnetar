@@ -61,7 +61,9 @@ export function executeOnFns<Payload extends { [key: string]: any } | string | u
       path: eventContext.path,
       pluginModuleConfig: eventContext.pluginModuleConfig,
       streamEvent: eventContext.streamEvent,
-      abort: () => (shouldAbort = true),
+      abort: (): void => {
+        shouldAbort = true
+      },
       current: undefined,
       diffApplied: 'na' as const,
     }
@@ -101,7 +103,7 @@ export function executeOnFns<Payload extends { [key: string]: any } | string | u
       pluginModuleConfig: eventContext.pluginModuleConfig,
       streamEvent: eventContext.streamEvent,
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      abort: () => {}, // no-op for stream events
+      abort: (): void => {}, // no-op for stream events
       current: cacheStoreResult?.current,
       diffApplied: cacheStoreResult?.diffApplied || ('na' as const),
     }

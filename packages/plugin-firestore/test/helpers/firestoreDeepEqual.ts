@@ -7,7 +7,7 @@ export async function firestoreDeepEqual(
   documentPath: string,
   expected: any,
   message?: string,
-) {
+): Promise<void> {
   const docRef = doc(db, `magnetarTests/${testName}/${documentPath}`)
   const docSnapshot = await getDoc(docRef)
   const docData = docSnapshot.data()

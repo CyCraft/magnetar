@@ -39,7 +39,7 @@ export async function handleStream(args: {
   } = args
   // no aborting possible in stream actions
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  const abort = () => {}
+  const abort = (): void => {}
   const path = [collectionPath, docId].filter(Boolean).join('/')
 
   // handle and await each eventFn in sequence

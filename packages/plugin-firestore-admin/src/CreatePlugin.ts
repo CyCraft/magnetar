@@ -56,7 +56,7 @@ export const CreatePlugin: MagnetarPlugin<FirestoreAdminPluginOptions> = (
   /** A map with the `collectionPath` as key and a `BatchSync` instance as value */
   const batchSyncMap: BatchSyncMap = new Map()
 
-  async function syncPendingWrites() {
+  async function syncPendingWrites(): Promise<void> {
     const promises: Promise<void>[] = []
     for (const [_path, batchSync] of batchSyncMap) {
       if (batchSync) promises.push(batchSync.forceSyncEarly())

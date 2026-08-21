@@ -5,11 +5,11 @@ import { CreatePlugin as CreatePluginLocal } from '../../src/index.js'
 
 const CreatePluginRemote = PluginMockRemote.CreatePlugin
 
-const getInitialDataCollection = () => [
+const getInitialDataCollection = (): (string | PokedexEntry)[][] => [
   // doc entries
   ['1', pokedex(1)],
 ]
-const getInitialDataDocument = () => ({ name: 'Luca', age: 10 })
+const getInitialDataDocument = (): { name: string; age: number } => ({ name: 'Luca', age: 10 })
 
 export type PokedexModuleData = PokedexEntry & { seen?: boolean; shouldFail?: string }
 

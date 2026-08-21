@@ -28,7 +28,7 @@ export function Countdown(ms: number): CountdownInstance {
   let duration: number = ms
   const done = new Promise<void>((resolve) => (resolveTrigger = resolve))
 
-  function finish() {
+  function finish(): void {
     clearInterval(interval)
     interval = null
     if (resolveTrigger) {

@@ -572,7 +572,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
     let timeoutResolve: any = null
     let timeoutReject: any = null
 
-    function testComplete() {
+    function testComplete(): void {
       complete++
       if (complete === all.length - 1) {
         if (timeoutResolve) {
@@ -663,7 +663,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
     let timeoutResolve: any = null
     let timeoutReject: any = null
 
-    function testComplete() {
+    function testComplete(): void {
       complete++
       if (complete === all.length - 1) {
         if (timeoutResolve) {
@@ -754,7 +754,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
     let timeoutResolve: any = null
     let timeoutReject: any = null
 
-    function testComplete() {
+    function testComplete(): void {
       complete++
       if (complete === all.length - 1) {
         if (timeoutResolve) {
@@ -858,7 +858,7 @@ import { firestoreDeepEqual } from '../helpers/firestoreDeepEqual.js'
     let timeoutResolve: any = null
     let timeoutReject: any = null
 
-    function testComplete() {
+    function testComplete(): void {
       complete++
       if (complete === all.length - 1) {
         if (timeoutResolve) {

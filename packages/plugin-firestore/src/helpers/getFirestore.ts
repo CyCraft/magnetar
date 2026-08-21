@@ -139,7 +139,7 @@ getDocs(myQuery)
       logWithFlair(
         `execute \`magnetarDebugAddFirebaseToWindow()\` to add these Firebase JS SDK variables to the window for debugging: db, getDocs, onSnapshot, getCountFromServer, and, collection, collectionGroup, limit, or, orderBy, query, startAfter, where`,
       )
-      ;(window as any).magnetarDebugAddFirebaseToWindow = () => {
+      ;(window as any).magnetarDebugAddFirebaseToWindow = (): void => {
         ;(window as any).db = db
         ;(window as any).getDocs = getDocs
         ;(window as any).onSnapshot = onSnapshot
