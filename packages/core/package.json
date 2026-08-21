@@ -25,10 +25,10 @@
   "dependencies": {
     "@magnetarjs/types": "*",
     "@magnetarjs/utils": "*",
-    "getorset-anything": "^1.0.1",
-    "is-what": "^5.0.2",
-    "map-anything": "^3.0.1",
-    "merge-anything": "^6.0.2"
+    "getorset-anything": "^1.1.0",
+    "is-what": "^5.5.0",
+    "map-anything": "^3.1.1",
+    "merge-anything": "^6.0.6"
   },
   "keywords": [
     "vuex-easy-firestore",

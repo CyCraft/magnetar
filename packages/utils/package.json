@@ -24,9 +24,9 @@
   "homepage": "https://github.com/cycraft/magnetar#readme",
   "dependencies": {
     "@magnetarjs/types": "*",
-    "fast-sort": "^3.4.0",
-    "is-what": "^5.0.2",
-    "path-to-prop": "^3.0.1"
+    "fast-sort": "^3.4.1",
+    "is-what": "^5.5.0",
+    "path-to-prop": "^3.0.2"
   },
   "keywords": [
     "magnetar",

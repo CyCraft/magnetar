@@ -29,11 +29,11 @@
     "@magnetarjs/types": "*",
     "@magnetarjs/utils": "*",
     "copy-anything": "^4.1.0",
-    "getorset-anything": "^1.0.1",
-    "is-what": "^5.0.2",
-    "merge-anything": "^6.0.2",
-    "nestify-anything": "^3.0.2",
-    "path-to-prop": "^3.0.1"
+    "getorset-anything": "^1.1.0",
+    "is-what": "^5.5.0",
+    "merge-anything": "^6.0.6",
+    "nestify-anything": "^3.0.3",
+    "path-to-prop": "^3.0.2"
   },
   "keywords": [
     "magnetar-plugin",
