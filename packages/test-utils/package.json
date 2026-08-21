@@ -23,7 +23,7 @@
   "dependencies": {
     "@magnetarjs/types": "*",
     "@magnetarjs/utils": "*",
-    "copy-anything": "^4.0.2",
+    "copy-anything": "^4.1.0",
     "getorset-anything": "^1.0.1",
     "is-what": "^5.0.2",
     "merge-anything": "^6.0.2",
