@@ -40,7 +40,7 @@
     "chart.js": "^4.4.7"
   },
   "devDependencies": {
-    "@cycraft/eslint": "^0.4.4",
+    "@cycraft/eslint": "^0.4.7",
     "@cycraft/run-ts": "^0.0.7",
     "@cycraft/tsconfig": "^0.1.2",
     "@magnetarjs/core": "*",
