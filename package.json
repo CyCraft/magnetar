@@ -34,7 +34,7 @@
     "test:plugin-vue3": "npm run -w=@magnetarjs/plugin-vue3 test",
     "prettier:run": "prettier --write \"packages/*/src/**/*.{vue,ts}\" && prettier --write \"docs/**/*.{vue,ts,md}\"",
     "lint": "eslint",
-    "release": "npm run lint && npm run typecheck && npm run build && bumpp package-lock.json package.json packages/*/package.json --commit --push --tag && npm exec --workspaces -- npm publish --access public"
+    "release": "npm run lint && npm run typecheck && npm run build && bumpp package-lock.json package.json packages/*/package.json --no-push && npm publish --workspaces --access public && git push --follow-tags && gh release create $(git describe --tags --abbrev=0) -R cycraft/magnetar --generate-notes --notes \"$(git log --pretty='- %s  %h' $(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD~1)\""
   },
   "overrides": {
     "chart.js": "^4.4.7"
