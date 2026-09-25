@@ -34,7 +34,7 @@
     "test:plugin-vue3": "npm run -w=@magnetarjs/plugin-vue3 test",
     "prettier:run": "prettier --write \"packages/*/src/**/*.{vue,ts}\" && prettier --write \"docs/**/*.{vue,ts,md}\"",
     "lint": "eslint",
-    "release": "npm run lint && npm run typecheck && npm run build && bumpp package-lock.json package.json packages/*/package.json --no-push && npm publish --workspaces --access public && git push --follow-tags && gh release create $(git describe --tags --abbrev=0) -R cycraft/magnetar --generate-notes --notes \"$(git log --pretty='- %s  %h' $(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD~1)\""
+    "release": "npm run lint && npm run typecheck && npm run build && bumpp package.json packages/*/package.json --no-push --all -x \"npm install --package-lock-only --no-fund --no-audit\" && npm publish --workspaces --access public && git push --follow-tags && gh release create $(git describe --tags --abbrev=0) -R cycraft/magnetar --generate-notes --notes \"$(git log --pretty='- %s  %h' $(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD~1)\""
   },
   "overrides": {
     "chart.js": "^4.4.7"
@@ -51,7 +51,7 @@
     "@vue/typescript": "^1.8.20",
     "array-shuffle": "^3.0.0",
     "browser-env": "^3.3.0",
-    "bumpp": "^9.11.1",
+    "bumpp": "^12.3.0",
     "coloncli": "^0.1.0",
     "copyfiles": "^2.4.1",
     "del-cli": "^5.1.0",
