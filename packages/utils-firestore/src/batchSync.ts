@@ -32,12 +32,14 @@ export type BatchSync = {
   forceSyncEarly: () => Promise<void>
 }
 
-const newStack = (): Stack => ({
-  operationCount: 0,
-  resolves: [],
-  rejects: [],
-  batch: { insert: new Map(), assign: new Map(), merge: new Map(), replace: new Map(), deleteProp: new Map(), delete: new Set() }, // prettier-ignore
-})
+function newStack(): Stack {
+  return {
+    operationCount: 0,
+    resolves: [],
+    rejects: [],
+    batch: { insert: new Map(), assign: new Map(), merge: new Map(), replace: new Map(), deleteProp: new Map(), delete: new Set() }, // prettier-ignore
+  }
+}
 
 /**
  * Each write operation in a batch counts towards the 500 limit.

@@ -16,11 +16,15 @@ import { Magnetar } from '../../src/index.js'
 const CreatePluginLocal = PluginMockLocal.CreatePlugin
 const CreatePluginRemote = PluginMockRemote.CreatePlugin
 
-const getInitialDataCollection = (): [string, PokedexEntry][] => [
-  // doc entries
-  ['1', pokedex(1)],
-]
-const getInitialDataDocument = (): { name: string; age: number } => ({ name: 'Luca', age: 10 })
+function getInitialDataCollection(): [string, PokedexEntry][] {
+  return [
+    // doc entries
+    ['1', pokedex(1)],
+  ]
+}
+function getInitialDataDocument(): { name: string; age: number } {
+  return { name: 'Luca', age: 10 }
+}
 
 export type PokedexModuleData = PokedexEntry & { seen?: boolean; shouldFail?: string }
 

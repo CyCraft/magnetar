@@ -7,7 +7,9 @@ import { db } from './initFirebase.js'
 
 const CreatePluginLocal = PluginMockLocal.CreatePlugin
 
-const getInitialDataDocument = (): { name: string; age: number } => ({ name: 'Luca', age: 10 })
+function getInitialDataDocument(): { name: string; age: number } {
+  return { name: 'Luca', age: 10 }
+}
 
 export type PokedexModuleData = PokedexEntry & {
   seen?: boolean
