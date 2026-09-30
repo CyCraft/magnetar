@@ -37,10 +37,10 @@
     "release": "npm run lint && npm run typecheck && npm run build && bumpp package.json packages/*/package.json --no-push --all -x \"npm install --package-lock-only --no-fund --no-audit\" && npm publish --workspaces --access public && git push --follow-tags && gh release create $(git describe --tags --abbrev=0) -R cycraft/magnetar --generate-notes --notes \"$(git log --pretty='- %s  %h' $(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD~1)\""
   },
   "overrides": {
-    "chart.js": "^4.4.7"
+    "chart.js": "^4.5.1"
   },
   "devDependencies": {
-    "@cycraft/eslint": "^0.4.7",
+    "@cycraft/eslint": "^0.4.11",
     "@cycraft/run-ts": "^0.0.7",
     "@cycraft/tsconfig": "^0.1.2",
     "@magnetarjs/core": "*",
@@ -52,7 +52,7 @@
     "array-shuffle": "^3.0.0",
     "browser-env": "^3.3.0",
     "bumpp": "^12.3.0",
-    "coloncli": "^0.1.0",
+    "coloncli": "^0.1.5",
     "copyfiles": "^2.4.1",
     "del-cli": "^5.1.0",
     "esbuild": "^0.28.2",
@@ -61,13 +61,13 @@
     "firebase-admin": "^12.7.0",
     "npm-check-updates": "^16.14.20",
     "roll-anything": "^3.0.4",
-    "sass": "^1.103.1",
+    "sass": "^1.105.1",
     "turbo": "^1.13.4",
     "typescript": "^5.9.3",
     "vite": "^5.4.21",
     "vitepress": "1.6.4",
     "vitest": "^1.6.1",
-    "vue": "^3.5.41",
+    "vue": "^3.5.43",
     "vue-tsc": "^2.2.12"
   },
   "author": "Luca Ban - Mesqueeb",
@@ -84,5 +84,5 @@
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "npm@12.0.2"
+  "packageManager": "npm@12.2.0"
 }
